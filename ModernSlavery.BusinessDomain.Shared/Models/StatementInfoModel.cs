@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.BusinessDomain.Shared.Models
@@ -18,6 +19,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public DateTime? DraftStatementModifiedDate { get; set; }
         public bool DraftStatementIsEmpty { get; set; }
+
+        public List<string> GroupSubmissionInfo { get; set; }
 
     }
 }

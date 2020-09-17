@@ -66,6 +66,8 @@ namespace ModernSlavery.Core.Models
                    && string.IsNullOrWhiteSpace(PoBox);
         }
 
+        public bool HasAnyAddress() => !IsEmpty();
+
         public static AddressModel Create(OrganisationAddress address)
         {
             return address == null
@@ -81,6 +83,27 @@ namespace ModernSlavery.Core.Models
                     PostCode = address.PostCode,
                     PoBox = address.PoBox
                 };
+        }
+
+        public bool IsValidAddress()
+        {
+            var isUK = Country.IsUK();
+            if (isUK)
+                return !string.IsNullOrWhiteSpace(Address1)
+                       || !string.IsNullOrWhiteSpace(Address2)
+                       || !string.IsNullOrWhiteSpace(Address3)
+                       || !string.IsNullOrWhiteSpace(City)
+                       || !string.IsNullOrWhiteSpace(PostCode)
+                       || !string.IsNullOrWhiteSpace(PoBox);
+
+            return !string.IsNullOrWhiteSpace(Country)
+                   && (!string.IsNullOrWhiteSpace(Address1)
+                       || !string.IsNullOrWhiteSpace(Address2)
+                       || !string.IsNullOrWhiteSpace(Address3)
+                       || !string.IsNullOrWhiteSpace(City)
+                       || !string.IsNullOrWhiteSpace(County)
+                       || !string.IsNullOrWhiteSpace(PostCode)
+                       || !string.IsNullOrWhiteSpace(PoBox));
         }
 
         public override bool Equals(object obj)

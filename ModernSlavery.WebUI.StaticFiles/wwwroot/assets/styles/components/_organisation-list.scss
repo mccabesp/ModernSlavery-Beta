@@ -1,0 +1,94 @@
+﻿.organisation-list {
+
+    div {
+        p
+        {
+            margin:0px;
+        }
+    }
+
+    .govuk-inset-text {
+        border-left: 10px solid $govuk-brand-colour;
+        margin-top: 0px;
+        margin-bottom:0px;
+    }
+
+    .govuk-blue {
+        color: $govuk-brand-colour;
+    } 
+}
+
+button.link-button{
+    border: none;
+    background: none;
+    text-decoration: underline;
+    cursor: pointer;
+    color: $govuk-brand-colour;
+    font-size: 19px;
+
+    &.find-organisation {
+        padding:0px;
+        margin-bottom:20px;
+    }   
+}
+
+.organisation-input-cell {
+    display: table-cell;
+    width: 100%;
+    vertical-align: bottom;
+
+    &.textbox{
+        padding-right:20px;
+    }
+    button{
+        margin-bottom:0px;
+    }
+}
+div#organisation-accordion {
+    border-bottom: none;
+
+    .govuk-accordion__controls {
+        display: none
+    }
+}
+
+button#organisation-accordion span {
+    font-weight: normal;
+}
+
+
+.govuk-summary-list__value.small {
+    display: none;
+}
+
+.govuk-inset-text.floating-summary {
+    background-color: #abcae5; // this is 50% tint of govuk-colour("light-blue");
+    border-left: 10px solid $govuk-brand-colour;
+}
+
+
+@media (max-width: 40.0525em) {
+
+    .govuk-summary-list__row {
+        position: relative;
+
+        &.header {
+            display: none;
+        }
+    }
+
+    .govuk-summary-list__actions {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    .govuk-summary-list__value.wide {
+        display: none;
+    }
+
+    .govuk-summary-list__value.small {
+        display: block;
+    }
+}
+

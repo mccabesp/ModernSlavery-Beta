@@ -1,0 +1,77 @@
+﻿@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model GroupStatusViewModel
+@if (!string.IsNullOrWhiteSpace(Model.BackUrl))
+{
+    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            @await Html.GovUkValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.ReturnToReviewPage);
+            @Html.HiddenFor(m => m.Submitted);
+            @Html.HiddenFor(m => m.OrganisationName);
+            @Html.HiddenFor(m => m.SubmissionDeadline);
+
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
+
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Read about group statements and individual statements</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p>
+                        <b>Group statements for organisations in a group</b><br />
+                        Where several organisations in a group (for example, a parent organisation and one or more subsidiaries) are required to publish a statement, they can agree to produce a combined group statement on behalf of all relevant organisations in the group. The statement must cover the steps that all relevant organisations have taken to tackle modern slavery risks in their business and supply chain.
+                    </p>
+                    <p>
+                        <b>Individual statements for organisations in a group</b><br />
+                        If there is no combined group statement, each organisation in the group that is required to publish a statement must produce its own individual statement.
+                    </p>
+                    <p>
+                        <b>If your organisation is not part of a group</b><br />
+                        Organisations that are not part of a group must produce individual statements if they are required to publish one (or want to produce one voluntarily).
+                    </p>
+                </div>
+            </details>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading">
+                            The @(Model.ReportingDeadlineYear-1) to @(Model.ReportingDeadlineYear) modern slavery statement for @(Model.OrganisationName) covers:
+                        </h2>
+                    </legend>
+                    <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input asp-for="GroupSubmission" value="false" id="GroupSubmission_False" checked="@(Model.GroupSubmission==false)" class="govuk-radios__input" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="GroupSubmission_False">
+                                a single organisation
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input asp-for="GroupSubmission" value="true" id="GroupSubmission_True" checked="@(Model.GroupSubmission==true)" class="govuk-radios__input" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="GroupSubmission_True">
+                                a group of organisations
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                Continue
+            </button>
+
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+                Cancel
+            </button>
+        }
+    </div>
+</div>
