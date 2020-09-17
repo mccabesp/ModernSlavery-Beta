@@ -40,7 +40,7 @@ namespace ModernSlavery.Core.Models
 
         public string Address { get; set; }
         public virtual int? StatementDeadlineYear { get; set; }
-        public DateTime Modified { get; set; } = VirtualDateTime.Now;
+        public virtual DateTime Modified { get; set; } = VirtualDateTime.Now;
         #endregion
 
         public OrganisationSearchModel SetSearchDocumentKey()

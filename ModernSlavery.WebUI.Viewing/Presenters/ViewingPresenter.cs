@@ -90,7 +90,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
                 searchParams.PageSize,
                 filter: searchParams.ToFilterQuery(),
                 facets: facets,
-                orderBy: string.IsNullOrWhiteSpace(searchParams.Keywords) ? nameof(OrganisationSearchModel.OrganisationName) : null,
+                orderBy: searchParams.ToSearchCriteria(),
                 searchFields: searchParams.SearchFields,
                 searchMode: searchParams.SearchMode);
         }
@@ -182,19 +182,15 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         public List<OptionSelect> GetReportingYearOptions(IEnumerable<int> filterSnapshotYears)
         {
             // setup the filters
-            var firstYear = _sharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear;
-            var currentYear = _sharedBusinessLogic.GetReportingStartDate(SectorTypes.Public).Year;
-            var allYears = new List<int>();
-            for (var year = firstYear; year <= currentYear; year++) allYears.Add(year);
-
+            var reportingDeadlines = _sharedBusinessLogic.GetReportingDeadlines(SectorTypes.Public);
             var sources = new List<OptionSelect>();
-            for (var year = currentYear; year >= firstYear; year--)
+            foreach (var reportingDeadline in reportingDeadlines)
             {
-                var isChecked = filterSnapshotYears != null && filterSnapshotYears.Any(x => x == year);
+                var isChecked = filterSnapshotYears != null && filterSnapshotYears.Any(x => x == reportingDeadline.Year);
                 sources.Add(
                     new OptionSelect
                     {
-                        Id = year.ToString(), Label = $"{year} to {year + 1}", Value = year.ToString(),
+                        Id = reportingDeadline.Year.ToString(), Label = $"{reportingDeadline.Year-1} to {reportingDeadline.Year}", Value = reportingDeadline.Year.ToString(),
                         Checked = isChecked
                         // Disabled = facetResults.Count == 0 && !isChecked
                     });

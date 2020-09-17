@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Models;
 using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
 
 namespace ModernSlavery.WebUI.Viewing.Models
@@ -13,13 +14,13 @@ namespace ModernSlavery.WebUI.Viewing.Models
     {
         public string Keywords { get; set; }
 
-        public IEnumerable<short> FilterSectorTypeIds { get; set; }
+        public IList<short> FilterSectorTypeIds { get; set; } = new List<short>();
 
-        public IEnumerable<byte> FilterTurnoverRanges { get; set; }
+        public IList<byte> FilterTurnoverRanges { get; set; } = new List<byte>();
 
-        public IEnumerable<int> FilterReportedYears { get; set; }
+        public IList<int> FilterReportedYears { get; set; } = new List<int>();
 
-        public IEnumerable<int> FilterCodeIds { get; set; }
+        public int FilterCount => FilterSectorTypeIds.Count + FilterTurnoverRanges.Count + FilterReportedYears.Count;
 
         public bool SubmittedOnly => string.IsNullOrWhiteSpace(Keywords);
 
@@ -53,19 +54,19 @@ namespace ModernSlavery.WebUI.Viewing.Models
         {
             var queryFilter = new List<string>();
 
-            if (FilterTurnoverRanges != null && FilterTurnoverRanges.Any())
+            if (FilterTurnoverRanges.Count>0)
             {
                 var turnoverQuery = FilterTurnoverRanges.Select(x => $"Turnover eq {x}");
                 queryFilter.Add($"({string.Join(" or ", turnoverQuery)})");
             }
 
-            if (FilterSectorTypeIds != null && FilterSectorTypeIds.Any())
+            if (FilterSectorTypeIds.Count > 0)
             {
                 var sectorQuery = FilterSectorTypeIds.Select(x => $"id eq {x}");
                 queryFilter.Add($"SectorTypeIds/any(id: {string.Join(" or ", sectorQuery)})");
             }
 
-            if (FilterReportedYears != null && FilterReportedYears.Any())
+            if (FilterReportedYears.Count > 0)
             {
                 var deadlineQuery = FilterReportedYears.Select(x => $"StatementDeadlineYear eq {x}");
                 queryFilter.Add($"({string.Join(" or ", deadlineQuery)})");
@@ -79,5 +80,14 @@ namespace ModernSlavery.WebUI.Viewing.Models
 
             return string.Join(" and ", queryFilter);
         }
+
+        public string ToSearchCriteria()
+        {
+            if (string.IsNullOrWhiteSpace(Keywords) && FilterCount == 0)
+                return $"{nameof(OrganisationSearchModel.Modified)} desc, {nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.StatementDeadlineYear)} desc";
+
+            return $"{nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.StatementDeadlineYear)} desc";
+        }
+
     }
 }

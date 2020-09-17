@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Infrastructure.Search
@@ -48,6 +49,9 @@ namespace ModernSlavery.Infrastructure.Search
         [IsFilterable] 
         [IsFacetable] 
         public override int? StatementDeadlineYear { get; set; }
+
+        [IsSortable]
+        public override DateTime Modified { get; set;  } = VirtualDateTime.Now;
 
         #endregion
     }
