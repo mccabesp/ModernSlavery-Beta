@@ -20,8 +20,8 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         #endregion
 
-        [Route("/error/")]
-        [Route("/error/{errorCode?}")]
+        [HttpGet("/error/")]
+        [HttpGet("/error/{errorCode?}")]
         public IActionResult Default(int errorCode = 500)
         {
             if (errorCode == 0)
@@ -54,7 +54,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             return View("CustomError", model);
         }
 
-        [Route("/error/service-unavailable")]
+        [HttpGet("/error/service-unavailable")]
         public IActionResult ServiceUnavailable()
         {
             var model = WebService.ErrorViewModelFactory.Create(1119);

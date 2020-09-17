@@ -40,7 +40,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             _statementBusinessLogic = statementBusinessLogic;
         }
 
-        [Route("Init")]
+        [HttpGet("Init")]
         public IActionResult Init()
         {
             if (!SharedBusinessLogic.SharedOptions.IsProduction())
