@@ -44,6 +44,7 @@ namespace ModernSlavery.Infrastructure.Search
         [IsFacetable] 
         public override int[] SectorTypeIds { get; set; }
 
+        [IsSortable]
         [IsFilterable] 
         [IsFacetable] 
         public override int? StatementDeadlineYear { get; set; }

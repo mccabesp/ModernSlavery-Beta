@@ -21,6 +21,8 @@ namespace ModernSlavery.WebUI.Viewing.Models
 
         public IEnumerable<int> FilterCodeIds { get; set; }
 
+        public bool SubmittedOnly => string.IsNullOrWhiteSpace(Keywords);
+
         public int Page { get; set; } = 1;
 
         public string SearchFields { get; set; }
@@ -51,30 +53,28 @@ namespace ModernSlavery.WebUI.Viewing.Models
         {
             var queryFilter = new List<string>();
 
-            if (FilterSectorTypeIds != null && FilterSectorTypeIds.Any())
-            {
-                var sectorQuery = FilterSectorTypeIds.Select(x => $"id eq '{x}'");
-                queryFilter.Add($"SicSectionIds/any(id: {string.Join(" or ", sectorQuery)})");
-            }
-
             if (FilterTurnoverRanges != null && FilterTurnoverRanges.Any())
             {
-                var sizeQuery = FilterTurnoverRanges.Select(x => $"Size eq {x}");
-                queryFilter.Add($"({string.Join(" or ", sizeQuery)})");
+                var turnoverQuery = FilterTurnoverRanges.Select(x => $"Turnover eq {x}");
+                queryFilter.Add($"({string.Join(" or ", turnoverQuery)})");
             }
 
-            if (FilterCodeIds != null && FilterCodeIds.Any())
+            if (FilterSectorTypeIds != null && FilterSectorTypeIds.Any())
             {
-                var codeIdQuery = FilterCodeIds.Select(x => $"id eq '{x}'");
-                queryFilter.Add($"SicCodeIds/any(id: {string.Join(" or ", codeIdQuery)})");
+                var sectorQuery = FilterSectorTypeIds.Select(x => $"id eq {x}");
+                queryFilter.Add($"SectorTypeIds/any(id: {string.Join(" or ", sectorQuery)})");
             }
 
-            var anyReportedYearParam = "";
             if (FilterReportedYears != null && FilterReportedYears.Any())
             {
-                anyReportedYearParam = "ReportedYear: " +
-                                       string.Join(" or ", FilterReportedYears.Select(x => $"ReportedYear eq '{x}'"));
-                queryFilter.Add($"ReportedYears/any({anyReportedYearParam})");
+                var deadlineQuery = FilterReportedYears.Select(x => $"StatementDeadlineYear eq {x}");
+                queryFilter.Add($"({string.Join(" or ", deadlineQuery)})");
+            }
+
+            //Only show submitted organisations
+            if (SubmittedOnly)
+            {
+                queryFilter.Add($"StatementId ne null");
             }
 
             return string.Join(" and ", queryFilter);

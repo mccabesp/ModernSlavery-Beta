@@ -23,7 +23,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public IEnumerable<short> s { get; set; }
 
         // Turnover Range
-        public IEnumerable<int> tr { get; set; }
+        public IEnumerable<byte> tr { get; set; }
 
         // Reporting Year
         public IEnumerable<int> y { get; set; }
