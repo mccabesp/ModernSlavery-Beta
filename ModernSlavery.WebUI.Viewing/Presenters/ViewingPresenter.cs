@@ -81,10 +81,9 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             };
         }
 
-        private async Task<PagedResult<OrganisationSearchModel>> DoSearchAsync(OrganisationSearchParameters searchParams,
-    Dictionary<string, Dictionary<object, long>> facets)
+        private async Task<PagedResult<OrganisationSearchModel>> DoSearchAsync(OrganisationSearchParameters searchParams,Dictionary<string, Dictionary<object, long>> facets)
         {
-            return await _viewingService.SearchBusinessLogic.OrganisationSearchRepository.SearchAsync(
+            return await _viewingService.SearchBusinessLogic.OrganisationSearchRepository.SearchDocumentsAsync(
                 searchParams.Keywords, // .ToSearchQuery(),
                 searchParams.Page,
                 searchParams.PageSize,

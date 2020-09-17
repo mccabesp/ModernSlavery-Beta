@@ -111,11 +111,98 @@ namespace ModernSlavery.Infrastructure.Search
             await CreateIndexIfNotExistsAsync(serviceClient, indexName);
         }
 
-        /// <summary>
-        ///     Adds all new records to index
-        /// </summary>
-        /// <param name="newRecords">The new or existing records which should be indexed.</param>
-        public async Task AddOrUpdateIndexDataAsync(IEnumerable<OrganisationSearchModel> newRecords)
+        private async Task CreateIndexIfNotExistsAsync(ISearchServiceClient serviceClient, string indexName)
+        {
+            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
+
+            if (await serviceClient.Indexes.ExistsAsync(indexName)) return;
+
+            var index = new Index { Name = indexName, Fields = FieldBuilder.BuildForType<AzureOrganisationSearchModel>() };
+
+            index.Suggesters = new List<Suggester>
+            {
+                new Suggester(
+                    suggestorName,
+                    nameof(OrganisationSearchModel.OrganisationName),
+                    nameof(OrganisationSearchModel.Abbreviations))
+            };
+
+            var charFilterRemoveAmpersand = new MappingCharFilter("msu_remove_Ampersand", new List<string> { "&=>" });
+            var charFilterRemoveDot = new MappingCharFilter("msu_remove_Dot", new List<string> { ".=>" });
+            var charFilterRemoveLtdInfoCaseInsensitive = new PatternReplaceCharFilter(
+                "msu_patternReplaceCharFilter_Ltd",
+                "(?i)(limited|ltd|llp| uk|\\(uk\\)|-uk)[\\.]*",
+                string.Empty); // case insensitive 'limited' 'ltd', 'llp', ' uk', '(uk)', '-uk' followed by zero or more dots (to cater for ltd. and some mis-punctuated limited..)
+            var charFilterRemoveWhitespace = new PatternReplaceCharFilter(
+                "msu_patternReplaceCharFilter_removeWhitespace",
+                "\\s",
+                string.Empty);
+
+            index.CharFilters = new List<CharFilter>
+            {
+                charFilterRemoveAmpersand, charFilterRemoveDot, charFilterRemoveLtdInfoCaseInsensitive,
+                charFilterRemoveWhitespace
+            };
+
+            var edgeNGramTokenFilterFront =
+                new EdgeNGramTokenFilterV2("msu_edgeNGram_front", 3, 300, EdgeNGramTokenFilterSide.Front);
+            var edgeNGramTokenFilterBack =
+                new EdgeNGramTokenFilterV2("msu_edgeNGram_back", 3, 300, EdgeNGramTokenFilterSide.Back);
+            index.TokenFilters = new List<TokenFilter> { edgeNGramTokenFilterFront, edgeNGramTokenFilterBack };
+
+            var standardTokenizer = new StandardTokenizerV2("msu_standard_v2_tokenizer");
+            var keywordTokenizer = new KeywordTokenizerV2("msu_keyword_v2_tokenizer");
+
+            index.Tokenizers = new List<Tokenizer> { standardTokenizer, keywordTokenizer };
+
+            var suffixAnalyzer = new CustomAnalyzer(
+                "msu_suffix",
+                standardTokenizer.Name,
+                new List<TokenFilterName> { TokenFilterName.Lowercase, edgeNGramTokenFilterBack.Name },
+                new List<CharFilterName> { charFilterRemoveAmpersand.Name, charFilterRemoveLtdInfoCaseInsensitive.Name });
+
+            var completeTokenAnalyzer = new CustomAnalyzer(
+                "msu_prefix_completeToken",
+                keywordTokenizer.Name,
+                new List<TokenFilterName> { TokenFilterName.Lowercase, edgeNGramTokenFilterFront.Name },
+                new List<CharFilterName>
+                {
+                    charFilterRemoveDot.Name,
+                    charFilterRemoveAmpersand.Name,
+                    charFilterRemoveLtdInfoCaseInsensitive.Name,
+                    charFilterRemoveWhitespace.Name
+                });
+
+            index.Analyzers = new List<Analyzer> { suffixAnalyzer, completeTokenAnalyzer };
+
+            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PartialNameForSuffixSearches)).Analyzer =
+                suffixAnalyzer.Name;
+            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PartialNameForSuffixSearches)).SynonymMaps =
+                new[] { synonymMapName };
+
+            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PartialNameForCompleteTokenSearches))
+                    .Analyzer =
+                completeTokenAnalyzer.Name;
+            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PartialNameForCompleteTokenSearches))
+                    .SynonymMaps =
+                new[] { synonymMapName };
+
+            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.OrganisationName)).SynonymMaps = new[] { synonymMapName };
+
+            //Add the synonyms if they dont already exist
+            if (!await serviceClient.SynonymMaps.ExistsAsync(synonymMapName))
+                serviceClient.SynonymMaps.CreateOrUpdate(
+                    new SynonymMap
+                    {
+                        Name = synonymMapName,
+                        //Format = "solr", cannot set after upgrade from v5.03 to version 9.0.0
+                        Synonyms = "coop, co-operative"
+                    });
+
+            await serviceClient.Indexes.CreateAsync(index);
+        }
+
+        public async Task AddOrUpdateDocumentsAsync(IEnumerable<OrganisationSearchModel> newRecords)
         {
             if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
@@ -168,11 +255,7 @@ namespace ModernSlavery.Infrastructure.Search
                 });
         }
 
-        /// <summary>
-        ///     Removes old records from index
-        /// </summary>
-        /// <param name="oldRecords">The old records which should be deleted from the index.</param>
-        public async Task<int> RemoveFromIndexAsync(IEnumerable<OrganisationSearchModel> oldRecords)
+        public async Task<int> DeleteDocumentsAsync(IEnumerable<OrganisationSearchModel> oldRecords)
         {
             if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
@@ -228,7 +311,7 @@ namespace ModernSlavery.Infrastructure.Search
             return deleteCount;
         }
 
-        public async Task<OrganisationSearchModel> GetAsync(string key, string selectFields = null)
+        public async Task<OrganisationSearchModel> GetDocumentAsync(string key, string selectFields = null)
         {
             if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
@@ -242,7 +325,7 @@ namespace ModernSlavery.Infrastructure.Search
             return result;
         }
 
-        public async Task<IList<OrganisationSearchModel>> ListAsync(string selectFields = null, string filter=null)
+        public async Task<IList<OrganisationSearchModel>> ListDocumentsAsync(string selectFields = null, string filter=null)
         {
             if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
@@ -251,7 +334,7 @@ namespace ModernSlavery.Infrastructure.Search
             var resultsList = new List<OrganisationSearchModel>();
             do
             {
-                var searchResults = await SearchAsync(null,currentPage,selectFields: selectFields, filter:filter);
+                var searchResults = await SearchDocumentsAsync(null,currentPage,selectFields: selectFields, filter:filter);
                 totalPages = searchResults.PageCount;
                 resultsList.AddRange(searchResults.Results);
                 currentPage++;
@@ -268,102 +351,11 @@ namespace ModernSlavery.Infrastructure.Search
 
             if (!await serviceClient.Indexes.ExistsAsync(IndexName)) return 0;
 
-            var searchResults = await SearchAsync(null, 1);
+            var searchResults = await SearchDocumentsAsync(null, 1);
             return searchResults.ActualRecordTotal;
         }
 
-
-        /// <summary>
-        ///     Returns a list of search suggestions based on input text
-        /// </summary>
-        /// <param name="searchText"></param>
-        /// <param name="fuzzy">
-        ///     Gets or sets a value indicating whether to use fuzzy matching for the suggestion
-        ///     query. Default is true. when set to true, the query will find suggestions even
-        ///     if there's a substituted or missing character in the search text. While this
-        ///     provides a better experience in some scenarios it comes at a performance cost
-        ///     as fuzzy suggestion searches are slower and consume more resources.
-        /// </param>
-        /// <param name="maxRecords">Maximum number of suggestions to return (default=10)</param>
-        /// </param>
-        public async Task<IEnumerable<KeyValuePair<string, OrganisationSearchModel>>> SuggestAsync(string searchText,
-            string searchFields = null,
-            string selectFields = null,
-            bool fuzzy = true,
-            int maxRecords = 10)
-        {
-            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
-
-            // Execute search based on query string
-            var sp = new SuggestParameters {UseFuzzyMatching = fuzzy, Top = maxRecords};
-
-            //Specify the fields to search
-            if (!string.IsNullOrWhiteSpace(searchFields)) sp.SearchFields = searchFields.SplitI().ToList();
-
-            //Limit result fields
-            if (!string.IsNullOrWhiteSpace(selectFields)) sp.Select = selectFields.SplitI().ToList();
-
-            var indexClient = await _indexClient.Value;
-
-            var results =
-                await indexClient.Documents.SuggestAsync<OrganisationSearchModel>(searchText, suggestorName, sp);
-            var suggestions =
-                results?.Results.Select(s => new KeyValuePair<string, OrganisationSearchModel>(s.Text, s.Document));
-
-            return suggestions;
-        }
-
-
-        /// <summary>
-        ///     Executes an advanced search using pagination, sorting, filters, facets, and highlighting.
-        /// </summary>
-        /// <param name="searchText">The text used for the search. When empty all results are returned.</param>
-        /// <param name="totalRecords">The returned total number of records in the results</param>
-        /// <param name="currentPage">The current page of results to return</param>
-        /// <param name="pageSize">The size of the result set to return (default=20). Maximum is 1000.</param>
-        /// <param name="filter">
-        ///     A set of comma or semicolon separated field names to searching.
-        ///     Only fields marked with the 'IsSearchable' attribute can be included.
-        ///     The default is empty and all searchable fields will be searched.
-        ///     ///
-        /// </param>
-        /// <param name="selectFields"></param>
-        /// A set of comma or semicolon separated field names to return values for.
-        /// Default is empty and will return all field values
-        /// <param name="orderBy">
-        ///     A set of comma or semicolon separated sort terms.
-        ///     Default is empty and will return results sorted by score relevance.
-        ///     For example, OrganisationName, SicName DESC
-        ///     Only fields marked with the 'IsSortable' attribute can be included.
-        /// </param>
-        /// <param name="facets">
-        ///     Specifies the facets to query and returns the facet results
-        ///     The default is empty and no facets will be applied.
-        ///     Only fields marked with the 'IsFacetable' attribute can be included.
-        ///     Call by specifing field names as keys in the dictionary.
-        ///     The resulting dictionary for each field returns all possible values and their count for that field.
-        ///     ///
-        /// </param>
-        /// <param name="filter">
-        ///     A filter expression using OData syntax (see
-        ///     https://docs.microsoft.com/en-us/rest/api/searchservice/odata-expression-syntax-for-azure-search)
-        ///     The default is empty and no filter will be applied.
-        ///     Only fields marked with the 'IsFilterable' attribute can be included.
-        ///     String comparisons are case sensitive.
-        ///     You can also use the operators '==','!=', '>=', '>', '<=', '<', '&&', '||' which will be automatically replaced with OData counterparts 'EQ','NE', 'GE', 'GT', 'LE', 'LT', 'AND', 'OR'.
-        /// Special functions also include search.in(myfield, 'a, b, c')
-        /// /// </param>
-        /// <param name="highlights">
-        ///     A set of comma or semicolon separated field names used for hit highlights.
-        ///     Only fields marked with the 'IsSearchable' attribute can be included.
-        ///     By default, Azure Search returns up to 5 highlights per field.
-        ///     The limit is configurable per field by appending -
-        ///     <max # of highlights>
-        ///         following the field name.
-        ///         For example, highlight=title-3,description-10 returns up to 3 highlighted hits from the title field and up to
-        ///         10 hits from the description field. <max # of highlights> must be an integer between 1 and 1000 inclusive.
-        /// </param>
-        public async Task<PagedResult<OrganisationSearchModel>> SearchAsync(string searchText,
+        public async Task<PagedResult<OrganisationSearchModel>> SearchDocumentsAsync(string searchText,
             int currentPage,
             int pageSize = 20,
             string searchFields = null,
@@ -450,99 +442,5 @@ namespace ModernSlavery.Infrastructure.Search
             return searchResults;
         }
 
-        /// <summary>
-        ///     Create the default index if it doesnt already exist
-        /// </summary>
-        /// <returns>The existing or new index</returns>
-        private async Task CreateIndexIfNotExistsAsync(ISearchServiceClient serviceClient, string indexName)
-        {
-            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
-
-            if (await serviceClient.Indexes.ExistsAsync(indexName)) return;
-
-            var index = new Index {Name = indexName, Fields = FieldBuilder.BuildForType<AzureOrganisationSearchModel>()};
-
-            index.Suggesters = new List<Suggester>
-            {
-                new Suggester(
-                    suggestorName,
-                    nameof(OrganisationSearchModel.OrganisationName),
-                    nameof(OrganisationSearchModel.Abbreviations))
-            };
-
-            var charFilterRemoveAmpersand = new MappingCharFilter("msu_remove_Ampersand", new List<string> {"&=>"});
-            var charFilterRemoveDot = new MappingCharFilter("msu_remove_Dot", new List<string> {".=>"});
-            var charFilterRemoveLtdInfoCaseInsensitive = new PatternReplaceCharFilter(
-                "msu_patternReplaceCharFilter_Ltd",
-                "(?i)(limited|ltd|llp| uk|\\(uk\\)|-uk)[\\.]*",
-                string.Empty); // case insensitive 'limited' 'ltd', 'llp', ' uk', '(uk)', '-uk' followed by zero or more dots (to cater for ltd. and some mis-punctuated limited..)
-            var charFilterRemoveWhitespace = new PatternReplaceCharFilter(
-                "msu_patternReplaceCharFilter_removeWhitespace",
-                "\\s",
-                string.Empty);
-
-            index.CharFilters = new List<CharFilter>
-            {
-                charFilterRemoveAmpersand, charFilterRemoveDot, charFilterRemoveLtdInfoCaseInsensitive,
-                charFilterRemoveWhitespace
-            };
-
-            var edgeNGramTokenFilterFront =
-                new EdgeNGramTokenFilterV2("msu_edgeNGram_front", 3, 300, EdgeNGramTokenFilterSide.Front);
-            var edgeNGramTokenFilterBack =
-                new EdgeNGramTokenFilterV2("msu_edgeNGram_back", 3, 300, EdgeNGramTokenFilterSide.Back);
-            index.TokenFilters = new List<TokenFilter> {edgeNGramTokenFilterFront, edgeNGramTokenFilterBack};
-
-            var standardTokenizer = new StandardTokenizerV2("msu_standard_v2_tokenizer");
-            var keywordTokenizer = new KeywordTokenizerV2("msu_keyword_v2_tokenizer");
-
-            index.Tokenizers = new List<Tokenizer> {standardTokenizer, keywordTokenizer};
-
-            var suffixAnalyzer = new CustomAnalyzer(
-                "msu_suffix",
-                standardTokenizer.Name,
-                new List<TokenFilterName> {TokenFilterName.Lowercase, edgeNGramTokenFilterBack.Name},
-                new List<CharFilterName> {charFilterRemoveAmpersand.Name, charFilterRemoveLtdInfoCaseInsensitive.Name});
-
-            var completeTokenAnalyzer = new CustomAnalyzer(
-                "msu_prefix_completeToken",
-                keywordTokenizer.Name,
-                new List<TokenFilterName> {TokenFilterName.Lowercase, edgeNGramTokenFilterFront.Name},
-                new List<CharFilterName>
-                {
-                    charFilterRemoveDot.Name,
-                    charFilterRemoveAmpersand.Name,
-                    charFilterRemoveLtdInfoCaseInsensitive.Name,
-                    charFilterRemoveWhitespace.Name
-                });
-
-            index.Analyzers = new List<Analyzer> {suffixAnalyzer, completeTokenAnalyzer};
-
-            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PartialNameForSuffixSearches)).Analyzer =
-                suffixAnalyzer.Name;
-            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PartialNameForSuffixSearches)).SynonymMaps =
-                new[] {synonymMapName};
-
-            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PartialNameForCompleteTokenSearches))
-                    .Analyzer =
-                completeTokenAnalyzer.Name;
-            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.PartialNameForCompleteTokenSearches))
-                    .SynonymMaps =
-                new[] {synonymMapName};
-
-            index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.OrganisationName)).SynonymMaps = new[] {synonymMapName};
-
-            //Add the synonyms if they dont already exist
-            if (!await serviceClient.SynonymMaps.ExistsAsync(synonymMapName))
-                serviceClient.SynonymMaps.CreateOrUpdate(
-                    new SynonymMap
-                    {
-                        Name = synonymMapName,
-                        //Format = "solr", cannot set after upgrade from v5.03 to version 9.0.0
-                        Synonyms = "coop, co-operative"
-                    });
-
-            await serviceClient.Indexes.CreateAsync(index);
-        }
     }
 }

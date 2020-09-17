@@ -30,36 +30,36 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="organisation">The organisation whos search index documents to retrieve</param>
         /// <param name="statementDeadlineYear">The reporting year whos search index documents to retrieve or 0 if all years</param>
         /// <returns>The list of search index documents from Azure</returns>
-        Task<IEnumerable<OrganisationSearchModel>> GetOrganisationSearchIndexesAsync(Organisation organisation, int statementDeadlineYear = 0, bool keyOnly=true);
+        Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(Organisation organisation, int statementDeadlineYear = 0, bool keyOnly=true);
 
         /// <summary>
         /// Delete old search index documents for a specific organisation entity
         /// </summary>
         /// <param name="organisation">The organisation whos search index documents to remove</param>
-        Task RemoveOrganisationSearchIndexesAsync(Organisation organisation);
+        Task RemoveSearchDocumentsAsync(Organisation organisation);
 
         /// <summary>
         /// Delete old search index documents
         /// </summary>
         /// <param name="searchIndexes">The search index documents to remove</param>
-        Task RemoveSearchIndexesAsync(IEnumerable<OrganisationSearchModel> searchIndexes);
-        
+        Task RemoveSearchDocumentsAsync(IEnumerable<OrganisationSearchModel> searchIndexes);
+
         /// <summary>
         /// Add new search index documents, update existing and delete old documents for all organisation entities in the database
         /// </summary>
-        Task UpdateOrganisationSearchIndexAsync();
+        Task RefreshSearchDocumentsAsync();
 
         /// <summary>
         /// Add new search index documents, update existing and delete old documents for specified list of organisation entities
         /// </summary>
         /// <param name="organisations">The organisations whos search index documents we want to update</param>
-        Task UpdateOrganisationSearchIndexAsync(IEnumerable<Organisation> organisations);
+        Task RefreshSearchDocumentsAsync(IEnumerable<Organisation> organisations);
 
         /// <summary>
         /// Adds new search index documents, update existing and delete old documents for a specific organisation entity
         /// </summary>
         /// <param name="organisation">The organisation whos search index documents to update</param>
         /// <param name="statementDeadlineYear">The reporting year whos search index documents to update or 0 if all years</param>
-        Task UpdateOrganisationSearchIndexAsync(Organisation organisation, int statementDeadlineYear = 0);
+        Task RefreshSearchDocumentsAsync(Organisation organisation, int statementDeadlineYear = 0);
     }
 }

@@ -689,7 +689,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 });
 
             //Update the search indexes
-            await _searchBusinessLogic.UpdateOrganisationSearchIndexAsync(newStatement.Organisation,newStatement.SubmissionDeadline.Year);
+            await _searchBusinessLogic.RefreshSearchDocumentsAsync(newStatement.Organisation,newStatement.SubmissionDeadline.Year);
 
             return new Outcome<StatementErrors>();
         }

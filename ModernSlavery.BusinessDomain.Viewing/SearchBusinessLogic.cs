@@ -17,13 +17,16 @@ namespace ModernSlavery.BusinessDomain.Viewing
 {
     public class SearchBusinessLogic : ISearchBusinessLogic
     {
+        #region Dependencies
         public SearchOptions SearchOptions { get; }
         public readonly SharedOptions _sharedOptions;
         private readonly IDataRepository _dataRepository;
         private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
         public ISearchRepository<OrganisationSearchModel> OrganisationSearchRepository { get; set; }
         public IAuditLogger SearchLog { get; }
+        #endregion
 
+        #region Constructor
         public SearchBusinessLogic(
             SearchOptions searchOptions,
             SharedOptions sharedOptions,
@@ -40,8 +43,10 @@ namespace ModernSlavery.BusinessDomain.Viewing
             OrganisationSearchRepository = organisationSearchRepository;
             SearchLog = searchLog;
         }
+        #endregion
 
-        public async Task UpdateOrganisationSearchIndexAsync(IEnumerable<Organisation> organisations)
+        #region RefreshSearchDocuments
+        public async Task RefreshSearchDocumentsAsync(IEnumerable<Organisation> organisations)
         {
             //Remove the test organisations
             if (!string.IsNullOrWhiteSpace(_sharedOptions.TestPrefix))
@@ -54,16 +59,16 @@ namespace ModernSlavery.BusinessDomain.Viewing
             await OrganisationSearchRepository.CreateIndexIfNotExistsAsync(OrganisationSearchRepository.IndexName).ConfigureAwait(false);
 
             //Get the old indexes
-            var oldSearchModels = await OrganisationSearchRepository.ListAsync(nameof(OrganisationSearchModel.SearchDocumentKey));
+            var oldSearchModels = await OrganisationSearchRepository.ListDocumentsAsync(nameof(OrganisationSearchModel.SearchDocumentKey));
 
             //Create the new indexes
             var newSearchModels = CreateOrganisationSearchModels(organisations);
 
-            if (newSearchModels.Any()) await OrganisationSearchRepository.AddOrUpdateIndexDataAsync(newSearchModels).ConfigureAwait(false);
+            if (newSearchModels.Any()) await OrganisationSearchRepository.AddOrUpdateDocumentsAsync(newSearchModels).ConfigureAwait(false);
 
             //Remove the retired models
             var retiredModels = oldSearchModels.Except(newSearchModels);
-            if (retiredModels.Any()) await OrganisationSearchRepository.RemoveFromIndexAsync(retiredModels).ConfigureAwait(false);
+            if (retiredModels.Any()) await OrganisationSearchRepository.DeleteDocumentsAsync(retiredModels).ConfigureAwait(false);
         }
 
         private IEnumerable<Organisation> LookupSearchableOrganisations(params Organisation[] organisations)
@@ -76,14 +81,14 @@ namespace ModernSlavery.BusinessDomain.Viewing
                                        sc.ScopeStatus == ScopeStatuses.PresumedInScope)));
         }
 
-        public async Task UpdateOrganisationSearchIndexAsync()
+        public async Task RefreshSearchDocumentsAsync()
         {
             //Get all the organisations
             var organisations = await _dataRepository.ToListAsync<Organisation>().ConfigureAwait(false);
-            await UpdateOrganisationSearchIndexAsync(organisations);
+            await RefreshSearchDocumentsAsync(organisations);
         }
 
-        public async Task UpdateOrganisationSearchIndexAsync(Organisation organisation, int statementDeadlineYear = 0)
+        public async Task RefreshSearchDocumentsAsync(Organisation organisation, int statementDeadlineYear = 0)
         {
             //Ensure we have an organisation
             if (organisation == null) throw new ArgumentNullException(nameof(organisation));
@@ -95,33 +100,37 @@ namespace ModernSlavery.BusinessDomain.Viewing
             if (statementDeadlineYear > 0) newSearchModels = newSearchModels.Where(m => m.StatementDeadlineYear == statementDeadlineYear);
 
              //Get the old indexes for statements
-            var retiredModels = await GetOrganisationSearchIndexesAsync(organisation, statementDeadlineYear);
+            var retiredModels = await ListSearchDocumentsAsync(organisation, statementDeadlineYear);
 
             //Batch update the included organisations
-            if (newSearchModels.Any()) await OrganisationSearchRepository.AddOrUpdateIndexDataAsync(newSearchModels);
+            if (newSearchModels.Any()) await OrganisationSearchRepository.AddOrUpdateDocumentsAsync(newSearchModels);
 
             //Remove the retired models
             retiredModels = retiredModels.Except(newSearchModels).ToList();
-            await RemoveSearchIndexesAsync(retiredModels);
+            await RemoveSearchDocumentsAsync(retiredModels);
         }
+        #endregion
 
-        public async Task RemoveOrganisationSearchIndexesAsync(Organisation organisation)
+        #region RemoveSearchDocuments 
+        public async Task RemoveSearchDocumentsAsync(Organisation organisation)
         {
 
             //Get the old indexes for statements
-            var retiredModels = await GetOrganisationSearchIndexesAsync(organisation);
+            var retiredModels = await ListSearchDocumentsAsync(organisation);
 
             //Remove the retired models
-            await RemoveSearchIndexesAsync(retiredModels);
+            await RemoveSearchDocumentsAsync(retiredModels);
         }
 
-        public async Task RemoveSearchIndexesAsync(IEnumerable<OrganisationSearchModel> searchIndexes)
+        public async Task RemoveSearchDocumentsAsync(IEnumerable<OrganisationSearchModel> searchIndexes)
         {
             //Remove the indexes
-            if (searchIndexes.Any()) await OrganisationSearchRepository.RemoveFromIndexAsync(searchIndexes).ConfigureAwait(false);
+            if (searchIndexes.Any()) await OrganisationSearchRepository.DeleteDocumentsAsync(searchIndexes).ConfigureAwait(false);
         }
+        #endregion
 
-        public async Task<IEnumerable<OrganisationSearchModel>> GetOrganisationSearchIndexesAsync(Organisation organisation, int statementDeadlineYear = 0, bool keyOnly = true)
+        #region ListSearchDocuments
+        public async Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(Organisation organisation, int statementDeadlineYear = 0, bool keyOnly = true)
         {
             //Ensure we have an organisation
             if (organisation == null) throw new ArgumentNullException(nameof(organisation));
@@ -130,10 +139,11 @@ namespace ModernSlavery.BusinessDomain.Viewing
             var filter = $"{nameof(OrganisationSearchModel.ParentOrganisationId)} eq {organisation.OrganisationId}";
             if (statementDeadlineYear>0)filter += $" and {nameof(OrganisationSearchModel.StatementDeadlineYear)} eq {statementDeadlineYear}";
 
-            return await OrganisationSearchRepository.ListAsync(selectFields: keyOnly ? nameof(OrganisationSearchModel.SearchDocumentKey) : null, filter: filter);
+            return await OrganisationSearchRepository.ListDocumentsAsync(selectFields: keyOnly ? nameof(OrganisationSearchModel.SearchDocumentKey) : null, filter: filter);
         }
+        #endregion
 
-        #region Create OrganisationSearchModel and Index Keys
+        #region Create OrganisationSearchModel
         /// <summary>
         /// Returns a list of fully populated search index documents for specific organisations
         /// </summary>
