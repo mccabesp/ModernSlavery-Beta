@@ -26,7 +26,7 @@ namespace ModernSlavery.WebUI.Submission.Models
         [MinLength(1)]
         public List<string> SelectedReasonOptions { get; set; } = new List<string>();
 
-        internal IEnumerable<string> FriendlyReasonOptions
+        public IEnumerable<string> FriendlyReasonOptions
         {
             get
             {
@@ -35,6 +35,12 @@ namespace ModernSlavery.WebUI.Submission.Models
                     return SelectedReasonOptions
                         .Where(i => i != "Other")
                         .Append(OtherReason);
+                }
+                if (SelectedReasonOptions.Contains("Its turnover or budget is less than £36 million per year"))
+                {
+                    return SelectedReasonOptions
+                        .Append($"Its annual turnover or budget is £{TurnOver}");
+
                 }
                 else
                     return SelectedReasonOptions;

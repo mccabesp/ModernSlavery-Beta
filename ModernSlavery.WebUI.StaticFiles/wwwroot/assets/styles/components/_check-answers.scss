@@ -2,8 +2,19 @@
 {
     display:flex;
 
-    .govuk-link{
+    .govuk-body {
         margin-left:auto;
+    }
+}
+
+.govuk-body.currency-symbol {
+    position: relative;
+
+    &:before {
+        content: "£";
+        top: 0;
+        position: absolute;
+        left: -20px;
     }
 }
 

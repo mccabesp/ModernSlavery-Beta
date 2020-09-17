@@ -4,7 +4,6 @@
 @{
     Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Complete - Modern Slavery reporting service";
-    var controller = ViewData["Controller"] as BaseController;
 }
 <div class="govuk-grid-row">
     <div class="column-two-thirds">
@@ -19,13 +18,13 @@
                 </div>
             </div>
 
-            @if (Model.EnterAnswers.RequiresEmailConfirmation)
-            {
-                <p class="govuk-body">We've sent you a confirmation email. We will contact you if we need more information.</p>
-            }
-            else if (controller.CurrentUser != null)
+            @if (Model.UserIsRegistered)
             {
                 <p class="govuk-body">We've sent a confirmation email to you and any other user associated with this organisation on our system. We will contact you if we need more information.</p>
+            }
+            else if (Model.EnterAnswers.RequiresEmailConfirmation)
+            {
+                <p class="govuk-body">We've sent you a confirmation email. We will contact you if we need more information.</p>
             }
 
             <h2 class="govuk-heading-m">
@@ -34,7 +33,14 @@
             <p class="govuk-body">
                 If you are not legally required to publish a modern slavery statement on your website, you can still create a statement voluntarily and submit it to our service.
             </p>
-            @if (controller.CurrentUser == null)
+
+            @if (Model.UserIsRegistered)
+            {
+                <p>
+                    <a href="@Url.Action("ManageOrganisation", "submission", new { organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId) })" class="govuk-button govuk-!-margin-right-1">Continue</a>
+                </p>
+            }
+            else
             {
                 <div class="govuk-inset-text govuk-secondary-text-colour">
                     To submit a modern slavery statement to our service, <a href="/sign-up">create an account</a> and register your organisation.
@@ -49,22 +55,6 @@
 
                 <a class="govuk-button govuk-!-margin-right-1" href="@Model.StartUrl">Start again</a>
             }
-            else
-            {
-                if (Model.UserIsRegistered)
-                {
-                    <p>
-                        <a href="@Url.Action("ManageOrganisation", "submission", new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId.ToString())})" class="govuk-button govuk-!-margin-right-1">Continue</a>
-                    </p>
-                }
-                else
-                {
-                    <p>
-                        <a href="@Url.Action("ManageOrganisation", "submission", new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId.ToString())})" class="govuk-button govuk-!-margin-right-1">Continue</a>
-                    </p>
-                }
-            }
-
 
         </div> 
     </div>

@@ -3,7 +3,9 @@
     Layout = "/Views/GdsLayout.cshtml";
     ViewBag.Title = "Review your information - Modern Slavery reporting service";
 }
-<a class="govuk-back-link" href="@Url.Action("EnterOutOfScopeAnswers")">Back</a>
+@section BeforeMain {
+    <a class="govuk-back-link" href="@Url.Action("EnterOutOfScopeAnswers")">Back</a>
+}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off" }))
@@ -20,9 +22,11 @@
 
             <div class="change-header">
                 <h2 class="govuk-heading-m">Declaration</h2>
-                <a class="govuk-link" href="@Url.Action("EnterOutOfScopeAnswers")">
-                    Change
-                </a>
+                <span class="govuk-body">
+                    <a class="govuk-link" href="@Url.Action("EnterOutOfScopeAnswers")">
+                        Change
+                    </a>
+                </span>
             </div>
 
             @await Html.PartialAsync("Parts/AnswersPart", Model)
@@ -33,7 +37,7 @@
                     <fieldset class="govuk-fieldset">
                         <div class="govuk-checkboxes">
                             <div class="govuk-checkboxes__item">
-                                @Html.CheckBox("RequiresEmailConfirmation", new { @class = "govuk-checkboxes__input",  id = "RequiresEmailConfirmation" })
+                                @Html.CheckBox("RequiresEmailConfirmation", new { @class = "govuk-checkboxes__input", id = "RequiresEmailConfirmation" })
                                 @Html.Label("RequiresEmailConfirmation", "I would like to recieve a confirmation email", new { @class = "govuk-label govuk-checkboxes__label" })
                             </div>
                         </div>
