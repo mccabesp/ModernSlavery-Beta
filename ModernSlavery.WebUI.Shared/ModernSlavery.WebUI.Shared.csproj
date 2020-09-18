@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Classes\StatementTypes\**" />
+    <Content Remove="Classes\StatementTypes\**" />
+    <EmbeddedResource Remove="Classes\StatementTypes\**" />
+    <None Remove="Classes\StatementTypes\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
@@ -44,10 +51,6 @@
       <LastGenOutput>AccountResources.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Classes\StatementTypes\" />
   </ItemGroup>
 
 

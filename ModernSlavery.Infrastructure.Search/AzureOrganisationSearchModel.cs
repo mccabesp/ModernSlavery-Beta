@@ -28,30 +28,37 @@ namespace ModernSlavery.Infrastructure.Search
         [IsFilterable]
         public override long? StatementId { get; set; }
 
+        [IsRetrievable(false)]
         [IsSearchable] 
         public override string PartialNameForSuffixSearches { get; set; }
 
+        [IsRetrievable(false)]
         [IsSearchable] 
         public override string PartialNameForCompleteTokenSearches { get; set; }
 
+        [IsRetrievable(false)]
         [IsSearchable, Analyzer(AnalyzerName.AsString.EnLucene)]
         public override string[] Abbreviations { get; set; }
 
         [IsFilterable]
-        [IsFacetable]
+        //[IsFacetable]
         public override int? Turnover { get; set; }
 
         [IsFilterable] 
-        [IsFacetable] 
+        //[IsFacetable] 
         public override int[] SectorTypeIds { get; set; }
 
         [IsSortable]
         [IsFilterable] 
-        [IsFacetable] 
+        //[IsFacetable] 
         public override int? StatementDeadlineYear { get; set; }
 
+        [IsRetrievable(false)]
         [IsSortable]
         public override DateTime Modified { get; set;  } = VirtualDateTime.Now;
+
+        [IsRetrievable(false)]
+        public override DateTime Timestamp { get; } = VirtualDateTime.Now;
 
         #endregion
     }

@@ -61,7 +61,18 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="statementDeadlineYear">The reporting year whos search index documents to update or 0 if all years</param>
         Task RefreshSearchDocumentsAsync(Organisation organisation, int statementDeadlineYear = 0);
 
-
-        Task<PagedResult<OrganisationSearchModel>> SearchDocumentsAsync(string searchText, int currentPage, int pageSize = 20, string searchFields = null, string selectFields = null, string orderBy = null, Dictionary<string, Dictionary<object, long>> facets = null, string filter = null, string highlights = null, SearchModes searchMode = SearchModes.Any);
+        /// <summary>
+        /// Search index of statements by organisation name and return sorted and filtered results
+        /// </summary>
+        /// <param name="keywords">The organisatio name to search for</param>
+        /// <param name="turnovers">A list of turnovers to apply as a filter</param>
+        /// <param name="sectors">A list of sectors to apply as a filter</param>
+        /// <param name="deadlineYears">A list of deadline years to apply as a filter</param>
+        /// <param name="submittedOnly">Whether to return only only organisations who have submitted</param>
+        /// <param name="returnFacets">Whether to return the faceted results (i.e., filter counts) </param>
+        /// <param name="currentPage">The page of results to return</param>
+        /// <param name="pageSize">The size of the results page</param>
+        /// <returns></returns>
+        Task<PagedSearchResult<OrganisationSearchModel>> SearchStatementsAsync(string keywords, IList<byte> turnovers = null, IList<short> sectors = null, IList<int> deadlineYears = null, bool submittedOnly = true, bool returnFacets = false, int currentPage = 1, int pageSize = 20);
     }
 }

@@ -12,20 +12,17 @@ namespace ModernSlavery.BusinessDomain.Submission
             ISharedBusinessLogic sharedBusinessLogic,
             ISubmissionBusinessLogic submissionBusinessLogic,
             IScopeBusinessLogic scopeBusinessLogic,
-            [KeyFilter("Private")] IPagedRepository<OrganisationRecord> privateSectorRepository,
-            IDraftFileBusinessLogic draftFileBusinessLogic)
+            [KeyFilter("Private")] IPagedRepository<OrganisationRecord> privateSectorRepository)
         {
             SharedBusinessLogic = sharedBusinessLogic;
             SubmissionBusinessLogic = submissionBusinessLogic;
             ScopeBusinessLogic = scopeBusinessLogic;
-            DraftFileBusinessLogic = draftFileBusinessLogic;
             PrivateSectorRepository = privateSectorRepository;
         }
 
         public ISharedBusinessLogic SharedBusinessLogic { get; }
         public ISubmissionBusinessLogic SubmissionBusinessLogic { get; }
         public IScopeBusinessLogic ScopeBusinessLogic { get; }
-        public IDraftFileBusinessLogic DraftFileBusinessLogic { get; }
         public IPagedRepository<OrganisationRecord> PrivateSectorRepository { get; }
     }
 }

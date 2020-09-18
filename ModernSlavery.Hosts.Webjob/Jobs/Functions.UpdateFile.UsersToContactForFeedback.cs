@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
+using Extensions = ModernSlavery.Core.Classes.Extensions;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
 {

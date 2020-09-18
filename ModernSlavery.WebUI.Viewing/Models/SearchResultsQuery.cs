@@ -43,7 +43,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
 
             foreach (var turnover in tr)
                 // ensure we have a valid org turnover
-                if (!Enum.IsDefined(typeof(TurnoverRanges), turnover))
+                if (!Enum.IsDefined(typeof(StatementTurnovers), turnover))
                     return false;
 
             return true;

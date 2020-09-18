@@ -355,13 +355,13 @@ namespace ModernSlavery.Infrastructure.Search
             return searchResults.ActualRecordTotal;
         }
 
-        public async Task<PagedResult<OrganisationSearchModel>> SearchDocumentsAsync(string searchText,
+        public async Task<PagedSearchResult<OrganisationSearchModel>> SearchDocumentsAsync(string searchText,
             int currentPage,
             int pageSize = 20,
             string searchFields = null,
             string selectFields = null,
+            string facetFields = null,
             string orderBy = null,
-            Dictionary<string, Dictionary<object, long>> facets = null,
             string filter = null,
             string highlights = null,
             SearchModes searchMode = SearchModes.Any)
@@ -389,16 +389,16 @@ namespace ModernSlavery.Infrastructure.Search
             // Define the sort type or order by relevance score
             if (!string.IsNullOrWhiteSpace(orderBy) && !orderBy.EqualsI("Relevance", "Relevance desc", "Relevance asc"))
                 sp.OrderBy = orderBy.SplitI().ToList();
-
+            
             // Add filtering
             sp.Filter = string.IsNullOrWhiteSpace(filter) ? null : filter;
 
             //Add facets
-            if (facets != null && facets.Count > 0) sp.Facets = facets.Keys.ToList();
+            var facets = facetFields?.SplitI().ToList();
+            if (facets != null && facets.Count > 0) sp.Facets = facets;
 
             //Execute the search
-            var
-                results = await indexClient.Documents.SearchAsync<OrganisationSearchModel>(searchText, sp);
+            var results = await indexClient.Documents.SearchAsync<OrganisationSearchModel>(searchText, sp);
 
             //Return the total records
             var totalRecords = results.Count.Value;
@@ -419,18 +419,9 @@ namespace ModernSlavery.Infrastructure.Search
                 await SearchLog.WriteAsync(telemetryProperties);
             }
 
-            //Return the facet results
-            if (sp.Facets != null && sp.Facets.Any())
-                foreach (var facetGroupKey in results.Facets.Keys)
-                {
-                    if (facets[facetGroupKey] == null) facets[facetGroupKey] = new Dictionary<object, long>();
-
-                    foreach (var facetResult in results.Facets[facetGroupKey])
-                        facets[facetGroupKey][facetResult.Value] = facetResult.Count.Value;
-                }
-
-            //Return the results
-            var searchResults = new PagedResult<OrganisationSearchModel>
+            
+            //Create the results
+            var searchResults = new PagedSearchResult<OrganisationSearchModel>
             {
                 Results = results.Results.Select(r => r.Document).ToList(),
                 CurrentPage = currentPage,
@@ -439,6 +430,20 @@ namespace ModernSlavery.Infrastructure.Search
                 VirtualRecordTotal = totalRecords
             };
 
+            //Add the facet results
+            if (results.Facets != null && results.Facets.Count>0)
+            {
+                searchResults.facets = new Dictionary<string, Dictionary<object, long>>();
+                foreach (var facetGroupKey in results.Facets.Keys)
+                {
+                    searchResults.facets[facetGroupKey] = new Dictionary<object, long>();
+
+                    foreach (var facetResult in results.Facets[facetGroupKey])
+                        searchResults.facets[facetGroupKey][facetResult.Value] = facetResult.Count.Value;
+                }
+            }
+
+            //Return the results
             return searchResults;
         }
 

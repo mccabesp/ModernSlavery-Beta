@@ -84,13 +84,13 @@ namespace ModernSlavery.Core.Interfaces
         ///         For example, highlight=title-3,description-10 returns up to 3 highlighted hits from the title field and up to
         ///         10 hits from the description field. <max # of highlights> must be an integer between 1 and 1000 inclusive.
         /// </param>
-        Task<PagedResult<T>> SearchDocumentsAsync(string searchText,
+        Task<PagedSearchResult<T>> SearchDocumentsAsync(string searchText,
             int currentPage,
             int pageSize = 20,
             string searchFields = null,
             string selectFields = null,
+            string facetFields = null,
             string orderBy = null,
-            Dictionary<string, Dictionary<object, long>> facets = null,
             string filter = null,
             string highlights = null,
             SearchModes searchMode = SearchModes.Any);

@@ -44,7 +44,7 @@
             <div>
                 <dt class="metadata-text-label">Turnover</dt>
                 <dd class="metadata-text-value">
-                    @(Model.Turnover.GetAttribute<DisplayAttribute>().Name)
+                    @(Model.Turnover.GetDisplayDescription())
                 </dd>
             </div>
             @if (Model.SectorType == SectorTypes.Private)

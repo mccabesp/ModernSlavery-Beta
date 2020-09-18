@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
@@ -217,7 +218,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
                 CompanyNumber = organisation.CompanyNumber,
                 Address = organisation.LatestAddress.GetAddressString(),
                 SectorTypeIds = submittedStatement?.Sectors.Select(s => (int)s.StatementSectorTypeId).ToArray(),
-                Turnover = submittedStatement == null ? (int?)null : (int)StatementModel.GetTurnover(submittedStatement),
+                Turnover = submittedStatement == null ? (int?)null : (int)submittedStatement.GetStatementTurnover(),
                 Modified = submittedStatement == null ? organisation.Modified : submittedStatement.Modified,
                 IsParent = submittedStatement == null ? false : submittedStatement.StatementOrganisations.Any(),
                 Abbreviations = CreateOrganisationNameAbbreviations(organisation.OrganisationName),
@@ -336,20 +337,101 @@ namespace ModernSlavery.BusinessDomain.Viewing
         }
         #endregion
 
-        #region SearchDocuments
-        public async Task<PagedResult<OrganisationSearchModel>> SearchDocumentsAsync(string searchText,
-            int currentPage,
-            int pageSize = 20,
-            string searchFields = null,
-            string selectFields = null,
-            string orderBy = null,
-            Dictionary<string, Dictionary<object, long>> facets = null,
-            string filter = null,
-            string highlights = null,
-            SearchModes searchMode = SearchModes.Any)
+        #region SearchStatements
+        public async Task<PagedSearchResult<OrganisationSearchModel>> SearchStatementsAsync(
+            string keywords,
+            IList<byte> turnovers=null,
+            IList<short> sectors=null,
+            IList<int> deadlineYears = null,
+            bool submittedOnly=true,
+            bool returnFacets = false,
+            int currentPage=1,
+            int pageSize = 20)
         {
-            return await _organisationSearchRepository.SearchDocumentsAsync(searchText,currentPage,pageSize,searchFields,selectFields,orderBy,facets, filter,highlights,searchMode);
+
+            #region Clean up the search keywords
+            keywords = keywords?.Trim();
+            keywords = RemoveTheMostCommonTermsOnOurDatabaseFromTheKeywords(keywords);
+            #endregion
+
+            //Specify the fields to return
+            string selectFields = string.Join(',',
+                nameof(OrganisationSearchModel.ParentOrganisationId),
+                nameof(OrganisationSearchModel.StatementDeadlineYear),
+                nameof(OrganisationSearchModel.OrganisationName),
+                nameof(OrganisationSearchModel.CompanyNumber),
+                nameof(OrganisationSearchModel.Address),
+                nameof(OrganisationSearchModel.ParentName),
+                nameof(OrganisationSearchModel.IsParent));
+
+            #region Build the sort criteria
+            int filterCount = sectors.Count + turnovers.Count + deadlineYears.Count;
+            var orderBy=(string.IsNullOrWhiteSpace(keywords) && filterCount == 0) 
+                ? $"{nameof(OrganisationSearchModel.Modified)} desc, {nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.StatementDeadlineYear)} desc"
+                : $"{nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.StatementDeadlineYear)} desc";
+            #endregion
+
+            #region Specify the facet filters
+            var facetFields = !returnFacets 
+                ? null 
+                : string.Join(',',
+                    nameof(OrganisationSearchModel.Turnover),
+                    nameof(OrganisationSearchModel.SectorTypeIds),
+                    nameof(OrganisationSearchModel.StatementDeadlineYear));
+
+            #endregion
+
+            #region Build the filter constraints
+            var queryFilter = new List<string>();
+
+            //Add the turnover filter
+            if (turnovers!=null && turnovers.Count > 0)
+            {
+                var turnoverQuery = turnovers.Select(x => $"Turnover eq {x}");
+                queryFilter.Add($"({string.Join(" or ", turnoverQuery)})");
+            }
+
+            //Add the sector filter
+            if (sectors!=null && sectors.Count > 0)
+            {
+                var sectorQuery = sectors.Select(x => $"id eq {x}");
+                queryFilter.Add($"SectorTypeIds/any(id: {string.Join(" or ", sectorQuery)})");
+            }
+
+            //Add the years filter
+            if (deadlineYears != null && deadlineYears.Count > 0)
+            {
+                var deadlineQuery = deadlineYears.Select(x => $"StatementDeadlineYear eq {x}");
+                queryFilter.Add($"({string.Join(" or ", deadlineQuery)})");
+            }
+
+            //Only show submitted organisations
+            if (submittedOnly)queryFilter.Add($"StatementId ne null");
+            
+            string filter = string.Join(" and ", queryFilter);
+            #endregion
+
+            //Execute the search
+            return await _organisationSearchRepository.SearchDocumentsAsync(keywords,currentPage,pageSize,selectFields: selectFields, facetFields:facetFields, orderBy: orderBy, filter:filter);
         }
         #endregion
+
+        private string RemoveTheMostCommonTermsOnOurDatabaseFromTheKeywords(string keywords)
+        {
+            if (string.IsNullOrEmpty(keywords)) return keywords;
+
+            const string patternToReplace = "(?i)(limited|ltd|llp|uk | uk|\\(uk\\)|-uk|plc)[\\.]*";
+
+            string resultingString;
+
+            resultingString = Regex.Replace(keywords, patternToReplace, string.Empty);
+            resultingString = resultingString.Trim();
+
+            var willThisReplacementClearTheString = resultingString == string.Empty;
+
+            return willThisReplacementClearTheString
+                ? keywords // don't replace - user wants to search 'limited' or 'uk'...
+                : resultingString;
+        }
     }
 }
