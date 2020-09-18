@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebAPI.Public.Models;
 
@@ -14,63 +17,28 @@ namespace ModernSlavery.WebAPI.Public.Controllers
     [Route("Api/Public")]
     public class PublicApiController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
         private readonly ILogger<PublicApiController> _logger;
+        private readonly IMapper _mapper;
+        private readonly IDataRepository _dataRepository;
 
-        public PublicApiController(ILogger<PublicApiController> logger)
+        public PublicApiController(ILogger<PublicApiController> logger, IMapper mapper, IDataRepository dataRepository)
         {
             _logger = logger;
-        }
-
-        [HttpGet]
-        public IEnumerable<WeatherForecastModel> Get()
-        {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecastModel
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+            _mapper = mapper;
+            _dataRepository = dataRepository;
         }
 
         /// <summary>
-        /// Search for registered organisations
+        /// Returns a list of statements submitted for specified or all years
         /// </summary>
-        /// <param name="searchQuery">The parameters of the search</param>
-        /// <returns>A list of organisations</returns>
-        [HttpGet("SearchOrganisations")]
-        public IEnumerable<OrganisationSearchModel> SearchOrganisations([FromQuery] SearchResultsQuery searchQuery)
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// Returns detailed information on a particular organisation
-        /// </summary>
-        /// <param name="organisationIdentifier">The unique identifier of the organisation</param>
-        /// <returns>Detailed information on a the specified organisation</returns>
-        [HttpGet("GetOrganisation/{organisationIdentifier}")]
-        public StatementViewModel GetOrganisation(string organisationIdentifier)
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// Returns a list of statements submitted by the organisation
-        /// </summary>
-        /// <param name="organisationIdentifier">The unique identifier of the organisation</param>
         /// <param name="years">The list of years to include (if empty returns all years)</param>
-        /// <returns>A list of statements for the specified organisation and years</returns>
+        /// <returns>A list of statements for the specified years (or all years)</returns>
         [HttpGet("ListStatements")]
-        public IEnumerable<StatementViewModel> GetStatements(string organisationIdentifier, params int[] years)
+        public IEnumerable<StatementSummaryModel> ListStatements(params int[] years)
         {
-            return null;
+            if (years.Length>0) return _dataRepository.GetAll<Statement>().Where(s => s.Status== StatementStatuses.Submitted && years.Contains(s.SubmissionDeadline.Year)).OrderBy(s => s.Organisation.OrganisationName).Select(s => _mapper.Map<StatementSummaryModel>(s));
+
+            return _dataRepository.GetAll<Statement>().Where(s => s.Status == StatementStatuses.Submitted).OrderBy(s => s.SubmissionDeadline.Year).ThenBy(s => s.Organisation.OrganisationName).Select(s => _mapper.Map<StatementSummaryModel>(s));            
         }
     }
 }
