@@ -16,6 +16,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public ReviewPageViewModelMapperProfile()
         {
             CreateMap<StatementModel, ReviewAndEditPageViewModel>()
+                .ForMember(s => s.GroupOrganisations, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.YourStatement, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.Compliance, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.Organisation, opt => opt.MapFrom(s => s))
@@ -49,6 +50,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return result;
         }
 
+        public GroupOrganisationsViewModel GroupOrganisations { get; set; }
         public YourStatementPageViewModel YourStatement { get; set; }
         public CompliancePageViewModel Compliance { get; set; }
         public YourOrganisationPageViewModel Organisation { get; set; }
@@ -64,6 +66,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [IgnoreMap]
         public IList<AutoMap.Diff> SubmittedModifications { get; set; }
 
+        [IgnoreMap]
+        [BindNever]
+        public string GroupStatusUrl { get; set; }
+        [IgnoreMap]
+        [BindNever]
+        public string GroupReviewUrl { get; set; }
         [IgnoreMap]
         [BindNever]
         public string YourStatementUrl { get; set; }
@@ -124,7 +132,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            return YourStatement.IsComplete() 
+            return GroupOrganisations.IsComplete() && YourStatement.IsComplete() 
                 && Compliance.IsComplete();
         }
 

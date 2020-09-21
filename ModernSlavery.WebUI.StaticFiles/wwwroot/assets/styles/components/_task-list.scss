@@ -33,9 +33,10 @@
     list-style: none;
     padding-left: 0;
 
-    @include govuk-media-query($from: tablet) {
+    //removed to get designs to match prototypes as we not using numbered sections
+    /*@include govuk-media-query($from: tablet) {
         padding-left: govuk-spacing(6);
-    }
+    }*/
 }
 
 .app-task-list__item {
@@ -72,3 +73,5 @@
         margin-bottom: 0;
     }
 }
+
+

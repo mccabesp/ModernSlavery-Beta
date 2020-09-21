@@ -25,6 +25,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.HighRisks, opt => opt.MapFrom(s => s.HighRisks.Where(r => r.Id > 0)))
                 .ForMember(d => d.LocationRisks, opt => opt.MapFrom(s => s.LocationRisks.Where(r => r.Id > 0)))
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
+                .ForMember(s => s.OrganisationId, opt => opt.Ignore())
                 .ForSourceMember(s => s.RiskTypes, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.RelevantRisks, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.HighRisks, opt => opt.DoNotValidate())

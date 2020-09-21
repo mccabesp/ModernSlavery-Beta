@@ -102,32 +102,32 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             var sector = model.SectorType;
             var authorised = false;
-            OrganisationRecord organisation = null;
+            OrganisationRecord organisationRecord = null;
             if (!model.ManualRegistration)
             {
-                organisation = model.GetManualOrganisation();
+                organisationRecord = model.GetManualOrganisation();
 
-                if (organisation != null)
+                if (organisationRecord != null)
                 {
                     authorised = model.ManualAuthorised;
                 }
                 else
                 {
-                    organisation = model.GetSelectedOrganisation();
+                    organisationRecord = model.GetSelectedOrganisation();
                     authorised = model.SelectedAuthorised;
                 }
             }
 
             //Set the address source to the user or original source if unchanged
-            if (organisation != null && model.GetAddressModel().Equals(organisation.GetAddressModel()))
-                model.AddressSource = organisation.AddressSource;
+            if (organisationRecord != null && model.GetAddressModel().Equals(organisationRecord))
+                model.AddressSource = organisationRecord.AddressSource;
             else
                 model.AddressSource = VirtualUser.EmailAddress;
 
             if (model.WrongAddress) model.ManualAddress = true;
 
             //When doing manual address only and user is already authorised redirect to confirm page
-            if (model.ManualAddress && sector == SectorTypes.Public && authorised && !organisation.HasAnyAddress())
+            if (model.ManualAddress && sector == SectorTypes.Public && authorised && !organisationRecord.HasAnyAddress())
             {
                 //We don't need contact info if there is no address only when there is an address
                 model.ConfirmReturnAction = nameof(AddAddress);

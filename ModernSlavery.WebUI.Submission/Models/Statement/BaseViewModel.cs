@@ -19,7 +19,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             SaveAndExit=3,
             DiscardAndExit=4,
             ExitNoChanges = 5,
-            Submit = 6
+            Submit = 6,
+            Search=7,
+            SearchNext = 8,
+            SearchPrevious = 9,
+            IncludeOrganisation = 10,
+            RemoveOrganisation = 11,
+            ToggleResults=12
         }
 
         [BindRequired]
@@ -53,6 +59,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [IgnoreMap]
         public int ReportingDeadlineYear => SubmissionDeadline.Year;
 
+        public long OrganisationId { get; set; }
         public string OrganisationName { get; set; }
 
         public abstract IEnumerable<ValidationResult> Validate(ValidationContext validationContext);

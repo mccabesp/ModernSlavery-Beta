@@ -330,11 +330,15 @@ namespace ModernSlavery.Core.Extensions
         {
             try
             {
-                var i = propertyName.IndexOf(".");
-                if (i > -1) return type.GetType().GetProperty(propertyName.Substring(0, i));
-
-                return type.GetProperty(propertyName,
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                PropertyInfo info = null;
+                var parts = propertyName.Split('.');
+                for (var p=0;p<parts.Length;p++)
+                {
+                    info = p<parts.Length-1 ? type.GetProperty(parts[p]) : type.GetProperty(parts[p], BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (info == null) { return null; }
+                    type = info.PropertyType;
+                }
+                return info;
             }
             catch
             {
