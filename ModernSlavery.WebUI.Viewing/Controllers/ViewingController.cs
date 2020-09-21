@@ -66,24 +66,16 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             return new EmptyResult();
         }
 
-        [HttpGet("Index")]
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
             //Clear the default back url of the organisation hub pages
             OrganisationBackUrl = null;
             ReportBackUrl = null;
 
-            if (WebService.FeatureSwitchOptions.IsEnabled("ReportingStepByStep"))
-                return View("Launchpad/PrototypeIndex");
-            return View("Launchpad/Index");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Redirect()
-        {
             await TrackPageViewAsync();
 
-            return RedirectToActionPermanent("Index");
+            return RedirectToActionPermanent("SearchResults");
         }
 
         #endregion
@@ -122,7 +114,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [NoCache]
         [HttpGet("~/search-results")]
         [HttpGet("search-results")]
-        public async Task<IActionResult> SearchResults([FromQuery] SearchResultsQuery searchQuery)
+        public async Task<IActionResult> SearchResults(SearchQueryModel searchQuery)
         {
             //Ensure search service is enabled
             if (ViewingService.SearchBusinessLogic.Disabled)
@@ -138,8 +130,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             if (!searchQuery.TryValidateSearchParams(out var result)) return result;
 
             // generate result view model
-            var searchParams = AutoMapper.Map<OrganisationSearchParameters>(searchQuery);
-            var model = await ViewingPresenter.SearchAsync(searchParams);
+            var model = await ViewingPresenter.SearchAsync(searchQuery);
 
             ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
 
@@ -149,19 +140,17 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [NoCache]
         [HttpGet("~/search-results-js")]
         [HttpGet("search-results-js")]
-        public async Task<IActionResult> SearchResultsJs([FromQuery] SearchResultsQuery searchQuery)
+        public async Task<IActionResult> SearchResultsJs(SearchQueryModel searchQuery)
         {
             //Clear the default back url of the organisation hub pages
             OrganisationBackUrl = null;
             ReportBackUrl = null;
 
-
             // ensure parameters are valid
             if (!searchQuery.TryValidateSearchParams(out var result)) return result;
 
             // generate result view model
-            var searchParams = AutoMapper.Map<OrganisationSearchParameters>(searchQuery);
-            var model = await ViewingPresenter.SearchAsync(searchParams);
+            var model = await ViewingPresenter.SearchAsync(searchQuery);
 
             ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
 

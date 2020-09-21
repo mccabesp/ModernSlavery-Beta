@@ -73,6 +73,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="currentPage">The page of results to return</param>
         /// <param name="pageSize">The size of the results page</param>
         /// <returns></returns>
-        Task<PagedSearchResult<OrganisationSearchModel>> SearchStatementsAsync(string keywords, IList<byte> turnovers = null, IList<short> sectors = null, IList<int> deadlineYears = null, bool submittedOnly = true, bool returnFacets = false, int currentPage = 1, int pageSize = 20);
+        Task<PagedSearchResult<OrganisationSearchModel>> SearchStatementsAsync(string keywords, IEnumerable<byte> turnovers = null, IEnumerable<short> sectors = null, IEnumerable<int> deadlineYears = null, bool submittedOnly = true, bool returnFacets = false, int currentPage = 1, int pageSize = 20);
     }
 }

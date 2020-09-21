@@ -24,7 +24,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
     public interface IViewingPresenter
     {
         IObfuscator Obfuscator { get; }
-        Task<SearchViewModel> SearchAsync(OrganisationSearchParameters searchParams);
+        Task<SearchViewModel> SearchAsync(SearchQueryModel searchQuery);
         Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(string organisationIdentifier, int reportingDeadlineYear);
     }
 
@@ -58,31 +58,31 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         #endregion
 
         #region Search methods
-        public async Task<SearchViewModel> SearchAsync(OrganisationSearchParameters searchParams)
+        public async Task<SearchViewModel> SearchAsync(SearchQueryModel searchQuery)
         {
             //Execute the search
             var searchResults = await _viewingService.SearchBusinessLogic.SearchStatementsAsync(
-                searchParams.Keywords,
-                searchParams.Turnovers,
-                searchParams.Sectors,
-                searchParams.DeadlineYears,
+                searchQuery.Keywords,
+                searchQuery.Turnovers,
+                searchQuery.Sectors,
+                searchQuery.Years,
                 false,
                 false,
-                searchParams.Page,
-                searchParams.PageSize);
+                searchQuery.PageNumber,
+                searchQuery.PageSize);
 
             // build the result view model
             return new SearchViewModel
             {
-                TurnoverOptions = GetTurnoverOptions(searchParams.Turnovers),
-                SectorOptions = GetSectorOptions(searchParams.Sectors),
-                ReportingYearOptions = GetReportingYearOptions(searchParams.DeadlineYears),
+                TurnoverOptions = GetTurnoverOptions(searchQuery.Turnovers),
+                SectorOptions = GetSectorOptions(searchQuery.Sectors),
+                ReportingYearOptions = GetReportingYearOptions(searchQuery.Years),
                 Organisations = searchResults,
-                search = searchParams.Keywords,
-                p = searchParams.Page,
-                s = searchParams.Sectors,
-                tr = searchParams.Turnovers,
-                y = searchParams.DeadlineYears
+                Keywords = searchQuery.Keywords,
+                PageNumber = searchQuery.PageNumber,
+                Sectors = searchQuery.Sectors,
+                Turnovers = searchQuery.Turnovers,
+                Years = searchQuery.Years
             };
         }
 

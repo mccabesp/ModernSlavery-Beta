@@ -340,9 +340,9 @@ namespace ModernSlavery.BusinessDomain.Viewing
         #region SearchStatements
         public async Task<PagedSearchResult<OrganisationSearchModel>> SearchStatementsAsync(
             string keywords,
-            IList<byte> turnovers=null,
-            IList<short> sectors=null,
-            IList<int> deadlineYears = null,
+            IEnumerable<byte> turnovers,
+            IEnumerable<short> sectors=null,
+            IEnumerable<int> deadlineYears = null,
             bool submittedOnly=true,
             bool returnFacets = false,
             int currentPage=1,
@@ -353,6 +353,10 @@ namespace ModernSlavery.BusinessDomain.Viewing
             keywords = keywords?.Trim();
             keywords = RemoveTheMostCommonTermsOnOurDatabaseFromTheKeywords(keywords);
             #endregion
+
+            turnovers = turnovers ?? Enumerable.Empty<byte>();
+            sectors = sectors ?? Enumerable.Empty<short>();
+            deadlineYears = deadlineYears ?? Enumerable.Empty<int>();
 
             //Specify the fields to return
             string selectFields = string.Join(',',
@@ -365,8 +369,8 @@ namespace ModernSlavery.BusinessDomain.Viewing
                 nameof(OrganisationSearchModel.IsParent));
 
             #region Build the sort criteria
-            int filterCount = sectors.Count + turnovers.Count + deadlineYears.Count;
-            var orderBy=(string.IsNullOrWhiteSpace(keywords) && filterCount == 0) 
+            var hasFilter = sectors.Any() || turnovers.Any() || deadlineYears.Any();
+            var orderBy=(string.IsNullOrWhiteSpace(keywords) && !hasFilter) 
                 ? $"{nameof(OrganisationSearchModel.Modified)} desc, {nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.StatementDeadlineYear)} desc"
                 : $"{nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.StatementDeadlineYear)} desc";
             #endregion
@@ -385,21 +389,21 @@ namespace ModernSlavery.BusinessDomain.Viewing
             var queryFilter = new List<string>();
 
             //Add the turnover filter
-            if (turnovers!=null && turnovers.Count > 0)
+            if (turnovers!=null && turnovers.Any())
             {
                 var turnoverQuery = turnovers.Select(x => $"Turnover eq {x}");
                 queryFilter.Add($"({string.Join(" or ", turnoverQuery)})");
             }
 
             //Add the sector filter
-            if (sectors!=null && sectors.Count > 0)
+            if (sectors!=null && sectors.Any())
             {
                 var sectorQuery = sectors.Select(x => $"id eq {x}");
                 queryFilter.Add($"SectorTypeIds/any(id: {string.Join(" or ", sectorQuery)})");
             }
 
             //Add the years filter
-            if (deadlineYears != null && deadlineYears.Count > 0)
+            if (deadlineYears != null && deadlineYears.Any())
             {
                 var deadlineQuery = deadlineYears.Select(x => $"StatementDeadlineYear eq {x}");
                 queryFilter.Add($"({string.Join(" or ", deadlineQuery)})");

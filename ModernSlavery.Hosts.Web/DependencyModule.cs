@@ -84,6 +84,7 @@ namespace ModernSlavery.Hosts.Web
                             _responseCachingOptions.CacheProfiles.ForEach(p =>
                                 options.CacheProfiles.Add(p)); //Load the response cache profiles from options
                         options.Filters.Add<ErrorHandlingFilter>();
+                        options.Filters.Add<HttpExceptionFilter>();
                     }).AddXmlSerializerFormatters();
 
             mvcBuilder.AddApplicationPart<WebAPI.Public.DependencyModule>();
