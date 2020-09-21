@@ -71,7 +71,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 ? DataRepository.GetAll<Organisation>().Take(100)
                 : DataRepository.GetAll<Organisation>();
 #else
-            var orgs = _dataRepository.GetAll<Organisation>();
+            var orgs = DataRepository.GetAll<Organisation>();
 #endif
             var records = new List<OrganisationsFileModel>();
 
@@ -192,19 +192,19 @@ namespace ModernSlavery.BusinessDomain.Registration
             return orgList;
         }
 
-        public Organisation CreateOrganisation(string organisationName, string source, SectorTypes sectorType, OrganisationStatuses status, AddressModel addressModel, AddressStatuses addressStatus= AddressStatuses.Pending, string companyNumber = null, DateTime? dateOfCessation = null, Dictionary<string, string> references = null, SortedSet<int> sicCodes = null, long userId = -1)
+        public Organisation CreateOrganisation(string organisationName, string source, SectorTypes sectorType, OrganisationStatuses status, AddressModel addressModel, AddressStatuses addressStatus = AddressStatuses.Pending, string companyNumber = null, DateTime? dateOfCessation = null, Dictionary<string, string> references = null, SortedSet<int> sicCodes = null, long userId = -1)
         {
             #region Check the parameters
             if (string.IsNullOrWhiteSpace(organisationName)) throw new ArgumentNullException(nameof(organisationName));
             if (sectorType == SectorTypes.Unknown) throw new ArgumentOutOfRangeException(nameof(sectorType));
-            if (!status.IsAny(OrganisationStatuses.Active, OrganisationStatuses.Pending)) throw new ArgumentOutOfRangeException(nameof(status),$"Organisation status must be active or pending but was {status}");
+            if (!status.IsAny(OrganisationStatuses.Active, OrganisationStatuses.Pending)) throw new ArgumentOutOfRangeException(nameof(status), $"Organisation status must be active or pending but was {status}");
             if (addressModel == null || addressModel.IsEmpty()) throw new ArgumentNullException(nameof(addressModel), "Cannot save an organisation with no address");
             #endregion
 
             #region Create the basic organisation
             var organisation = new Organisation
             {
-                OrganisationName=organisationName,
+                OrganisationName = organisationName,
                 SectorType = sectorType,
                 CompanyNumber = companyNumber,
                 DateOfCessation = dateOfCessation,
@@ -405,7 +405,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         public async Task LogBadSicCodesAsync(Organisation organisation, SortedSet<int> badSicCodes)
         {
             if (organisation == null) throw new ArgumentNullException(nameof(organisation));
-            if (organisation.OrganisationId == 0) throw new ArgumentException("Organisation must be saved first before logging bad SIC codes",nameof(organisation));
+            if (organisation.OrganisationId == 0) throw new ArgumentException("Organisation must be saved first before logging bad SIC codes", nameof(organisation));
             if (badSicCodes == null) throw new ArgumentNullException(nameof(badSicCodes));
 
             //Log the bad sic codes here to ensure organisation identifiers have been created when saved
