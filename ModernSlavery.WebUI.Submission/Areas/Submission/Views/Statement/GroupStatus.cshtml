@@ -2,9 +2,11 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model GroupStatusViewModel
-@if (!string.IsNullOrWhiteSpace(Model.BackUrl))
-{
-    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+@section BeforeMain{
+    @if (!string.IsNullOrWhiteSpace(Model.BackUrl))
+    {
+        <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+    }
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
