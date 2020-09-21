@@ -306,7 +306,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
         #endregion
 
-        #region Reports
+        #region Statements
 
         [HttpGet("Statement/{organisationIdentifier}/{year}")]
         public async Task<IActionResult> Statement(string organisationIdentifier, int year)
@@ -316,7 +316,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             var viewModel = openResult.Result;
-            return View("OrganisationDetails/Report", viewModel);
+            return View("Statement", viewModel);
         }
 
         [HttpGet("~/Organisation/{organisationIdentifier}/{year}")]

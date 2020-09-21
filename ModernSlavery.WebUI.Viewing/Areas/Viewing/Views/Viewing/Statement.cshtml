@@ -1,0 +1,88 @@
+﻿@using System.ComponentModel.DataAnnotations
+@model ModernSlavery.WebUI.Viewing.Models.StatementViewModel
+@{
+    //Required for variables in Sitemap taghelpers
+    var reportingPeriod = (Model.StatementDeadline.Year - 1) + "-" + (Model.StatementDeadline.Year).ToTwoDigitYear();
+
+    Layout = "~/Views/GdsLayout.cshtml";
+    ViewBag.Title = Model.OrganisationName + " Modern Slavery statement" + " / " + reportingPeriod;
+    ViewBag.pageDescription = $"View {reportingPeriod} Modern Slavery statement for {Model.OrganisationName}";
+    ViewBag.pageClass = "organisation-report-page";
+
+}
+
+@section BeforeMain {
+    @* Model.BackUrl needs creating and setting *@
+    <a class="govuk-back-link" href="">Back</a>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">
+            @Model.OrganisationName modern slavery statement summary @(Model.StatementDeadline.Year - 1) to @Model.StatementDeadline.Year
+        </h1>
+
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    Organisation address
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                @* Model.OrganisationAddress *@
+            </div>
+        </details>
+
+        <p class="govuk-body">
+            Read a summary of this organisation’s modern slavery statement, or link to the full statement on the organisation’s website.
+            The summary does not replace the full statement.
+            @* Group orgs content *@
+        </p>
+
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    What does the summary consist of?
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                We asked the organisation to answer a series of questions about their modern slavery statement.
+                Their answers are published below as a statement summary.
+                The questions are based on the areas that the Modern Slavery Act encourages organisations to cover in their modern slavery statement, setting out the steps they have taken to tackle modern slavery risks.
+                All answers relate to the financial year covered by the statement.
+                The organisation is responsible for the information it provided.
+                GOV.UK does not verify the accuracy of this information.
+            </div>
+        </details>
+
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-panel govuk-panel--highlight">
+            <div class="govuk-panel__body">
+                <p class="govuk-body">
+                    Link to full statement
+                    <br>
+                    @* Link to statement *@
+                    <a class="govuk-link" href="#">Go to full modern slavery statement on organisation’s website</a>
+                </p>
+            </div>
+        </div>
+
+        <ul>
+            Contents
+            <li><a class="govuk-link" href="#statement-period">Statement period and sign-off details</a></li>
+            <li><a class="govuk-link" href="#">Areas covered by statement</a></li>
+        </ul>
+
+        <h2 id="statement-period" class="govuk-heading-m">
+            Statement period and sign-off details
+        </h2>
+
+        <p class="govuk-body">
+        </p>
+
+    </div>
+</div>

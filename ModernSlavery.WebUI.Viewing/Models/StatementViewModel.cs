@@ -44,6 +44,11 @@ namespace ModernSlavery.WebUI.Viewing.Models
             TrainingTypes = trainingTypes;
         }
 
+        public StatementViewModel()
+        {
+
+        }
+
         #region Types
         public class RiskViewModel
         {
