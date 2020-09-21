@@ -406,7 +406,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public async Task<Outcome<StatementErrors, StatementModel>> GetLatestSubmittedStatementModelAsync(long organisationId, DateTime reportingDeadline)
         {
-            var statement = FindLatestSubmittedStatementAsync(organisationId, reportingDeadline);
+            var statement = await FindLatestSubmittedStatementAsync(organisationId, reportingDeadline);
             if (statement == null) return new Outcome<StatementErrors, StatementModel>(StatementErrors.NotFound, $"Cannot find statement summary for Organisation:{organisationId} due for reporting deadline {reportingDeadline}");
 
             var statementModel = new StatementModel();

@@ -307,6 +307,18 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         #endregion
 
         #region Reports
+
+        [HttpGet("Statement/{organisationIdentifier}/{year}")]
+        public async Task<IActionResult> Statement(string organisationIdentifier, int year)
+        {
+            //Get the latest statement data for this organisation, reporting year
+            var openResult = await ViewingPresenter.GetStatementViewModelAsync(organisationIdentifier, year);
+            if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
+
+            var viewModel = openResult.Result;
+            return View("OrganisationDetails/Report", viewModel);
+        }
+
         [HttpGet("~/Organisation/{organisationIdentifier}/{year}")]
         public async Task<IActionResult> Report(string organisationIdentifier, int year)
         {
