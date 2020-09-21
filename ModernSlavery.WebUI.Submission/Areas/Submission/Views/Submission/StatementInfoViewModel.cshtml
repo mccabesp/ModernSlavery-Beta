@@ -3,7 +3,7 @@
 @{
     var reportingDeadline = Model.StatementInfo.ReportingDeadline.AddDays(-1);
     var reportDateFormatter = new GDSDateFormatter(reportingDeadline);
-    var groupSubmissionWord = Model.StatementInfo.SubmittedStatementModifiedDate == null ? (Model.DraftAvailable ? "Already" : "Also") : "Also";
+    var groupSubmissionWord = Model.StatementInfo.SubmittedStatementModifiedDate == null ? (Model.DraftAvailable ? "Also" : "Already") : "Also";
 }
 <div class="gpg-manage-reports__row">
 
@@ -24,10 +24,10 @@
         </div>
         @*TODO: get CanChangeScope flag working*@
         @*@if (Model.CanChangeScope)
-        {*@
-            <div>
-                <a id="ChangeScope@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@(Url.ActionArea("ChangeOrganisationScope", "Scope", "Submission", new {organisationIdentifier = Model.OrganisationIdentifier, reportingDeadlineYear=reportDateFormatter.StartYear}))">Change</a>
-            </div>
+            {*@
+        <div>
+            <a id="ChangeScope@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@(Url.ActionArea("ChangeOrganisationScope", "Scope", "Submission", new {organisationIdentifier = Model.OrganisationIdentifier, reportingDeadlineYear=reportDateFormatter.StartYear}))">Change</a>
+        </div>
         @*}*@
     </div>
 
@@ -58,10 +58,10 @@
 
             @if (Model.StatementInfo.GroupSubmissionInfo != null)
             {
-            <div>
-                @if (Model.StatementInfo.GroupSubmissionInfo.Count > 1)
-                {
-                    <span> @groupSubmissionWord included in:</span>
+                <div class="group-submission-info">
+                    @if (Model.StatementInfo.GroupSubmissionInfo.Count > 1)
+                    {
+                        <span> @groupSubmissionWord included in:</span>
 
                         <ul class="govuk-list--bullet">
                             @foreach (var submission in Model.StatementInfo.GroupSubmissionInfo)
@@ -71,15 +71,15 @@
                         </ul>
 
 
-                }
-                 @if (Model.StatementInfo.GroupSubmissionInfo.Count == 1)
-                 {
-                    <span>@groupSubmissionWord included in @Model.StatementInfo.GroupSubmissionInfo.FirstOrDefault()</span>
-                 }
+                    }
+                    @if (Model.StatementInfo.GroupSubmissionInfo.Count == 1)
+                    {
+                        <span>@groupSubmissionWord included in @Model.StatementInfo.GroupSubmissionInfo.FirstOrDefault()</span>
+                    }
                 </div>
             }
 
-            </div>
+        </div>
     </div>
 
     <div class="gpg-manage-reports__cell gpg-manage-reports__cell--action">

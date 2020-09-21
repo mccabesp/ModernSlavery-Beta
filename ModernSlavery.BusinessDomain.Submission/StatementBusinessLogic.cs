@@ -375,12 +375,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Get the submitted statement info
             var statement = organisation.Statements.FirstOrDefault(s => s.SubmissionDeadline == reportingDeadline);
             if (statement != null)
-            {
                 statementInfoModel.SubmittedStatementModifiedDate = statement?.Modified;
-
-                var groupStatements = await FindGroupSubmissionStatementsAsync(organisation.OrganisationId);
-                if (groupStatements != null) statementInfoModel.GroupSubmissionInfo = GetGroupSubmissionInformationString(groupStatements).ToList();
-            }
 
             //Get the draft statement info
             var statementModel = await FindDraftStatementModelAsync(organisation.OrganisationId, reportingDeadline);
@@ -389,6 +384,10 @@ namespace ModernSlavery.BusinessDomain.Submission
                 statementInfoModel.DraftStatementModifiedDate = statementModel.EditTimestamp;
                 statementInfoModel.DraftStatementIsEmpty = statementModel.IsEmpty();
             }
+
+            //Get group status info
+            var groupStatements = await FindGroupSubmissionStatementsAsync(organisation.OrganisationId);
+            if (groupStatements.Any()) statementInfoModel.GroupSubmissionInfo = GetGroupSubmissionInformationString(groupStatements).ToList();
 
             return statementInfoModel;
         }
