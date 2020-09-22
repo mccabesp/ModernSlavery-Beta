@@ -2,7 +2,7 @@
 @model ModernSlavery.WebUI.Viewing.Models.StatementViewModel
 @{
     //Required for variables in Sitemap taghelpers
-    var reportingPeriod = (Model.StatementDeadline.Year - 1) + "-" + (Model.StatementDeadline.Year).ToTwoDigitYear();
+    var reportingPeriod = (Model.SubmissionDeadline.Year - 1) + "-" + (Model.SubmissionDeadline.Year).ToTwoDigitYear();
 
     Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = Model.OrganisationName + " Modern Slavery statement" + " / " + reportingPeriod;
@@ -19,7 +19,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">
-            @Model.OrganisationName modern slavery statement summary @(Model.StatementDeadline.Year - 1) to @Model.StatementDeadline.Year
+            @Model.OrganisationName modern slavery statement summary @(Model.SubmissionDeadline.Year - 1) to @Model.SubmissionDeadline.Year
         </h1>
 
         <details class="govuk-details" data-module="govuk-details">
@@ -29,7 +29,7 @@
                 </span>
             </summary>
             <div class="govuk-details__text">
-                @* Model.OrganisationAddress *@
+                Model.
             </div>
         </details>
 
@@ -58,6 +58,8 @@
     </div>
 </div>
 
+<hr class="govuk-section-break govuk-section-break--visible">
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <div class="govuk-panel govuk-panel--highlight">
@@ -65,8 +67,7 @@
                 <p class="govuk-body">
                     Link to full statement
                     <br>
-                    @* Link to statement *@
-                    <a class="govuk-link" href="#">Go to full modern slavery statement on organisation’s website</a>
+                    <a class="govuk-link" href="#@Model.StatementUrl">Go to full modern slavery statement on organisation’s website</a>
                 </p>
             </div>
         </div>
@@ -74,12 +75,55 @@
         <ul>
             Contents
             <li><a class="govuk-link" href="#statement-period">Statement period and sign-off details</a></li>
-            <li><a class="govuk-link" href="#">Areas covered by statement</a></li>
+            <li><a class="govuk-link" href="#areas-covered">Areas covered by statement</a></li>
         </ul>
 
         <h2 id="statement-period" class="govuk-heading-m">
             Statement period and sign-off details
         </h2>
+
+        <p class="govuk-body govuk-!-font-weight-bold">
+            The statement covers the following period:
+        </p>
+
+        <p class="govuk-body">
+            @Model.StatementStartDate.ToString("d MMMM yyyy") to @Model.StatementEndDate.ToString("d MMMM yyyy")
+        </p>
+
+        <p class="govuk-body govuk-!-font-weight-bold">
+            The name of the director (or equivalent) that signed off the statement is:
+        </p>
+
+        <p class="govuk-body">
+            @Model.ApproverFirstName @Model.ApproverLastName, @Model.ApproverJobTitle
+        </p>
+
+        <p class="govuk-body govuk-!-font-weight-bold">
+            The statement was approved by the board or equivalent management body on:
+        </p>
+
+        <p class="govuk-body">
+            @Model.ApprovedDate.ToString("d MMMM yyyy")
+        </p>
+
+        <h2 id="areas-covered" class="govuk-heading-m">
+            Areas covered by statement
+        </h2>
+
+        <p class="govuk-body">
+            Government guidance encourages organisations to cover a range of areas in their modern slavery statements.
+        </p>
+
+        <p class="govuk-body govuk-!-font-weight-bold">
+            The statement covers the following recommended areas:
+        </p>
+
+        <p class="govuk-body">
+        </p>
+
+        <p class="govuk-body govuk-!-font-weight-bold">
+            The statement does not cover the following area(s):
+        </p>
 
         <p class="govuk-body">
         </p>

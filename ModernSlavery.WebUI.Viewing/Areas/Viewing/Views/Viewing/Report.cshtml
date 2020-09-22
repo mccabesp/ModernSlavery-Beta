@@ -2,7 +2,7 @@
 @model ModernSlavery.WebUI.Viewing.Models.StatementViewModel
 @{
     //Required for variables in Sitemap taghelpers
-    var reportingPeriod = (Model.StatementDeadline.Year - 1) + "-" + (Model.StatementDeadline.Year).ToTwoDigitYear();
+    var reportingPeriod = (Model.SubmissionDeadline.Year - 1) + "-" + (Model.SubmissionDeadline.Year).ToTwoDigitYear();
 
     Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = Model.OrganisationName + " Modern Slavery statement" + " / " + reportingPeriod;
@@ -52,7 +52,7 @@
                 <div>
                     <dt class="metadata-text-label">Approved By</dt>
                     <dd class="metadata-text-value">
-                        <span>@Model.Approver</span>
+                        <span>@Model.ApproverFirstName @Model.ApproverLastName, @Model.ApproverJobTitle</span>
                     </dd>
                 </div>
             }

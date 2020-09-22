@@ -98,10 +98,11 @@ namespace ModernSlavery.WebUI.Viewing.Models
 
         #region General Properties
         public long StatementId { get; set; }
-        [IgnoreMap]
-        public DateTime StatementDeadline { get; set; }
+        public DateTime SubmissionDeadline { get; set; }
         public long OrganisationId { get; set; }
         public string OrganisationName { get; set; }
+        [IgnoreMap]
+        public string OrganisationAddress { get; set; }
         [IgnoreMap]
         public string EncryptedOrganisationId { get; set; }
         [IgnoreMap]
@@ -123,8 +124,9 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public string StatementUrl { get; set; }
         public DateTime StatementStartDate { get; set; }
         public DateTime StatementEndDate { get; set; }
-        [IgnoreMap]
-        public string Approver { get; set; }
+        public string ApproverFirstName { get; set; }
+        public string ApproverLastName { get; set; }
+        public string ApproverJobTitle { get; set; }
         public DateTime ApprovedDate { get; set; }
         #endregion
 
