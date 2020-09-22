@@ -10,7 +10,8 @@ namespace ModernSlavery.Hosts.Web.Tests
     public static class TestData
     {
         //org details
-        public static Organisation Organisation { get; } = OrganisationHelper.ListOrganisations(TestRunSetup.TestWebHost).OrderBy(o => o.OrganisationName).FirstOrDefault();
+        public static Organisation Organisation { get; set; }
+            = OrganisationHelper.ListOrganisations(TestRunSetup.TestWebHost).OrderBy(o => o.OrganisationName).FirstOrDefault();
 
         public static string EmployerReference => Organisation.OrganisationReference;
         public static string OrgName => Organisation.OrganisationName;

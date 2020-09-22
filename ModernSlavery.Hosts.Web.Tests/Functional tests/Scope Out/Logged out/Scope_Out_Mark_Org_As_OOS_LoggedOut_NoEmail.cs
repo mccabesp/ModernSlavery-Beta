@@ -12,27 +12,32 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-
     [TestFixture]
-
     public class Scope_Out_Mark_Org_As_OOS_LoggedOut_NoEmail : UITest
     {
-       protected string EmployerReference;
+        protected string EmployerReference;
+
+        [OneTimeSetUp]
+        public async Task SetUp()
+        {
+            TestData.Organisation = TestRunSetup.TestWebHost.GetOrganisation("00032539 Public Limited Company");
+        }
 
         [Test, Order(20)]
         public async Task SetSecurityCode()
         {
-            var result = Testing.Helpers.Extensions.OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
+            var result = OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
 
             if (result.Failed)
             {
                 throw new Exception("Unable to set security code");
             }
 
-            await Testing.Helpers.Extensions.OrganisationHelper.SaveAsync(TestRunSetup.TestWebHost);
+            await TestRunSetup.TestWebHost.SaveAsync();
 
             await Task.CompletedTask;
         }
@@ -130,7 +135,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //RightOfText("Registered address").Expect("");
 
             RightOfText("Reason your organisation is not required to publish a modern slavery statement on your website").Expect("Here are the reasons why.");
-            
+
 
 
 

@@ -16,15 +16,19 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-
     [TestFixture]
-
-
     public class Scope_Out_Mark_Org_As_OOS_LoggedIn : CreateAccount
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
         string Pin;
+
+        [OneTimeSetUp]
+        public async Task SetUp()
+        {
+            TestData.Organisation = TestRunSetup.TestWebHost.GetOrganisation("A E Stuart Limited");
+        }
+
         public Scope_Out_Mark_Org_As_OOS_LoggedIn() : base(_firstname, _lastname, _title, _email, _password)
         {
 
@@ -132,7 +136,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ExpectHeader("Organisation details");
 
-            RightOfText("Organisation Reference").Expect(Registration.Organisation.OrganisationReference);
+            RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference);
             RightOfText("Organisation Name").Expect(TestData.OrgName);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");
