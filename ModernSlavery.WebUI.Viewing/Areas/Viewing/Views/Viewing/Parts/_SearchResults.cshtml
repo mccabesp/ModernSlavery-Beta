@@ -15,15 +15,15 @@
                         </h2>
                         <div class="panel font-xsmall">
                             <div>Submitted under </div>
-                            <strong>@Html.ActionLink(organisation.ParentName, "Statement", "Viewing", new { organisationIdentifier, organisation.StatementDeadlineYear })</strong>
+                            <strong>@Html.ActionLink(organisation.ParentName, "Statement", "Viewing", new { organisationIdentifier, organisation.SubmissionDeadlineYear })</strong>
                         </div>
                     }
                     else
                     {
                         <h2>
-                            @Html.ActionLink(organisation.OrganisationName, "Statement", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId), organisation.StatementDeadlineYear })
+                            @Html.ActionLink(organisation.OrganisationName, "Statement", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId), organisation.SubmissionDeadlineYear })
                         </h2>
-                        @if (organisation.IsParent)
+                        @if (organisation.GroupSubmission)
                         {
                             <div class="panel font-xsmall">
                                 <div>Submitted as group</div>
@@ -40,7 +40,7 @@
                     }
                     <dl class="metadata">
                         <dt class="metadata-text-label">Statement year</dt>
-                        <dd class="metadata-text-value">@(organisation.StatementDeadlineYear-1) to @(organisation.StatementDeadlineYear)</dd>
+                        <dd class="metadata-text-value">@(organisation.SubmissionDeadlineYear-1) to @(organisation.SubmissionDeadlineYear)</dd>
                     </dl>
                 </div>
             </div>

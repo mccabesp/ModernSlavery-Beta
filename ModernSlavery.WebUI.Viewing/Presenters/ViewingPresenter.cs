@@ -68,6 +68,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
                 searchQuery.Years,
                 false,
                 false,
+                false,
                 searchQuery.PageNumber,
                 searchQuery.PageSize);
 

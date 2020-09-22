@@ -12,7 +12,6 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebAPI.Models;
-using ModernSlavery.WebAPI.Public.Models;
 
 namespace ModernSlavery.WebAPI.Public.Controllers
 {
@@ -40,7 +39,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <param name="searchQuery">The parameters of the search</param>
         /// <returns>A list of organisations</returns>
         [HttpGet("SearchOrganisations")]
-        public async IAsyncEnumerable<OrganisationSearchModel> SearchOrganisations([FromQuery] SearchQueryModel searchQuery)
+        public async IAsyncEnumerable<StatementSummaryModel> SearchOrganisations([FromQuery] SearchQueryModel searchQuery)
         {
             //Ensure search service is enabled
             if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable,"Service is disabled");
@@ -56,12 +55,13 @@ namespace ModernSlavery.WebAPI.Public.Controllers
                 searchQuery.Years,
                 false,
                 false,
+                true,
                 searchQuery.PageNumber,
                 searchQuery.PageSize);
 
             // build the result view model
             foreach (var organisationSearchModel in searchResults.Results)
-                yield return organisationSearchModel;
+                yield return _mapper.Map<StatementSummaryModel>(organisationSearchModel);
         }
 
         /// <summary>
@@ -72,17 +72,11 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         [HttpGet("ListStatements")]
         public async IAsyncEnumerable<StatementSummaryModel> ListStatements([FromQuery] params int[] years)
         {
-            IQueryable<Statement> statements;
-            
-            if (years!=null && years.Length > 0) 
-                statements = _dataRepository.GetAll<Statement>().Where(s => s.Status == StatementStatuses.Submitted && years.Contains(s.SubmissionDeadline.Year)).OrderBy(s => s.Organisation.OrganisationName);
-            else 
-                statements = _dataRepository.GetAll<Statement>().Where(s => s.Status == StatementStatuses.Submitted).OrderBy(s => s.SubmissionDeadline.Year).ThenBy(s => s.Organisation.OrganisationName);
+            var statementSummaryModels = SearchOrganisations(new SearchQueryModel { Years=years });
 
-            
-            foreach (var statement in statements)
-                yield return _mapper.Map<StatementSummaryModel>(statement);
-
+            // build the result view model
+            await foreach (var statementSummaryModel in statementSummaryModels)
+                yield return statementSummaryModel;
         }
     }
 }

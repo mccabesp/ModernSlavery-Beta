@@ -223,7 +223,7 @@ namespace ModernSlavery.Infrastructure.Search
             var batches = new ConcurrentBag<IndexBatch<AzureOrganisationSearchModel>>();
             while (actions.Any())
             {
-                var batchSize = actions.Count > 1000 ? 1000 : actions.Count;
+                var batchSize = actions.Count > _searchOptions.BatchSize ? _searchOptions.BatchSize : actions.Count;
                 var batch = IndexBatch.New(actions.Take(batchSize).ToList());
                 batches.Add(batch);
                 actions.RemoveRange(0, batchSize);

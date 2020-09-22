@@ -1,49 +1,32 @@
 using System;
 using System.Collections.Generic;
 using AutoMapper;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Models
 {
-    [Serializable]
-    public class OrganisationSearchModel
+    public class StatementSummaryModelMapperProfile : Profile
     {
-        public class OrganisationSearchModelMapperProfile : Profile
+        public StatementSummaryModelMapperProfile()
         {
-            public OrganisationSearchModelMapperProfile()
-            {
-                CreateMap<OrganisationSearchModel, OrganisationSearchModel>();
-            }
+            CreateMap<OrganisationSearchModel, StatementSummaryModel>()
+                .ForMember(d => d.OrganisationType, opt => opt.MapFrom(s => (SectorTypes?)s.Turnover))
+                .ForMember(d => d.Turnover, opt => opt.MapFrom(s => (StatementTurnovers?)s.Turnover))
+                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => (StatementYears?)s.StatementYears));
         }
+    }
 
-        public override bool Equals(object obj)
-        {
-            var target = obj as OrganisationSearchModel;
-            return target != null && target.SearchDocumentKey == SearchDocumentKey;
-        }
-
-        public override int GetHashCode()
-        {
-            return SearchDocumentKey.GetHashCode();
-        }
-
-        #region Search Properties
-        public virtual string SearchDocumentKey { get; set; }
-        public virtual string PartialNameForSuffixSearches { get; set; }
-        public virtual string PartialNameForCompleteTokenSearches { get; set; }
-        public virtual string[] Abbreviations { get; set; }
-        public virtual DateTime Timestamp { get; } = VirtualDateTime.Now;
-
-        #endregion
-
+    [Serializable]
+    public class StatementSummaryModel
+    {
         #region General Properties
         public virtual long? StatementId { get; set; }
         public virtual long ParentOrganisationId { get; set; }
         public virtual int? SubmissionDeadlineYear { get; set; }
         public virtual string OrganisationName { get; set; }
 
-        public virtual int? OrganisationType { get; set; }
-
+        public SectorTypes OrganisationType { get; set; }
         public AddressModel Address { get; set; }
 
         public virtual string CompanyNumber { get; set; }
@@ -87,11 +70,10 @@ namespace ModernSlavery.Core.Models
         #endregion
 
         #region Your Organisation
-        public virtual int[] SectorTypeIds { get; set; }
         public List<string> Sectors { get; set; } = new List<string>();
         public string OtherSector { get; set; }
 
-        public virtual int? Turnover { get; set; }
+        public virtual StatementTurnovers? Turnover { get; set; }
         #endregion
 
         #region Policies
@@ -125,22 +107,7 @@ namespace ModernSlavery.Core.Models
         public bool? IncludesMeasuringProgress { get; set; }
         public string ProgressMeasures { get; set; }
         public string KeyAchievements { get; set; }
-        public int? StatementYears { get; set; }
+        public StatementYears? StatementYears { get; set; }
         #endregion
-
-        public OrganisationSearchModel SetSearchDocumentKey()
-        {
-            var key = ParentOrganisationId.ToString();
-            if (SubmissionDeadlineYear.HasValue) key += $"-{SubmissionDeadlineYear}";
-            if (!string.IsNullOrWhiteSpace(ParentName))
-            {
-                if (ChildOrganisationId.HasValue)
-                    key += $"-{ChildOrganisationId}";
-                else
-                    key += $"-{OrganisationName.ToLower()}";
-            }
-            SearchDocumentKey = key;
-            return this;
-        }
     }
 }

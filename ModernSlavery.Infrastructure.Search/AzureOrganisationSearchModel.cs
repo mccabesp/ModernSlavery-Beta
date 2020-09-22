@@ -1,12 +1,22 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using AutoMapper;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Infrastructure.Search
 {
+    public class AzureOrganisationSearchModelMapperProfile : Profile
+    {
+        public AzureOrganisationSearchModelMapperProfile()
+        {
+            CreateMap<OrganisationSearchModel, AzureOrganisationSearchModel>();
+        }
+    }
+
     [Serializable]
     public class AzureOrganisationSearchModel : OrganisationSearchModel
     {
@@ -51,7 +61,7 @@ namespace ModernSlavery.Infrastructure.Search
         [IsSortable]
         [IsFilterable] 
         //[IsFacetable] 
-        public override int? StatementDeadlineYear { get; set; }
+        public override int? SubmissionDeadlineYear { get; set; }
 
         [IsRetrievable(false)]
         [IsSortable]
