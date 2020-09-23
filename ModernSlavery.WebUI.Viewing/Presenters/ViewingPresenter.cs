@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
@@ -38,16 +39,23 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         private readonly IViewingService _viewingService;
         public IObfuscator Obfuscator { get; }
         private readonly IMapper _mapper;
+        private readonly IServiceProvider _serviceProvider;
         #endregion
 
         #region Constructor
-        public ViewingPresenter(IViewingService viewingService, IStatementBusinessLogic statementBusinessLogic, ISharedBusinessLogic sharedBusinessLogic, IObfuscator obfuscator, IMapper mapper)
+        public ViewingPresenter(IViewingService viewingService,
+            IStatementBusinessLogic statementBusinessLogic,
+            ISharedBusinessLogic sharedBusinessLogic,
+            IObfuscator obfuscator,
+            IServiceProvider serviceProvider,
+            IMapper mapper)
         {
             _viewingService = viewingService;
             _statementBusinessLogic = statementBusinessLogic;
             _sharedBusinessLogic = sharedBusinessLogic;
             Obfuscator = obfuscator;
             _mapper = mapper;
+            _serviceProvider = serviceProvider;
         }
         #endregion
 
@@ -256,7 +264,8 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             var statementModel = openOutcome.Result;
 
             //Copy the statement properties to the view model
-            var statementViewModel=_mapper.Map<StatementViewModel>(statementModel);
+            var viewModel = ActivatorUtilities.CreateInstance<StatementViewModel>(_serviceProvider);
+            var statementViewModel = _mapper.Map(statementModel, viewModel);
 
             //Return the view model
             return new Outcome<StatementErrors, StatementViewModel>(statementViewModel);

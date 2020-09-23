@@ -17,7 +17,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
             CreateMap<StatementModel.RisksModel, StatementViewModel.RiskViewModel>();
             CreateMap<StatementModel.DiligenceModel, StatementViewModel.DueDiligenceViewModel>();
 
-            CreateMap<StatementModel, StatementViewModel>().DisableCtorValidation();
+            CreateMap<StatementModel, StatementViewModel>();
         }
     }
 
