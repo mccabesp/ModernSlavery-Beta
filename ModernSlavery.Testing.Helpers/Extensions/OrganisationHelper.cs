@@ -19,6 +19,13 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 {
     public static class OrganisationHelper
     {
+        public static T Find<T>(this IHost host, Func<T, bool> query)
+            where T : class
+        {
+            var dataRepository = host.GetDataRepository();
+            return dataRepository.GetAll<T>().Where(query).FirstOrDefault();
+        }
+
         public static Organisation GetOrganisation(this IHost host, string organisationName)
         {
             var dataRepository = host.GetDataRepository();
