@@ -12,8 +12,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     public class GroupResultsViewModel
     {
         [Required(AllowEmptyStrings = false)]
+        [StringLength(
+            100,
+            ErrorMessage = "You must enter an organisations name or company number between 3 and 100 characters in length",
+            MinimumLength = 3)]
         public string SearchKeywords { get; set; }
-        [Required(AllowEmptyStrings =false)]
+        [Required(AllowEmptyStrings = false)]
         [MaxLength(100)]
         public string OrganisationName { get; set; }
 

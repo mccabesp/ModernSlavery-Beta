@@ -3,6 +3,7 @@
 @{
     var reportingDeadline = Model.StatementInfo.ReportingDeadline.AddDays(-1);
     var reportDateFormatter = new GDSDateFormatter(reportingDeadline);
+    var groupSubmissionWord = Model.StatementInfo.SubmittedStatementModifiedDate == null ? (Model.DraftAvailable ? "Also" : "Already") : "Also";
 }
 <div class="gpg-manage-reports__row">
 
@@ -23,22 +24,23 @@
         </div>
         @*TODO: get CanChangeScope flag working*@
         @*@if (Model.CanChangeScope)
-        {*@
-            <div>
-                <a id="ChangeScope@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@(Url.ActionArea("ChangeOrganisationScope", "Scope", "Submission", new {organisationIdentifier = Model.OrganisationIdentifier, reportingDeadlineYear=reportDateFormatter.StartYear}))">Change</a>
-            </div>
+            {*@
+        <div>
+            <a id="ChangeScope@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@(Url.ActionArea("ChangeOrganisationScope", "Scope", "Submission", new {organisationIdentifier = Model.OrganisationIdentifier, reportingDeadlineYear=reportDateFormatter.StartYear}))">Change</a>
+        </div>
         @*}*@
     </div>
 
     <div class="gpg-manage-reports__cell">
         <div>
+
             @if (Model.StatementInfo.SubmittedStatementModifiedDate == null)
             {
                 if (Model.DraftAvailable)
                 {
                     <span>In progress</span>
                 }
-                else
+                else if (Model.StatementInfo.GroupSubmissionInfo == null)
                 {
                     <span>Not started</span>
                 }
@@ -53,6 +55,30 @@
                 var modifiedDateFormatter = new GDSDateFormatter(Model.StatementInfo.SubmittedStatementModifiedDate.Value);
                 <span> on @modifiedDateFormatter.FullStartDate</span>
             }
+
+            @if (Model.StatementInfo.GroupSubmissionInfo != null)
+            {
+                <div class="group-submission-info">
+                    @if (Model.StatementInfo.GroupSubmissionInfo.Count > 1)
+                    {
+                        <span> @groupSubmissionWord included in:</span>
+
+                        <ul class="govuk-list--bullet">
+                            @foreach (var submission in Model.StatementInfo.GroupSubmissionInfo)
+                            {
+                                <li>@submission</li>
+                            }
+                        </ul>
+
+
+                    }
+                    @if (Model.StatementInfo.GroupSubmissionInfo.Count == 1)
+                    {
+                        <span>@groupSubmissionWord included in @Model.StatementInfo.GroupSubmissionInfo.FirstOrDefault()</span>
+                    }
+                </div>
+            }
+
         </div>
     </div>
 

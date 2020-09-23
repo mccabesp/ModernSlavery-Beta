@@ -21,7 +21,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<GroupSearchViewModel, StatementModel>(MemberList.Source)
                 .IncludeBase<GroupOrganisationsViewModel, StatementModel>()
                 .ForSourceMember(d => d.GroupResults, opt => opt.DoNotValidate())
-                .ForSourceMember(d => d.GroupReviewUrl, opt => opt.DoNotValidate());
+                .ForSourceMember(d => d.GroupReviewUrl, opt => opt.DoNotValidate())
+                .ForSourceMember(d => d.ShowBanner, opt => opt.DoNotValidate());
 
             CreateMap<StatementModel, GroupSearchViewModel>()
                 .IncludeBase<StatementModel, GroupOrganisationsViewModel>();
@@ -30,13 +31,16 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class GroupSearchViewModel : GroupOrganisationsViewModel
     {
-        public override string PageTitle => "Who is your statement for?";
+        public override string PageTitle => "Which organisations are included in your group statement?";
         [IgnoreMap]
         [BindNever]
         public string GroupReviewUrl { get; set; }
 
         [IgnoreMap]
         public GroupResultsViewModel GroupResults { get; set; } = new GroupResultsViewModel();
+        [IgnoreMap]
+        [BindNever]
+        public bool? ShowBanner { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

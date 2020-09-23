@@ -2,9 +2,11 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model GroupReviewViewModel
-@if (!string.IsNullOrWhiteSpace(Model.BackUrl))
-{
-    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+@section BeforeMain {
+    @if (!string.IsNullOrWhiteSpace(Model.BackUrl))
+    {
+        <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+    }
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -23,38 +25,54 @@
                             for @(Model.OrganisationName) (@(Model.ReportingDeadlineYear-1) to @(Model.ReportingDeadlineYear))
                         </h2>
                     </legend>
-                    <div class="govuk-hint">
+
+
+                    <p class="govuk-body">
                         You’ve told us your statement is for the following group of organisations. You can add more organisations to the group, or remove organisations, before confirming and continuing.
-                    </div>
-                    <div class="govuk-hint">
+
+                    </p>
+
+                    <p class="govuk-body">
                         If your statement is for a single organisation, and not a group, you can return to the ‘Who is your statement for?’ page and <a class="govuk-link" href="@Model.GroupStatusUrl">specify a single organisation</a>.
-                    </div>
+                    </p>
                 </fieldset>
-            </div>
 
-            @for (var organisationIndex = 0; organisationIndex < Model.StatementOrganisations.Count; organisationIndex++)
-            {
-                <div>
-                    @(Model.StatementOrganisations[organisationIndex].OrganisationName)
-                </div>
+                @if (Model.StatementOrganisations.Count >= 1 && Model.StatementOrganisations.Count <= 5)
+                {
+                    <partial name="GroupSearch/_ReviewList" model="Model" />
+                }
+                @if (Model.StatementOrganisations.Count > 5)
+                {
 
-                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="removeIndex" value="@organisationIndex">
-                    Remove
+                    <div class="govuk-accordion" data-module="govuk-accordion" id="organisation-accordion">
+                        <div class="govuk-accordion__section ">
+                            <div class="govuk-accordion__section-header">
+                                <h2 class="govuk-accordion__section-heading">
+                                    <span class="govuk-accordion__section-button" id="organisation-accordion">
+                                        Included in statement <span>(@(Model.StatementOrganisations.Count) organisations)</span>
+                                    </span>
+                                </h2>
+                            </div>
+                            <div id="organisation-accordion" class="govuk-accordion__section-content" aria-labelledby="organisation-accordion">
+                                <partial name="GroupSearch/_ReviewList" model="Model" />
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                    Confirm and continue
                 </button>
 
-            }
+                <a href="@Model.GroupSearchUrl" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    Select more organisations
+                </a>
 
-            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
-                Confirm and Continue
-            </button>
+                <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+                    Cancel
+                </button>
 
-            <a href="@Model.GroupSearchUrl" class="govuk-button govuk-button--secondary" data-module="govuk-button">
-                Select more organisations
-            </a>
-
-            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
-                Cancel
-            </button>
+            </div>
         }
     </div>
 </div>

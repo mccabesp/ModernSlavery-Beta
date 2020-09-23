@@ -325,6 +325,28 @@ namespace ModernSlavery.BusinessDomain.Submission
             };
         }
 
+        private async Task<IEnumerable<Statement>> FindGroupSubmissionStatementsAsync(long organisationId, int? reportingDeadlineYear = null)
+        {
+            var statementOrganisations = await _organisationBusinessLogic.DataRepository.ToListAsync<StatementOrganisation>
+                (s => s.OrganisationId == organisationId);
+
+            if (reportingDeadlineYear != null)
+                statementOrganisations = statementOrganisations.Where(x => x.Statement.SubmissionDeadline.Year == reportingDeadlineYear).ToList();
+
+            return statementOrganisations.OrderByDescending(x => x.Statement.Modified).Select(s => s.Statement);
+        }
+
+        private IEnumerable<string> GetGroupSubmissionInformationString(IEnumerable<Statement> statements)
+        {
+            var result = new List<string>();
+            foreach (var statement in statements)
+            {
+                result.Add($"{statement.Organisation.OrganisationName}'s {statement.SubmissionDeadline.Year - 1} to {statement.SubmissionDeadline.Year} group submission, published on {statement.Modified:d MMM yyyy}");
+
+            }
+            return result;
+        }
+
         #endregion
 
         #region Public Methods
@@ -354,7 +376,8 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             //Get the submitted statement info
             var statement = organisation.Statements.FirstOrDefault(s => s.SubmissionDeadline == reportingDeadline);
-            if (statement != null) statementInfoModel.SubmittedStatementModifiedDate = statement?.Modified;
+            if (statement != null)
+                statementInfoModel.SubmittedStatementModifiedDate = statement?.Modified;
 
             //Get the draft statement info
             var statementModel = await FindDraftStatementModelAsync(organisation.OrganisationId, reportingDeadline);
@@ -363,6 +386,10 @@ namespace ModernSlavery.BusinessDomain.Submission
                 statementInfoModel.DraftStatementModifiedDate = statementModel.EditTimestamp;
                 statementInfoModel.DraftStatementIsEmpty = statementModel.IsEmpty();
             }
+
+            //Get group status info
+            var groupStatements = await FindGroupSubmissionStatementsAsync(organisation.OrganisationId);
+            if (groupStatements.Any()) statementInfoModel.GroupSubmissionInfo = GetGroupSubmissionInformationString(groupStatements).ToList();
 
             return statementInfoModel;
         }
@@ -736,6 +763,28 @@ namespace ModernSlavery.BusinessDomain.Submission
             return GetModifications(oldStatementModel, newStatementModel);
         }
 
+        public async Task<string> GetExistingStatementInformation(long organisationId, DateTime reportingDeadline)
+        {
+            var submission = await FindSubmittedStatementAsync(organisationId, reportingDeadline);
+            if (submission != null)
+                return $"Included in the {reportingDeadline.Year - 1} to {reportingDeadline.Year} statement for {submission.Organisation.OrganisationName}\n" +
+                    $"(submitted to our service on {submission.Modified:dd MMM yyyy})";
+
+
+            var groupSubmission = await FindGroupSubmissionStatementsAsync(organisationId, reportingDeadline.Year);
+            if (groupSubmission.Any())
+                return $"Included in the {reportingDeadline.Year - 1} to {reportingDeadline.Year} statement for {groupSubmission.FirstOrDefault().Organisation.OrganisationName}\n" +
+                    $"(submitted to our service on {groupSubmission.FirstOrDefault().Modified:dd MMM yyyy})";
+
+            var draftFilePath = GetDraftFilepath(organisationId, reportingDeadline.Year);
+            var draftExists = await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath);
+
+            if (draftExists)
+                return $"Draft submission in progress on our service";
+
+            return null;
+
+        }
 
         #endregion
     }
