@@ -8,8 +8,10 @@ using System.Web;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
+using Microsoft.Extensions.Options;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
@@ -38,7 +40,7 @@ namespace ModernSlavery.Infrastructure.Search
             SearchOptions searchOptions,
             [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog,
             IMapper autoMapper,
-            TelemetryClient telemetryClient = null)
+            IOptions<TelemetryConfiguration> telemetryOptions=null)
         {
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             _searchOptions = searchOptions ?? throw new ArgumentNullException(nameof(searchOptions));
@@ -49,10 +51,11 @@ namespace ModernSlavery.Infrastructure.Search
                 Console.WriteLine($"{nameof(AzureOrganisationSearchRepository)} is disabled");
                 return;
             }
-            _autoMapper = autoMapper;
             SearchLog = searchLog;
-            IndexName = searchOptions.OrganisationIndexName.ToLower();
+            _autoMapper = autoMapper;
+            _telemetryClient = telemetryOptions==null ? null : new TelemetryClient(telemetryOptions.Value);
 
+            IndexName = searchOptions.OrganisationIndexName.ToLower();
             if (string.IsNullOrWhiteSpace(searchOptions.ServiceName)) throw new ArgumentNullException(nameof(searchOptions.ServiceName));
 
 #if DEBUG
@@ -231,9 +234,10 @@ namespace ModernSlavery.Infrastructure.Search
 
             var indexClient = await _indexClient.Value;
 
-            Parallel.ForEach(
-                batches,
-                batch =>
+            //Parallel.ForEach(
+            //    batches,
+            //    batch =>
+            foreach (var batch in batches)
                 {
                     var retries = 0;
                     retry:
@@ -252,7 +256,7 @@ namespace ModernSlavery.Infrastructure.Search
 
                         throw;
                     }
-                });
+                }
         }
 
         public async Task<int> DeleteDocumentsAsync(IEnumerable<OrganisationSearchModel> oldRecords)
@@ -398,23 +402,31 @@ namespace ModernSlavery.Infrastructure.Search
             if (facets != null && facets.Count > 0) sp.Facets = facets;
 
             //Execute the search
-            var results = await indexClient.Documents.SearchAsync<OrganisationSearchModel>(searchText, sp);
+            var headers = new Dictionary<string, List<string>>() { { "x-ms-azs-return-searchid", new List<string>() { "true" } } };
+            var results = await indexClient.Documents.SearchWithHttpMessagesAsync<OrganisationSearchModel>(searchText, sp,customHeaders:headers);
 
             //Return the total records
-            var totalRecords = results.Count.Value;
+            var totalRecords = results.Body.Count.Value;
 
             /* There are too many empty searches being executed (about 1200). This needs further investigation to see if/how they can be reduced */
-            if (!string.IsNullOrEmpty(searchText))
+            if (!string.IsNullOrEmpty(searchText) && currentPage==1)
             {
+                //Get the search id for logging purposes
+                var searchId = results.Response.Headers.TryGetValues("x-ms-azs-searchid", out IEnumerable<string> headerValues) ? headerValues.FirstOrDefault() : string.Empty;
+
                 var telemetryProperties = new Dictionary<string, string>
                 {
                     {"TimeStamp", VirtualDateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")},
+                    {"SearchServiceName", _searchOptions.ServiceName},
+                    {"IndexName", IndexName},
+                    {"SearchId", searchId},
                     {"QueryTerms", searchText},
-                    {"ResultCount", totalRecords.ToString()},
-                    {"SearchParameters", HttpUtility.UrlDecode(sp.ToString())}
+                    {"Filter",sp.Filter},
+                    {"OrderBy",sp.OrderBy.ToDelimitedString()},
+                    {"ResultCount", totalRecords.ToString()}
                 };
 
-                _telemetryClient?.TrackEvent("msu_Search", telemetryProperties);
+                _telemetryClient?.TrackEvent("Search", telemetryProperties);
 
                 await SearchLog.WriteAsync(telemetryProperties);
             }
@@ -423,7 +435,7 @@ namespace ModernSlavery.Infrastructure.Search
             //Create the results
             var searchResults = new PagedSearchResult<OrganisationSearchModel>
             {
-                Results = results.Results.Select(r => r.Document).ToList(),
+                Results = results.Body.Results.Select(r => r.Document).ToList(),
                 CurrentPage = currentPage,
                 PageSize = pageSize,
                 ActualRecordTotal = totalRecords,
@@ -431,14 +443,14 @@ namespace ModernSlavery.Infrastructure.Search
             };
 
             //Add the facet results
-            if (results.Facets != null && results.Facets.Count>0)
+            if (results.Body.Facets != null && results.Body.Facets.Count>0)
             {
                 searchResults.facets = new Dictionary<string, Dictionary<object, long>>();
-                foreach (var facetGroupKey in results.Facets.Keys)
+                foreach (var facetGroupKey in results.Body.Facets.Keys)
                 {
                     searchResults.facets[facetGroupKey] = new Dictionary<object, long>();
 
-                    foreach (var facetResult in results.Facets[facetGroupKey])
+                    foreach (var facetResult in results.Body.Facets[facetGroupKey])
                         searchResults.facets[facetGroupKey][facetResult.Value] = facetResult.Count.Value;
                 }
             }

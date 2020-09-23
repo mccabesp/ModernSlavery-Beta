@@ -75,8 +75,6 @@ namespace ModernSlavery.Infrastructure.Hosts
             hostBuilder.ConfigureLogging((hostBuilderContext, loggingBuilder) =>
             {
                 loggingBuilder.ClearProviders();
-                //Setup the seri logger
-                hostBuilderContext.Configuration.SetupSerilogLogger();
                 //loggingBuilder.AddAzureQueueLogger(); //Use the custom logger
                 var instrumentationKey = appConfig["ApplicationInsights:InstrumentationKey"];
                 loggingBuilder.AddApplicationInsights(instrumentationKey); //log to app insights
