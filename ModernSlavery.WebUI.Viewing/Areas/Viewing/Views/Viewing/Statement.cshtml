@@ -29,11 +29,11 @@
                 </span>
             </summary>
             <div class="govuk-details__text">
-                Model.
+
             </div>
         </details>
 
-        <p class="govuk-body">
+        <p class="govuk-body govuk-!-font-size-24">
             Read a summary of this organisation’s modern slavery statement, or link to the full statement on the organisation’s website.
             The summary does not replace the full statement.
             @* Group orgs content *@
@@ -58,17 +58,15 @@
     </div>
 </div>
 
-<hr class="govuk-section-break govuk-section-break--visible">
+<hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-8">
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <div class="govuk-panel govuk-panel--highlight">
-            <div class="govuk-panel__body">
-                <p class="govuk-body">
-                    Link to full statement
-                    <br>
-                    <a class="govuk-link" href="#@Model.StatementUrl">Go to full modern slavery statement on organisation’s website</a>
-                </p>
+            <div class="govuk-panel__body govuk-!-font-size-24">
+                <strong>Link to full statement</strong>
+                <br>
+                <a class="govuk-link govuk-!-font-size-16" href="@Model.StatementUrl" rel="noreferrer noopener">Go to full modern slavery statement on organisation’s website</a>
             </div>
         </div>
 
