@@ -19,7 +19,7 @@ namespace ModernSlavery.Infrastructure.Telemetry
         public void ConfigureServices(IServiceCollection services)
         {
             //Add app insights tracking using ApplicationInsights:InstrumentationKey (from AppSettings.json or Azure KeyVault)
-            services.AddApplicationInsightsTelemetry(_applicationInsightsOptions.InstrumentationKey);
+            services.AddApplicationInsightsTelemetry();
 
             //Add filter to removes Http 404 (NotFound) errors received from file storage from telemetry sent to Application Insights
             services.AddApplicationInsightsTelemetryProcessor<FileNotFoundTelemetryFilter>();

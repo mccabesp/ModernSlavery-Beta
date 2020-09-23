@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
+using ModernSlavery.Core.Classes.StatementTypeIndexes;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Models
@@ -8,9 +11,54 @@ namespace ModernSlavery.Core.Models
     [Serializable]
     public class OrganisationSearchModel
     {
-        public class OrganisationSearchModelMapperProfile : Profile
+        [Serializable]
+        public class KeyName
         {
-            public OrganisationSearchModelMapperProfile()
+            public class AutoMapperProfile : Profile
+            {
+                private readonly SectorTypeIndex _sectorTypeIndex;
+                private readonly PolicyTypeIndex _policyTypeIndex;
+                private readonly RiskTypeIndex _riskTypeIndex;
+                private readonly DiligenceTypeIndex _diligenceTypeIndex;
+                private readonly TrainingTypeIndex _trainingTypeIndex;
+
+                public AutoMapperProfile(
+                    SectorTypeIndex sectorTypeIndex,
+                    PolicyTypeIndex policyTypeIndex,
+                    RiskTypeIndex riskTypeIndex,
+                    DiligenceTypeIndex diligenceTypeIndex,
+                    TrainingTypeIndex trainingTypeIndex)
+                {
+                    _sectorTypeIndex = sectorTypeIndex;
+                    _policyTypeIndex = policyTypeIndex;
+                    _riskTypeIndex = riskTypeIndex;
+                    _diligenceTypeIndex = diligenceTypeIndex;
+                    _trainingTypeIndex = trainingTypeIndex;
+
+                    CreateMap<KeyName, SectorTypes?>().ConstructUsing(s => s == null ? (SectorTypes?)null : (SectorTypes)s.Key);
+                    CreateMap<KeyName, StatementTurnovers?>().ConstructUsing(s => s == null ? (StatementTurnovers?)null : (StatementTurnovers)s.Key);
+                    CreateMap<KeyName, StatementYears?>().ConstructUsing(s => s == null ? (StatementYears?)null : (StatementYears)s.Key);
+
+                    CreateMap<KeyName, SectorTypeIndex.SectorType>().ConstructUsing(s => _sectorTypeIndex.FirstOrDefault(r => r.Id == s.Key));
+                    CreateMap<KeyName, PolicyTypeIndex.PolicyType>().ConstructUsing(s => _policyTypeIndex.FirstOrDefault(r => r.Id == s.Key));
+                    CreateMap<KeyName, RiskTypeIndex.RiskType>().ConstructUsing(s => _riskTypeIndex.FirstOrDefault(r => r.Id == s.Key))
+                        .ForMember(d => d.Description, opt => opt.MapFrom(s => s.Name));
+
+                    CreateMap<KeyName, DiligenceTypeIndex.DiligenceType>().ConstructUsing(s => _diligenceTypeIndex.FirstOrDefault(r => r.Id == s.Key))
+                        .ForMember(d => d.Description, opt => opt.MapFrom(s => s.Name));
+
+                    CreateMap<KeyName, TrainingTypeIndex.TrainingType>().ConstructUsing(s => _trainingTypeIndex.FirstOrDefault(r => r.Id == s.Key))
+                        .ForMember(d => d.Description, opt => opt.MapFrom(s => s.Name));
+                }
+            }
+
+            public int Key { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class AutoMapperProfile : Profile
+        {
+            public AutoMapperProfile()
             {
                 CreateMap<OrganisationSearchModel, OrganisationSearchModel>();
             }
@@ -28,34 +76,34 @@ namespace ModernSlavery.Core.Models
         }
 
         #region Search Properties
-        public virtual string SearchDocumentKey { get; set; }
-        public virtual string PartialNameForSuffixSearches { get; set; }
-        public virtual string PartialNameForCompleteTokenSearches { get; set; }
-        public virtual string[] Abbreviations { get; set; }
-        public virtual DateTime Timestamp { get; } = VirtualDateTime.Now;
+        public string SearchDocumentKey { get; set; }
+        public string PartialNameForSuffixSearches { get; set; }
+        public string PartialNameForCompleteTokenSearches { get; set; }
+        public string[] Abbreviations { get; set; }
+        public DateTime Timestamp { get; } = VirtualDateTime.Now;
 
         #endregion
 
         #region General Properties
-        public virtual long? StatementId { get; set; }
-        public virtual long ParentOrganisationId { get; set; }
-        public virtual int? SubmissionDeadlineYear { get; set; }
-        public virtual string OrganisationName { get; set; }
+        public long? StatementId { get; set; }
+        public long ParentOrganisationId { get; set; }
+        public int? SubmissionDeadlineYear { get; set; }
+        public string OrganisationName { get; set; }
 
-        public virtual int? OrganisationType { get; set; }
+        public KeyName SectorType { get; set; }
 
         public AddressModel Address { get; set; }
 
-        public virtual string CompanyNumber { get; set; }
-        public virtual DateTime Modified { get; set; } = VirtualDateTime.Now;
+        public string CompanyNumber { get; set; }
+        public DateTime Modified { get; set; } = VirtualDateTime.Now;
 
         #endregion
 
         #region Group Submission
         public bool GroupSubmission { get; set; }
-        public virtual string ParentName { get; set; }
-        public virtual long? ChildOrganisationId { get; set; }
-        public virtual long? ChildStatementOrganisationId { get; set; }
+        public string ParentName { get; set; }
+        public long? ChildOrganisationId { get; set; }
+        public long? ChildStatementOrganisationId { get; set; }
         #endregion
 
         #region Your Statement
@@ -87,37 +135,36 @@ namespace ModernSlavery.Core.Models
         #endregion
 
         #region Your Organisation
-        public virtual int[] SectorTypeIds { get; set; }
-        public List<string> Sectors { get; set; } = new List<string>();
+        public List<KeyName> Sectors { get; set; } = new List<KeyName>();
         public string OtherSector { get; set; }
 
-        public virtual int? Turnover { get; set; }
+        public KeyName Turnover { get; set; }
         #endregion
 
         #region Policies
-        public List<string> Policies { get; set; } = new List<string>();
+        public List<KeyName> Policies { get; set; } = new List<KeyName>();
         public string OtherPolicies { get; set; }
 
         #endregion
 
         #region Supply Chain Risks
-        public List<string> RelevantRisks { get; set; } = new List<string>();
+        public List<KeyName> RelevantRisks { get; set; } = new List<KeyName>();
         public string OtherRelevantRisks { get; set; }
-        public List<string> HighRisks { get; set; } = new List<string>();
+        public List<KeyName> HighRisks { get; set; } = new List<KeyName>();
         public string OtherHighRisks { get; set; }
 
-        public List<string> LocationRisks { get; set; } = new List<string>();
+        public List<KeyName> LocationRisks { get; set; } = new List<KeyName>();
         #endregion
 
         #region Due Diligence
-        public List<string> DueDiligences { get; set; } = new List<string>();
+        public List<KeyName> DueDiligences { get; set; } = new List<KeyName>();
         public string ForcedLabourDetails { get; set; }
         public string SlaveryInstanceDetails { get; set; }
         public List<string> RemediationTypes { get; set; } = new List<string>();
         #endregion
 
         #region Training
-        public List<string> Training { get; set; } = new List<string>();
+        public List<KeyName> Training { get; set; } = new List<KeyName>();
         public string OtherTraining { get; set; }
         #endregion
 
@@ -125,7 +172,7 @@ namespace ModernSlavery.Core.Models
         public bool? IncludesMeasuringProgress { get; set; }
         public string ProgressMeasures { get; set; }
         public string KeyAchievements { get; set; }
-        public int? StatementYears { get; set; }
+        public KeyName StatementYears { get; set; }
         #endregion
 
         public OrganisationSearchModel SetSearchDocumentKey()

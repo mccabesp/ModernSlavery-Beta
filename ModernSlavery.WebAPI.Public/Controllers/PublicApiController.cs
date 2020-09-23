@@ -48,7 +48,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
             if (!searchQuery.TryValidateSearchParams(out var result)) throw result.ToHttpException();
 
             //Execute the search
-            var searchResults = await _searchBusinessLogic.SearchStatementsAsync(
+            var searchResults = await _searchBusinessLogic.SearchOrganisationsAsync(
                 searchQuery.Keywords,
                 searchQuery.Turnovers,
                 searchQuery.Sectors,

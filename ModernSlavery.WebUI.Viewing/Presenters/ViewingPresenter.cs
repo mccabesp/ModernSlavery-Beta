@@ -61,7 +61,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         public async Task<SearchViewModel> SearchAsync(SearchQueryModel searchQuery)
         {
             //Execute the search
-            var searchResults = await _viewingService.SearchBusinessLogic.SearchStatementsAsync(
+            var searchResults = await _viewingService.SearchBusinessLogic.SearchOrganisationsAsync(
                 searchQuery.Keywords,
                 searchQuery.Turnovers,
                 searchQuery.Sectors,

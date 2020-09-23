@@ -252,6 +252,9 @@ namespace ModernSlavery.Infrastructure.Hosts
             // Initialise AutoMapper
             var mapperConfig = new MapperConfiguration(config =>
             {
+                //allows auto mapper to inject our dependencies
+                config.ConstructServicesUsing(type => ActivatorUtilities.CreateInstance(provider, type));
+
                 var assemblies = AppDomain.CurrentDomain.GetAssemblies()
                     .Where(a => a.GetName().Name.StartsWith(assemblyPrefix, true, default));
                 assemblies
@@ -260,14 +263,8 @@ namespace ModernSlavery.Infrastructure.Hosts
                         {
                             // register all out mapper profiles (classes/mappers/*)
                             config.AddMaps(assembly);
-                            // allows auto mapper to inject our dependencies
-                            //config.ConstructServicesUsing(serviceTypeToConstruct =>
-                            //{
-                            //    //TODO
-                            //});                    });
                         });
 
-                config.ConstructServicesUsing(type => ActivatorUtilities.CreateInstance(provider, type));
             });
 
 

@@ -27,9 +27,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// Retrieves all the search index documents from Azure Congitic Search for a specific organisation
         /// </summary>
         /// <param name="organisation">The organisation whos search index documents to retrieve</param>
-        /// <param name="statementDeadlineYear">The reporting year whos search index documents to retrieve or 0 if all years</param>
+        /// <param name="submissionDeadlineYear">The reporting year whos search index documents to retrieve or 0 if all years</param>
         /// <returns>The list of search index documents from Azure</returns>
-        Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(Organisation organisation, int statementDeadlineYear = 0, bool keyOnly=true);
+        Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(Organisation organisation, int submissionDeadlineYear = 0, bool keyOnly=true);
 
         /// <summary>
         /// Delete old search index documents for a specific organisation entity
@@ -74,6 +74,14 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="currentPage">The page of results to return</param>
         /// <param name="pageSize">The size of the results page</param>
         /// <returns></returns>
-        Task<PagedSearchResult<OrganisationSearchModel>> SearchStatementsAsync(string keywords, IEnumerable<byte> turnovers = null, IEnumerable<short> sectors = null, IEnumerable<int> deadlineYears = null, bool submittedOnly = true, bool returnFacets = false, bool returnAllFields = false, int currentPage = 1, int pageSize = 20);
+        Task<PagedSearchResult<OrganisationSearchModel>> SearchOrganisationsAsync(string keywords, IEnumerable<byte> turnovers = null, IEnumerable<short> sectors = null, IEnumerable<int> deadlineYears = null, bool submittedOnly = true, bool returnFacets = false, bool returnAllFields = false, int currentPage = 1, int pageSize = 20);
+
+        /// <summary>
+        /// Returns a list of group organisations reporting uder the parent organisation
+        /// </summary>
+        /// <param name="parentOrganisationId">The Id of the parent organisation</param>
+        /// <param name="submissionDeadlineYear">The submission deadline year of the statement</param>
+        /// <returns></returns>
+        Task<IEnumerable<OrganisationSearchModel>> ListGroupOrganisationsAsync(long parentOrganisationId, int submissionDeadlineYear);
     }
 }

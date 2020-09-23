@@ -40,7 +40,8 @@ namespace ModernSlavery.Infrastructure.Search
             SearchOptions searchOptions,
             [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog,
             IMapper autoMapper,
-            IOptions<TelemetryConfiguration> telemetryOptions=null)
+            IOptions<TelemetryConfiguration> telemetryOptions=null,
+            TelemetryClient telemetryClient = null)
         {
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             _searchOptions = searchOptions ?? throw new ArgumentNullException(nameof(searchOptions));
@@ -53,7 +54,7 @@ namespace ModernSlavery.Infrastructure.Search
             }
             SearchLog = searchLog;
             _autoMapper = autoMapper;
-            _telemetryClient = telemetryOptions==null ? null : new TelemetryClient(telemetryOptions.Value);
+            _telemetryClient = telemetryClient;
 
             IndexName = searchOptions.OrganisationIndexName.ToLower();
             if (string.IsNullOrWhiteSpace(searchOptions.ServiceName)) throw new ArgumentNullException(nameof(searchOptions.ServiceName));
@@ -120,7 +121,43 @@ namespace ModernSlavery.Infrastructure.Search
 
             if (await serviceClient.Indexes.ExistsAsync(indexName)) return;
 
-            var index = new Index { Name = indexName, Fields = FieldBuilder.BuildForType<AzureOrganisationSearchModel>() };
+            #region Create the field definitions
+            List<Field> fields = (List<Field>)FieldBuilder.BuildForType<OrganisationSearchModel>();
+            void Add(Field field)
+            {
+                var index = fields.FindIndex(f => f.Name == field.Name);
+                if (index < 0)
+                    fields.Add(field);
+                else
+                    fields[index] = field;
+            }
+
+            //Index fields
+            Add(Field.New(nameof(OrganisationSearchModel.SearchDocumentKey),DataType.String,isKey:true));
+            Add(Field.New(nameof(OrganisationSearchModel.Timestamp),DataType.String, isRetrievable:false));
+
+            //Searchable fields
+            Add(Field.NewSearchableString(nameof(OrganisationSearchModel.PartialNameForSuffixSearches), AnalyzerName.EnMicrosoft, isRetrievable:false));
+            Add(Field.NewSearchableString(nameof(OrganisationSearchModel.PartialNameForCompleteTokenSearches), AnalyzerName.EnMicrosoft, isRetrievable:false));
+            Add(Field.NewSearchableCollection(nameof(OrganisationSearchModel.Abbreviations), AnalyzerName.EnLucene, isRetrievable:false));
+            Add(Field.NewSearchableString(nameof(OrganisationSearchModel.OrganisationName),AnalyzerName.EnLucene, isFilterable:true,isSortable:true));
+            Add(Field.NewSearchableString(nameof(OrganisationSearchModel.CompanyNumber),AnalyzerName.EnMicrosoft));
+
+            //Filterable fields
+            Add(Field.New(nameof(OrganisationSearchModel.ParentOrganisationId), DataType.Int64, isFilterable:true));
+            Add(Field.New(nameof(OrganisationSearchModel.StatementId), DataType.Int64, isFilterable:true));
+            Add(Field.New(nameof(OrganisationSearchModel.SubmissionDeadlineYear), DataType.Int32, isFilterable: true, isSortable:true));
+            Add(Field.New(nameof(OrganisationSearchModel.Modified), DataType.DateTimeOffset, isSortable:true));
+
+            //Complex filterable fields
+            var keyNameFilterFields = new List<Field>();
+            keyNameFilterFields.Add(Field.New(nameof(OrganisationSearchModel.KeyName.Key), DataType.Int32, isFilterable: true));
+            keyNameFilterFields.Add(Field.New(nameof(OrganisationSearchModel.KeyName.Name), DataType.String));
+            Add(Field.NewComplex(nameof(OrganisationSearchModel.Turnover),false, keyNameFilterFields));
+            Add(Field.NewComplex(nameof(OrganisationSearchModel.Sectors), true, keyNameFilterFields));
+            #endregion
+
+            var index = new Index { Name = indexName, Fields = fields };
 
             index.Suggesters = new List<Suggester>
             {
@@ -220,10 +257,10 @@ namespace ModernSlavery.Infrastructure.Search
             newRecords = newRecords.OrderBy(o => o.OrganisationName);
 
             //Set the records to add or update
-            var actions = newRecords.Select(r => IndexAction.MergeOrUpload(_autoMapper.Map<AzureOrganisationSearchModel>(r)))
+            var actions = newRecords.Select(r => IndexAction.MergeOrUpload(r))
                 .ToList();
 
-            var batches = new ConcurrentBag<IndexBatch<AzureOrganisationSearchModel>>();
+            var batches = new ConcurrentBag<IndexBatch<OrganisationSearchModel>>();
             while (actions.Any())
             {
                 var batchSize = actions.Count > _searchOptions.BatchSize ? _searchOptions.BatchSize : actions.Count;
@@ -267,9 +304,9 @@ namespace ModernSlavery.Infrastructure.Search
                 throw new ArgumentNullException(nameof(oldRecords), "You must supply at least one record to index");
 
             //Set the records to add or update
-            var actions = oldRecords.Select(r => IndexAction.Delete(_autoMapper.Map<AzureOrganisationSearchModel>(r))).ToList();
+            var actions = oldRecords.Select(r => IndexAction.Delete(r)).ToList();
 
-            var batches = new ConcurrentBag<IndexBatch<AzureOrganisationSearchModel>>();
+            var batches = new ConcurrentBag<IndexBatch<OrganisationSearchModel>>();
 
             while (actions.Any())
             {
@@ -458,6 +495,7 @@ namespace ModernSlavery.Infrastructure.Search
             //Return the results
             return searchResults;
         }
+
 
     }
 }
