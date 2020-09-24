@@ -20,7 +20,7 @@ namespace ModernSlavery.Core.Options
         public void Validate()
         {
             var exceptions = new List<Exception>();
-            if (string.IsNullOrWhiteSpace(ApiKey)) exceptions.Add(new ConfigurationErrorsException("CompaniesHouse:ApiKey cannot be empty"));
+            if (string.IsNullOrWhiteSpace(ApiKey) || GetApiKeys().Length==0) exceptions.Add(new ConfigurationErrorsException("CompaniesHouse:ApiKey cannot be empty"));
             if (string.IsNullOrWhiteSpace(ApiServer)) exceptions.Add(new ConfigurationErrorsException("CompaniesHouse:ApiServer cannot be empty"));
 
             if (exceptions.Count > 0)

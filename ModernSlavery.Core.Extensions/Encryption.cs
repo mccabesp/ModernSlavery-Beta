@@ -323,6 +323,7 @@ namespace ModernSlavery.Core.Extensions
 
         private static readonly byte[] GZipHeaderBytes = {0x1f, 0x8b, 8, 0, 0, 0, 0, 0, 4, 0};
         private static readonly byte[] GZipLevel10HeaderBytes = {0x1f, 0x8b, 8, 0, 0, 0, 0, 0, 2, 0};
+        private static readonly byte[] GZipLevel11HeaderBytes = {0x1f, 0x8b, 8, 0, 0, 0, 0, 0, 0, 10};
         private static readonly byte[] GZipLevel12HeaderBytes = {0x1f, 0x8b, 8, 0, 0, 0, 0, 0, 0, 11};
 
         public static bool IsCompressed(this byte[] bytes)
@@ -332,15 +333,17 @@ namespace ModernSlavery.Core.Extensions
             var header = bytes.SubArray(4, 10);
 
             if (header.SequenceEqual(GZipLevel12HeaderBytes)
-                || header.SequenceEqual(GZipHeaderBytes)
-                || header.SequenceEqual(GZipLevel10HeaderBytes))
+                || header.SequenceEqual(GZipLevel11HeaderBytes)
+                || header.SequenceEqual(GZipLevel10HeaderBytes) 
+                || header.SequenceEqual(GZipHeaderBytes))
                 return true;
 
             header = bytes.SubArray(0, 10);
 
             return header.SequenceEqual(GZipLevel12HeaderBytes)
-                   || header.SequenceEqual(GZipHeaderBytes)
-                   || header.SequenceEqual(GZipLevel10HeaderBytes);
+                || header.SequenceEqual(GZipLevel11HeaderBytes)
+                || header.SequenceEqual(GZipLevel10HeaderBytes)
+                || header.SequenceEqual(GZipHeaderBytes);
         }
 
         public static string Compress(string text, bool mandatory = false)
@@ -389,7 +392,7 @@ namespace ModernSlavery.Core.Extensions
         public static byte[] Decompress(byte[] gZipBuffer)
         {
             if (gZipBuffer == null || gZipBuffer.Length < 1 || !gZipBuffer.IsCompressed()) return gZipBuffer;
-
+            
             using (var memoryStream = new MemoryStream())
             {
                 var dataLength = BitConverter.ToInt32(gZipBuffer, 0);

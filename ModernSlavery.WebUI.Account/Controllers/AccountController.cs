@@ -182,23 +182,22 @@ namespace ModernSlavery.WebUI.Account.Controllers
                 return View("PasswordReset", model);
             }
 
-            VirtualUser.ResetAttempts = 0;
-            VirtualUser.ResetSendDate = VirtualDateTime.Now;
+            user.ResetAttempts = 0;
+            user.ResetSendDate = VirtualDateTime.Now;
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //show confirmation
-            ViewBag.EmailAddress = VirtualUser.EmailAddress;
-            if (SharedBusinessLogic.SharedOptions.ShowEmailVerifyLink || VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+            ViewBag.EmailAddress = user.EmailAddress;
+            if (SharedBusinessLogic.SharedOptions.ShowEmailVerifyLink || user.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
                 ViewBag.TestUrl = Url.Action(
                     "NewPassword",
                     "Account",
                     new
                     {
                         code = Encryption.EncryptQuerystring(
-                            VirtualUser.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime())
+                            user.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime())
                     },
                     "https");
-
 
             return View("PasswordResetSent");
         }

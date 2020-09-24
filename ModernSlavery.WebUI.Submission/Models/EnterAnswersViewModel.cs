@@ -26,6 +26,27 @@ namespace ModernSlavery.WebUI.Submission.Models
         [MinLength(1)]
         public List<string> SelectedReasonOptions { get; set; } = new List<string>();
 
+        public IEnumerable<string> FriendlyReasonOptions
+        {
+            get
+            {
+                if (SelectedReasonOptions.Contains("Other"))
+                {
+                    return SelectedReasonOptions
+                        .Where(i => i != "Other")
+                        .Append(OtherReason);
+                }
+                if (SelectedReasonOptions.Contains("Its turnover or budget is less than £36 million per year"))
+                {
+                    return SelectedReasonOptions
+                        .Append($"Its annual turnover or budget is £{TurnOver}");
+
+                }
+                else
+                    return SelectedReasonOptions;
+            }
+        }
+
         [Required]
         [MaxLength(256)]
         public string OtherReason { get; set; }

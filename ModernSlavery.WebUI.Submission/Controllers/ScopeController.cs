@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
@@ -262,6 +263,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var stateModel = UnstashModel<ScopingViewModel>();
             if (stateModel == null) return SessionExpiredView();
 
+            enterAnswersModel.UserIsRegistered = stateModel.UserIsRegistered;
             // update the state
             stateModel.EnterAnswers = enterAnswersModel;
             StashModel(stateModel);
@@ -349,7 +351,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
             var currentDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
-            if (stateModel.DeadlineDate == currentDeadlineDate)
+
+            if (stateModel.UserIsRegistered)
             {
                 var emailAddressesForOrganisation = organisation.UserOrganisations
                     .Where(uo => uo.PINConfirmedDate != null)
@@ -358,21 +361,20 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 {
                     _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(user.EmailAddress,
                             organisation.OrganisationName,
-                            user.ContactFullname,
+                            stateModel.EnterAnswers.FullName,
                             $"{stateModel.DeadlineDate.Year} to {stateModel.DeadlineDate.Year + 1}",
                             organisation.LatestAddress.GetAddressString(),
-                            stateModel.EnterAnswers.Reason);
+                            stateModel.EnterAnswers.FriendlyReasonOptions.ToArray());
                 }
             }
-            if (stateModel.EnterAnswers.RequiresEmailConfirmation)
+            else if (stateModel.EnterAnswers.RequiresEmailConfirmation)
             {
-                //TODO: confirm this email logic - should it be a new template or same as one above?
                 _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(stateModel.EnterAnswers.EmailAddress,
                         organisation.OrganisationName,
                         stateModel.EnterAnswers.FullName,
-                        $"{stateModel.DeadlineDate.Year - 1} to {stateModel.DeadlineDate.Year}",
+                        $"{stateModel.DeadlineDate.Year} to {stateModel.DeadlineDate.Year + 1}",
                         organisation.LatestAddress.GetAddressString(),
-                        stateModel.EnterAnswers.Reason);
+                        stateModel.EnterAnswers.FriendlyReasonOptions.ToArray());
             }
 
             //Start new user registration

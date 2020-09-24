@@ -51,8 +51,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
             throw new NotImplementedException();
         }
 
-        public async Task<PagedResult<OrganisationRecord>> SearchAsync(string searchText, int page, int pageSize,
-            bool test = false)
+        public async Task<PagedResult<OrganisationRecord>> SearchAsync(string searchText, int page, int pageSize,bool test = false)
         {
             if (searchText.IsNumber()) searchText = searchText.PadLeft(8, '0');
 

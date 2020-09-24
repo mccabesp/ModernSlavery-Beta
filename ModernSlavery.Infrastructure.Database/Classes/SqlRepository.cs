@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Transactions;
+using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using ModernSlavery.Core.Interfaces;
@@ -141,11 +142,6 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
 
             await DbContext.BulkUpdateAsync(entities, batchSize,timeout);
-        }
-
-        public void UpdateChangesInBulk<TEntity>(IEnumerable<TEntity> listOfOrganisations) where TEntity : class
-        {
-            DbContext.UpdateChangesInBulk(listOfOrganisations);
         }
 
         public async Task ExecuteTransactionAsync(Func<Task> delegateAction)

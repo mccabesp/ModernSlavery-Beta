@@ -22,3 +22,44 @@
     text-decoration: underline;
   }
 }
+.pagination-next {
+    .next-arrow {
+        display: inline-block;
+        background: url("/assets/images/arrow-next.svg") no-repeat ;
+        height:15px;
+        width:20px;
+    }
+}
+.pagination-prev {
+     border-bottom: 1px solid $govuk-border-colour;     
+    .prev-arrow {
+        display: inline-block;
+        background: url("/assets/images/arrow-previous.svg") no-repeat;
+        height: 15px;
+        width: 20px;
+       
+    }
+}
+
+
+.pagination {
+    padding-bottom: 20px;
+
+    span {
+        color: $govuk-brand-colour;
+    }
+
+    button.pagination-button {
+        border: none;
+        background: none;     
+        cursor: pointer;
+        color: $govuk-brand-colour;
+        font-size: 19px;
+        text-align:left;
+
+        .pagination-numbers{
+            text-decoration:underline;
+            margin-left:25px;
+        }
+    }
+}

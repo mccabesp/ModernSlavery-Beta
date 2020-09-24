@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
-using Autofac.Features.AttributeFilters;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
-using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Submission.Classes;
-using ModernSlavery.WebUI.Submission.Models;
-using ModernSlavery.WebUI.Submission.Models.Statement;
 using ModernSlavery.WebUI.Submission.Presenters;
 
 namespace ModernSlavery.WebUI.Submission
@@ -38,6 +34,12 @@ namespace ModernSlavery.WebUI.Submission
             builder.RegisterType<StatementPresenter>().As<IStatementPresenter>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ScopePresenter>().As<IScopePresenter>().InstancePerLifetimeScope();
+
+            builder.RegisterType<OrganisationRepository>()
+                .As<IPagedRepository<OrganisationRecord>>()
+                .Keyed<IPagedRepository<OrganisationRecord>>("PrivateAndPublic")
+                .InstancePerLifetimeScope();
+
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

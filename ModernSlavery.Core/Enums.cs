@@ -50,5 +50,8 @@ namespace ModernSlavery.Core
         Unauthorised = 2,
         Locked = 3,
         TooLate = 4,
+        DuplicateName = 5,
+        CoHoTransientError = 6,
+        CoHoPermanentError = 7
     }
 }

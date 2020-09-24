@@ -243,6 +243,12 @@ namespace ModernSlavery.Infrastructure.Hosts
 
         public static void AddAutoMapper(this IServiceCollection services, bool assertConfigurationIsValid=false)
         {
+            //Add a single mapper to the dependency container
+            services.AddSingleton(provider => ConfigureAutoMapper(provider, assertConfigurationIsValid));
+        }
+
+        private static IMapper ConfigureAutoMapper(IServiceProvider provider, bool assertConfigurationIsValid = false)
+        {
             var assemblyPrefix = nameof(ModernSlavery);
 
             // Initialise AutoMapper
@@ -262,17 +268,18 @@ namespace ModernSlavery.Infrastructure.Hosts
                             //    //TODO
                             //});                    });
                         });
+
+                config.ConstructServicesUsing(type => ActivatorUtilities.CreateInstance(provider, type));
             });
+
 
             //Compile the mapping now rather than at runtime
             mapperConfig.CompileMappings();
 
             // only during development, validate your mappings; remove it before release
-            if (assertConfigurationIsValid)mapperConfig.AssertConfigurationIsValid();
-
-
-            //Add a single mapper to the dependency container
-            services.AddSingleton(mapperConfig.CreateMapper());
+            if (assertConfigurationIsValid) mapperConfig.AssertConfigurationIsValid();
+            
+            return mapperConfig.CreateMapper();
         }
     }
 }

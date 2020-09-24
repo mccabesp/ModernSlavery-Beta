@@ -16,7 +16,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(ReferenceOrganisations));
             try
             {
-                await ReferenceOrganisationsAsync().ConfigureAwait(false);
+                await _organisationBusinessLogic.SetUniqueOrganisationReferencesAsync().ConfigureAwait(false);
                 log.LogDebug($"Executed {nameof(ReferenceOrganisations)} successfully");
             }
             catch (Exception ex)
@@ -27,23 +27,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
-            }
-            finally
-            {
-                RunningJobs.Remove(nameof(ReferenceOrganisations));
-            }
-            
-        }
-
-        private async Task ReferenceOrganisationsAsync()
-        {
-            if (RunningJobs.Contains(nameof(ReferenceOrganisations))) return;
-
-            RunningJobs.Add(nameof(ReferenceOrganisations));
-
-            try
-            {
-                await _organisationBusinessLogic.SetUniqueOrganisationReferencesAsync().ConfigureAwait(false);
             }
             finally
             {

@@ -133,76 +133,7 @@ namespace ModernSlavery.Infrastructure.Database
             await DbContextBulkExtensions.BulkUpdateAsync(this, entities.ToList(), b => { b.BatchSize = batchSize; });
             if (timeout != null) Database.SetCommandTimeout(previousTimeout);
         }
-
-        /// <summary>
-        ///     https://social.msdn.microsoft.com/Forums/en-US/c369c1f9-828c-480a-b1e3-14677b64a3c0/how-to-update-large-quantity-of-data-in-database-using-c
-        /// </summary>
-        public void UpdateChangesInBulk<TEntity>(IEnumerable<TEntity> listOfOrganisations) where TEntity : class
-        {
-            var dataTableOfOrganisations = new DataTable("MyDataTableOfOrganisations");
-            dataTableOfOrganisations = ConvertToDataTable(listOfOrganisations);
-            var connectionString = Database.GetDbConnection().ConnectionString;
-            using (var conn = new SqlConnection(connectionString))
-            {
-                using (var command = new SqlCommand(string.Empty, conn))
-                {
-                    try
-                    {
-                        conn.Open();
-
-                        var tempTableName = "#TempBulkUpdateTable";
-
-                        // Make sure the temp table doesn't exist
-                        command.CommandText =
-                            $" IF OBJECT_ID('tempdb..{tempTableName}') IS NOT NULL DROP Table {tempTableName}; ";
-                        command.ExecuteNonQuery();
-
-                        // Create the temp table on database
-                        command.CommandText = $" CREATE TABLE {tempTableName} (                     "
-                                              + "     OrganisationId bigint not null,                 "
-                                              + "     SecurityCode nvarchar(max) null,                "
-                                              + "     SecurityCodeExpiryDateTime datetime2(7) null,   "
-                                              + "     SecurityCodeCreatedDateTime datetime2(7) null   "
-                                              + " ); ";
-                        command.ExecuteNonQuery();
-
-                        // Bulk insert into temp table
-                        using (var bulkcopy = new SqlBulkCopy(conn))
-                        {
-                            bulkcopy.BulkCopyTimeout = 660;
-                            bulkcopy.DestinationTableName = tempTableName;
-                            bulkcopy.WriteToServer(dataTableOfOrganisations);
-                            bulkcopy.Close();
-                        }
-
-                        // Updating destination table
-                        command.CommandTimeout = 300;
-                        command.CommandText = " Update Organisations                                                "
-                                              + " set SecurityCode = tmp.SecurityCode,                                 "
-                                              + "     SecurityCodeExpiryDateTime = tmp.SecurityCodeExpiryDateTime,     "
-                                              + "     SecurityCodeCreatedDateTime = tmp.SecurityCodeCreatedDateTime    "
-                                              + " from Organisations orgs                                              "
-                                              + $" inner join {tempTableName} tmp on tmp.OrganisationId = orgs.OrganisationId ";
-                        command.ExecuteNonQuery();
-
-                        // Dropping the temp table
-                        command.CommandText =
-                            $" IF OBJECT_ID('tempdb..{tempTableName}') IS NOT NULL DROP Table {tempTableName}; ";
-                        command.ExecuteNonQuery();
-                    }
-                    catch (Exception ex)
-                    {
-                        var mesage = ex.Message;
-                        // Handle exception properly
-                    }
-                    finally
-                    {
-                        conn.Close();
-                    }
-                }
-            }
-        }
-
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
