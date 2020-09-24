@@ -247,24 +247,16 @@ namespace ModernSlavery.Infrastructure.Hosts
 
         private static IMapper ConfigureAutoMapper(IServiceProvider provider, bool assertConfigurationIsValid = false)
         {
-            var assemblyPrefix = nameof(ModernSlavery);
-
             // Initialise AutoMapper
             var mapperConfig = new MapperConfiguration(config =>
             {
-                //allows auto mapper to inject our dependencies
+                //allows auto mapper to inject our dependencies into created services
                 config.ConstructServicesUsing(type => ActivatorUtilities.CreateInstance(provider, type));
 
-                var assemblies = AppDomain.CurrentDomain.GetAssemblies()
-                    .Where(a => a.GetName().Name.StartsWith(assemblyPrefix, true, default));
-                assemblies
-                    .ForEach(
-                        assembly =>
-                        {
-                            // register all out mapper profiles (classes/mappers/*)
-                            config.AddMaps(assembly);
-                        });
-
+                //Map all the profiles in all the domains assemblies which match the domain namespace
+                var assemblyPrefix = nameof(ModernSlavery);
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name.StartsWith(assemblyPrefix, true, default));
+                config.AddMaps(assemblies);
             });
 
 
@@ -273,7 +265,8 @@ namespace ModernSlavery.Infrastructure.Hosts
 
             // only during development, validate your mappings; remove it before release
             if (assertConfigurationIsValid) mapperConfig.AssertConfigurationIsValid();
-            
+
+            //Create the mapper            
             return mapperConfig.CreateMapper();
         }
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using AutoMapper;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Entities;
@@ -11,57 +12,120 @@ namespace ModernSlavery.Core.Models
     [Serializable]
     public class OrganisationSearchModel
     {
-        [Serializable]
-        public class KeyName
-        {
-            public class AutoMapperProfile : Profile
-            {
-                private readonly SectorTypeIndex _sectorTypeIndex;
-                private readonly PolicyTypeIndex _policyTypeIndex;
-                private readonly RiskTypeIndex _riskTypeIndex;
-                private readonly DiligenceTypeIndex _diligenceTypeIndex;
-                private readonly TrainingTypeIndex _trainingTypeIndex;
-
-                public AutoMapperProfile(
-                    SectorTypeIndex sectorTypeIndex,
-                    PolicyTypeIndex policyTypeIndex,
-                    RiskTypeIndex riskTypeIndex,
-                    DiligenceTypeIndex diligenceTypeIndex,
-                    TrainingTypeIndex trainingTypeIndex)
-                {
-                    _sectorTypeIndex = sectorTypeIndex;
-                    _policyTypeIndex = policyTypeIndex;
-                    _riskTypeIndex = riskTypeIndex;
-                    _diligenceTypeIndex = diligenceTypeIndex;
-                    _trainingTypeIndex = trainingTypeIndex;
-
-                    CreateMap<KeyName, SectorTypes?>().ConstructUsing(s => s == null ? (SectorTypes?)null : (SectorTypes)s.Key);
-                    CreateMap<KeyName, StatementTurnovers?>().ConstructUsing(s => s == null ? (StatementTurnovers?)null : (StatementTurnovers)s.Key);
-                    CreateMap<KeyName, StatementYears?>().ConstructUsing(s => s == null ? (StatementYears?)null : (StatementYears)s.Key);
-
-                    CreateMap<KeyName, SectorTypeIndex.SectorType>().ConstructUsing(s => _sectorTypeIndex.FirstOrDefault(r => r.Id == s.Key));
-                    CreateMap<KeyName, PolicyTypeIndex.PolicyType>().ConstructUsing(s => _policyTypeIndex.FirstOrDefault(r => r.Id == s.Key));
-                    CreateMap<KeyName, RiskTypeIndex.RiskType>().ConstructUsing(s => _riskTypeIndex.FirstOrDefault(r => r.Id == s.Key))
-                        .ForMember(d => d.Description, opt => opt.MapFrom(s => s.Name));
-
-                    CreateMap<KeyName, DiligenceTypeIndex.DiligenceType>().ConstructUsing(s => _diligenceTypeIndex.FirstOrDefault(r => r.Id == s.Key))
-                        .ForMember(d => d.Description, opt => opt.MapFrom(s => s.Name));
-
-                    CreateMap<KeyName, TrainingTypeIndex.TrainingType>().ConstructUsing(s => _trainingTypeIndex.FirstOrDefault(r => r.Id == s.Key))
-                        .ForMember(d => d.Description, opt => opt.MapFrom(s => s.Name));
-                }
-            }
-
-            public int Key { get; set; }
-            public string Name { get; set; }
-        }
-
+        #region Automapper
         public class AutoMapperProfile : Profile
         {
-            public AutoMapperProfile()
+            public AutoMapperProfile() : base()
             {
                 CreateMap<OrganisationSearchModel, OrganisationSearchModel>();
             }
+        }
+        #endregion
+
+        [Serializable]
+        public class KeyName
+        {
+            #region Automapper
+            public class AutoMapperProfile : Profile
+            {
+                public AutoMapperProfile() : base()
+                {
+                    CreateMap<OrganisationSearchModel.KeyName, SectorTypes?>().ConstructUsing(s => s == null ? (SectorTypes?)null : (SectorTypes)s.Key);
+                    CreateMap<OrganisationSearchModel.KeyName, StatementTurnovers?>().ConstructUsing(s => s == null ? (StatementTurnovers?)null : (StatementTurnovers)s.Key);
+                    CreateMap<OrganisationSearchModel.KeyName, StatementYears?>().ConstructUsing(s => s == null ? (StatementYears?)null : (StatementYears)s.Key);
+
+                    CreateMap<OrganisationSearchModel.KeyName, SectorTypeIndex.SectorType>().ConvertUsing<SectorConverter>();
+                    CreateMap<OrganisationSearchModel.KeyName, PolicyTypeIndex.PolicyType>().ConvertUsing<PolicyConverter>();
+                    CreateMap<OrganisationSearchModel.KeyName, RiskTypeIndex.RiskType>().ConvertUsing<RiskConverter>();
+                    CreateMap<OrganisationSearchModel.KeyName, DiligenceTypeIndex.DiligenceType>().ConvertUsing<DiligenceConverter>();
+                    CreateMap<OrganisationSearchModel.KeyName, TrainingTypeIndex.TrainingType>().ConvertUsing<TrainingConverter>();
+                }
+
+                public class SectorConverter : ITypeConverter<OrganisationSearchModel.KeyName, SectorTypeIndex.SectorType>
+                {
+                    private readonly SectorTypeIndex _sectorTypeIndex;
+
+                    public SectorConverter(SectorTypeIndex sectorTypeIndex)
+                    {
+                        _sectorTypeIndex = sectorTypeIndex;
+                    }
+
+                    public SectorTypeIndex.SectorType Convert(OrganisationSearchModel.KeyName source, SectorTypeIndex.SectorType destination, ResolutionContext context)
+                    {
+                        return _sectorTypeIndex.FirstOrDefault(sectorType => sectorType.Id == source.Key);
+                    }
+                }
+
+                public class PolicyConverter : ITypeConverter<OrganisationSearchModel.KeyName, PolicyTypeIndex.PolicyType>
+                {
+                    private readonly PolicyTypeIndex _policyTypeIndex;
+
+                    public PolicyConverter(PolicyTypeIndex policyTypeIndex)
+                    {
+                        _policyTypeIndex = policyTypeIndex;
+                    }
+
+                    public PolicyTypeIndex.PolicyType Convert(OrganisationSearchModel.KeyName source, PolicyTypeIndex.PolicyType destination, ResolutionContext context)
+                    {
+                        return _policyTypeIndex.FirstOrDefault(policyType => policyType.Id == source.Key);
+                    }
+                }
+
+                public class RiskConverter : ITypeConverter<OrganisationSearchModel.KeyName, RiskTypeIndex.RiskType>
+                {
+                    private readonly RiskTypeIndex _riskTypeIndex;
+
+                    public RiskConverter(RiskTypeIndex riskTypeIndex)
+                    {
+                        _riskTypeIndex = riskTypeIndex;
+                    }
+
+                    public RiskTypeIndex.RiskType Convert(OrganisationSearchModel.KeyName source, RiskTypeIndex.RiskType destination, ResolutionContext context)
+                    {
+                        var type = _riskTypeIndex.FirstOrDefault(riskType => riskType.Id == source.Key);
+                        type.Description = source.Name;
+                        return type;
+                    }
+                }
+
+                public class DiligenceConverter : ITypeConverter<OrganisationSearchModel.KeyName, DiligenceTypeIndex.DiligenceType>
+                {
+                    private readonly DiligenceTypeIndex _diligenceTypeIndex;
+
+                    public DiligenceConverter(DiligenceTypeIndex diligenceTypeIndex)
+                    {
+                        _diligenceTypeIndex = diligenceTypeIndex;
+                    }
+
+                    public DiligenceTypeIndex.DiligenceType Convert(OrganisationSearchModel.KeyName source, DiligenceTypeIndex.DiligenceType destination, ResolutionContext context)
+                    {
+                        var type = _diligenceTypeIndex.FirstOrDefault(diligenceType => diligenceType.Id == source.Key);
+                        type.Description = source.Name;
+                        return type;
+                    }
+                }
+
+                public class TrainingConverter : ITypeConverter<OrganisationSearchModel.KeyName, TrainingTypeIndex.TrainingType>
+                {
+                    private readonly TrainingTypeIndex _trainingTypeIndex;
+
+                    public TrainingConverter(TrainingTypeIndex trainingTypeIndex)
+                    {
+                        _trainingTypeIndex = trainingTypeIndex;
+                    }
+
+                    public TrainingTypeIndex.TrainingType Convert(OrganisationSearchModel.KeyName source, TrainingTypeIndex.TrainingType destination, ResolutionContext context)
+                    {
+                        var type = _trainingTypeIndex.FirstOrDefault(trainingType => trainingType.Id == source.Key);
+                        type.Description = source.Name;
+                        return type;
+                    }
+                }
+            }
+            #endregion
+
+            public int Key { get; set; }
+            public string Name { get; set; }
         }
 
         public override bool Equals(object obj)

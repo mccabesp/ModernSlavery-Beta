@@ -62,6 +62,14 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         Task RefreshSearchDocumentsAsync(Organisation organisation, int statementDeadlineYear = 0);
 
         /// <summary>
+        /// Returns an organisation statement summary for the specified reporting year
+        /// </summary>
+        /// <param name="parentOrganisationId">The Id of the organisation</param>
+        /// <param name="submissionDeadlineYear">The reporting deadline year</param>
+        /// <returns></returns>
+        Task<OrganisationSearchModel> GetOrganisationAsync(long parentOrganisationId, int submissionDeadlineYear);
+
+        /// <summary>
         /// Search index of statements by organisation name and return sorted and filtered results
         /// </summary>
         /// <param name="keywords">The organisatio name to search for</param>
@@ -77,10 +85,10 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         Task<PagedSearchResult<OrganisationSearchModel>> SearchOrganisationsAsync(string keywords, IEnumerable<byte> turnovers = null, IEnumerable<short> sectors = null, IEnumerable<int> deadlineYears = null, bool submittedOnly = true, bool returnFacets = false, bool returnAllFields = false, int currentPage = 1, int pageSize = 20);
 
         /// <summary>
-        /// Returns a list of group organisations reporting uder the parent organisation
+        /// Returns a list of group organisations reporting under the parent organisation for the specified reporting year
         /// </summary>
         /// <param name="parentOrganisationId">The Id of the parent organisation</param>
-        /// <param name="submissionDeadlineYear">The submission deadline year of the statement</param>
+        /// <param name="submissionDeadlineYear">The reporting deadline year</param>
         /// <returns></returns>
         Task<IEnumerable<OrganisationSearchModel>> ListGroupOrganisationsAsync(long parentOrganisationId, int submissionDeadlineYear);
     }

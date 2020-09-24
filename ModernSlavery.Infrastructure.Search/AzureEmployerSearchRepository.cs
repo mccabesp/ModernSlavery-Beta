@@ -122,7 +122,7 @@ namespace ModernSlavery.Infrastructure.Search
             if (await serviceClient.Indexes.ExistsAsync(indexName)) return;
 
             #region Create the field definitions
-            List<Field> fields = (List<Field>)FieldBuilder.BuildForType<OrganisationSearchModel>();
+            var fields = new List<Field>(FieldBuilder.BuildForType<OrganisationSearchModel>());
             void Add(Field field)
             {
                 var index = fields.FindIndex(f => f.Name == field.Name);
@@ -145,6 +145,7 @@ namespace ModernSlavery.Infrastructure.Search
 
             //Filterable fields
             Add(Field.New(nameof(OrganisationSearchModel.ParentOrganisationId), DataType.Int64, isFilterable:true));
+            Add(Field.New(nameof(OrganisationSearchModel.ParentName), DataType.String, isFilterable:true));
             Add(Field.New(nameof(OrganisationSearchModel.StatementId), DataType.Int64, isFilterable:true));
             Add(Field.New(nameof(OrganisationSearchModel.SubmissionDeadlineYear), DataType.Int32, isFilterable: true, isSortable:true));
             Add(Field.New(nameof(OrganisationSearchModel.Modified), DataType.DateTimeOffset, isSortable:true));
@@ -271,13 +272,12 @@ namespace ModernSlavery.Infrastructure.Search
 
             var indexClient = await _indexClient.Value;
 
-            //Parallel.ForEach(
-            //    batches,
-            //    batch =>
-            foreach (var batch in batches)
+            Parallel.ForEach(
+                batches,
+                batch =>
                 {
                     var retries = 0;
-                    retry:
+                retry:
                     try
                     {
                         indexClient.Documents.Index(batch);
@@ -293,7 +293,7 @@ namespace ModernSlavery.Infrastructure.Search
 
                         throw;
                     }
-                }
+                });
         }
 
         public async Task<int> DeleteDocumentsAsync(IEnumerable<OrganisationSearchModel> oldRecords)

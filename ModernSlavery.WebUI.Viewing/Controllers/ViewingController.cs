@@ -237,56 +237,14 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
         #endregion
 
-        #region Organisation details
+        #region Statement Summary
         [NoCache]
-        [HttpGet("~/Organisation/{organisationIdentifier}")]
-        public IActionResult Organisation(string organisationIdentifier)
+        [HttpGet("~/StatementSummary/{organisationIdentifier}/{reportingDeadlineYear}")]
+        public IActionResult StatementSummary(string organisationIdentifier, int reportingDeadlineYear)
         {
-            if (string.IsNullOrWhiteSpace(organisationIdentifier))
-                return new HttpBadRequestResult("Missing organisation identifier");
-
-            CustomResult<Organisation> organisationLoadingOutcome;
-
-            try
-            {
-                long organisationId = ViewingPresenter.Obfuscator.DeObfuscate(organisationIdentifier);
-                organisationLoadingOutcome = ViewingService.OrganisationBusinessLogic.LoadInfoFromActiveOrganisationId(organisationId);
-
-                if (organisationLoadingOutcome.Failed)
-                    return organisationLoadingOutcome.ErrorMessage.ToHttpStatusViewResult();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, $"Cannot decrypt return organisationIdentifier from '{organisationIdentifier}'");
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(400));
-            }
-
-            //Clear the default back url of the report page
-            ReportBackUrl = null;
-
-            return View(
-                "OrganisationDetails/Organisation",
-                new OrganisationDetailsViewModel
-                {
-                    Organisation = organisationLoadingOutcome.Result,
-                    LastSearchUrl = SearchPresenter.GetLastSearchUrl(),
-                    OrganisationBackUrl = OrganisationBackUrl
-                });
+            return View();
         }
 
-        #endregion
-
-        #region Reports
-        [HttpGet("~/Statement/{organisationIdentifier}/{statementDeadlineYear}")]
-        public async Task<IActionResult> Statement(string organisationIdentifier, int statementDeadlineYear)
-        {
-            //Get the latest statement data for this organisation, reporting year
-            var openResult = await ViewingPresenter.GetStatementViewModelAsync(organisationIdentifier, statementDeadlineYear);
-            if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
-
-            var viewModel = openResult.Result;
-            return View("OrganisationDetails/Report", viewModel);
-        }
         #endregion
     }
 }

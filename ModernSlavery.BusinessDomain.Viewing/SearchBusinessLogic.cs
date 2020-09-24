@@ -52,6 +52,24 @@ namespace ModernSlavery.BusinessDomain.Viewing
         #endregion
 
         #region RefreshSearchDocuments
+
+        private IEnumerable<Organisation> LookupSearchableOrganisations(params Organisation[] organisations)
+        {
+            return organisations.Where(
+                o => o.Status == OrganisationStatuses.Active
+                     && o.OrganisationScopes.Any(
+                             sc => sc.Status == ScopeRowStatuses.Active
+                                   && (sc.ScopeStatus == ScopeStatuses.InScope ||
+                                       sc.ScopeStatus == ScopeStatuses.PresumedInScope)));
+        }
+
+        public async Task RefreshSearchDocumentsAsync()
+        {
+            //Get all the organisations
+            var organisations = await _dataRepository.ToListAsync<Organisation>().ConfigureAwait(false);
+            await RefreshSearchDocumentsAsync(organisations);
+        }
+
         public async Task RefreshSearchDocumentsAsync(IEnumerable<Organisation> organisations)
         {
             //Remove the test organisations
@@ -75,23 +93,6 @@ namespace ModernSlavery.BusinessDomain.Viewing
             //Remove the retired models
             var retiredModels = oldSearchModels.Except(newSearchModels);
             if (retiredModels.Any()) await _organisationSearchRepository.DeleteDocumentsAsync(retiredModels).ConfigureAwait(false);
-        }
-
-        private IEnumerable<Organisation> LookupSearchableOrganisations(params Organisation[] organisations)
-        {
-            return organisations.Where(
-                o => o.Status == OrganisationStatuses.Active
-                     && o.OrganisationScopes.Any(
-                             sc => sc.Status == ScopeRowStatuses.Active
-                                   && (sc.ScopeStatus == ScopeStatuses.InScope ||
-                                       sc.ScopeStatus == ScopeStatuses.PresumedInScope)));
-        }
-
-        public async Task RefreshSearchDocumentsAsync()
-        {
-            //Get all the organisations
-            var organisations = await _dataRepository.ToListAsync<Organisation>().ConfigureAwait(false);
-            await RefreshSearchDocumentsAsync(organisations);
         }
 
         public async Task RefreshSearchDocumentsAsync(Organisation organisation, int statementDeadlineYear = 0)
@@ -381,7 +382,23 @@ namespace ModernSlavery.BusinessDomain.Viewing
         }
         #endregion
 
-        #region SearchStatements
+        #region GetOrganisationAsync
+        public async Task<OrganisationSearchModel> GetOrganisationAsync(long parentOrganisationId, int submissionDeadlineYear)
+        {
+            //Ensure we have an organisation
+            if (parentOrganisationId == 0) throw new ArgumentOutOfRangeException(nameof(parentOrganisationId));
+
+            //Ensure we have an year
+            if (submissionDeadlineYear == 0) throw new ArgumentOutOfRangeException(nameof(submissionDeadlineYear));
+
+            //Create the key for parent organisation
+            var key = $"{parentOrganisationId}-{submissionDeadlineYear}";
+
+            return await _organisationSearchRepository.GetDocumentAsync(key);
+        }
+        #endregion
+
+        #region SearchOrganisationsAsync
         public async Task<PagedSearchResult<OrganisationSearchModel>> SearchOrganisationsAsync(
             string keywords,
             IEnumerable<byte> turnovers,
