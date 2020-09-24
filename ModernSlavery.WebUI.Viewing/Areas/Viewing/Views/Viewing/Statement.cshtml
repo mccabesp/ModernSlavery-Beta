@@ -84,343 +84,423 @@
             <li><a class="govuk-link" href="#progress">Monitoring progress</a></li>
         </ul>
 
-        <!-- #region statement-period -->
+        <div id="statement-period">
+            <h2 class="govuk-heading-m">
+                Statement period and sign-off details
+            </h2>
 
-        <h2 id="statement-period" class="govuk-heading-m">
-            Statement period and sign-off details
-        </h2>
-
-        <p class="govuk-body govuk-!-font-weight-bold">
-            The statement covers the following period:
-        </p>
-
-        <p class="govuk-body">
-            @Model.StatementStartDate.ToString("d MMMM yyyy") to @Model.StatementEndDate.ToString("d MMMM yyyy")
-        </p>
-
-        <p class="govuk-body govuk-!-font-weight-bold">
-            The name of the director (or equivalent) that signed off the statement is:
-        </p>
-
-        <p class="govuk-body">
-            @Model.ApproverFirstName @Model.ApproverLastName, @Model.ApproverJobTitle
-        </p>
-
-        <p class="govuk-body govuk-!-font-weight-bold">
-            The statement was approved by the board or equivalent management body on:
-        </p>
-
-        <p class="govuk-body">
-            @Model.ApprovedDate.ToString("d MMMM yyyy")
-        </p>
-
-        <!-- #endregion -->
-        <!-- #region areas-covered -->
-
-        <h2 id="areas-covered" class="govuk-heading-m">
-            Areas covered by statement
-        </h2>
-
-        <p class="govuk-body">
-            Government guidance encourages organisations to cover a range of areas in their modern slavery statements.
-        </p>
-
-        <p class="govuk-body govuk-!-font-weight-bold">
-            The statement covers the following recommended areas:
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet">
-            @if (Model.IncludesStructure)
-            {
-                <li>The organisation’s structure, business and supply chains</li>
-            }
-            @if (Model.IncludesPolicies)
-            {
-                <li>Policies</li>
-            }
-            @if (Model.IncludesRisks)
-            {
-                <li>Risk assessment and management</li>
-            }
-            @if (Model.IncludesDueDiligence)
-            {
-                <li>Due diligence processes</li>
-            }
-            @if (Model.IncludesTraining)
-            {
-                <li>Staff training about slavery and human trafficking</li>
-            }
-            @if (Model.IncludesGoals)
-            {
-                <li>Goals and key performance indicators (KPIs) to measure progress over time, and the effectiveness of the organisation’s actions</li>
-            }
-        </ul>
-
-        <p class="govuk-body govuk-!-font-weight-bold">
-            The statement does not cover the following area(s):
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet">
-            @if (!Model.IncludesStructure)
-            {
-                <li>The organisation’s structure, business and supply chains</li>
-            }
-            @if (!Model.IncludesPolicies)
-            {
-                <li>Policies</li>
-            }
-            @if (!Model.IncludesRisks)
-            {
-                <li>Risk assessment and management</li>
-            }
-            @if (!Model.IncludesDueDiligence)
-            {
-                <li>Due diligence processes</li>
-            }
-            @if (!Model.IncludesTraining)
-            {
-                <li>Staff training about slavery and human trafficking</li>
-            }
-            @if (!Model.IncludesGoals)
-            {
-                <li>Goals and key performance indicators (KPIs) to measure progress over time, and the effectiveness of the organisation’s actions</li>
-            }
-        </ul>
-        <!-- #endregion -->
-        <!-- #region sectors -->
-
-        <h2 id="sectors" class="govuk-heading-m">
-            Organisation sector(s) and turnover
-        </h2>
-
-        @if (Model.Sectors.Any())
-        {
             <p class="govuk-body govuk-!-font-weight-bold">
-                The organisation operates in:
+                The statement covers the following period:
+            </p>
+
+            <p class="govuk-body">
+                @Model.StatementStartDate.ToString("d MMMM yyyy") to @Model.StatementEndDate.ToString("d MMMM yyyy")
+            </p>
+
+            <p class="govuk-body govuk-!-font-weight-bold">
+                The name of the director (or equivalent) that signed off the statement is:
+            </p>
+
+            <p class="govuk-body">
+                @Model.ApproverFirstName @Model.ApproverLastName, @Model.ApproverJobTitle
+            </p>
+
+            <p class="govuk-body govuk-!-font-weight-bold">
+                The statement was approved by the board or equivalent management body on:
+            </p>
+
+            <p class="govuk-body">
+                @Model.ApprovedDate.ToString("d MMMM yyyy")
+            </p>
+
+        </div>
+
+        <div id="areas-covered">
+            <h2 class="govuk-heading-m">
+                Areas covered by statement
+            </h2>
+
+            <p class="govuk-body">
+                Government guidance encourages organisations to cover a range of areas in their modern slavery statements.
+            </p>
+
+            <p class="govuk-body govuk-!-font-weight-bold">
+                The statement covers the following recommended areas:
             </p>
 
             <ul class="govuk-list govuk-list--bullet">
-                @foreach (var item in Model.Sectors)
+                @if (Model.IncludesStructure)
                 {
-                    var sector = Model.SectorTypes.SingleOrDefault(t => t.Id == item).Description;
-                    <li>@sector</li>
+                    <li>The organisation’s structure, business and supply chains</li>
+                }
+                @if (Model.IncludesPolicies)
+                {
+                    <li>Policies</li>
+                }
+                @if (Model.IncludesRisks)
+                {
+                    <li>Risk assessment and management</li>
+                }
+                @if (Model.IncludesDueDiligence)
+                {
+                    <li>Due diligence processes</li>
+                }
+                @if (Model.IncludesTraining)
+                {
+                    <li>Staff training about slavery and human trafficking</li>
+                }
+                @if (Model.IncludesGoals)
+                {
+                    <li>Goals and key performance indicators (KPIs) to measure progress over time, and the effectiveness of the organisation’s actions</li>
                 }
             </ul>
-        }
-        else
-        {
-            <p class="govuk-body">
-                The organisation did not tell us which sector(s) it operates in.
-            </p>
-        }
 
-        @if (Model.Turnover != StatementViewModel.TurnoverRanges.NotProvided)
-        {
             <p class="govuk-body govuk-!-font-weight-bold">
-                Its turnover or budget in the financial accounting year of this statement was:
+                The statement does not cover the following area(s):
             </p>
-            <p class="govuk-body">
-                @Model.Turnover
-            </p>
-        }
-        else
-        {
-            <p class="govuk-body">
-                The organisation did not tell us what its turnover or budget was in the financial accounting year of this statement.
-            </p>
-        }
 
-        <!-- #endregion -->
-        <!-- #region policies -->
-
-        <h2 id="policies" class="govuk-heading-m">
-            Policies relating to modern slavery
-        </h2>
-
-        @if (Model.Policies.Any())
-        {
-            <div class="govuk-body govuk-!-font-weight-bold">
-                The organisation’s policies and codes during the period of this statement included the following provisions relating to modern slavery:
-            </div>
             <ul class="govuk-list govuk-list--bullet">
-                @foreach (var item in Model.Policies)
+                @if (!Model.IncludesStructure)
                 {
-                    var policy = Model.PolicyTypes.SingleOrDefault(t => t.Id == item).Description;
-                    <li>@policy</li>
+                    <li>The organisation’s structure, business and supply chains</li>
+                }
+                @if (!Model.IncludesPolicies)
+                {
+                    <li>Policies</li>
+                }
+                @if (!Model.IncludesRisks)
+                {
+                    <li>Risk assessment and management</li>
+                }
+                @if (!Model.IncludesDueDiligence)
+                {
+                    <li>Due diligence processes</li>
+                }
+                @if (!Model.IncludesTraining)
+                {
+                    <li>Staff training about slavery and human trafficking</li>
+                }
+                @if (!Model.IncludesGoals)
+                {
+                    <li>Goals and key performance indicators (KPIs) to measure progress over time, and the effectiveness of the organisation’s actions</li>
                 }
             </ul>
-        }
-        else
-        {
-            <div class="govuk-body">
-                The organisation did not specify any policies or codes relating to modern slavery during the period of the statement.
-            </div>
-        }
+        </div>
 
-        <!-- #endregion -->
-        <!-- #region risks -->
+        <div id="sectors">
+            <h2 class="govuk-heading-m">
+                Organisation sector(s) and turnover
+            </h2>
 
-        <h2 id="risks" class="govuk-heading-m">
-            Assessing modern slavery risks
-        </h2>
-
-        @if (Model.RelevantRisks.Any())
-        {
-            <div class="govuk-body govuk-!-font-weight-bold">
-                The organisation told us it considered the following areas to be relevant when assessing its supply chain for modern slavery risks:
-            </div>
-            var relevantRiskGroups = Model.RelevantRisks
-                .Select(hr =>
-                {
-                    var type = Model.RiskTypes.SingleOrDefault(t => t.Id == hr.Id);
-                    return new { hr.Id, hr.Details, type.Category };
-                })
-                .GroupBy(hr => hr.Category)
-                .ToDictionary(g => g.Key, g => g.ToList());
-            @foreach (var group in relevantRiskGroups)
+            @if (Model.Sectors.Any())
             {
-                <div class="govuk-body">
-                    @group.Key
-                </div>
+                <p class="govuk-body govuk-!-font-weight-bold">
+                    The organisation operates in:
+                </p>
+
                 <ul class="govuk-list govuk-list--bullet">
-                    @foreach (var item in group.Value)
+                    @foreach (var item in Model.Sectors)
                     {
-                        <li>@item.Details</li>
+                        var sector = Model.SectorTypes.SingleOrDefault(t => t.Id == item).Description;
+                        <li>@sector</li>
                     }
                 </ul>
             }
-            @if (!string.IsNullOrEmpty(Model.OtherRelevantRisks))
+            else
             {
-                <div class="govuk-body">
-                    In addition, the organisation specified the following risk area:
-                    <br>
-                    @Model.OtherRelevantRisks
-                </div>
+                <p class="govuk-body">
+                    The organisation did not tell us which sector(s) it operates in.
+                </p>
             }
-        }
-        else
-        {
-            <div class="govuk-body">
-                The organisation did not tell us which areas were relevant when assessing its supply chains for modern slavery risks.
-            </div>
-        }
 
-        <!-- #endregion -->
-        <!-- #region high-risks -->
-
-        <h2 id="high-risks" class="govuk-heading-m">
-            Highest risks identified
-        </h2>
-
-        @if (Model.HighRisks.Any())
-        {
-            <div class="govuk-body govuk-!-font-weight-bold">
-                The organisation told us it considered the following areas to be relevant when assessing its supply chain for modern slavery risks:
-            </div>
-            var highRiskGroups = Model.HighRisks
-                .Select(hr =>
-                {
-                    var type = Model.RiskTypes.SingleOrDefault(t => t.Id == hr.Id);
-                    return new { hr.Id, hr.Details, type.Category };
-                })
-                .GroupBy(hr => hr.Category)
-                .ToDictionary(g => g.Key, g => g.ToList());
-            @foreach (var group in highRiskGroups)
+            @if (Model.Turnover != StatementViewModel.TurnoverRanges.NotProvided)
             {
-                <div class="govuk-body">
-                    @group.Key
+                <p class="govuk-body govuk-!-font-weight-bold">
+                    Its turnover or budget in the financial accounting year of this statement was:
+                </p>
+                <p class="govuk-body">
+                    @Model.Turnover
+                </p>
+            }
+            else
+            {
+                <p class="govuk-body">
+                    The organisation did not tell us what its turnover or budget was in the financial accounting year of this statement.
+                </p>
+            }
+
+        </div>
+
+        <div id="policies">
+            <h2 class="govuk-heading-m">
+                Policies relating to modern slavery
+            </h2>
+
+            @if (Model.Policies.Any())
+            {
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    The organisation’s policies and codes during the period of this statement included the following provisions relating to modern slavery:
                 </div>
                 <ul class="govuk-list govuk-list--bullet">
-                    @foreach (var item in group.Value)
+                    @foreach (var item in Model.Policies)
                     {
-                        <li>@item.Details</li>
+                        var policy = Model.PolicyTypes.SingleOrDefault(t => t.Id == item).Description;
+                        <li>@policy</li>
                     }
                 </ul>
             }
-            @if (!string.IsNullOrEmpty(Model.OtherHighRisks))
+            else
             {
                 <div class="govuk-body">
-                    Other highest risk the organisation specified
-                    <br>
-                    @Model.OtherHighRisks
+                    The organisation did not specify any policies or codes relating to modern slavery during the period of the statement.
                 </div>
             }
-        }
-        else
-        {
-            <div class="govuk-body">
-                The organisation did not tell us where it identified the highest risks of modern slavery in its business and supply chains during the period of the statement.
-            </div>
-        }
 
-        <!-- #endregion -->
-        <!-- #region geographic-risks -->
+        </div>
 
-        <h2 id="geographic-risks" class="govuk-heading-m">
-            Geographic risks
-        </h2>
-        @if (Model.LocationRisks.Any())
-        {
-            <div class="govuk-body govuk-!-font-weight-bold">
-                During the period of the statement, the organisation considered the following geographic areas in its business and supply chains to be at highest risk of modern slavery:
-            </div>
-            var locationRiskGroups = Model.LocationRisks
-                .Select(hr =>
-                {
-                    var type = Model.RiskTypes.SingleOrDefault(t => t.Id == hr.Id);
-                    return new { hr.Id, hr.Details, type.Category };
-                })
-                .GroupBy(hr => hr.Category)
-                .ToDictionary(g => g.Key, g => g.ToList());
-            @foreach (var group in locationRiskGroups)
+        <div id="risks">
+            <h2 class="govuk-heading-m">
+                Assessing modern slavery risks
+            </h2>
+
+            @if (Model.RelevantRisks.Any())
             {
-                <div class="govuk-body">
-                    @group.Key
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    The organisation told us it considered the following areas to be relevant when assessing its supply chain for modern slavery risks:
                 </div>
-                <ul class="govuk-list govuk-list--bullet">
-                    @foreach (var item in group.Value)
+                var relevantRiskGroups = Model.RelevantRisks
+                    .Select(r =>
                     {
-                        <li>@item.Details</li>
-                    }
-                </ul>
+                        var type = Model.RiskTypes.SingleOrDefault(t => t.Id == r.Id);
+                        return new { r.Id, r.Details, type.Category };
+                    })
+                    .GroupBy(r => r.Category)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+                @foreach (var group in relevantRiskGroups)
+                {
+                    <div class="govuk-body">
+                        @group.Key
+                    </div>
+                    <ul class="govuk-list govuk-list--bullet">
+                        @foreach (var item in group.Value)
+                        {
+                            <li>@item.Details</li>
+                        }
+                    </ul>
+                }
+                @if (!string.IsNullOrEmpty(Model.OtherRelevantRisks))
+                {
+                    <div class="govuk-body">
+                        In addition, the organisation specified the following risk area:
+                        <br>
+                        @Model.OtherRelevantRisks
+                    </div>
+                }
             }
-        }
-        else
-        {
-            <div class="govuk-body">
-                The organisation did not tell us which geographic areas in its business and supply chains it considered to be at highest risk of modern slavery during the period of the statement.
-            </div>
-        }
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us which areas were relevant when assessing its supply chains for modern slavery risks.
+                </div>
+            }
 
-        <!-- #endregion -->
-        <!-- #region monitoring -->
+        </div>
 
-        <h2 id="monitoring" class="govuk-heading-m">
-            Monitoring working conditions
-        </h2>
+        <div id="high-risks">
+            <h2 class="govuk-heading-m">
+                Highest risks identified
+            </h2>
 
-        <!-- #endregion -->
-        <!-- #region indicators -->
+            @if (Model.HighRisks.Any())
+            {
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    The organisation told us it considered the following areas to be relevant when assessing its supply chain for modern slavery risks:
+                </div>
+                var highRiskGroups = Model.HighRisks
+                    .Select(hr =>
+                    {
+                        var type = Model.RiskTypes.SingleOrDefault(t => t.Id == hr.Id);
+                        return new { hr.Id, hr.Details, type.Category };
+                    })
+                    .GroupBy(hr => hr.Category)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+                @foreach (var group in highRiskGroups)
+                {
+                    <div class="govuk-body">
+                        @group.Key
+                    </div>
+                    <ul class="govuk-list govuk-list--bullet">
+                        @foreach (var item in group.Value)
+                        {
+                            <li>@item.Details</li>
+                        }
+                    </ul>
+                }
+                @if (!string.IsNullOrEmpty(Model.OtherHighRisks))
+                {
+                    <div class="govuk-body">
+                        Other highest risk the organisation specified
+                        <br>
+                        @Model.OtherHighRisks
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us where it identified the highest risks of modern slavery in its business and supply chains during the period of the statement.
+                </div>
+            }
 
-        <h2 id="indicators" class="govuk-heading-m">
-            Indicators and instances of modern slavery
-        </h2>
+        </div>
 
-        <!-- #endregion -->
-        <!-- #region training -->
+        <div id="geographic-risks">
+            <h2 class="govuk-heading-m">
+                Geographic risks
+            </h2>
+            @if (Model.LocationRisks.Any())
+            {
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    During the period of the statement, the organisation considered the following geographic areas in its business and supply chains to be at highest risk of modern slavery:
+                </div>
+                var locationRiskGroups = Model.LocationRisks
+                    .Select(lr =>
+                    {
+                        var type = Model.RiskTypes.SingleOrDefault(t => t.Id == lr.Id);
+                        return new { lr.Id, lr.Details, type.Category };
+                    })
+                    .GroupBy(lr => lr.Category)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+                @foreach (var group in locationRiskGroups)
+                {
+                    <div class="govuk-body">
+                        @group.Key
+                    </div>
+                    <ul class="govuk-list govuk-list--bullet">
+                        @foreach (var item in group.Value)
+                        {
+                            <li>@item.Details</li>
+                        }
+                    </ul>
+                }
+            }
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us which geographic areas in its business and supply chains it considered to be at highest risk of modern slavery during the period of the statement.
+                </div>
+            }
 
-        <h2 id="training" class="govuk-heading-m">
-            Training on modern slavery
-        </h2>
+        </div>
 
-        <!-- #endregion -->
-        <!-- #region progress -->
+        <div id="monitoring">
+            <h2 class="govuk-heading-m">
+                Monitoring working conditions
+            </h2>
 
-        <h2 id="progress" class="govuk-heading-m">
-            Monitoring progress
-        </h2>
+            @if (Model.DueDiligences.Any())
+            {
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    The organisation used the following methods and processes to monitor working conditions in its business and supply chains during this period:
+                </div>
+                var diligenceGroups = Model.DueDiligences
+                    .Select(d =>
+                    {
+                        var type = Model.DiligenceTypes.SingleOrDefault(t => t.Id == d.Id);
+                        var parent = Model.DiligenceTypes.SingleOrDefault(t => t.Id == type.ParentId);
+                        return new { d.Id, d.Details, Category = parent.Description };
+                    })
+                    .GroupBy(hr => hr.Category)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+                @foreach (var group in diligenceGroups)
+                {
+                    <div class="govuk-body">
+                        @group.Key
+                    </div>
+                    <ul class="govuk-list govuk-list--bullet">
+                        @foreach (var item in group.Value)
+                        {
+                            <li>@item.Details</li>
+                        }
+                    </ul>
+                }
+            }
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us which methods and processes it used to monitor working conditions in its business and supply chains during this period.
+                </div>
+            }
 
-        <!-- #endregion -->
+        </div>
+
+        <div id="indicators">
+            <h2 class="govuk-heading-m">
+                Indicators and instances of modern slavery
+            </h2>
+
+            @if (Model.HasForceLabour == true)
+            {
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    @* TODO James - content for this state? *@
+                    The organisation identified potential indicators of forced labour or modern slavery in its business or supply chains during this period:
+                </div>
+
+                <div class="govuk-body">
+                    @Model.ForcedLabourDetails
+                </div>
+            }
+            else if (Model.HasForceLabour == false)
+            {
+                <div class="govuk-body">
+                    The organisation did not identify any potential indicators of forced labour or modern slavery in its business or supply chains during this period.
+                </div>
+            }
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us whether it identified any potential indicators of forced labour or modern slavery in its business or supply chains during this period.
+                </div>
+            }
+
+            @if (Model.HasSlaveryInstance == true)
+            {
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    The organisation found 1 instance of modern slavery:
+                </div>
+
+                <div class="govuk-body">
+                    @* TODO James - remediation ? *@
+                    @Model.SlaveryInstanceDetails
+                </div>
+            }
+            else if (Model.HasSlaveryInstance == false)
+            {
+                <div class="govuk-body">
+                    The organisation did not find any instances of modern slavery in its business or supply chains.
+                </div>
+            }
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us whether it found instances of modern slavery in its business or supply chains.
+                </div>
+            }
+        </div>
+
+        <div id="training">
+            <h2 class="govuk-heading-m">
+                Training on modern slavery
+            </h2>
+
+        </div>
+
+        <div id="progress">
+            <h2 class="govuk-heading-m">
+                Monitoring progress
+            </h2>
+
+        </div>
 
     </div>
 </div>
