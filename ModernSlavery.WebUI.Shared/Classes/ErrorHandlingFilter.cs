@@ -29,7 +29,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
                     ViewName = "CustomError",
                     ViewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), context.ModelState)
                     {
-                        Model = webService.ErrorViewModelFactory.Create(hex.StatusCode) // set the model
+                        Model = webService.ErrorViewModelFactory.Create((int)hex.StatusCode) // set the model
                     }
                 };
 

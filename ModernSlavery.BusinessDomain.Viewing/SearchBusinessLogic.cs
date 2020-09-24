@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Autofac.Features.AttributeFilters;
+using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core;
@@ -25,6 +26,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
         private readonly IDataRepository _dataRepository;
         private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
         private readonly ISearchRepository<OrganisationSearchModel> _organisationSearchRepository;
+        private readonly IMapper _autoMapper;
         public IAuditLogger SearchLog { get; }
         public bool Disabled => _organisationSearchRepository.Disabled;
         #endregion
@@ -36,8 +38,8 @@ namespace ModernSlavery.BusinessDomain.Viewing
             IDataRepository dataRepository,
             IReportingDeadlineHelper reportingDeadlineHelper,
             ISearchRepository<OrganisationSearchModel> organisationSearchRepository,
-            [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog
-        )
+            [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog,
+            IMapper autoMapper)
         {
             SearchOptions = searchOptions;
             _sharedOptions = sharedOptions;
@@ -45,10 +47,29 @@ namespace ModernSlavery.BusinessDomain.Viewing
             _reportingDeadlineHelper = reportingDeadlineHelper;
             _organisationSearchRepository = organisationSearchRepository;
             SearchLog = searchLog;
+            _autoMapper = autoMapper;
         }
         #endregion
 
         #region RefreshSearchDocuments
+
+        private IEnumerable<Organisation> LookupSearchableOrganisations(params Organisation[] organisations)
+        {
+            return organisations.Where(
+                o => o.Status == OrganisationStatuses.Active
+                     && o.OrganisationScopes.Any(
+                             sc => sc.Status == ScopeRowStatuses.Active
+                                   && (sc.ScopeStatus == ScopeStatuses.InScope ||
+                                       sc.ScopeStatus == ScopeStatuses.PresumedInScope)));
+        }
+
+        public async Task RefreshSearchDocumentsAsync()
+        {
+            //Get all the organisations
+            var organisations = await _dataRepository.ToListAsync<Organisation>().ConfigureAwait(false);
+            await RefreshSearchDocumentsAsync(organisations);
+        }
+
         public async Task RefreshSearchDocumentsAsync(IEnumerable<Organisation> organisations)
         {
             //Remove the test organisations
@@ -74,23 +95,6 @@ namespace ModernSlavery.BusinessDomain.Viewing
             if (retiredModels.Any()) await _organisationSearchRepository.DeleteDocumentsAsync(retiredModels).ConfigureAwait(false);
         }
 
-        private IEnumerable<Organisation> LookupSearchableOrganisations(params Organisation[] organisations)
-        {
-            return organisations.Where(
-                o => o.Status == OrganisationStatuses.Active
-                     && o.OrganisationScopes.Any(
-                             sc => sc.Status == ScopeRowStatuses.Active
-                                   && (sc.ScopeStatus == ScopeStatuses.InScope ||
-                                       sc.ScopeStatus == ScopeStatuses.PresumedInScope)));
-        }
-
-        public async Task RefreshSearchDocumentsAsync()
-        {
-            //Get all the organisations
-            var organisations = await _dataRepository.ToListAsync<Organisation>().ConfigureAwait(false);
-            await RefreshSearchDocumentsAsync(organisations);
-        }
-
         public async Task RefreshSearchDocumentsAsync(Organisation organisation, int statementDeadlineYear = 0)
         {
             //Ensure we have an organisation
@@ -100,7 +104,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
             var newSearchModels = LookupSearchableOrganisations(organisation).SelectMany(o => CreateOrganisationSearchModels(o));
 
             //Remove those models not for the selected statementDeadlineYear
-            if (statementDeadlineYear > 0) newSearchModels = newSearchModels.Where(m => m.StatementDeadlineYear == statementDeadlineYear);
+            if (statementDeadlineYear > 0) newSearchModels = newSearchModels.Where(m => m.SubmissionDeadlineYear == statementDeadlineYear);
 
              //Get the old indexes for statements
             var retiredModels = await ListSearchDocumentsAsync(organisation, statementDeadlineYear);
@@ -133,14 +137,14 @@ namespace ModernSlavery.BusinessDomain.Viewing
         #endregion
 
         #region ListSearchDocuments
-        public async Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(Organisation organisation, int statementDeadlineYear = 0, bool keyOnly = true)
+        public async Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(Organisation organisation, int submissionDeadlineYear = 0, bool keyOnly = true)
         {
             //Ensure we have an organisation
             if (organisation == null) throw new ArgumentNullException(nameof(organisation));
 
             //Get the old indexes for statements
             var filter = $"{nameof(OrganisationSearchModel.ParentOrganisationId)} eq {organisation.OrganisationId}";
-            if (statementDeadlineYear>0)filter += $" and {nameof(OrganisationSearchModel.StatementDeadlineYear)} eq {statementDeadlineYear}";
+            if (submissionDeadlineYear>0)filter += $" and {nameof(OrganisationSearchModel.SubmissionDeadlineYear)} eq {submissionDeadlineYear}";
 
             return await _organisationSearchRepository.ListDocumentsAsync(selectFields: keyOnly ? nameof(OrganisationSearchModel.SearchDocumentKey) : null, filter: filter);
         }
@@ -161,7 +165,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
             foreach (var organisation in organisations)
                 foreach (var searchModel in CreateOrganisationSearchModels(organisation))
                 {
-                    if (searchModel.StatementDeadlineYear == null && searchModel.ChildStatementOrganisationId == null)
+                    if (searchModel.SubmissionDeadlineYear == null && searchModel.ChildStatementOrganisationId == null)
                         unreportedSearchModels[searchModel.ParentOrganisationId] = searchModel;
                     else
                     {
@@ -211,49 +215,90 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
             var parentStatementModel = new OrganisationSearchModel
             {
+                GroupSubmission = submittedStatement == null ? false : submittedStatement.StatementOrganisations.Any(),
+
+                StatementUrl = submittedStatement?.StatementUrl,
+                StatementStartDate = submittedStatement?.StatementStartDate,
+                StatementEndDate = submittedStatement?.StatementEndDate,
+                ApprovingPerson = submittedStatement?.ApprovingPerson,
+                ApprovedDate = submittedStatement?.ApprovedDate,
+
+                IncludesStructure = submittedStatement?.IncludesStructure,
+                StructureDetails = submittedStatement?.StructureDetails,
+                IncludesPolicies = submittedStatement?.IncludesPolicies,
+                PolicyDetails = submittedStatement?.PolicyDetails,
+                IncludesRisks = submittedStatement?.IncludesRisks,
+                RisksDetails = submittedStatement?.RisksDetails,
+                IncludesDueDiligence = submittedStatement?.IncludesDueDiligence,
+                DueDiligenceDetails = submittedStatement?.DueDiligenceDetails,
+                IncludesTraining = submittedStatement?.IncludesTraining,
+                TrainingDetails = submittedStatement?.TrainingDetails,
+                IncludesGoals = submittedStatement?.IncludesGoals,
+                GoalsDetails = submittedStatement?.GoalsDetails,
+
+                Sectors = submittedStatement?.Sectors.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementSectorTypeId, Name = s.StatementSectorType.Description }).ToList(),
+                OtherSector = submittedStatement?.OtherSector,
+
+                Policies = submittedStatement?.Policies.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementPolicyTypeId, Name = s.StatementPolicyType.Description }).ToList(),
+                OtherPolicies = submittedStatement?.OtherPolicies,
+
+                RelevantRisks = submittedStatement?.RelevantRisks.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementRiskTypeId, Name = string.IsNullOrWhiteSpace(s.Details) ? s.StatementRiskType.Description : s.Details }).ToList(),
+                OtherRelevantRisks = submittedStatement?.OtherRelevantRisks,
+                HighRisks = submittedStatement?.HighRisks.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementRiskTypeId, Name = string.IsNullOrWhiteSpace(s.Details) ? s.StatementRiskType.Description : s.Details }).ToList(),
+                OtherHighRisks = submittedStatement?.OtherHighRisks,
+                LocationRisks = submittedStatement?.LocationRisks.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementRiskTypeId, Name = string.IsNullOrWhiteSpace(s.Details) ? s.StatementRiskType.Description : s.Details }).ToList(),
+
+                DueDiligences = submittedStatement?.Diligences.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementDiligenceTypeId, Name = string.IsNullOrWhiteSpace(s.Details) ? s.StatementDiligenceType.Description : s.Details }).ToList(),
+                ForcedLabourDetails = submittedStatement?.ForcedLabourDetails,
+                SlaveryInstanceDetails = submittedStatement?.SlaveryInstanceDetails,
+                RemediationTypes = submittedStatement?.SlaveryInstanceRemediation.SplitI(Environment.NewLine, 0, StringSplitOptions.RemoveEmptyEntries).ToList(),
+
+                Training = submittedStatement?.Training.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementTrainingTypeId, Name = string.IsNullOrWhiteSpace(s.Details) ? s.StatementTrainingType.Description : s.Details }).ToList(),
+                OtherTraining = submittedStatement?.OtherTraining,
+
                 StatementId = submittedStatement?.StatementId,
                 ParentOrganisationId = organisation.OrganisationId,
-                StatementDeadlineYear = reportingDeadlineYear,
+                SubmissionDeadlineYear = reportingDeadlineYear,
                 OrganisationName = organisation.OrganisationName,
                 CompanyNumber = organisation.CompanyNumber,
-                Address = organisation.LatestAddress.GetAddressString(),
-                SectorTypeIds = submittedStatement?.Sectors.Select(s => (int)s.StatementSectorTypeId).ToArray(),
-                Turnover = submittedStatement == null ? (int?)null : (int)submittedStatement.GetStatementTurnover(),
+                SectorType = new OrganisationSearchModel.KeyName { Key = (int)organisation.SectorType, Name = organisation.SectorType.ToString() },
+                Address = AddressModel.Create(organisation.LatestAddress),
+
+                IncludesMeasuringProgress = submittedStatement?.IncludesMeasuringProgress,
+                ProgressMeasures = submittedStatement?.ProgressMeasures,
+                KeyAchievements = submittedStatement?.KeyAchievements,
                 Modified = submittedStatement == null ? organisation.Modified : submittedStatement.Modified,
-                IsParent = submittedStatement == null ? false : submittedStatement.StatementOrganisations.Any(),
                 Abbreviations = CreateOrganisationNameAbbreviations(organisation.OrganisationName),
                 PartialNameForCompleteTokenSearches = organisation.OrganisationName,
                 PartialNameForSuffixSearches = organisation.OrganisationName
             };
+
+            if (submittedStatement != null)
+            {
+                var turnover = submittedStatement.GetStatementTurnover();
+                parentStatementModel.Turnover = new OrganisationSearchModel.KeyName { Key = (int)turnover, Name = turnover.ToString() };
+                var statementYears = submittedStatement.GetStatementYears();
+                parentStatementModel.StatementYears = new OrganisationSearchModel.KeyName { Key = (int)statementYears, Name = statementYears.ToString() };
+            }
+
             yield return parentStatementModel.SetSearchDocumentKey();
 
             if (submittedStatement!=null)
                 foreach (var childOrganisation in submittedStatement.StatementOrganisations.Where(go => go.Included))
                 {
-                    var childStatementModel = new OrganisationSearchModel
-                    {
-                        StatementId = parentStatementModel.StatementId,
-                        ParentOrganisationId = parentStatementModel.ParentOrganisationId,
-                        StatementDeadlineYear = parentStatementModel.StatementDeadlineYear,
-                        ParentName = parentStatementModel.OrganisationName,
-                        SectorTypeIds = parentStatementModel.SectorTypeIds,
-                        Turnover = parentStatementModel.Turnover,
-                        Modified = parentStatementModel.Modified,
-                        ChildStatementOrganisationId = childOrganisation.StatementOrganisationId,
-                        ChildOrganisationId = childOrganisation.OrganisationId
-                    };
+                    var childStatementModel = _autoMapper.Map<OrganisationSearchModel>(parentStatementModel);
 
-                    if (childOrganisation.Organisation == null)
-                    {
-                        childStatementModel.OrganisationName = childOrganisation.OrganisationName;
-                        childStatementModel.CompanyNumber = organisation.CompanyNumber;
-                        childStatementModel.Address = organisation.LatestAddress.GetAddressString();
-                    }
-                    else
+                    childStatementModel.OrganisationName = childOrganisation.OrganisationName;
+                    childStatementModel.ParentName = parentStatementModel.OrganisationName;
+                    childStatementModel.ChildStatementOrganisationId = childOrganisation.StatementOrganisationId;
+                    childStatementModel.ChildOrganisationId = childOrganisation.OrganisationId;
+
+                    if (childOrganisation.Organisation != null)
                     {
                         childStatementModel.OrganisationName = childOrganisation.Organisation.OrganisationName;
                         childStatementModel.CompanyNumber = childOrganisation.Organisation.CompanyNumber;
-                        childStatementModel.Address = childOrganisation.Organisation.LatestAddress.GetAddressString();
+                        childStatementModel.Address = AddressModel.Create(childOrganisation.Organisation.LatestAddress);
+                        childStatementModel.SectorType = new OrganisationSearchModel.KeyName { Key = (int)organisation.SectorType, Name = organisation.SectorType.ToString() };
                     }
                     childStatementModel.Abbreviations = CreateOrganisationNameAbbreviations(childStatementModel.OrganisationName);
                     childStatementModel.PartialNameForCompleteTokenSearches = childStatementModel.OrganisationName;
@@ -288,7 +333,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
             var parentStatementModel = new OrganisationSearchModel
             {
                 ParentOrganisationId = organisation.OrganisationId,
-                StatementDeadlineYear = reportingDeadlineYear,
+                SubmissionDeadlineYear = reportingDeadlineYear,
             };
             yield return parentStatementModel.SetSearchDocumentKey();
 
@@ -297,7 +342,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
                 var childStatementModel = new OrganisationSearchModel
                 {
                     ParentOrganisationId = parentStatementModel.ParentOrganisationId,
-                    StatementDeadlineYear = parentStatementModel.StatementDeadlineYear,
+                    SubmissionDeadlineYear = parentStatementModel.SubmissionDeadlineYear,
                     ChildStatementOrganisationId = childOrganisation.StatementOrganisationId,
                 };
 
@@ -337,14 +382,31 @@ namespace ModernSlavery.BusinessDomain.Viewing
         }
         #endregion
 
-        #region SearchStatements
-        public async Task<PagedSearchResult<OrganisationSearchModel>> SearchStatementsAsync(
+        #region GetOrganisationAsync
+        public async Task<OrganisationSearchModel> GetOrganisationAsync(long parentOrganisationId, int submissionDeadlineYear)
+        {
+            //Ensure we have an organisation
+            if (parentOrganisationId == 0) throw new ArgumentOutOfRangeException(nameof(parentOrganisationId));
+
+            //Ensure we have an year
+            if (submissionDeadlineYear == 0) throw new ArgumentOutOfRangeException(nameof(submissionDeadlineYear));
+
+            //Create the key for parent organisation
+            var key = $"{parentOrganisationId}-{submissionDeadlineYear}";
+
+            return await _organisationSearchRepository.GetDocumentAsync(key);
+        }
+        #endregion
+
+        #region SearchOrganisationsAsync
+        public async Task<PagedSearchResult<OrganisationSearchModel>> SearchOrganisationsAsync(
             string keywords,
-            IList<byte> turnovers=null,
-            IList<short> sectors=null,
-            IList<int> deadlineYears = null,
+            IEnumerable<byte> turnovers,
+            IEnumerable<short> sectors=null,
+            IEnumerable<int> deadlineYears = null,
             bool submittedOnly=true,
             bool returnFacets = false,
+            bool returnAllFields = false,
             int currentPage=1,
             int pageSize = 20)
         {
@@ -352,32 +414,55 @@ namespace ModernSlavery.BusinessDomain.Viewing
             #region Clean up the search keywords
             keywords = keywords?.Trim();
             keywords = RemoveTheMostCommonTermsOnOurDatabaseFromTheKeywords(keywords);
+
+            string RemoveTheMostCommonTermsOnOurDatabaseFromTheKeywords(string keywords)
+            {
+                if (string.IsNullOrEmpty(keywords)) return keywords;
+
+                const string patternToReplace = "(?i)(limited|ltd|llp|uk | uk|\\(uk\\)|-uk|plc)[\\.]*";
+
+                string resultingString;
+
+                resultingString = Regex.Replace(keywords, patternToReplace, string.Empty);
+                resultingString = resultingString.Trim();
+
+                var willThisReplacementClearTheString = resultingString == string.Empty;
+
+                return willThisReplacementClearTheString
+                    ? keywords // don't replace - user wants to search 'limited' or 'uk'...
+                    : resultingString;
+            }
+
             #endregion
 
+            turnovers = turnovers ?? Enumerable.Empty<byte>();
+            sectors = sectors ?? Enumerable.Empty<short>();
+            deadlineYears = deadlineYears ?? Enumerable.Empty<int>();
+
             //Specify the fields to return
-            string selectFields = string.Join(',',
+            string selectFields = returnAllFields ? null : string.Join(',',
                 nameof(OrganisationSearchModel.ParentOrganisationId),
-                nameof(OrganisationSearchModel.StatementDeadlineYear),
+                nameof(OrganisationSearchModel.SubmissionDeadlineYear),
                 nameof(OrganisationSearchModel.OrganisationName),
                 nameof(OrganisationSearchModel.CompanyNumber),
                 nameof(OrganisationSearchModel.Address),
                 nameof(OrganisationSearchModel.ParentName),
-                nameof(OrganisationSearchModel.IsParent));
+                nameof(OrganisationSearchModel.GroupSubmission));
 
             #region Build the sort criteria
-            int filterCount = sectors.Count + turnovers.Count + deadlineYears.Count;
-            var orderBy=(string.IsNullOrWhiteSpace(keywords) && filterCount == 0) 
-                ? $"{nameof(OrganisationSearchModel.Modified)} desc, {nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.StatementDeadlineYear)} desc"
-                : $"{nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.StatementDeadlineYear)} desc";
+            var hasFilter = sectors.Any() || turnovers.Any() || deadlineYears.Any();
+            var orderBy=(string.IsNullOrWhiteSpace(keywords) && !hasFilter) 
+                ? $"{nameof(OrganisationSearchModel.Modified)} desc, {nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.SubmissionDeadlineYear)} desc"
+                : $"{nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.SubmissionDeadlineYear)} desc";
             #endregion
 
             #region Specify the facet filters
             var facetFields = !returnFacets 
                 ? null 
                 : string.Join(',',
-                    nameof(OrganisationSearchModel.Turnover),
-                    nameof(OrganisationSearchModel.SectorTypeIds),
-                    nameof(OrganisationSearchModel.StatementDeadlineYear));
+                    $"{nameof(OrganisationSearchModel.Turnover)}/{nameof(OrganisationSearchModel.KeyName.Key)}",
+                    $"{nameof(OrganisationSearchModel.SectorType)}/{nameof(OrganisationSearchModel.KeyName.Key)}",
+                    nameof(OrganisationSearchModel.SubmissionDeadlineYear));
 
             #endregion
 
@@ -385,21 +470,21 @@ namespace ModernSlavery.BusinessDomain.Viewing
             var queryFilter = new List<string>();
 
             //Add the turnover filter
-            if (turnovers!=null && turnovers.Count > 0)
+            if (turnovers!=null && turnovers.Any())
             {
-                var turnoverQuery = turnovers.Select(x => $"Turnover eq {x}");
+                var turnoverQuery = turnovers.Select(x => $"Turnover/Key eq {x}");
                 queryFilter.Add($"({string.Join(" or ", turnoverQuery)})");
             }
 
             //Add the sector filter
-            if (sectors!=null && sectors.Count > 0)
+            if (sectors!=null && sectors.Any())
             {
-                var sectorQuery = sectors.Select(x => $"id eq {x}");
-                queryFilter.Add($"SectorTypeIds/any(id: {string.Join(" or ", sectorQuery)})");
+                var sectorQuery = sectors.Select(x => $"sector/Key eq {x}");
+                queryFilter.Add($"Sectors/any(sector: {string.Join(" or ", sectorQuery)})");
             }
 
             //Add the years filter
-            if (deadlineYears != null && deadlineYears.Count > 0)
+            if (deadlineYears != null && deadlineYears.Any())
             {
                 var deadlineQuery = deadlineYears.Select(x => $"StatementDeadlineYear eq {x}");
                 queryFilter.Add($"({string.Join(" or ", deadlineQuery)})");
@@ -416,22 +501,21 @@ namespace ModernSlavery.BusinessDomain.Viewing
         }
         #endregion
 
-        private string RemoveTheMostCommonTermsOnOurDatabaseFromTheKeywords(string keywords)
+        #region ListGroupOrganisationsAsync
+        public async Task<IEnumerable<OrganisationSearchModel>> ListGroupOrganisationsAsync(long parentOrganisationId, int submissionDeadlineYear)
         {
-            if (string.IsNullOrEmpty(keywords)) return keywords;
+            //Ensure we have an organisation
+            if (parentOrganisationId == 0) throw new ArgumentOutOfRangeException(nameof(parentOrganisationId));
 
-            const string patternToReplace = "(?i)(limited|ltd|llp|uk | uk|\\(uk\\)|-uk|plc)[\\.]*";
+            //Ensure we have an year
+            if (submissionDeadlineYear == 0) throw new ArgumentOutOfRangeException(nameof(submissionDeadlineYear));
 
-            string resultingString;
+            //Create the filter for all parent organisations
+            var filter = $"{nameof(OrganisationSearchModel.ParentName)} ne null and {nameof(OrganisationSearchModel.ParentOrganisationId)} eq {parentOrganisationId} and {nameof(OrganisationSearchModel.SubmissionDeadlineYear)} eq {submissionDeadlineYear}";
 
-            resultingString = Regex.Replace(keywords, patternToReplace, string.Empty);
-            resultingString = resultingString.Trim();
-
-            var willThisReplacementClearTheString = resultingString == string.Empty;
-
-            return willThisReplacementClearTheString
-                ? keywords // don't replace - user wants to search 'limited' or 'uk'...
-                : resultingString;
+            return await _organisationSearchRepository.ListDocumentsAsync(filter: filter);
         }
+        #endregion
+
     }
 }

@@ -27,9 +27,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// Retrieves all the search index documents from Azure Congitic Search for a specific organisation
         /// </summary>
         /// <param name="organisation">The organisation whos search index documents to retrieve</param>
-        /// <param name="statementDeadlineYear">The reporting year whos search index documents to retrieve or 0 if all years</param>
+        /// <param name="submissionDeadlineYear">The reporting year whos search index documents to retrieve or 0 if all years</param>
         /// <returns>The list of search index documents from Azure</returns>
-        Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(Organisation organisation, int statementDeadlineYear = 0, bool keyOnly=true);
+        Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(Organisation organisation, int submissionDeadlineYear = 0, bool keyOnly=true);
 
         /// <summary>
         /// Delete old search index documents for a specific organisation entity
@@ -62,6 +62,14 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         Task RefreshSearchDocumentsAsync(Organisation organisation, int statementDeadlineYear = 0);
 
         /// <summary>
+        /// Returns an organisation statement summary for the specified reporting year
+        /// </summary>
+        /// <param name="parentOrganisationId">The Id of the organisation</param>
+        /// <param name="submissionDeadlineYear">The reporting deadline year</param>
+        /// <returns></returns>
+        Task<OrganisationSearchModel> GetOrganisationAsync(long parentOrganisationId, int submissionDeadlineYear);
+
+        /// <summary>
         /// Search index of statements by organisation name and return sorted and filtered results
         /// </summary>
         /// <param name="keywords">The organisatio name to search for</param>
@@ -70,9 +78,18 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="deadlineYears">A list of deadline years to apply as a filter</param>
         /// <param name="submittedOnly">Whether to return only only organisations who have submitted</param>
         /// <param name="returnFacets">Whether to return the faceted results (i.e., filter counts) </param>
+        /// <param name="returnAllFields">When true returns all retrievable fields (for Api) otherwise returns only fields for viewing service</param>
         /// <param name="currentPage">The page of results to return</param>
         /// <param name="pageSize">The size of the results page</param>
         /// <returns></returns>
-        Task<PagedSearchResult<OrganisationSearchModel>> SearchStatementsAsync(string keywords, IList<byte> turnovers = null, IList<short> sectors = null, IList<int> deadlineYears = null, bool submittedOnly = true, bool returnFacets = false, int currentPage = 1, int pageSize = 20);
+        Task<PagedSearchResult<OrganisationSearchModel>> SearchOrganisationsAsync(string keywords, IEnumerable<byte> turnovers = null, IEnumerable<short> sectors = null, IEnumerable<int> deadlineYears = null, bool submittedOnly = true, bool returnFacets = false, bool returnAllFields = false, int currentPage = 1, int pageSize = 20);
+
+        /// <summary>
+        /// Returns a list of group organisations reporting under the parent organisation for the specified reporting year
+        /// </summary>
+        /// <param name="parentOrganisationId">The Id of the parent organisation</param>
+        /// <param name="submissionDeadlineYear">The reporting deadline year</param>
+        /// <returns></returns>
+        Task<IEnumerable<OrganisationSearchModel>> ListGroupOrganisationsAsync(long parentOrganisationId, int submissionDeadlineYear);
     }
 }

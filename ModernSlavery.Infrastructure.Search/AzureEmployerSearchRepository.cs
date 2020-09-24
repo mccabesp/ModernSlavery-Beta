@@ -8,8 +8,10 @@ using System.Web;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
 using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
+using Microsoft.Extensions.Options;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
@@ -38,6 +40,7 @@ namespace ModernSlavery.Infrastructure.Search
             SearchOptions searchOptions,
             [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog,
             IMapper autoMapper,
+            IOptions<TelemetryConfiguration> telemetryOptions=null,
             TelemetryClient telemetryClient = null)
         {
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
@@ -49,10 +52,11 @@ namespace ModernSlavery.Infrastructure.Search
                 Console.WriteLine($"{nameof(AzureOrganisationSearchRepository)} is disabled");
                 return;
             }
-            _autoMapper = autoMapper;
             SearchLog = searchLog;
-            IndexName = searchOptions.OrganisationIndexName.ToLower();
+            _autoMapper = autoMapper;
+            _telemetryClient = telemetryClient;
 
+            IndexName = searchOptions.OrganisationIndexName.ToLower();
             if (string.IsNullOrWhiteSpace(searchOptions.ServiceName)) throw new ArgumentNullException(nameof(searchOptions.ServiceName));
 
 #if DEBUG
@@ -117,7 +121,44 @@ namespace ModernSlavery.Infrastructure.Search
 
             if (await serviceClient.Indexes.ExistsAsync(indexName)) return;
 
-            var index = new Index { Name = indexName, Fields = FieldBuilder.BuildForType<AzureOrganisationSearchModel>() };
+            #region Create the field definitions
+            var fields = new List<Field>(FieldBuilder.BuildForType<OrganisationSearchModel>());
+            void Add(Field field)
+            {
+                var index = fields.FindIndex(f => f.Name == field.Name);
+                if (index < 0)
+                    fields.Add(field);
+                else
+                    fields[index] = field;
+            }
+
+            //Index fields
+            Add(Field.New(nameof(OrganisationSearchModel.SearchDocumentKey),DataType.String,isKey:true));
+            Add(Field.New(nameof(OrganisationSearchModel.Timestamp),DataType.String, isRetrievable:false));
+
+            //Searchable fields
+            Add(Field.NewSearchableString(nameof(OrganisationSearchModel.PartialNameForSuffixSearches), AnalyzerName.EnMicrosoft, isRetrievable:false));
+            Add(Field.NewSearchableString(nameof(OrganisationSearchModel.PartialNameForCompleteTokenSearches), AnalyzerName.EnMicrosoft, isRetrievable:false));
+            Add(Field.NewSearchableCollection(nameof(OrganisationSearchModel.Abbreviations), AnalyzerName.EnLucene, isRetrievable:false));
+            Add(Field.NewSearchableString(nameof(OrganisationSearchModel.OrganisationName),AnalyzerName.EnLucene, isFilterable:true,isSortable:true));
+            Add(Field.NewSearchableString(nameof(OrganisationSearchModel.CompanyNumber),AnalyzerName.EnMicrosoft));
+
+            //Filterable fields
+            Add(Field.New(nameof(OrganisationSearchModel.ParentOrganisationId), DataType.Int64, isFilterable:true));
+            Add(Field.New(nameof(OrganisationSearchModel.ParentName), DataType.String, isFilterable:true));
+            Add(Field.New(nameof(OrganisationSearchModel.StatementId), DataType.Int64, isFilterable:true));
+            Add(Field.New(nameof(OrganisationSearchModel.SubmissionDeadlineYear), DataType.Int32, isFilterable: true, isSortable:true));
+            Add(Field.New(nameof(OrganisationSearchModel.Modified), DataType.DateTimeOffset, isSortable:true));
+
+            //Complex filterable fields
+            var keyNameFilterFields = new List<Field>();
+            keyNameFilterFields.Add(Field.New(nameof(OrganisationSearchModel.KeyName.Key), DataType.Int32, isFilterable: true));
+            keyNameFilterFields.Add(Field.New(nameof(OrganisationSearchModel.KeyName.Name), DataType.String));
+            Add(Field.NewComplex(nameof(OrganisationSearchModel.Turnover),false, keyNameFilterFields));
+            Add(Field.NewComplex(nameof(OrganisationSearchModel.Sectors), true, keyNameFilterFields));
+            #endregion
+
+            var index = new Index { Name = indexName, Fields = fields };
 
             index.Suggesters = new List<Suggester>
             {
@@ -217,13 +258,13 @@ namespace ModernSlavery.Infrastructure.Search
             newRecords = newRecords.OrderBy(o => o.OrganisationName);
 
             //Set the records to add or update
-            var actions = newRecords.Select(r => IndexAction.MergeOrUpload(_autoMapper.Map<AzureOrganisationSearchModel>(r)))
+            var actions = newRecords.Select(r => IndexAction.MergeOrUpload(r))
                 .ToList();
 
-            var batches = new ConcurrentBag<IndexBatch<AzureOrganisationSearchModel>>();
+            var batches = new ConcurrentBag<IndexBatch<OrganisationSearchModel>>();
             while (actions.Any())
             {
-                var batchSize = actions.Count > 1000 ? 1000 : actions.Count;
+                var batchSize = actions.Count > _searchOptions.BatchSize ? _searchOptions.BatchSize : actions.Count;
                 var batch = IndexBatch.New(actions.Take(batchSize).ToList());
                 batches.Add(batch);
                 actions.RemoveRange(0, batchSize);
@@ -236,7 +277,7 @@ namespace ModernSlavery.Infrastructure.Search
                 batch =>
                 {
                     var retries = 0;
-                    retry:
+                retry:
                     try
                     {
                         indexClient.Documents.Index(batch);
@@ -263,9 +304,9 @@ namespace ModernSlavery.Infrastructure.Search
                 throw new ArgumentNullException(nameof(oldRecords), "You must supply at least one record to index");
 
             //Set the records to add or update
-            var actions = oldRecords.Select(r => IndexAction.Delete(_autoMapper.Map<AzureOrganisationSearchModel>(r))).ToList();
+            var actions = oldRecords.Select(r => IndexAction.Delete(r)).ToList();
 
-            var batches = new ConcurrentBag<IndexBatch<AzureOrganisationSearchModel>>();
+            var batches = new ConcurrentBag<IndexBatch<OrganisationSearchModel>>();
 
             while (actions.Any())
             {
@@ -398,23 +439,31 @@ namespace ModernSlavery.Infrastructure.Search
             if (facets != null && facets.Count > 0) sp.Facets = facets;
 
             //Execute the search
-            var results = await indexClient.Documents.SearchAsync<OrganisationSearchModel>(searchText, sp);
+            var headers = new Dictionary<string, List<string>>() { { "x-ms-azs-return-searchid", new List<string>() { "true" } } };
+            var results = await indexClient.Documents.SearchWithHttpMessagesAsync<OrganisationSearchModel>(searchText, sp,customHeaders:headers);
 
             //Return the total records
-            var totalRecords = results.Count.Value;
+            var totalRecords = results.Body.Count.Value;
 
             /* There are too many empty searches being executed (about 1200). This needs further investigation to see if/how they can be reduced */
-            if (!string.IsNullOrEmpty(searchText))
+            if (!string.IsNullOrEmpty(searchText) && currentPage==1)
             {
+                //Get the search id for logging purposes
+                var searchId = results.Response.Headers.TryGetValues("x-ms-azs-searchid", out IEnumerable<string> headerValues) ? headerValues.FirstOrDefault() : string.Empty;
+
                 var telemetryProperties = new Dictionary<string, string>
                 {
                     {"TimeStamp", VirtualDateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")},
+                    {"SearchServiceName", _searchOptions.ServiceName},
+                    {"IndexName", IndexName},
+                    {"SearchId", searchId},
                     {"QueryTerms", searchText},
-                    {"ResultCount", totalRecords.ToString()},
-                    {"SearchParameters", HttpUtility.UrlDecode(sp.ToString())}
+                    {"Filter",sp.Filter},
+                    {"OrderBy",sp.OrderBy.ToDelimitedString()},
+                    {"ResultCount", totalRecords.ToString()}
                 };
 
-                _telemetryClient?.TrackEvent("msu_Search", telemetryProperties);
+                _telemetryClient?.TrackEvent("Search", telemetryProperties);
 
                 await SearchLog.WriteAsync(telemetryProperties);
             }
@@ -423,7 +472,7 @@ namespace ModernSlavery.Infrastructure.Search
             //Create the results
             var searchResults = new PagedSearchResult<OrganisationSearchModel>
             {
-                Results = results.Results.Select(r => r.Document).ToList(),
+                Results = results.Body.Results.Select(r => r.Document).ToList(),
                 CurrentPage = currentPage,
                 PageSize = pageSize,
                 ActualRecordTotal = totalRecords,
@@ -431,14 +480,14 @@ namespace ModernSlavery.Infrastructure.Search
             };
 
             //Add the facet results
-            if (results.Facets != null && results.Facets.Count>0)
+            if (results.Body.Facets != null && results.Body.Facets.Count>0)
             {
                 searchResults.facets = new Dictionary<string, Dictionary<object, long>>();
-                foreach (var facetGroupKey in results.Facets.Keys)
+                foreach (var facetGroupKey in results.Body.Facets.Keys)
                 {
                     searchResults.facets[facetGroupKey] = new Dictionary<object, long>();
 
-                    foreach (var facetResult in results.Facets[facetGroupKey])
+                    foreach (var facetResult in results.Body.Facets[facetGroupKey])
                         searchResults.facets[facetGroupKey][facetResult.Value] = facetResult.Count.Value;
                 }
             }
@@ -446,6 +495,7 @@ namespace ModernSlavery.Infrastructure.Search
             //Return the results
             return searchResults;
         }
+
 
     }
 }

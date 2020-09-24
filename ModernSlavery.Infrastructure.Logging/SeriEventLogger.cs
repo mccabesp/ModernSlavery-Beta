@@ -1,11 +1,25 @@
-﻿using ModernSlavery.Core.Interfaces;
+﻿using Microsoft.ApplicationInsights.Extensibility;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using Newtonsoft.Json;
 using Serilog;
+using Serilog.Core;
 
 namespace ModernSlavery.Infrastructure.Logging
 {
     public class SeriEventLogger : IEventLogger
     {
+        private readonly Logger log;
+        public SeriEventLogger(SharedOptions sharedOptions, TelemetryConfiguration telemetryConfiguration)
+        {
+            if (sharedOptions.IsDevelopment())
+                log = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+            else
+                log = new LoggerConfiguration().WriteTo.ApplicationInsights(TelemetryConfiguration.Active, TelemetryConverter.Traces).CreateLogger();
+
+            Log.Logger = log;
+        }
+
         public void Debug(string message, object values = null)
         {
             Log.Debug(GetLogMessage(message, values), values);

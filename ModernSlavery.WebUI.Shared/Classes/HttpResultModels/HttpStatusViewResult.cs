@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Shared.Classes.HttpResultModels
@@ -106,6 +107,11 @@ namespace ModernSlavery.WebUI.Shared.Classes.HttpResultModels
             };
 
             return base.ExecuteResultAsync(actionContext);
+        }
+
+        public HttpException ToHttpException()
+        {
+            return new HttpException(StatusCode.Value, StatusDescription);
         }
     }
 }
