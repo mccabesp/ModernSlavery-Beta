@@ -38,17 +38,17 @@ namespace ModernSlavery.WebAPI.Public
                     return currentAssemblyName == assemblyName;
                 });
 
-                c.SwaggerDoc("v1", new OpenApiInfo
+                c.SwaggerDoc("Version 1", new OpenApiInfo
                 {
-                    Version = "v1",
-                    Title = "Modern Slavery Statement API",
-                    Description = "Web API for returning organisation data and information on their modern slavery statements",
+                    Version = "Version 1",
+                    Title = "Modern Slavery Statement Summary API",
+                    Description = "Public Web API for returning summary data for published modern slavery statements",
                     TermsOfService = new Uri("https://example.com/terms"),
                     Contact = new OpenApiContact
                     {
-                        Name = "Stephen McCabe",
-                        Email = "stephen.mccabe@cadenceinnova.com",
-                        Url = new Uri("https://twitter.com/mccabesp"),
+                        Name = "Modern Slavery Unit",
+                        Email = "modernslaveryunit@homeoffice.com",
+                        Url = new Uri("https://twitter.com/modernslavery"),
                     },
                     License = new OpenApiLicense
                     {
@@ -73,16 +73,21 @@ namespace ModernSlavery.WebAPI.Public
         {
             var app = lifetimeScope.Resolve<IApplicationBuilder>();
 
+            
             //Configure dependencies here
             // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger(options=> { options.RouteTemplate = "Api/{documentName}/OpenApi.json"; });
+            app.UseSwagger(options=> { options.RouteTemplate = "Api/{documentName}/ModernSlaverySummaryApi.json"; });
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
+            app.UseSwaggerUI(options => 
             {
-                c.SwaggerEndpoint("/Api/v1/OpenApi.json", "Modern Slavery Statement Service API");
-                c.RoutePrefix = "Api";
+                options.SwaggerEndpoint("/Api/Version 1/ModernSlaverySummaryApi.json", "Modern Slavery Statement Summary API");
+                options.RoutePrefix = "Api";
+                options.InjectStylesheet("/Api/ModernSlaverySummaryApi.css");
+                //options.InjectJavascript("/assets/javascripts/jquery-1.11.3.min.js");
+                //options.InjectJavascript("/Api/ModernSlaverySummaryApi.js");
+                options.DocumentTitle = "Modern Slavery Statement Summary API";
             });
         }
 

@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using ModernSlavery.Core.Classes.StatementTypeIndexes;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +23,7 @@ namespace ModernSlavery.WebAPI.Public.Classes
         /// </summary>
         public CsvMediaTypeFormatter()
         {
+            SupportedMediaTypes.Add(Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/csv"));
             SupportedMediaTypes.Add(Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse("text/csv"));
             SupportedEncodings.Add(Encoding.UTF8);
             SupportedEncodings.Add(Encoding.Unicode);
@@ -54,28 +58,64 @@ namespace ModernSlavery.WebAPI.Public.Classes
                 List<string> values = new List<string>();
                 foreach (var val in vals)
                 {
-                    if (val.Value != null)
-                    {
-                        var tmpval = val.Value.ToString();
-
-                        //Check if the value contans a comma and place it in quotes if so
-                        if (tmpval.Contains(","))
-                            tmpval = string.Concat("\"", tmpval, "\"");
-
-                        //Replace any \r or \n special characters from a new line with a space
-                        tmpval = tmpval.Replace("\r", " ", StringComparison.InvariantCultureIgnoreCase);
-                        tmpval = tmpval.Replace("\n", " ", StringComparison.InvariantCultureIgnoreCase);
-
-                        values.Add(tmpval);
-                    }
+                    string text;
+                    if (val.Value is string)
+                        text = val.Value.ToString();
+                    else if (val.Value is IEnumerable list)
+                        text = string.Join(Environment.NewLine, ConvertToText(list));
                     else
-                    {
-                        values.Add(string.Empty);
-                    }
+                        text = ConvertToText(val.Value);
+
+                    values.Add(AddQuotes(text) ?? string.Empty);
                 }
                 csv.AppendLine(string.Join(",", values));
             }
             return context.HttpContext.Response.WriteAsync(csv.ToString(), selectedEncoding);
+        }
+
+        private static IEnumerable<string> ConvertToText(IEnumerable list)
+        {
+            foreach (var value in list)
+            {
+                var text = ConvertToText(value);
+                if (text!=null) yield return text;
+            }
+        }
+
+        private static string ConvertToText(object value)
+        {
+            if (value == null) return null;
+
+            switch (value)
+            {
+                case string text:
+                    return text;
+                case AddressModel addressModel:
+                    return addressModel.GetFullAddress(Environment.NewLine);
+                case SectorTypeIndex.SectorType sectorType:
+                    return sectorType.Description;
+                case PolicyTypeIndex.PolicyType policyType:
+                    return policyType.Description;
+                case RiskTypeIndex.RiskType riskType:
+                    return riskType.Description;
+                case DiligenceTypeIndex.DiligenceType diligenceType:
+                    return diligenceType.Description;
+                case TrainingTypeIndex.TrainingType trainingType:
+                    return trainingType.Description;
+                default:
+                    return value.ToString();
+            }
+        }
+
+        private static string AddQuotes(string text)
+        {
+            if (text == null) return null;
+
+            //Check if the value contans a comma and place it in quotes if so
+            if (text.Contains(",") || text.Contains(Environment.NewLine))
+                text = string.Concat("\"", text, "\"");
+
+            return text;
         }
 
         private static Type GetTypeOf(object obj)
