@@ -36,7 +36,10 @@
         <p class="govuk-body govuk-!-font-size-24">
             Read a summary of this organisation’s modern slavery statement, or link to the full statement on the organisation’s website.
             The summary does not replace the full statement.
-            @* Group orgs content *@
+            @if (Model.GroupSubmission)
+            {
+                <text>This statement covers a <a class="govuk-link" href="">a group of organisations</a>.</text>
+            }
         </p>
 
         <details class="govuk-details" data-module="govuk-details">

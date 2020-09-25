@@ -253,7 +253,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         public async Task<IActionResult> Statement(string organisationIdentifier, int year)
         {
             //Get the latest statement data for this organisation, reporting year
-            var openResult = await ViewingPresenter.GetStatementViewModelAsync(organisationIdentifier, year);
+            var openResult = await ViewingPresenter.GetStatementSummaryViewModel(organisationIdentifier, year);
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             var viewModel = openResult.Result;

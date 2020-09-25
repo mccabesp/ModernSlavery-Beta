@@ -28,6 +28,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         IObfuscator Obfuscator { get; }
         Task<SearchViewModel> SearchAsync(SearchQueryModel searchQuery);
         Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(string organisationIdentifier, int reportingDeadlineYear);
+        Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(string organisationIdentifier, int reportingDeadlineYear);
     }
 
     public class ViewingPresenter : IViewingPresenter
@@ -184,15 +185,16 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             return new Outcome<StatementErrors, StatementViewModel>(statementViewModel);
         }
 
-        public async Task<StatementSummaryViewModel> GetStatementSummaryViewModel(string organisationIdentifier, int reportingDeadlineYear)
+        public async Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(string organisationIdentifier, int reportingDeadlineYear)
         {
             long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
             var organisationSearchModel = await _searchBusinessLogic.GetOrganisationAsync(organisationId, reportingDeadlineYear);
 
-            // build the result view model
-            var vm = _mapper.Map<StatementSummaryViewModel>(organisationSearchModel);
+            if (organisationSearchModel == null)
+                return new Outcome<StatementErrors, StatementSummaryViewModel>(StatementErrors.NotFound, $"Cannot find statement summary for Organisation:{organisationId} due for reporting deadline year {reportingDeadlineYear}");
 
-            return vm;
+            var vm = _mapper.Map<StatementSummaryViewModel>(organisationSearchModel);
+            return new Outcome<StatementErrors, StatementSummaryViewModel>(vm);
         }
 
         #endregion
