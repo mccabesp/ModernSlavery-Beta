@@ -482,14 +482,94 @@
             <h2 class="govuk-heading-m">
                 Training on modern slavery
             </h2>
+            @if (Model.Training.Any())
+            {
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    The organisation provided training on modern slavery to the following people:
+                </div>
 
+                <ul class="govuk-list govuk-list--bullet">
+                    @foreach (var item in Model.Training)
+                    {
+                        <li>@item.Description</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us whether it provided training on modern slavery during this period.
+                </div>
+            }
         </div>
 
         <div id="progress">
             <h2 class="govuk-heading-m">
                 Monitoring progress
             </h2>
+            @if (Model.IncludesMeasuringProgress == true)
+            {
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    The organisation told us its statement for this period includes goals relating to how it would tackle modern slavery risks in its business and supply chains.
+                </div>
+            }
+            else
+            {
+                <div class="govuk-body">
+                    @* TODO James - Should there be content here? *@
+                </div>
+            }
 
+            @if (!string.IsNullOrWhiteSpace(Model.ProgressMeasures))
+            {
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    The organisation measured its progress towards these goals as follows:
+                </div>
+
+                <div class="govuk-body">
+                    @Model.ProgressMeasures
+                </div>
+            }
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not provide any information on monitoring progress towards goals relating to modern slavery.
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.KeyAchievements))
+            {
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    We asked the organisation to tell us about its key achievements during this period in relation to preventing modern slavery. These were:
+                </div>
+
+                <div class="govuk-body">
+                    @Model.KeyAchievements
+                </div>
+            }
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us about its key achievements during this period in relation to preventing modern slavery.
+                </div>
+            }
+
+            @if (Model.StatementYears != StatementYears.NotProvided)
+            {
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    The organisation has been producing modern slavery statements for:
+                </div>
+
+                <div class="govuk-body">
+                    @Model.StatementYears
+                </div>
+            }
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us how long it has been producing modern slavery statements.
+                </div>
+            }
         </div>
 
     </div>
