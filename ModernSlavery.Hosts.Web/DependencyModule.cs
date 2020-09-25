@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Net.Http;
 using Autofac;
-using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -23,8 +20,8 @@ using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.Infrastructure.Storage.FileRepositories;
 using ModernSlavery.Infrastructure.Telemetry;
+using ModernSlavery.WebAPI.Public.Classes;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Binding;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
@@ -75,6 +72,8 @@ namespace ModernSlavery.Hosts.Web
             var mvcBuilder = services.AddControllersWithViews(
                     options =>
                     {
+                        options.OutputFormatters.Add(new CsvMediaTypeFormatter());
+                        
                         options.ModelBinderProviders.Insert(0,new DependencyModelBinderSource());
                         options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
                         options.ModelMetadataDetailsProviders.Add(
@@ -85,8 +84,10 @@ namespace ModernSlavery.Hosts.Web
                             _responseCachingOptions.CacheProfiles.ForEach(p =>
                                 options.CacheProfiles.Add(p)); //Load the response cache profiles from options
                         options.Filters.Add<ErrorHandlingFilter>();
-                    });
+                        options.Filters.Add<HttpExceptionFilter>();
+                    }).AddXmlSerializerFormatters();
 
+            mvcBuilder.AddApplicationPart<WebAPI.Public.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Identity.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Account.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Admin.DependencyModule>();
@@ -254,6 +255,7 @@ namespace ModernSlavery.Hosts.Web
 
         public void RegisterModules(IList<Type> modules)
         {
+            modules.AddDependency<WebAPI.Public.DependencyModule>();
             modules.AddDependency<WebUI.Identity.DependencyModule>();
             modules.AddDependency<WebUI.StaticFiles.DependencyModule>();
             modules.AddDependency<WebUI.Account.DependencyModule>();

@@ -24,9 +24,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
     [Route("Submit")]
     public partial class SubmissionController : BaseController
     {
-        public delegate bool IsPageChanged(ReturnViewModel postedReturnViewModel,
-            ReturnViewModel stashedReturnViewModel);
-
         private readonly IStatementBusinessLogic _statementBusinessLogic;
         private readonly ISubmissionService _SubmissionService;
 
@@ -40,7 +37,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             _statementBusinessLogic = statementBusinessLogic;
         }
 
-        [Route("Init")]
+        [HttpGet("Init")]
         public IActionResult Init()
         {
             if (!SharedBusinessLogic.SharedOptions.IsProduction())

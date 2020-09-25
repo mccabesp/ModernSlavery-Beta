@@ -40,7 +40,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                await _searchBusinessLogic.UpdateOrganisationSearchIndexAsync().ConfigureAwait(false);
+                await _searchBusinessLogic.RefreshSearchDocumentsAsync().ConfigureAwait(false);
 
                 if (force && !string.IsNullOrWhiteSpace(userEmail))
                     try

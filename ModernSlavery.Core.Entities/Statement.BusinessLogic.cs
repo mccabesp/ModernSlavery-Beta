@@ -37,6 +37,17 @@ namespace ModernSlavery.Core.Entities
             StatusDate = VirtualDateTime.Now;
             StatusDetails = details;
         }
+
+        public StatementYears GetStatementYears()
+        {
+            return Enums.GetEnumFromRange<StatementYears>(MinStatementYears, MaxStatementYears == null ? 0 : MaxStatementYears.Value);
+        }
+
+        public StatementTurnovers GetStatementTurnover()
+        {
+            return Enums.GetEnumFromRange<StatementTurnovers>(MinTurnover, MaxTurnover == null ? 0 : MaxTurnover.Value);
+        }
+
         public ScopeStatuses GetScopeStatus()
         {
             return Organisation.GetActiveScopeStatus(SubmissionDeadline);

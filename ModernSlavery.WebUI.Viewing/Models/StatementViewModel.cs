@@ -60,40 +60,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
             public short Id { get; set; }
             public string Details { get; set; }
         }
-        public enum TurnoverRanges : byte
-        {
-            //Not Provided
-            NotProvided = 0,
 
-            [Display(Description = "Under £36 million")]
-            Under36Million = 1,
-
-            [Display(Description = "£36 million to £60 million")]
-            From36to60Million = 2,
-
-            [Display(Description = "£60 million to £100 million")]
-            From60to100Million = 3,
-
-            [Display(Description = "£100 million to £500 million")]
-            From100to500Million = 4,
-
-            [Display(Description = "Over £500 million")]
-            Over500Million = 5,
-        }
-
-        public enum YearRanges : byte
-        {
-            NotProvided = 0,
-
-            [Display(Description = "This is the first time")]
-            Year1 = 1,
-
-            [Display(Description = "1 to 5 years")]
-            Years1To5 = 2,
-
-            [Display(Description = "More than 5 years")]
-            Over5Years = 3,
-        }
         #endregion
 
         #region General Properties
@@ -155,7 +122,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
 
         public string OtherSector { get; set; }
 
-        public TurnoverRanges? Turnover { get; set; }
+        public StatementTurnovers? Turnover { get; set; }
         #endregion
 
         #region Policies
@@ -241,7 +208,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public bool? IncludesMeasuringProgress { get; set; }
         public string ProgressMeasures { get; set; }
         public string KeyAchievements { get; set; }
-        public YearRanges? StatementYears { get; set; }
+        public StatementYears? StatementYears { get; set; }
         #endregion
     }
 }

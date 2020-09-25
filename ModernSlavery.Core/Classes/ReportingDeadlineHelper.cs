@@ -69,8 +69,6 @@ namespace ModernSlavery.Core.Classes
         }
         public DateTime GetReportingDeadline(SectorTypes sectorType, int reportingDeadlineYear = 0)
         {
-            var now = VirtualDateTime.Now;
-
             int tempDay;
             int tempMonth;
             switch (sectorType)
@@ -88,9 +86,11 @@ namespace ModernSlavery.Core.Classes
                         "Cannot calculate accounting date for this sector type");
             }
 
-            if (reportingDeadlineYear == 0) reportingDeadlineYear = now.Year;
+            if (reportingDeadlineYear != 0) return new DateTime(reportingDeadlineYear, tempMonth, tempDay).Date;
 
-            var reportingDeadline = new DateTime(reportingDeadlineYear, tempMonth, tempDay).Date;
+            var now = VirtualDateTime.Now;
+
+            var reportingDeadline = new DateTime(now.Year, tempMonth, tempDay).Date;
 
             return reportingDeadline < now ? reportingDeadline.AddYears(1) : reportingDeadline;
         }

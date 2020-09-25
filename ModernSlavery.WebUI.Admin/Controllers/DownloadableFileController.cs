@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         #region File Download Action
 
-        [Route("download")]
+        [HttpGet("admin/downloadfile")]
         [AllowOnlyTrustedDomains]
         [ResponseCache(CacheProfileName = "Download")]
         public async Task<IActionResult> DownloadFile(string p)

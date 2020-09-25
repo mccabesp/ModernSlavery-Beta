@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Models;
-using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
 
 namespace ModernSlavery.WebUI.Viewing.Models
 {
@@ -27,12 +26,35 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public List<OptionSelect> ReportingYearOptions { get; set; }
         public List<OptionSelect> TurnoverOptions { get; internal set; }
 
-        public string search { get; set; }
+        /// <summary>
+        /// The keyword to search for
+        /// </summary>
+        [FromQuery(Name = "search")]
+        public string Keywords { get; set; }
 
-        public IEnumerable<short> s { get; set; }
-        public IEnumerable<byte> tr { get; set; }
-        public IEnumerable<int> y { get; set; }
-        public int p { get; set; }
+        /// <summary>
+        /// The sectors to search for
+        /// </summary>
+        [FromQuery(Name = "s")]
+        public IEnumerable<short> Sectors { get; set; }
+
+        /// <summary>
+        /// The turnovers to include in the search 
+        /// </summary>
+        [FromQuery(Name = "t")]
+        public IEnumerable<byte> Turnovers { get; set; }
+
+        /// <summary>
+        /// The the end year of thwe reporting deadlines to include
+        /// </summary>
+        [FromQuery(Name = "y")]
+        public IEnumerable<int> Years { get; set; }
+
+        /// <summary>
+        /// The page of results to return
+        /// </summary>
+        [FromQuery(Name = "p")]
+        public int PageNumber { get; set; } = 1;
 
         public PagedResult<OrganisationSearchModel> Organisations { get; set; }
 

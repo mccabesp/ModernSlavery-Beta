@@ -11,10 +11,13 @@ using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
+using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
+using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Viewing.Models;
 using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
 
@@ -23,11 +26,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
     public interface IViewingPresenter
     {
         IObfuscator Obfuscator { get; }
-
-        Task<SearchViewModel> SearchAsync(OrganisationSearchParameters searchParams);
-        List<OptionSelect> GetTurnoverOptions(IEnumerable<byte> filterTurnoverRanged, Dictionary<object, long> facetReults);
-        Task<List<OptionSelect>> GetSectorOptionsAsync(IEnumerable<short> filterSectorTypeIds, Dictionary<object, long> facetResults);
-        PagedResult<OrganisationSearchModel> GetPagedResult(IEnumerable<OrganisationSearchModel> searchResults,long totalRecords,int page,int pageSize);
+        Task<SearchViewModel> SearchAsync(SearchQueryModel searchQuery);
         Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(string organisationIdentifier, int reportingDeadlineYear);
     }
 
@@ -40,6 +39,8 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         public IObfuscator Obfuscator { get; }
         private readonly IMapper _mapper;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ISearchBusinessLogic _searchBusinessLogic;
+        private readonly SectorTypeIndex _sectorTypes;
         #endregion
 
         #region Constructor
@@ -48,7 +49,9 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             ISharedBusinessLogic sharedBusinessLogic,
             IObfuscator obfuscator,
             IServiceProvider serviceProvider,
-            IMapper mapper)
+            IMapper mapper,
+            ISearchBusinessLogic searchBusinessLogic,
+            SectorTypeIndex sectorTypes)
         {
             _viewingService = viewingService;
             _statementBusinessLogic = statementBusinessLogic;
@@ -56,121 +59,55 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             Obfuscator = obfuscator;
             _mapper = mapper;
             _serviceProvider = serviceProvider;
+            _sectorTypes = sectorTypes;
+            _searchBusinessLogic = searchBusinessLogic;
         }
         #endregion
 
         #region Search methods
-        public async Task<SearchViewModel> SearchAsync(OrganisationSearchParameters searchParams)
+        public async Task<SearchViewModel> SearchAsync(SearchQueryModel searchQuery)
         {
-            var facets = new Dictionary<string, Dictionary<object, long>>();
-            facets.Add("Turnover", null);
-            facets.Add("SectorTypeIds", null);
-            facets.Add("StatementYears", null);
-
-            var searchTermEnteredOnScreen = searchParams.Keywords;
-
-            searchParams.Keywords = searchParams.Keywords?.Trim();
-            searchParams.Keywords = searchParams.RemoveTheMostCommonTermsOnOurDatabaseFromTheKeywords();
-            var searchResults = await DoSearchAsync(searchParams, facets);
+            //Execute the search
+            var searchResults = await _viewingService.SearchBusinessLogic.SearchOrganisationsAsync(
+                searchQuery.Keywords,
+                searchQuery.Turnovers,
+                searchQuery.Sectors,
+                searchQuery.Years,
+                false,
+                false,
+                false,
+                searchQuery.PageNumber,
+                searchQuery.PageSize);
 
             // build the result view model
             return new SearchViewModel
             {
-                TurnoverOptions = GetTurnoverOptions(searchParams.FilterTurnoverRanges, facets["Turnover"]),
-                SectorOptions = await GetSectorOptionsAsync(searchParams.FilterSectorTypeIds, facets["SectorTypeIds"]),
-                ReportingYearOptions = GetReportingYearOptions(searchParams.FilterReportedYears),
+                TurnoverOptions = GetTurnoverOptions(searchQuery.Turnovers),
+                SectorOptions = GetSectorOptions(searchQuery.Sectors),
+                ReportingYearOptions = GetReportingYearOptions(searchQuery.Years),
                 Organisations = searchResults,
-                search = searchTermEnteredOnScreen,
-                p = searchParams.Page,
-                s = searchParams.FilterSectorTypeIds,
-                tr = searchParams.FilterTurnoverRanges,
-                y = searchParams.FilterReportedYears
+                Keywords = searchQuery.Keywords,
+                PageNumber = searchQuery.PageNumber,
+                Sectors = searchQuery.Sectors,
+                Turnovers = searchQuery.Turnovers,
+                Years = searchQuery.Years
             };
         }
 
-        private async Task<PagedResult<OrganisationSearchModel>> DoSearchAsync(OrganisationSearchParameters searchParams,
-    Dictionary<string, Dictionary<object, long>> facets)
-        {
-            return await _viewingService.SearchBusinessLogic.OrganisationSearchRepository.SearchAsync(
-                searchParams.Keywords, // .ToSearchQuery(),
-                searchParams.Page,
-                searchParams.PageSize,
-                filter: searchParams.ToFilterQuery(),
-                facets: facets,
-                orderBy: string.IsNullOrWhiteSpace(searchParams.Keywords) ? nameof(OrganisationSearchModel.Name) : null,
-                searchFields: searchParams.SearchFields,
-                searchMode: searchParams.SearchMode);
-        }
-
-        public PagedResult<OrganisationSearchModel> GetPagedResult(IEnumerable<OrganisationSearchModel> searchResults,long totalRecords,int page,int pageSize)
-        {
-            var result = new PagedResult<OrganisationSearchModel>();
-
-            if (page == 0 || page < 0) page = 1;
-
-            result.Results = searchResults.ToList();
-            result.ActualRecordTotal = (int) totalRecords;
-            result.VirtualRecordTotal = result.Results.Count;
-            result.CurrentPage = page;
-            result.PageSize = pageSize;
-
-            return result;
-        }
-
-        public async Task<List<SuggestOrganisationResult>> SuggestOrganisationNameAsync(string searchText)
-        {
-            var results = await _viewingService.SearchBusinessLogic.OrganisationSearchRepository.SuggestAsync(
-                searchText,
-                $"{nameof(OrganisationSearchModel.Name)};{nameof(OrganisationSearchModel.PreviousName)};{nameof(OrganisationSearchModel.Abbreviations)}");
-
-            var matches = new List<SuggestOrganisationResult>();
-            foreach (var result in results)
-            {
-                //Ensure all names in suggestions are unique
-                if (matches.Any(m => m.Text == result.Value.Name)) continue;
-
-                matches.Add(
-                    new SuggestOrganisationResult
-                    {
-                        Id = Obfuscator.Obfuscate(result.Value.OrganisationId),
-                        Text = result.Value.Name,
-                        PreviousName = result.Value.PreviousName
-                    });
-            }
-
-            return matches;
-        }
         #endregion
 
         #region Filter methods
-        public async Task<List<SearchViewModel.SectorTypeViewModel>> GetAllSectorTypesAsync()
+        public List<OptionSelect> GetTurnoverOptions(IEnumerable<byte> filterTurnoverRanges)
         {
-            var results = new List<SearchViewModel.SectorTypeViewModel>();
-            var sortedSectors =
-                await _sharedBusinessLogic.DataRepository.ToListAscendingAsync<StatementSectorType, string>(st =>
-                    st.Description);
-
-            foreach (var sector in sortedSectors)
-                results.Add(
-                    new SearchViewModel.SectorTypeViewModel
-                    {
-                        SectorTypeId = sector.StatementSectorTypeId,
-                        Description = sector.Description = sector.Description.BeforeFirst(";")
-                    });
-
-            return results;
-        }
-
-        public List<OptionSelect> GetTurnoverOptions(IEnumerable<byte> filterTurnoverRanges, Dictionary<object, long> facetResults)
-        {
-            var allRanges = Enum.GetValues(typeof(TurnoverRanges));
+            var allRanges = Enums.GetValues<StatementTurnovers>();
 
             // setup the filters
             var results = new List<OptionSelect>();
-            foreach (TurnoverRanges range in allRanges)
+            foreach (var range in allRanges)
             {
+                if (range == StatementTurnovers.NotProvided) continue;
                 var id = (byte)range;
-                var label = range.GetAttribute<DisplayAttribute>().Name;
+                var label = range.GetDisplayDescription();
                 var isChecked = filterTurnoverRanges != null && filterTurnoverRanges.Contains(id);
                 results.Add(
                     new OptionSelect
@@ -186,23 +123,19 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             return results;
         }
 
-        public async Task<List<OptionSelect>> GetSectorOptionsAsync(IEnumerable<short> filterSectorTypeIds, Dictionary<object, long> facetResults)
+        public List<OptionSelect> GetSectorOptions(IEnumerable<short> filterSectorTypeIds)
         {
             // setup the filters
-            var allSectorTypes = await GetAllSectorTypesAsync();
             var sources = new List<OptionSelect>();
-            foreach (var sectorType in allSectorTypes)
+            foreach (var sectorType in _sectorTypes)
             {
-                var isChecked = filterSectorTypeIds != null &&
-                                filterSectorTypeIds.Any(x => x == sectorType.SectorTypeId);
                 sources.Add(
                     new OptionSelect
                     {
-                        Id = sectorType.SectorTypeId.ToString(),
+                        Id = sectorType.Id.ToString(),
                         Label = sectorType.Description.TrimEnd('\r', '\n'),
-                        Value = sectorType.SectorTypeId.ToString(),
-                        Checked = isChecked
-                        // Disabled = facetResults.Count == 0 && !isChecked
+                        Value = sectorType.Id.ToString(),
+                        Checked = filterSectorTypeIds != null && filterSectorTypeIds.Any(x => x == sectorType.Id)
                     });
             }
 
@@ -212,43 +145,23 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         public List<OptionSelect> GetReportingYearOptions(IEnumerable<int> filterSnapshotYears)
         {
             // setup the filters
-            var firstYear = _sharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear;
-            var currentYear = _sharedBusinessLogic.GetReportingStartDate(SectorTypes.Public).Year;
-            var allYears = new List<int>();
-            for (var year = firstYear; year <= currentYear; year++) allYears.Add(year);
-
+            var reportingDeadlines = _sharedBusinessLogic.GetReportingDeadlines(SectorTypes.Public);
             var sources = new List<OptionSelect>();
-            for (var year = currentYear; year >= firstYear; year--)
+            foreach (var reportingDeadline in reportingDeadlines)
             {
-                var isChecked = filterSnapshotYears != null && filterSnapshotYears.Any(x => x == year);
+                var isChecked = filterSnapshotYears != null && filterSnapshotYears.Any(x => x == reportingDeadline.Year);
                 sources.Add(
                     new OptionSelect
                     {
-                        Id = year.ToString(), Label = $"{year} to {year + 1}", Value = year.ToString(),
+                        Id = reportingDeadline.Year.ToString(),
+                        Label = $"{reportingDeadline.Year - 1} to {reportingDeadline.Year}",
+                        Value = reportingDeadline.Year.ToString(),
                         Checked = isChecked
                         // Disabled = facetResults.Count == 0 && !isChecked
                     });
             }
 
             return sources;
-        }
-
-        public List<OptionSelect> GetReportingStatusOptions(IEnumerable<int> filterReportingStatus)
-        {
-            var allStatuses = Enum.GetValues(typeof(SearchReportingStatusFilter));
-
-            // setup the filters
-            var results = new List<OptionSelect>();
-            foreach (SearchReportingStatusFilter enumEntry in allStatuses)
-            {
-                var id = (int) enumEntry;
-                var label = enumEntry.GetAttribute<DisplayAttribute>().Name;
-                var isChecked = filterReportingStatus != null && filterReportingStatus.Contains(id);
-                results.Add(new OptionSelect
-                    {Id = $"ReportingStatus{id}", Label = label, Value = id.ToString(), Checked = isChecked});
-            }
-
-            return results;
         }
         #endregion
 

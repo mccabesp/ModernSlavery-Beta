@@ -89,8 +89,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
         }
 
         [AllowAnonymous]
-        [Route("verify-change-email")]
-        [HttpGet]
+        [HttpGet("verify-change-email")]
         public async Task<IActionResult> VerifyChangeEmail(string code)
         {
             // if not logged in go straight to CompleteChangeEmailAsync
@@ -109,8 +108,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             return await LogoutUser(redirectUrl);
         }
 
-        [Route("complete-change-email")]
-        [HttpGet]
+        [HttpGet("complete-change-email")]
         public async Task<IActionResult> CompleteChangeEmailAsync(string code)
         {
             var checkResult = await CheckUserRegisteredOkAsync();

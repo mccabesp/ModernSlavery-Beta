@@ -2,11 +2,9 @@
 @model SearchViewModel
 <p class="result-info">
     <span class="result-count">@(string.Format("{0:n0}", Model.Organisations.ActualRecordTotal))</span>
-    <span>organisation</span>
-    @if (Model.Organisations.ActualRecordTotal != 1)
-    {
-        <span>s</span>
-    }
+    <span>organisation@(Model.Organisations.ActualRecordTotal != 1 ? "s" : "")</span>
+    
+    
 
     @if (Model.SectorFilterInfo.Count > 0)
     {

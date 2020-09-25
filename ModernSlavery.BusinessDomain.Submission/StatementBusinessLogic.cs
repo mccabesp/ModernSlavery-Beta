@@ -25,14 +25,16 @@ namespace ModernSlavery.BusinessDomain.Submission
         private readonly SubmissionOptions _submissionOptions;
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
         private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
+        private readonly ISearchBusinessLogic _searchBusinessLogic;
         private readonly IMapper _mapper;
 
-        public StatementBusinessLogic(ILogger<StatementBusinessLogic> logger, SubmissionOptions submissionOptions, ISharedBusinessLogic sharedBusinessLogic, IOrganisationBusinessLogic organisationBusinessLogic, IMapper mapper)
+        public StatementBusinessLogic(ILogger<StatementBusinessLogic> logger, SubmissionOptions submissionOptions, ISharedBusinessLogic sharedBusinessLogic, IOrganisationBusinessLogic organisationBusinessLogic, ISearchBusinessLogic searchBusinessLogic, IMapper mapper)
         {
             _logger = logger;
             _submissionOptions = submissionOptions;
             _sharedBusinessLogic = sharedBusinessLogic;
             _organisationBusinessLogic = organisationBusinessLogic;
+            _searchBusinessLogic = searchBusinessLogic;
             _mapper = mapper;
         }
 
@@ -660,8 +662,8 @@ namespace ModernSlavery.BusinessDomain.Submission
                 {
                     try
                     {
-                        //Save new group organisations from companies house
-                        var newOrganisations = statementModel.StatementOrganisations.Where(o => o.OrganisationId == null && !string.IsNullOrWhiteSpace(o.CompanyNumber));
+                         //Save new group organisations from companies house
+                         var newOrganisations = statementModel.StatementOrganisations.Where(o => o.OrganisationId == null && !string.IsNullOrWhiteSpace(o.CompanyNumber));
                         foreach (var groupOrganisation in newOrganisations)
                         {
                             var organisation = _organisationBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.CompanyNumber == groupOrganisation.CompanyNumber);
@@ -712,6 +714,9 @@ namespace ModernSlavery.BusinessDomain.Submission
                         throw;
                     }
                 });
+
+            //Update the search indexes
+            await _searchBusinessLogic.RefreshSearchDocumentsAsync(newStatement.Organisation,newStatement.SubmissionDeadline.Year);
 
             return new Outcome<StatementErrors>();
         }
