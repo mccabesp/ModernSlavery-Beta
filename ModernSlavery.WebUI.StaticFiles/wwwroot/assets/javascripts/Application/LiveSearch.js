@@ -1,6 +1,6 @@
 ﻿// Modified from https://github.com/DFEAGILEDEVOPS/cscp-website/blob/c0fe7fa88d129cbb3fdeda64d201421cbb94c4d5/Web/Web.UI/Server/Assets/Scripts/Elements/Forms/live-search.js
 
-(function() {
+(function () {
     "use strict";
 
     window.GOVUK = window.GOVUK || {};
@@ -35,7 +35,7 @@
         this.$form = $("#" + this.formId);
 
         this.$form.find("input[type=text]").keypress(
-            function(e) {
+            function (e) {
                 if (e.keyCode === 13) {
                     // 13 is the return key
                     this.formChange();
@@ -55,7 +55,7 @@
     LiveSearch.prototype.bindFilterEvents = function bindFilterEvents() {
         this.$form = $("#" + this.formId);
         this.$form.on("change",
-            ".options-container input[type=checkbox], .options-container input[type=radio]",
+            ".app-c-option-select__container input[type=checkbox], app-c-option-select__container input[type=radio]",
             this.formChange.bind(this));
         this.clearLoadingIndicator();
         if (this.onRefresh) this.onRefresh();
@@ -116,11 +116,11 @@
             url: this.action,
             data: this.state,
             searchState: searchState
-        }).done(function(response) {
+        }).done(function (response) {
             liveSearch.cache($.param(liveSearch.state), response);
             liveSearch.displayResults(response, this.searchState);
             liveSearch.clearLoadingIndicator();
-        }).error(function() {
+        }).error(function () {
             window.location = "/error/1146";
         });
         //} else {
@@ -154,7 +154,7 @@
         var that = this;
         // update the radio buttons
         this.$form.find(".options-container input[type=checkbox], .options-container input[type=radio]").each(
-            function(i, el) {
+            function (i, el) {
                 var $el = $(el);
                 var checked = that.isBooleanSelected($el.attr("name"), $el.attr("value"));
                 if ($el.prop("checked") !== checked) $el.click();
@@ -173,7 +173,7 @@
 
     LiveSearch.prototype.restoreTextInputs = function restoreTextInputs() {
         var that = this;
-        this.$form.find("input[type=text]").each(function(i, el) {
+        this.$form.find("input[type=text]").each(function (i, el) {
             var $el = $(el);
             $el.val(that.getTextInputValue($el.attr("name")));
         });
@@ -189,12 +189,12 @@
         return "";
     };
 
-    LiveSearch.prototype.clearFilters = function(e) {
+    LiveSearch.prototype.clearFilters = function (e) {
         this.clearBooleans();
         this.saveState();
 
         var self = this;
-        this.updateResults().done(function() {
+        this.updateResults().done(function () {
             self.saveHistory();
             self.collapseFilters();
         });
@@ -206,7 +206,7 @@
     LiveSearch.prototype.clearBooleans = function clearBooleans() {
         this.$form.unbind("change");
         this.$form.find(".options-container input[type=checkbox], .options-container input[type=radio]").each(
-            function(i, el) {
+            function (i, el) {
                 var $el = $(el);
                 if ($el.prop("checked")) $el.click();
             });

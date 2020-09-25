@@ -25,5 +25,11 @@
 //this is for the custom styling of the confirm answers in the scope out journey
 @import "./components/_check-answers";
 
-//this is for the organisation list during group submission
+//this is for the custom styling of the organisation list used in group submission
 @import "./components/_organisation-list";
+
+//this is for the styling of the search filters on the search page as per https://finder-frontend.herokuapp.com/component-guide/option-select
+@import "./components/_option-select";
+
+//this is for the custom styling of the search results list on the search page
+@import "./components/_search-results-list";

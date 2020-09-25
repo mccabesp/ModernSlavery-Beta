@@ -29,20 +29,20 @@
     };
 }
 
-<a id="ClearFilters" href="search-results?search=@(Model.Keywords)">Clear all filters</a>
+@*<a id="ClearFilters" href="search-results?search=@(Model.Keywords)">Clear all filters</a>
+
+<div class="filter-divider"></div>*@
+
+<partial name="Parts/_SearchOptionSelect" model="sectors" />
 
 <div class="filter-divider"></div>
 
-<partial name="Parts/_SearchOptionSelect" model="turnover"/>
+<partial name="Parts/_SearchOptionSelect" model="turnover" />
 
 <div class="filter-divider"></div>
 
-<partial name="Parts/_SearchOptionSelect" model="sectors"/>
+<partial name="Parts/_SearchOptionSelect" model="years" />
 
 <div class="filter-divider"></div>
 
-<partial name="Parts/_SearchOptionSelect" model="years"/>
-
-<div class="filter-divider"></div>
-
-<input id="UpdateFilterParams" class="button button-update js-update-filters" type="submit" value="Update results"/>
+<input id="UpdateFilterParams" class="govuk-button govuk-button--secondary button-update js-update-filters" type="submit" value="Update results" />

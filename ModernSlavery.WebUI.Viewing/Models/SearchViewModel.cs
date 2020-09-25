@@ -96,7 +96,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
         {
             get
             {
-                if (_sectorFilterInfo == null) _sectorFilterInfo = OptionSelect.GetCheckedString(SectorOptions);
+                if (_sectorFilterInfo.Count == 0) _sectorFilterInfo = OptionSelect.GetCheckedString(SectorOptions);
 
                 return _sectorFilterInfo;
             }
@@ -106,7 +106,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
         {
             get
             {
-                if (_sizeFilterInfo == null) _sizeFilterInfo = OptionSelect.GetCheckedString(TurnoverOptions);
+                if (_sectorFilterInfo.Count == 0) _sizeFilterInfo = OptionSelect.GetCheckedString(TurnoverOptions);
 
                 return _sizeFilterInfo;
             }
@@ -116,7 +116,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
         {
             get
             {
-                if (_reportingYearFilterInfo == null)
+                if (_sectorFilterInfo.Count == 0)
                     _reportingYearFilterInfo = OptionSelect.GetCheckedString(ReportingYearOptions);
 
                 return _reportingYearFilterInfo;
