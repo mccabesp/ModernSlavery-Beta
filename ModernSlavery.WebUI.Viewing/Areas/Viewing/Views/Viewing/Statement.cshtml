@@ -1,4 +1,5 @@
 ﻿@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+@inject ModernSlavery.Core.Classes.StatementTypeIndexes.RiskTypeIndex _riskTypeIndex
 @inject ModernSlavery.Core.Classes.StatementTypeIndexes.DiligenceTypeIndex _diligenceTypeIndex
 @{
     //Required for variables in Sitemap taghelpers
@@ -270,12 +271,13 @@
                     The organisation told us it considered the following areas to be relevant when assessing its supply chain for modern slavery risks:
                 </div>
                 var relevantRiskGroups = Model.RelevantRisks
-                    .GroupBy(r => r.Category)
+                    .GroupBy(r => r.ParentId)
                     .ToDictionary(g => g.Key, g => g.ToList());
                 @foreach (var group in relevantRiskGroups)
                 {
+                    var parent = _riskTypeIndex.SingleOrDefault(i => i.Id == group.Key);
                     <div class="govuk-body">
-                        @group.Key
+                        @parent.Description
                     </div>
                     <ul class="govuk-list govuk-list--bullet">
                         @foreach (var risk in group.Value)
@@ -313,12 +315,13 @@
                     The organisation told us it considered the following areas to be relevant when assessing its supply chain for modern slavery risks:
                 </div>
                 var highRiskGroups = Model.HighRisks
-                    .GroupBy(hr => hr.Category)
+                    .GroupBy(hr => hr.ParentId)
                     .ToDictionary(g => g.Key, g => g.ToList());
                 @foreach (var group in highRiskGroups)
                 {
+                    var parent = _riskTypeIndex.SingleOrDefault(i => i.Id == group.Key);
                     <div class="govuk-body">
-                        @group.Key
+                        @parent.Description
                     </div>
                     <ul class="govuk-list govuk-list--bullet">
                         @foreach (var highRisk in group.Value)
@@ -355,12 +358,13 @@
                     During the period of the statement, the organisation considered the following geographic areas in its business and supply chains to be at highest risk of modern slavery:
                 </div>
                 var locationRiskGroups = Model.LocationRisks
-                    .GroupBy(lr => lr.Category)
+                    .GroupBy(lr => lr.ParentId)
                     .ToDictionary(g => g.Key, g => g.ToList());
                 @foreach (var group in locationRiskGroups)
                 {
+                    var parent = _riskTypeIndex.SingleOrDefault(i => i.Id == group.Key);
                     <div class="govuk-body">
-                        @group.Key
+                        @parent.Description
                     </div>
                     <ul class="govuk-list govuk-list--bullet">
                         @foreach (var locationRisk in group.Value)
