@@ -1,8 +1,8 @@
-﻿@using System.ComponentModel.DataAnnotations
-@model ModernSlavery.WebUI.Viewing.Models.StatementViewModel
+﻿@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+@inject ModernSlavery.Core.Classes.StatementTypeIndexes.DiligenceTypeIndex _diligenceTypeIndex
 @{
     //Required for variables in Sitemap taghelpers
-    var reportingPeriod = (Model.SubmissionDeadline.Year - 1) + "-" + (Model.SubmissionDeadline.Year).ToTwoDigitYear();
+    var reportingPeriod = (Model.SubmissionDeadlineYear - 1) + "-" + Model.SubmissionDeadlineYear;
 
     Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = Model.OrganisationName + " Modern Slavery statement" + " / " + reportingPeriod;
@@ -19,7 +19,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">
-            @Model.OrganisationName modern slavery statement summary @(Model.SubmissionDeadline.Year - 1) to @Model.SubmissionDeadline.Year
+            @Model.OrganisationName modern slavery statement summary @(Model.SubmissionDeadlineYear - 1) to @Model.SubmissionDeadlineYear
         </h1>
 
         <details class="govuk-details" data-module="govuk-details">
@@ -94,7 +94,7 @@
             </p>
 
             <p class="govuk-body">
-                @Model.StatementStartDate.ToString("d MMMM yyyy") to @Model.StatementEndDate.ToString("d MMMM yyyy")
+                @Model.StatementStartDate.Value.ToString("d MMMM yyyy") to @Model.StatementEndDate.Value.ToString("d MMMM yyyy")
             </p>
 
             <p class="govuk-body govuk-!-font-weight-bold">
@@ -102,7 +102,7 @@
             </p>
 
             <p class="govuk-body">
-                @Model.ApproverFirstName @Model.ApproverLastName, @Model.ApproverJobTitle
+                @Model.ApprovingPerson
             </p>
 
             <p class="govuk-body govuk-!-font-weight-bold">
@@ -110,7 +110,7 @@
             </p>
 
             <p class="govuk-body">
-                @Model.ApprovedDate.ToString("d MMMM yyyy")
+                @Model.ApprovedDate.Value.ToString("d MMMM yyyy")
             </p>
 
         </div>
@@ -129,27 +129,27 @@
             </p>
 
             <ul class="govuk-list govuk-list--bullet">
-                @if (Model.IncludesStructure)
+                @if (Model.IncludesStructure.Value)
                 {
                     <li>The organisation’s structure, business and supply chains</li>
                 }
-                @if (Model.IncludesPolicies)
+                @if (Model.IncludesPolicies.Value)
                 {
                     <li>Policies</li>
                 }
-                @if (Model.IncludesRisks)
+                @if (Model.IncludesRisks.Value)
                 {
                     <li>Risk assessment and management</li>
                 }
-                @if (Model.IncludesDueDiligence)
+                @if (Model.IncludesDueDiligence.Value)
                 {
                     <li>Due diligence processes</li>
                 }
-                @if (Model.IncludesTraining)
+                @if (Model.IncludesTraining.Value)
                 {
                     <li>Staff training about slavery and human trafficking</li>
                 }
-                @if (Model.IncludesGoals)
+                @if (Model.IncludesGoals.Value)
                 {
                     <li>Goals and key performance indicators (KPIs) to measure progress over time, and the effectiveness of the organisation’s actions</li>
                 }
@@ -160,27 +160,27 @@
             </p>
 
             <ul class="govuk-list govuk-list--bullet">
-                @if (!Model.IncludesStructure)
+                @if (!Model.IncludesStructure.Value)
                 {
                     <li>The organisation’s structure, business and supply chains</li>
                 }
-                @if (!Model.IncludesPolicies)
+                @if (!Model.IncludesPolicies.Value)
                 {
                     <li>Policies</li>
                 }
-                @if (!Model.IncludesRisks)
+                @if (!Model.IncludesRisks.Value)
                 {
                     <li>Risk assessment and management</li>
                 }
-                @if (!Model.IncludesDueDiligence)
+                @if (!Model.IncludesDueDiligence.Value)
                 {
                     <li>Due diligence processes</li>
                 }
-                @if (!Model.IncludesTraining)
+                @if (!Model.IncludesTraining.Value)
                 {
                     <li>Staff training about slavery and human trafficking</li>
                 }
-                @if (!Model.IncludesGoals)
+                @if (!Model.IncludesGoals.Value)
                 {
                     <li>Goals and key performance indicators (KPIs) to measure progress over time, and the effectiveness of the organisation’s actions</li>
                 }
@@ -199,10 +199,9 @@
                 </p>
 
                 <ul class="govuk-list govuk-list--bullet">
-                    @foreach (var item in Model.Sectors)
+                    @foreach (var sector in Model.Sectors)
                     {
-                        var sector = Model.SectorTypes.SingleOrDefault(t => t.Id == item).Description;
-                        <li>@sector</li>
+                        <li>@sector.Description</li>
                     }
                 </ul>
             }
@@ -213,7 +212,7 @@
                 </p>
             }
 
-            @if (Model.Turnover != StatementViewModel.TurnoverRanges.NotProvided)
+            @if (Model.Turnover != StatementTurnovers.NotProvided)
             {
                 <p class="govuk-body govuk-!-font-weight-bold">
                     Its turnover or budget in the financial accounting year of this statement was:
@@ -242,10 +241,9 @@
                     The organisation’s policies and codes during the period of this statement included the following provisions relating to modern slavery:
                 </div>
                 <ul class="govuk-list govuk-list--bullet">
-                    @foreach (var item in Model.Policies)
+                    @foreach (var policy in Model.Policies)
                     {
-                        var policy = Model.PolicyTypes.SingleOrDefault(t => t.Id == item).Description;
-                        <li>@policy</li>
+                        <li>@policy.Description</li>
                     }
                 </ul>
             }
@@ -269,11 +267,6 @@
                     The organisation told us it considered the following areas to be relevant when assessing its supply chain for modern slavery risks:
                 </div>
                 var relevantRiskGroups = Model.RelevantRisks
-                    .Select(r =>
-                    {
-                        var type = Model.RiskTypes.SingleOrDefault(t => t.Id == r.Id);
-                        return new { r.Id, r.Details, type.Category };
-                    })
                     .GroupBy(r => r.Category)
                     .ToDictionary(g => g.Key, g => g.ToList());
                 @foreach (var group in relevantRiskGroups)
@@ -282,9 +275,9 @@
                         @group.Key
                     </div>
                     <ul class="govuk-list govuk-list--bullet">
-                        @foreach (var item in group.Value)
+                        @foreach (var risk in group.Value)
                         {
-                            <li>@item.Details</li>
+                            <li>@risk.Description</li>
                         }
                     </ul>
                 }
@@ -317,11 +310,6 @@
                     The organisation told us it considered the following areas to be relevant when assessing its supply chain for modern slavery risks:
                 </div>
                 var highRiskGroups = Model.HighRisks
-                    .Select(hr =>
-                    {
-                        var type = Model.RiskTypes.SingleOrDefault(t => t.Id == hr.Id);
-                        return new { hr.Id, hr.Details, type.Category };
-                    })
                     .GroupBy(hr => hr.Category)
                     .ToDictionary(g => g.Key, g => g.ToList());
                 @foreach (var group in highRiskGroups)
@@ -330,9 +318,9 @@
                         @group.Key
                     </div>
                     <ul class="govuk-list govuk-list--bullet">
-                        @foreach (var item in group.Value)
+                        @foreach (var highRisk in group.Value)
                         {
-                            <li>@item.Details</li>
+                            <li>@highRisk.Description</li>
                         }
                     </ul>
                 }
@@ -364,11 +352,6 @@
                     During the period of the statement, the organisation considered the following geographic areas in its business and supply chains to be at highest risk of modern slavery:
                 </div>
                 var locationRiskGroups = Model.LocationRisks
-                    .Select(lr =>
-                    {
-                        var type = Model.RiskTypes.SingleOrDefault(t => t.Id == lr.Id);
-                        return new { lr.Id, lr.Details, type.Category };
-                    })
                     .GroupBy(lr => lr.Category)
                     .ToDictionary(g => g.Key, g => g.ToList());
                 @foreach (var group in locationRiskGroups)
@@ -377,9 +360,9 @@
                         @group.Key
                     </div>
                     <ul class="govuk-list govuk-list--bullet">
-                        @foreach (var item in group.Value)
+                        @foreach (var locationRisk in group.Value)
                         {
-                            <li>@item.Details</li>
+                            <li>@locationRisk.Description</li>
                         }
                     </ul>
                 }
@@ -406,9 +389,8 @@
                 var diligenceGroups = Model.DueDiligences
                     .Select(d =>
                     {
-                        var type = Model.DiligenceTypes.SingleOrDefault(t => t.Id == d.Id);
-                        var parent = Model.DiligenceTypes.SingleOrDefault(t => t.Id == type.ParentId);
-                        return new { d.Id, d.Details, Category = parent.Description };
+                        var parent = _diligenceTypeIndex.SingleOrDefault(t => t.Id == d.ParentId);
+                        return new { d.Id, d.Description, Category = parent.Description };
                     })
                     .GroupBy(hr => hr.Category)
                     .ToDictionary(g => g.Key, g => g.ToList());
@@ -420,7 +402,7 @@
                     <ul class="govuk-list govuk-list--bullet">
                         @foreach (var item in group.Value)
                         {
-                            <li>@item.Details</li>
+                            <li>@item.Description</li>
                         }
                     </ul>
                 }
@@ -439,10 +421,9 @@
                 Indicators and instances of modern slavery
             </h2>
 
-            @if (Model.HasForceLabour == true)
+            @if (!string.IsNullOrWhiteSpace(Model.ForcedLabourDetails))
             {
                 <div class="govuk-body govuk-!-font-weight-bold">
-                    @* TODO James - content for this state? *@
                     The organisation identified potential indicators of forced labour or modern slavery in its business or supply chains during this period:
                 </div>
 
@@ -450,20 +431,23 @@
                     @Model.ForcedLabourDetails
                 </div>
             }
-            else if (Model.HasForceLabour == false)
+            else
             {
                 <div class="govuk-body">
                     The organisation did not identify any potential indicators of forced labour or modern slavery in its business or supply chains during this period.
                 </div>
             }
-            else
-            {
-                <div class="govuk-body">
-                    The organisation did not tell us whether it identified any potential indicators of forced labour or modern slavery in its business or supply chains during this period.
-                </div>
-            }
+            @*
+                TODO - What about the not provided case?
+                else
+                {
+                    <div class="govuk-body">
+                        The organisation did not tell us whether it identified any potential indicators of forced labour or modern slavery in its business or supply chains during this period.
+                    </div>
+                }
+            *@
 
-            @if (Model.HasSlaveryInstance == true)
+            @if (!string.IsNullOrWhiteSpace(Model.SlaveryInstanceDetails))
             {
                 <div class="govuk-body govuk-!-font-weight-bold">
                     The organisation found 1 instance of modern slavery:
@@ -474,18 +458,21 @@
                     @Model.SlaveryInstanceDetails
                 </div>
             }
-            else if (Model.HasSlaveryInstance == false)
+            else
             {
                 <div class="govuk-body">
                     The organisation did not find any instances of modern slavery in its business or supply chains.
                 </div>
             }
-            else
-            {
-                <div class="govuk-body">
-                    The organisation did not tell us whether it found instances of modern slavery in its business or supply chains.
-                </div>
-            }
+            @*
+                TODO - What about the not provided case?
+                else
+                {
+                    <div class="govuk-body">
+                        The organisation did not tell us whether it found instances of modern slavery in its business or supply chains.
+                    </div>
+                }
+            *@
         </div>
 
         <div id="training">

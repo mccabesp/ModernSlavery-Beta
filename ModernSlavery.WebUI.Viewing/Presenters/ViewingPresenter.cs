@@ -184,6 +184,17 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             return new Outcome<StatementErrors, StatementViewModel>(statementViewModel);
         }
 
+        public async Task<StatementSummaryViewModel> GetStatementSummaryViewModel(string organisationIdentifier, int reportingDeadlineYear)
+        {
+            long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
+            var organisationSearchModel = await _searchBusinessLogic.GetOrganisationAsync(organisationId, reportingDeadlineYear);
+
+            // build the result view model
+            var vm = _mapper.Map<StatementSummaryViewModel>(organisationSearchModel);
+
+            return vm;
+        }
+
         #endregion
     }
 }
