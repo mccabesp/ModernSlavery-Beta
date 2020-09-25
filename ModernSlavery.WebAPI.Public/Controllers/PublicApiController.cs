@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
@@ -12,7 +16,11 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebAPI.Models;
+using ModernSlavery.WebAPI.Public.Classes;
 using ModernSlavery.WebUI.Shared.Models;
+using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace ModernSlavery.WebAPI.Public.Controllers
 {
@@ -42,7 +50,8 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// </summary>
         /// <param name="searchQuery">The parameters of the search</param>
         /// <returns>A list of statement summaries matching the search criteria</returns>
-        [HttpGet("SearchStatementSummariesAsync")]
+        [HttpGet("SearchStatementSummaries")]
+        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryViewModel>))]
         public async IAsyncEnumerable<StatementSummaryViewModel> SearchStatementSummariesAsync([FromQuery] SearchQueryModel searchQuery)
         {
             //Ensure search service is enabled
@@ -79,14 +88,15 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// </summary>
         /// <param name="years">The list of years to include (if empty returns all reporting years)</param>
         /// <returns>A list of statement summaries for the specified years (or all years)</returns>
-        [HttpGet("ListStatementSummariesAsync")]
+        [HttpGet("ListStatementSummaries")]
+        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryViewModel>))]
         public async IAsyncEnumerable<StatementSummaryViewModel> ListStatementSummariesAsync([FromQuery] params int[] years)
         {
             //Ensure search service is enabled
             if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable, "Service is disabled");
 
             //Ensure the years are in 4 digits
-            years = years?.Select(y => y.ToTwoDigitYear()).ToArray();
+            years = years?.Select(y => y.ToFourDigitYear()).ToArray();
 
             //Retrieve the results from the search service
             var organisationSearchModels = await _searchBusinessLogic.ListSearchDocumentsAsync(years);
@@ -112,6 +122,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <param name="extension">The file type to return (i.e., 'json', 'csv' or 'xml')</param>
         /// <returns></returns>
         [HttpGet("StatementSummaries{fromYear}-{toYear}.{extension}")]
+        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryViewModel>))]
         public async IAsyncEnumerable<StatementSummaryViewModel> ListStatementSummariesAsync(int fromYear, int toYear, string extension)
         {
             //Ensure search service is enabled
@@ -151,7 +162,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <param name="parentOrganisationId">The unique id of the parent group organisation</param>
         /// <param name="year">The year of the submitted statement</param>
         /// <returns>A list of group statement summaries for the specified organisation and year</returns>
-        [HttpGet("GetStatementSummaryAsync")]
+        [HttpGet("GetStatementSummary")]
         public async Task<StatementSummaryViewModel> GetStatementSummaryAsync([FromQuery] string parentOrganisationId, int year)
         {
             //Ensure search service is enabled
@@ -179,7 +190,8 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <param name="parentOrganisationId">The unique id of the parent group organisation</param>
         /// <param name="year">The year of the submitted statement</param>
         /// <returns>A list of group statement summaries for the specified organisation and year</returns>
-        [HttpGet("ListGroupStatementSummariesAsync")]
+        [HttpGet("ListGroupStatementSummaries")]
+        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryViewModel>))]
         public async IAsyncEnumerable<StatementSummaryViewModel> ListGroupStatementSummariesAsync([FromQuery] string parentOrganisationId, int year)
         {
             //Ensure search service is enabled
@@ -216,7 +228,6 @@ namespace ModernSlavery.WebAPI.Public.Controllers
                 Inline = false  // false = prompt the user for downloading;  true = browser to try to show the file inline
             };
             Response.Headers.Add("Content-Disposition", cd.ToString());
-            Response.Headers.Add("X-Content-Type-Options", "nosniff");
         }
     }
 }

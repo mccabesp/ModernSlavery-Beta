@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,7 +18,6 @@ namespace ModernSlavery.WebAPI.Public.Classes
     /// </summary>
     public class CsvMediaTypeFormatter : TextOutputFormatter
     {
-
         /// <summary>
         /// CSV Formatter
         /// </summary>
@@ -135,7 +135,7 @@ namespace ModernSlavery.WebAPI.Public.Classes
 
         protected override bool CanWriteType(Type type)
         {
-            return typeof(IEnumerable).IsAssignableFrom(type);
+            return typeof(IEnumerable).IsAssignableFrom(type) || type.IsAsyncEnumerable();
         }
     }
 }
