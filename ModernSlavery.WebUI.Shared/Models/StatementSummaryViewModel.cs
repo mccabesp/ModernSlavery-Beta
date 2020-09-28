@@ -136,5 +136,15 @@ namespace ModernSlavery.WebUI.Shared.Models
         public string KeyAchievements { get; set; }
         public StatementYears? StatementYears { get; set; }
         #endregion
+
+        public bool HasAnyAreaCovered()
+        {
+            return IncludesStructure.HasValue
+                || IncludesPolicies.HasValue
+                || IncludesRisks.HasValue
+                || IncludesDueDiligence.HasValue
+                || IncludesTraining.HasValue
+                || IncludesGoals.HasValue;
+        }
     }
 }
