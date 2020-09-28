@@ -697,8 +697,9 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         [NonAction]
         protected void StashModel<KeyT, ModelT>(KeyT keyController, ModelT model)
+            where KeyT : Type
         {
-            var keyName = $"{typeof(KeyT)}:{typeof(ModelT)}:Model";
+            var keyName = $"{keyController}:{typeof(ModelT)}:Model";
             Session[keyName] = Core.Extensions.Json.SerializeObjectDisposed(model);
         }
 
@@ -743,7 +744,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         [NonAction]
         protected T UnstashModel<T>(Type keyController, bool delete = false) where T : class
         {
-            var keyName = $"{this.GetType()}:{typeof(T)}:Model";
+            var keyName = $"{keyController}:{typeof(T)}:Model";
             var json = Session[keyName].ToStringOrNull();
             var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json);
             if (delete) Session.Remove(keyName);
