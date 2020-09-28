@@ -4,31 +4,47 @@
 <ul id="SearchResults" class="results">
     @foreach (var organisation in Model.Organisations.Results)
     {
-        var organisationIdentifier = Obfuscator.Obfuscate(organisation.OrganisationId);
+        var organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId);
         <li class="document">
             <div class="comparison-table">
                 <div class="comparison-organisation-container">
-                    <h2>
-                        @Html.ActionLink(organisation.Name, "Organisation", "Viewing", new { organisationIdentifier }, new { data_name = "ViewLink", data_id = organisationIdentifier })
-                    </h2>
-                    @if (string.IsNullOrWhiteSpace(organisation.PreviousName) == false)
+                    @if (!string.IsNullOrWhiteSpace(organisation.ParentName))
                     {
+                        <h2>
+                            @organisation.OrganisationName
+                        </h2>
                         <div class="panel font-xsmall">
-                            <div>Previously known as</div>
-                            <strong>@organisation.PreviousName</strong>
+                            <div>Submitted under </div>
+                            <strong>@Html.ActionLink(organisation.ParentName, "Statement", "Viewing", new { organisationIdentifier, year = organisation.SubmissionDeadlineYear })</strong>
                         </div>
+                    }
+                    else
+                    {
+                        <h2>
+                            @Html.ActionLink(organisation.OrganisationName, "Statement", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId), year = organisation.SubmissionDeadlineYear })
+                        </h2>
+                        @if (organisation.GroupSubmission)
+                        {
+                            <div class="panel font-xsmall">
+                                <div>Submitted as group</div>
+                            </div>
+                        }
                     }
                     <address>@organisation.Address</address>
                     @if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
                     {
-                        <dl class="metadata">
-                            <dt class="metadata-text-label">Company Number</dt>
-                            <dd class="metadata-text-value">@organisation.CompanyNumber</dd>
+                        <dl>
+                            <dt>Company Number</dt>
+                            <dd>@organisation.CompanyNumber</dd>
                         </dl>
                     }
+                    <dl class="metadata">
+                        <dt class="metadata-text-label">Statement year</dt>
+                        <dd class="metadata-text-value">@(organisation.SubmissionDeadlineYear-1) to @(organisation.SubmissionDeadlineYear)</dd>
+                    </dl>
                 </div>
             </div>
         </li>
     }
 </ul>
-<partial name="Pagination.cshtml" model="Model" />
+<partial name="_SearchPagination.cshtml" model="Model" />

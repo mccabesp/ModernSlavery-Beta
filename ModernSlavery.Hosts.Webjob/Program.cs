@@ -21,7 +21,7 @@ namespace ModernSlavery.Hosts.Webjob
             var functions = host.Services.GetService<Functions>();
             //var loggerFactory = host.Services.GetService<ILoggerFactory>();
             //var logger = loggerFactory.CreateLogger<ILogger<Program>>();
-            //functions.ReferenceOrganisations(null, logger).Wait();
+            //functions.UpdateOrganisationSearchIndexesAsync(null, logger).Wait();
             //return;
 
             //Run the host

@@ -8,6 +8,7 @@ using System.Linq;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Binding;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -47,30 +48,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         }
 
-        #region Types
-        public enum TurnoverRanges : byte
-        {
-            //Not Provided
-            NotProvided = 0,
-
-            [GovUkRadioCheckboxLabelText(Text = "Under £36 million")]
-            Under36Million = 1,
-
-            [GovUkRadioCheckboxLabelText(Text = "£36 million to £60 million")]
-            From36to60Million = 2,
-
-            [GovUkRadioCheckboxLabelText(Text = "£60 million to £100 million")]
-            From60to100Million = 3,
-
-            [GovUkRadioCheckboxLabelText(Text = "£100 million to £500 million")]
-            From100to500Million = 4,
-
-            [GovUkRadioCheckboxLabelText(Text = "Over £500 million")]
-            Over500Million = 5,
-        }
-
-        #endregion
-
         public override string PageTitle => "Your organisation";
 
         public List<short> Sectors { get; set; } = new List<short>();
@@ -79,7 +56,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public string OtherSector { get; set; }
 
         [Display(Name = "What was your turnover or budget during the last financial accounting year?")]
-        public TurnoverRanges? Turnover { get; set; }
+        public StatementTurnovers? Turnover { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -99,7 +76,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             return Sectors.Any()
                 && !Sectors.Any(t => t == other.Id && string.IsNullOrWhiteSpace(OtherSector))
-                && Turnover != TurnoverRanges.NotProvided;
+                && Turnover != StatementTurnovers.NotProvided;
         }
     }
 }

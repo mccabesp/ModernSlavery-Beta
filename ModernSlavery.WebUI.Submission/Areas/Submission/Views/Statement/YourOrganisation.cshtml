@@ -1,4 +1,5 @@
 ﻿@using ModernSlavery.WebUI.GDSDesignSystem.Attributes
+@using System.Linq; 
 @{
     Layout = "/Views/GdsLayout.cshtml";
 }
@@ -65,12 +66,12 @@
                         </h2>
                     </legend>
                     <div class="govuk-radios">
-                        @foreach (YourOrganisationPageViewModel.TurnoverRanges item in (Enum.GetValues(typeof(YourOrganisationPageViewModel.TurnoverRanges)).Cast<YourOrganisationPageViewModel.TurnoverRanges>().Where(x => x != YourOrganisationPageViewModel.TurnoverRanges.NotProvided)))
+                        @foreach (var turnover in Enums.GetValues<StatementTurnovers>().Where(x => x != StatementTurnovers.NotProvided))
                         {
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="Turnover-@(item)" name="Turnover" type="radio" checked="@(Model.Turnover==item)" value="@(item)">
-                                <label class="govuk-label govuk-radios__label" for="Turnover-@(item)">
-                                    @(item.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text)
+                                <input class="govuk-radios__input" id="Turnover-@(turnover)" name="Turnover" type="radio" checked="@(Model.Turnover==turnover)" value="@(turnover)">
+                                <label class="govuk-label govuk-radios__label" for="Turnover-@(turnover)">
+                                    @(turnover.GetDisplayDescription())
                                 </label>
                             </div>
                         }

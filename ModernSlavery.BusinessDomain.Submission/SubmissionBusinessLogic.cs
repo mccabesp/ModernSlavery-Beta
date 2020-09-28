@@ -106,7 +106,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                         ModifiedDate = j.r.Modified,
                         StatementUrl = j.r.StatementUrl,
                         ApprovingPerson = j.r.ApprovingPerson,
-                        Turnover = StatementsFileModel.GetTurnover(j.r).ToString(),
+                        Turnover = j.r.GetStatementTurnover().ToString(),
                         Modifications = j.r.Modifications,
                         EHRCResponse = j.r.EHRCResponse
                     });

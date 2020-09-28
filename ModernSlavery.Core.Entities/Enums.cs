@@ -66,6 +66,60 @@ namespace ModernSlavery.Core.Entities
         Deleted = 5
     }
 
+    public enum StatementTurnovers : byte
+    {
+        //Not Provided
+        [Range(0, 0)]
+        NotProvided = 0,
+
+        //Under £36 million
+        [Display(Description = "Under £36 million")]
+        [Range(0, 36)]
+        Under36Million = 1,
+
+        //£36 million - £60 million
+        [Display(Description = "£36 million to £60 million")]
+        [Range(36, 60)]
+        From36to60Million = 2,
+
+        //£60 million - £100 million
+        [Display(Description = "£60 million to £100 million")]
+        [Range(60, 100)]
+        From60to100Million = 3,
+
+        //£100 million - £500 million
+        [Display(Description = "£100 million to £500 million")]
+        [Range(100, 500)]
+        From100to500Million = 4,
+
+        //£500 million+
+        [Display(Description = "Over £500 million")]
+        [Range(500, 0)]
+        Over500Million = 5,
+    }
+
+    public enum StatementYears : byte
+    {
+        //Not Provided
+        [Range(0, 0)]
+        NotProvided = 0,
+
+        //This is the first time
+        [Display(Description = "This is the first time")]
+        [Range(1, 1)]
+        Year1 = 1,
+
+        //1 to 5 Years
+        [Display(Description = "1 to 5 years")]
+        [Range(1, 5)]
+        Years1To5 = 2,
+
+        //More than 5 years
+        [Display(Description = "More than 5 years")]
+        [Range(5, 0)]
+        Over5Years = 3,
+    }
+
     public enum ScopeRowStatuses : byte
     {
         Unknown = 0,

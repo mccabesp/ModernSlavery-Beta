@@ -174,7 +174,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
         public void RollbackTransaction()
         {
-            if (Transaction == null) throw new Exception("Cannot rollback a transaction which has not been started");
+            if (Transaction == null) return;
 
             Transaction.Rollback();
             Transaction.Dispose();

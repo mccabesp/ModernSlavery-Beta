@@ -33,8 +33,6 @@ namespace ModernSlavery.WebUI.Viewing
             builder.RegisterType<ViewingPresenter>().As<IViewingPresenter>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<SearchPresenter>().As<ISearchPresenter>().InstancePerLifetimeScope();
-            builder.RegisterType<ComparePresenter>().As<IComparePresenter>()
-                .InstancePerLifetimeScope();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
