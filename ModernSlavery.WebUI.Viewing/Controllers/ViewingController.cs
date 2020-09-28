@@ -257,7 +257,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             var viewModel = openResult.Result;
-            return View("Statement", viewModel);
+            return View("Statement-Summary", viewModel);
         }
 
         #endregion
