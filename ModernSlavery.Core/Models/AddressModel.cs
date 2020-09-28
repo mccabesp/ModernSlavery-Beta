@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 
@@ -20,7 +21,7 @@ namespace ModernSlavery.Core.Models
 
         public bool? IsUkAddress { get; set; }
 
-        public string GetFullAddress()
+        public string GetFullAddress(string delimiter= ", ")
         {
             var list = new List<string>();
             list.Add(Address1);
@@ -31,7 +32,7 @@ namespace ModernSlavery.Core.Models
             list.Add(Country);
             list.Add(PostCode);
             list.Add(PoBox);
-            return list.ToDelimitedString(", ");
+            return list.ToDelimitedString(delimiter);
         }
 
         public List<string> GetAddressList()

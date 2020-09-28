@@ -148,6 +148,21 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
             return await _organisationSearchRepository.ListDocumentsAsync(selectFields: keyOnly ? nameof(OrganisationSearchModel.SearchDocumentKey) : null, filter: filter);
         }
+
+        public async Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(IEnumerable<int> submissionDeadlineYears=null)
+        {
+            //Get the old indexes for statements
+            var filter = $"{nameof(OrganisationSearchModel.StatementId)} ne null";
+            if (submissionDeadlineYears.Any())
+            {
+                string yearFilter = null;
+                var deadlineQuery = submissionDeadlineYears.Select(x => $"{nameof(OrganisationSearchModel.SubmissionDeadlineYear)} eq {x}");
+                yearFilter+=string.Join(" or ", deadlineQuery);
+                if (!string.IsNullOrWhiteSpace(yearFilter))filter += $" and ({yearFilter})";
+            }
+
+            return await _organisationSearchRepository.ListDocumentsAsync(filter: filter);
+        }
         #endregion
 
         #region Create OrganisationSearchModel
@@ -472,26 +487,26 @@ namespace ModernSlavery.BusinessDomain.Viewing
             //Add the turnover filter
             if (turnovers!=null && turnovers.Any())
             {
-                var turnoverQuery = turnovers.Select(x => $"Turnover/Key eq {x}");
+                var turnoverQuery = turnovers.Select(x => $"{nameof(OrganisationSearchModel.Turnover)}/{nameof(OrganisationSearchModel.KeyName.Key)} eq {x}");
                 queryFilter.Add($"({string.Join(" or ", turnoverQuery)})");
             }
 
             //Add the sector filter
             if (sectors!=null && sectors.Any())
             {
-                var sectorQuery = sectors.Select(x => $"sector/Key eq {x}");
-                queryFilter.Add($"Sectors/any(sector: {string.Join(" or ", sectorQuery)})");
+                var sectorQuery = sectors.Select(x => $"{nameof(OrganisationSearchModel.Sectors)}/{nameof(OrganisationSearchModel.KeyName.Key)} eq {x}");
+                queryFilter.Add($"{nameof(OrganisationSearchModel.Sectors)}/any(sector: {string.Join(" or ", sectorQuery)})");
             }
 
             //Add the years filter
             if (deadlineYears != null && deadlineYears.Any())
             {
-                var deadlineQuery = deadlineYears.Select(x => $"StatementDeadlineYear eq {x}");
+                var deadlineQuery = deadlineYears.Select(x => $"{nameof(OrganisationSearchModel.SubmissionDeadlineYear)} eq {x}");
                 queryFilter.Add($"({string.Join(" or ", deadlineQuery)})");
             }
 
             //Only show submitted organisations
-            if (submittedOnly)queryFilter.Add($"StatementId ne null");
+            if (submittedOnly)queryFilter.Add($"{nameof(OrganisationSearchModel.StatementId)} ne null");
             
             string filter = string.Join(" and ", queryFilter);
             #endregion
