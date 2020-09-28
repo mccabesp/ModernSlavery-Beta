@@ -39,4 +39,5 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             await Task.CompletedTask;
         }
+    }
 }
