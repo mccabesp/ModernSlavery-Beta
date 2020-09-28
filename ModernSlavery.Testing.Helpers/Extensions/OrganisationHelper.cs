@@ -18,7 +18,22 @@ using ModernSlavery.BusinessDomain.Shared.Interfaces;
 namespace ModernSlavery.Testing.Helpers.Extensions
 {
     public static class OrganisationHelper
+
+        
     {
+
+        public static async Task SetSecurityCode(IHost Host, Organisation Org, DateTime ExpiryDate) 
+        {
+            var result = GetSecurityCodeBusinessLogic(Host).CreateSecurityCode(Org, ExpiryDate);
+
+            if (result.Failed)
+            {
+                throw new Exception("Unable to set security code");
+            }
+
+            await SaveAsync(Host);
+        }
+
         public static T Find<T>(this IHost host, Func<T, bool> query)
             where T : class
         {
