@@ -15,7 +15,7 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
 {
-    [TestFixture, Ignore("Awaiting Scope Merge")]
+    [TestFixture]
 
     class Scope_Out_Tell_Us_Why_Content_Check : UITest
     {

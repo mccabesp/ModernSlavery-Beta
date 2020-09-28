@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Not implemented yet")]
+    [TestFixture]
 
     public class GoupSubmission_SwitchSingleToGroup : Submission_Complete_Mandatory_Sections
+
+        //Information needing to be added: A second variant organisation to add to grouping Fly Jet Australia
     {
         [Test, Order(60)]
         public async Task NavigateToSubmissionPage()
@@ -15,7 +17,6 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click(TestData.OrgName);
             Click("Continue");
             ExpectHeader("Review before submitting");
-
 
             await Task.CompletedTask;
         }
@@ -44,21 +45,45 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
         [Test, Order(56)]
-        public async Task SubmitFormWithOptionalSections()
+        public async Task NavigateToConversionPage()
         {
-            Click("Confirm and submit");
+            Expect("Is this statement for a group of organisations?");
+            Click("Is this statement for a group of organisations?");
 
-            Expect("You've submitted your Modern Slavery statement for 2019 to 2020");
-
-            Click("Finish and Sign out");
-
-
-            WaitForNewPage();
+            ExpectText("If your statement is gor a group of organisations, you need to specify it's for a group and tell us which organisations are in the group.");
+            ClickText("specify it's for a group");
+            ExpectHeader("Who is your statement for?");
 
             await Task.CompletedTask;
-
-            //todo validate submitted form
-
         }
+
+        [Test, Order(57)]
+        public async Task SelectConversionToAGroupSubmission()
+        {
+            Expect("a single organisation");
+            Expect("a group of organisations");
+            Click("a group of organisations");
+
+            Click("Continue");
+            ExpectHeader("Which organisations are included in your group statement?");
+
+            await Task.CompletedTask;
+        }
+
+        [Test, Order(58)]
+        public async Task AddAndConfirmGroup()
+        {
+            Set("Search").To("Fly Jet");
+            Click("Search ");
+            Expect("Fly Jet Australia");
+            AtRow("Fly Jet Australia").Click("Include");
+            Expect("1 orgnanisation included");
+            Expect("View your group");
+            Click("View your group");
+            Click("Confirm and continue");
+
+          
+            await Task.CompletedTask;
+        }       
     }
 }
