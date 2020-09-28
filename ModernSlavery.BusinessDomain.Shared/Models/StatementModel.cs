@@ -72,8 +72,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.IncludesTraining, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesTraining))
                 .ForMember(dest => dest.IncludesGoals, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesGoals))
                 .ForMember(dest => dest.IncludesMeasuringProgress, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesMeasuringProgress))
-                .ForMember(dest => dest.HasForceLabour, opt => opt.MapFrom(st => st.StatementId == 0 ? (bool?)null : !string.IsNullOrWhiteSpace(st.ForcedLabourDetails)))
-                .ForMember(dest => dest.HasSlaveryInstance, opt => opt.MapFrom(st => st.StatementId == 0 ? (bool?)null : !string.IsNullOrWhiteSpace(st.SlaveryInstanceDetails)))
+                .ForMember(dest => dest.HasForceLabour, opt => opt.MapFrom(st => st.StatementId == 0 || st.ForcedLabourDetails == null ? (bool?)null : st.ForcedLabourDetails != string.Empty))
+                .ForMember(dest => dest.HasSlaveryInstance, opt => opt.MapFrom(st => st.StatementId == 0 || st.SlaveryInstanceDetails == null  ? (bool?)null : st.SlaveryInstanceDetails != string.Empty))
                 .ForMember(dest => dest.HasRemediation, opt => opt.MapFrom(st => st.StatementId == 0 ? (bool?)null : !string.IsNullOrWhiteSpace(st.SlaveryInstanceRemediation)));
 
         }
