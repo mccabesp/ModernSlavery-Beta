@@ -26,7 +26,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         private static string LogsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LogFiles");
         private static string ScreenshotsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots");
-        
+
         [OneTimeSetUp]
         public async Task RunBeforeAnyTestsAsync()
         {
@@ -54,7 +54,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             }
 
             //Create the test host usign the default dependency module and override with a test module
-            TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>(applicationName:"ModernSlavery.Hosts.Web");
+            TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>(applicationName: "ModernSlavery.Hosts.Web");
 
             //Create SQL firewall rule for the build agent
             TestWebHost.OpenSQLFirewall();
@@ -78,6 +78,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             WebDriverService = UITest.SetupWebDriverService(baseUrl: baseUrl);
 
         }
+        
 
         [OneTimeTearDown]
         public async Task RunAfterAnyTestsAsync()
