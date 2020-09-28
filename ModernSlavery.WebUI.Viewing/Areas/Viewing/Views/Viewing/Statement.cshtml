@@ -216,13 +216,13 @@
                 </p>
             }
 
-            @if (Model.Turnover != StatementTurnovers.NotProvided)
+            @if (Model.Turnover != null && Model.Turnover != StatementTurnovers.NotProvided)
             {
                 <p class="govuk-body govuk-!-font-weight-bold">
                     Its turnover or budget in the financial accounting year of this statement was:
                 </p>
                 <p class="govuk-body">
-                    @Model.Turnover
+                    @Model.Turnover.Value.EnumDisplayNameFor()
                 </p>
             }
             else
@@ -558,14 +558,14 @@
                 </div>
             }
 
-            @if (Model.StatementYears != StatementYears.NotProvided)
+            @if (Model.StatementYears != null && Model.StatementYears != StatementYears.NotProvided)
             {
                 <div class="govuk-body govuk-!-font-weight-bold">
                     The organisation has been producing modern slavery statements for:
                 </div>
 
                 <div class="govuk-body">
-                    @Model.StatementYears
+                    @Model.StatementYears.Value.EnumDisplayNameFor()
                 </div>
             }
             else
