@@ -16,7 +16,7 @@ using ModernSlavery.Core.Entities;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture, Ignore("Temporary Ignore")]
+    [TestFixture]
 
 
 
@@ -26,26 +26,24 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(50)]
         public async Task VerifyInfo()
         {
-            //may need fixed due to missing address fields
-            Try(() => {
-                ExpectHeader("Declaration complete"); ;            },
-                    () => { Expect("You have declared your organisation is not required to publish a modern slavery statementon your website"); },
-                    () => { ExpectText("We have sent you a confirmation email.We will contact you if we need more information."); },
-                    () => { ExpectHeader("Publishing a statement voluntarily"); },
-                    () => { ExpectText("If you are not legally required to publish a modern slavery statement on your website, you can still create a statement voluntarily and submit it to our service."); },
-                    () => { ExpectText(That.Contains, "To submit a modern slavery statement to our service, "); },
-                    () => { ExpectLink(That.Contains, "create an account"); },
-                    () => { ExpectText(That.Contains, " and register your organisation."); },
-                    () => { ExpectHeader("Tell us about another organisation’s publishing requirements"); },
-                    () => { ExpectText("If you need to tell us whether another organisation is required to publish a modern slavery statement, click on the ‘start again’ button."); },
-                    () => { ExpectButton("Start again"); },
+          
+                ExpectHeader("Declaration complete");
 
 
-                    () => { ExpectButton("Confirm and continue"); });
-            await Task.CompletedTask;
+                Expect("We've sent you a confirmation email. We will contact you if we need more information.");
 
-            await Task.CompletedTask;
-        }
+                ExpectHeader("Publishing a statement voluntarily");
+                Expect("If you are not legally required to publish a modern slavery statement on your website, you can still create a statement voluntarily and submit it to our service.");
+                Expect(What.Contains, "To submit a modern slavery statement to our service, ");
+                ExpectLink(That.Contains, "create an account");
+                Expect(What.Contains, " and register your organisation.");
+
+                ExpectHeader("Tell us about another organisation’s publishing requirements");
+                Expect("If you need to tell us whether another organisation is required to publish a modern slavery statement, click on the ‘start again’ button.");
+
+                Expect("Start again");
+                await Task.CompletedTask;
+            }
 
 
        

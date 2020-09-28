@@ -16,7 +16,7 @@ using ModernSlavery.Core.Entities;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture, Ignore("Awaiting Scope Merge")]
+    [TestFixture, Ignore("Feature Descoped")]
 
     public class Scope_Out_Create_Account_After_Registration : Scope_Out_Mark_Org_As_OOS_LoggedOut
     {

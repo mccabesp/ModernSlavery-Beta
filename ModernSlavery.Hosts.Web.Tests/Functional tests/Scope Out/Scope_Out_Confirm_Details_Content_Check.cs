@@ -12,24 +12,34 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture, Ignore("Awaiting Scope Merge")]
+    [TestFixture]
 
     public class Scope_Out_Confirm_Details_Content_Check : UITest
     {
         protected string EmployerReference;
-        protected Organisation Org;
-        [Test, Order(20)]
-        public async Task AddOrgToDb()
+        [OneTimeSetUp]
+        public async Task SetUp()
         {
-            //EmployerReference =  ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(TestData.OrgName, "ABCD1234");
+            TestData.Organisation = TestRunSetup.TestWebHost
+                .Find<Organisation>(org => TestData.Organisation.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
 
-            Org = Testing.Helpers.Extensions.OrganisationHelper.GetOrganisation(TestRunSetup.TestWebHost, TestData.OrgName);
+            var result = Testing.Helpers.Extensions.OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
+
+            if (result.Failed)
+            {
+                throw new Exception("Unable to set security code");
+            }
+
+            await Testing.Helpers.Extensions.OrganisationHelper.SaveAsync(TestRunSetup.TestWebHost);
 
             await Task.CompletedTask;
+
         }
 
         [Test, Order(22)]
@@ -43,8 +53,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Employer Reference").To(Org.OrganisationReference);
-            Set("Security Code").To(Org.SecurityCode);
+            Set("Organisation Reference").To(TestData.Organisation.OrganisationReference);
+            Set("Security Code").To(TestData.Organisation.SecurityCode);
             await Task.CompletedTask;
         }
 
@@ -61,20 +71,24 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //may need fixed due to missing address fields
             Try(() => {
-                RightOfText("Name").Expect(Org.OrganisationName); ;
+                RightOfText("Organisation Name").Expect(TestData.Organisation.OrganisationName); ;
             },
-                    () => { RightOfText("Reference").Expect(Org.OrganisationReference); }, 
-                    () => { RightOfText("Registered address").Expect(Org.LatestAddress.Address1 + ", " + Org.LatestAddress.Address2 + ", " + Org.LatestAddress.Address3 + ", " + Org.LatestAddress.TownCity + ", " + Org.LatestAddress.PostCode); },
+                    () => { RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference); },
+                    //() => { RightOfText("Registered address").Expect(TestData.Organisation.LatestAddress.Address1); },
+                    //() => { RightOfText("Registered address").Expect(TestData.Organisation.LatestAddress.Address2); },
+                    //() => { RightOfText("Registered address").Expect(TestData.Organisation.LatestAddress.Address3); },
+                    //() => { RightOfText("Registered address").Expect(TestData.Organisation.LatestAddress.TownCity); },
+                    //() => { RightOfText("Registered address").Expect(TestData.Organisation.LatestAddress.PostCode); },
                     () => { Expect(What.Contains, "If this information is not correct, please email"); },
                     () => { ExpectLink("modernslaverystatements@homeoffice.gov.uk"); },
                     () => { ExpectButton("Confirm and continue"); });
             await Task.CompletedTask;
         }
 
-        [Test, Order(28)]
+        [Test, Order(30)]
         public async Task VerifyLinkURL()
         {
-            ExpectXPath("//a [@href='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/' and contains(., 'testuser')]");
+            ExpectXPath("//a [@href='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/')]");
             await Task.CompletedTask;
         }
     }

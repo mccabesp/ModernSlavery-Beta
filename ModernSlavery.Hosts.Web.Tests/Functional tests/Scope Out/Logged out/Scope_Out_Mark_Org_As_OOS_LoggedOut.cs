@@ -12,6 +12,7 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -22,17 +23,21 @@ namespace ModernSlavery.Hosts.Web.Tests
     {
        protected string EmployerReference;
 
+        [OneTimeSetUp]
+        public async Task SetUp()
+        {
+            TestData.Organisation = TestRunSetup.TestWebHost
+                .Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
+        }
+
         [Test, Order(20)]
         public async Task SetSecurityCode()
         {
-            var result = Testing.Helpers.Extensions.OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
 
-            if (result.Failed)
-            {
-                throw new Exception("Unable to set security code");
-            }
 
-            await Testing.Helpers.Extensions.OrganisationHelper.SaveAsync(TestRunSetup.TestWebHost);
+            await OrganisationHelper.SetSecurityCode(TestRunSetup.TestWebHost, TestData.Organisation, new DateTime(2021, 6, 10));
+
 
             await Task.CompletedTask;
         }
@@ -121,7 +126,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             await Task.CompletedTask;
         }
 
-        [Test, Order(38)]
+        [Test, Order(39)]
         public async Task CheckDetails()
         {
             RightOfText("Organisation Name").Expect(TestData.OrgName);
@@ -132,15 +137,17 @@ namespace ModernSlavery.Hosts.Web.Tests
             RightOfText("Reason your organisation is not required to publish a modern slavery statement on your website").Expect("Here are the reasons why.");
             RightOfText("Contact name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last) ;
             //todo await helper implementation for address logic
-            RightOfText("Job title").Expect("Create_Account.roger_job_title");
+            RightOfText("Job title").Expect(Create_Account.roger_job_title);
             RightOfText("Contact email").Expect(Create_Account.roger_email);
 
-            ClickLabel("I would like to receive a confirmation email");
+            BelowHeader("Declaration").RightOfText("Reason your organisation is not required to publish a modern slavery statement on your website").Expect("Here are the reasons why.");
+
+            ClickLabel("I would like to recieve a confirmation email");
 
             await Task.CompletedTask;
         }
 
-        [Test, Order(38)]
+        [Test, Order(40)]
         public async Task ConfirmAndSendLeadsToConfirmationPage()
         {
             Click("Confirm and send");
@@ -148,22 +155,6 @@ namespace ModernSlavery.Hosts.Web.Tests
             await Task.CompletedTask;
         }
 
-        [Test, Order(42)]
-        public async Task CompletePageContentCheck()
-        {
-            Click("Confirm and send");
-            ExpectHeader("Declaration complete");
-
-            Expect("You have declared your organisation is not required to publish a modern slavery statement");
-
-            Expect("We have sent you a confirmation email. We will contact you if we need more information.");
-
-            ExpectHeader("Produced a statement voluntarily?");
-            Expect("If you are not legally required to publish a modern slavery statement, but have produced one voluntarily, you can still submit it to our service.");
-            Expect(What.Contains, "To submit a modern slavery statement to our service, ");
-            ExpectLink(That.Contains, "create an account");
-            Expect(What.Contains, " and register your organisation.");
-            await Task.CompletedTask;
-        }
+        
     }
 }

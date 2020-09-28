@@ -32,6 +32,17 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
+        [OneTimeSetUp]
+        public async Task SetUp()
+        {
+            TestData.Organisation = TestRunSetup.TestWebHost
+                .Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
+        }
+
+        private bool CanBeSetOutOfScope(Organisation org)
+            => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope);
+
         [Test, Order(29)]
         public async Task RegisterOrgAndSetScope()
         {

@@ -12,20 +12,36 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture, Ignore("Awaiting Scope Merge, email functionality needs added")]
+    [TestFixture]
 
     public class Scope_Out_Infomation_Not_Correct : UITest
     {
         private string EmployerReference;
 
-        [Test, Order(20)]
-        public async Task AddOrgToDb()
+        [OneTimeSetUp]
+        public async Task SetUp()
         {
-           // EmployerReference = ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(TestData.OrgName, "ABCD1234");
+            TestData.Organisation = TestRunSetup.TestWebHost
+                .Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
+        }
+
+        private bool CanBeSetOutOfScope(Organisation org)
+            => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope);
+
+        [Test, Order(18)]
+        public async Task SetScope()
+        {
+
+            await OrganisationHelper.GetOrganisationBusinessLogic(TestRunSetup.TestWebHost).CreateOrganisationSecurityCodeAsync(Registration.Organisation.OrganisationReference, new DateTime(2030, 1, 10));
+
+
+
 
             await Task.CompletedTask;
         }
@@ -41,7 +57,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Employer Reference").To(EmployerReference);
+            Set("Organisation Reference").To(EmployerReference);
             Set("Security Code").To("ABCD1234");
             await Task.CompletedTask;
         }
