@@ -30,7 +30,19 @@
                 </span>
             </summary>
             <div class="govuk-details__text">
-
+                @{ var address = Model.Address.GetAddressList(); }
+                @for (var i = 0; i < address.Count; i++)
+                {
+                    if (i < address.Count - 1)
+                    {
+                        <text>@address[i],</text>
+                        <br>
+                    }
+                    else // last element doesnt need a comma or line break
+                    {
+                        <text>@address[i]</text>
+                    }
+                }
             </div>
         </details>
 
