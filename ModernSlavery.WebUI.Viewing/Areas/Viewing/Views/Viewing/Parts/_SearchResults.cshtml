@@ -25,13 +25,13 @@
                                 </p>
                                 <p class="govuk-body govuk-!-margin-bottom-2">
                                     <span class="grey-text">Submitted under </span>
-                                    <span class="blue-header govuk-!-font-weight-bold">@Html.ActionLink(organisation.ParentName, "StatementSummary", "Viewing", new { organisationIdentifier, organisation.SubmissionDeadlineYear })</span>
+                                    <span class="blue-header govuk-!-font-weight-bold">@Html.ActionLink(organisation.ParentName, "StatementSummary", "Viewing", new { organisationIdentifier, year = organisation.SubmissionDeadlineYear })</span>
                                 </p>
                             }
                             else
                             {
                                 <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold blue-header">
-                                    @Html.ActionLink(organisation.OrganisationName, "StatementSummary", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId), organisation.SubmissionDeadlineYear })
+                                    @Html.ActionLink(organisation.OrganisationName, "StatementSummary", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId), year = organisation.SubmissionDeadlineYear })
                                 </p>
                                 @if (organisation.GroupSubmission)
                                 {
