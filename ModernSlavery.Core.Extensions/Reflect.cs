@@ -37,6 +37,11 @@ namespace ModernSlavery.Core.Extensions
             return attrib != null;
         }
 
+        public static bool IsAsyncEnumerable(this Type type)
+        {
+            return type.Name.StartsWith("IAsyncEnumerable`");
+        }
+
         /// <summary>
         ///     Return all local classes which implement a single interface or abstraction which is also declared within the same
         ///     assembly

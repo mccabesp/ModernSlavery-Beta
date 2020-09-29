@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
@@ -16,6 +17,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
+using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Viewing.Models;
 using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
 
@@ -26,6 +28,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         IObfuscator Obfuscator { get; }
         Task<SearchViewModel> SearchAsync(SearchQueryModel searchQuery);
         Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(string organisationIdentifier, int reportingDeadlineYear);
+        Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(string organisationIdentifier, int reportingDeadlineYear);
     }
 
     public class ViewingPresenter : IViewingPresenter
@@ -36,16 +39,19 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         private readonly IViewingService _viewingService;
         public IObfuscator Obfuscator { get; }
         private readonly IMapper _mapper;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ISearchBusinessLogic _searchBusinessLogic;
         private readonly SectorTypeIndex _sectorTypes;
         #endregion
 
         #region Constructor
-        public ViewingPresenter(
-            IViewingService viewingService, 
-            IStatementBusinessLogic statementBusinessLogic, 
-            ISharedBusinessLogic sharedBusinessLogic, 
-            IObfuscator obfuscator, 
+        public ViewingPresenter(IViewingService viewingService,
+            IStatementBusinessLogic statementBusinessLogic,
+            ISharedBusinessLogic sharedBusinessLogic,
+            IObfuscator obfuscator,
+            IServiceProvider serviceProvider,
             IMapper mapper,
+            ISearchBusinessLogic searchBusinessLogic,
             SectorTypeIndex sectorTypes)
         {
             _viewingService = viewingService;
@@ -53,7 +59,9 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             _sharedBusinessLogic = sharedBusinessLogic;
             Obfuscator = obfuscator;
             _mapper = mapper;
+            _serviceProvider = serviceProvider;
             _sectorTypes = sectorTypes;
+            _searchBusinessLogic = searchBusinessLogic;
         }
         #endregion
 
@@ -146,7 +154,9 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
                 sources.Add(
                     new OptionSelect
                     {
-                        Id = reportingDeadline.Year.ToString(), Label = $"{reportingDeadline.Year-1} to {reportingDeadline.Year}", Value = reportingDeadline.Year.ToString(),
+                        Id = reportingDeadline.Year.ToString(),
+                        Label = $"{reportingDeadline.Year - 1} to {reportingDeadline.Year}",
+                        Value = reportingDeadline.Year.ToString(),
                         Checked = isChecked
                         // Disabled = facetResults.Count == 0 && !isChecked
                     });
@@ -168,10 +178,23 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             var statementModel = openOutcome.Result;
 
             //Copy the statement properties to the view model
-            var statementViewModel=_mapper.Map<StatementViewModel>(statementModel);
+            var viewModel = ActivatorUtilities.CreateInstance<StatementViewModel>(_serviceProvider);
+            var statementViewModel = _mapper.Map(statementModel, viewModel);
 
             //Return the view model
             return new Outcome<StatementErrors, StatementViewModel>(statementViewModel);
+        }
+
+        public async Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(string organisationIdentifier, int reportingDeadlineYear)
+        {
+            long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
+            var organisationSearchModel = await _searchBusinessLogic.GetOrganisationAsync(organisationId, reportingDeadlineYear);
+
+            if (organisationSearchModel == null)
+                return new Outcome<StatementErrors, StatementSummaryViewModel>(StatementErrors.NotFound, $"Cannot find statement summary for Organisation:{organisationId} due for reporting deadline year {reportingDeadlineYear}");
+
+            var vm = _mapper.Map<StatementSummaryViewModel>(organisationSearchModel);
+            return new Outcome<StatementErrors, StatementSummaryViewModel>(vm);
         }
 
         #endregion

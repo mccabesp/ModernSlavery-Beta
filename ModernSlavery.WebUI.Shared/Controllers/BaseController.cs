@@ -689,16 +689,23 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         #region Session Handling
 
         [NonAction]
-        protected void StashModel<T>(T model)
+        protected void StashModel<TModel>(TModel model)
         {
-            var keyName = $"{this.GetType()}:{typeof(T)}:Model";
+            var controllerType = this.GetType();
+            var modelType = typeof(TModel);
+
+            var keyName = $"{controllerType}:{modelType}:Model";
             Session[keyName] = Core.Extensions.Json.SerializeObjectDisposed(model);
         }
 
         [NonAction]
-        protected void StashModel<KeyT, ModelT>(KeyT keyController, ModelT model)
+        protected void StashModel<TController, TModel>(TController controller, TModel model)
+            where TController : Type
         {
-            var keyName = $"{typeof(KeyT)}:{typeof(ModelT)}:Model";
+            var controllerType = controller?.GetType() ?? typeof(TController);
+            var modelType = typeof(TModel);
+
+            var keyName = $"{controllerType}:{modelType}:Model";
             Session[keyName] = Core.Extensions.Json.SerializeObjectDisposed(model);
         }
 
@@ -708,16 +715,16 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             var controllerType = this.GetType();
             
             foreach (var key in Session.Keys.ToList())
-                if (key.StartsWithI($"{controllerType}:") && key.EndsWithI(":Model"))
+                if (key.IsMatch($"{controllerType}:[0-9A-Za-z]*Model$"))
                     Session.Remove(key);
         }
 
         public void ClearStash<TController>(Controller controller=null)where TController : Controller
         {
-            var controllerType = controller == null ? typeof(TController) : controller.GetType();
+            var controllerType = controller?.GetType() ?? typeof(TController);
 
             foreach (var key in Session.Keys.ToList())
-                if (key.StartsWithI($"{controllerType}:") && key.EndsWithI(":Model"))
+                if (key.IsMatch($"{controllerType}:[0-9A-Za-z]*Model$"))
                     Session.Remove(key);
         }
 
@@ -725,27 +732,34 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         protected void ClearAllStashes()
         {
             foreach (var key in Session.Keys.ToList())
-                if (key.EndsWithI(":Model"))
+                if (key.IsMatch(":[0-9A-Za-z]*Model$"))
                     Session.Remove(key);
         }
 
         [NonAction]
-        protected T UnstashModel<T>(bool delete = false) where T : class
+        protected TModel UnstashModel<TModel>(bool delete = false) where TModel : class
         {
-            var keyName = $"{this.GetType()}:{typeof(T)}:Model";
+            var controllerType = this.GetType();
+            var modelType = typeof(TModel);
+
+            var keyName = $"{controllerType}:{modelType}:Model";
             var json = Session[keyName].ToStringOrNull();
-            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json);
+            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<TModel>(json);
             if (delete) Session.Remove(keyName);
 
             return result;
         }
 
         [NonAction]
-        protected T UnstashModel<T>(Type keyController, bool delete = false) where T : class
+        protected TModel UnstashModel<TModel>(Type controller, bool delete = false) where TModel : class
         {
-            var keyName = $"{this.GetType()}:{typeof(T)}:Model";
+            var controllerType = controller.GetType();
+            var modelType = typeof(TModel);
+
+            var keyName = $"{controllerType}:{modelType}:Model";
+
             var json = Session[keyName].ToStringOrNull();
-            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json);
+            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<TModel>(json);
             if (delete) Session.Remove(keyName);
 
             return result;

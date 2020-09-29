@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Xml;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
+using Microsoft.Net.Http.Headers;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -70,22 +73,21 @@ namespace ModernSlavery.Hosts.Web
             services.AddHttpContextAccessor();
 
             var mvcBuilder = services.AddControllersWithViews(
-                    options =>
-                    {
-                        options.OutputFormatters.Add(new CsvMediaTypeFormatter());
-                        
-                        options.ModelBinderProviders.Insert(0,new DependencyModelBinderSource());
-                        options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
-                        options.ModelMetadataDetailsProviders.Add(
-                            new TrimModelBinder()); //Set DisplayMetadata to input empty strings as null
-                        options.ModelMetadataDetailsProviders.Add(
-                            new DefaultResourceValidationMetadataProvider()); // sets default resource type to use for display text and error messages
-                        if (_responseCachingOptions.Enabled)
-                            _responseCachingOptions.CacheProfiles.ForEach(p =>
-                                options.CacheProfiles.Add(p)); //Load the response cache profiles from options
-                        options.Filters.Add<ErrorHandlingFilter>();
-                        options.Filters.Add<HttpExceptionFilter>();
-                    }).AddXmlSerializerFormatters();
+                options =>
+                {
+                    options.OutputFormatters.Add(new CsvMediaTypeFormatter());
+                    options.OutputFormatters.Add(new XmlMediaTypeFormatter());
+                    options.FormatterMappings.SetMediaTypeMappingForFormat("csv", MediaTypeHeaderValue.Parse("text/csv"));
+
+                    options.RespectBrowserAcceptHeader = true; // false by default - Any 'Accept' header gets turned into application/json. If you want to allow the clients to accept different headers, you need to switch that translation off
+                    options.ModelBinderProviders.Insert(0, new DependencyModelBinderSource());
+                    options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
+                    options.ModelMetadataDetailsProviders.Add(new TrimModelBinder()); //Set DisplayMetadata to input empty strings as null
+                    options.ModelMetadataDetailsProviders.Add(new DefaultResourceValidationMetadataProvider()); // sets default resource type to use for display text and error messages
+                    if (_responseCachingOptions.Enabled)_responseCachingOptions.CacheProfiles.ForEach(p =>options.CacheProfiles.Add(p)); //Load the response cache profiles from options
+                    options.Filters.Add<ErrorHandlingFilter>();
+                    options.Filters.Add<HttpExceptionFilter>();
+                });
 
             mvcBuilder.AddApplicationPart<WebAPI.Public.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Identity.DependencyModule>();
@@ -138,7 +140,7 @@ namespace ModernSlavery.Hosts.Web
                     o.Cookie.SecurePolicy =
                         CookieSecurePolicy.Always; //Equivalent to <httpCookies requireSSL="true" /> from Web.Config
                     o.Cookie.HttpOnly = false; //Always use https cookies
-                    o.Cookie.SameSite = SameSiteMode.Strict;
+                    o.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
                     o.Cookie.Domain =
                         _sharedOptions.WEBSITE_HOSTNAME
                             .BeforeFirst(":"); //Domain cannot be an authority and contain a port number

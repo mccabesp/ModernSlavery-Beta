@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using System.Xml.Serialization;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
@@ -11,7 +13,8 @@ using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
 namespace ModernSlavery.WebUI.Shared.Models
 {
-    [Serializable]
+    [Serializable()]
+    [XmlType("StatementSummary")]
     public class StatementSummaryViewModel
     {
         #region Automapper

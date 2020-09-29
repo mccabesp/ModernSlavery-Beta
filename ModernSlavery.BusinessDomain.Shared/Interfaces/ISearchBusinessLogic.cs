@@ -91,5 +91,12 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="submissionDeadlineYear">The reporting deadline year</param>
         /// <returns></returns>
         Task<IEnumerable<OrganisationSearchModel>> ListGroupOrganisationsAsync(long parentOrganisationId, int submissionDeadlineYear);
+
+        /// <summary>
+        /// Returns all submitted statement summary documents for the specified years (or all)
+        /// </summary>
+        /// <param name="submissionDeadlineYears">The specified reporting years (return all if empty)</param>
+        /// <returns>List of submitted statement summary documents</returns>
+        Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(IEnumerable<int> submissionDeadlineYears = null);
     }
 }
