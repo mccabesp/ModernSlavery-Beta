@@ -478,21 +478,18 @@
                     @Model.ForcedLabourDetails
                 </div>
             }
-            else
+            else if (Model.ForcedLabourDetails == string.Empty)
             {
                 <div class="govuk-body">
                     The organisation did not identify any potential indicators of forced labour or modern slavery in its business or supply chains during this period.
                 </div>
             }
-            @*
-                TODO - What about the not provided case?
-                else
-                {
-                    <div class="govuk-body">
-                        The organisation did not tell us whether it identified any potential indicators of forced labour or modern slavery in its business or supply chains during this period.
-                    </div>
-                }
-            *@
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us whether it identified any potential indicators of forced labour or modern slavery in its business or supply chains during this period.
+                </div>
+            }
 
             @if (!string.IsNullOrWhiteSpace(Model.SlaveryInstanceDetails))
             {
@@ -505,21 +502,18 @@
                     @Model.SlaveryInstanceDetails
                 </div>
             }
-            else
+            else if (Model.SlaveryInstanceDetails == string.Empty)
             {
                 <div class="govuk-body">
                     The organisation did not find any instances of modern slavery in its business or supply chains.
                 </div>
             }
-            @*
-                TODO - What about the not provided case?
-                else
-                {
-                    <div class="govuk-body">
-                        The organisation did not tell us whether it found instances of modern slavery in its business or supply chains.
-                    </div>
-                }
-            *@
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us whether it found instances of modern slavery in its business or supply chains.
+                </div>
+            }
         </div>
 
         <div id="training">
