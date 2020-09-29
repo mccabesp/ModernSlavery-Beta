@@ -48,8 +48,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(d => d.StatementEndDate, opt => opt.MapFrom(s => s.StatementEndDate == DateTime.MinValue ? (DateTime?)null : s.StatementEndDate))
                 .ForMember(d => d.ApprovedDate, opt => opt.MapFrom(s => s.ApprovedDate == DateTime.MinValue ? (DateTime?)null : s.ApprovedDate))
                 .ForMember(d => d.OrganisationName, opt => opt.MapFrom(s => s.Organisation.OrganisationName))
-                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => StatementModel.GetStatementYears(s)))
-                .ForMember(d => d.Turnover, opt => opt.MapFrom(s => StatementModel.GetTurnover(s)))
+                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => s.GetStatementYears()))
+                .ForMember(d => d.Turnover, opt => opt.MapFrom(s => s.GetStatementTurnover()))
                 .ForMember(dest => dest.Modifications, opt => opt.MapFrom(s => string.IsNullOrWhiteSpace(s.Modifications) ? null : JsonConvert.DeserializeObject<List<AutoMap.Diff>>(s.Modifications)))
                 .ForMember(dest => dest.GroupSubmission, opt => opt.MapFrom(s => s.StatementId == 0 ? (bool?)null : s.StatementOrganisations.Any()))
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
@@ -72,8 +72,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.IncludesTraining, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesTraining))
                 .ForMember(dest => dest.IncludesGoals, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesGoals))
                 .ForMember(dest => dest.IncludesMeasuringProgress, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesMeasuringProgress))
-                .ForMember(dest => dest.HasForceLabour, opt => opt.MapFrom(st => st.StatementId == 0 ? (bool?)null : !string.IsNullOrWhiteSpace(st.ForcedLabourDetails)))
-                .ForMember(dest => dest.HasSlaveryInstance, opt => opt.MapFrom(st => st.StatementId == 0 ? (bool?)null : !string.IsNullOrWhiteSpace(st.SlaveryInstanceDetails)))
+                .ForMember(dest => dest.HasForceLabour, opt => opt.MapFrom(st => st.StatementId == 0 || st.ForcedLabourDetails == null ? (bool?)null : st.ForcedLabourDetails != string.Empty))
+                .ForMember(dest => dest.HasSlaveryInstance, opt => opt.MapFrom(st => st.StatementId == 0 || st.SlaveryInstanceDetails == null  ? (bool?)null : st.SlaveryInstanceDetails != string.Empty))
                 .ForMember(dest => dest.HasRemediation, opt => opt.MapFrom(st => st.StatementId == 0 ? (bool?)null : !string.IsNullOrWhiteSpace(st.SlaveryInstanceRemediation)));
 
         }
@@ -82,54 +82,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
     [Serializable]
     public class StatementModel
     {
-        #region Enum Types
-        public enum TurnoverRanges : byte
-        {
-            //Not Provided
-            [Range(0, 0)]
-            NotProvided = 0,
-
-            //Under £36 million
-            [Range(0, 36)]
-            Under36Million = 1,
-
-            //£36 million - £60 million
-            [Range(36, 60)]
-            From36to60Million = 2,
-
-            //£60 million - £100 million
-            [Range(60, 100)]
-            From60to100Million = 3,
-
-            //£100 million - £500 million
-            [Range(100, 500)]
-            From100to500Million = 4,
-
-            //£500 million+
-            [Range(500, 0)]
-            Over500Million = 5,
-        }
-
-        public enum YearRanges : byte
-        {
-            //Not Provided
-            [Range(0, 0)]
-            NotProvided = 0,
-
-            //This is the first time
-            [Range(1, 1)]
-            Year1 = 1,
-
-            //1 to 5 Years
-            [Range(1, 5)]
-            Years1To5 = 2,
-
-            //More than 5 years
-            [Range(5, 0)]
-            Over5Years = 3,
-        }
-        #endregion
-
         public bool? GroupSubmission { get; set; }
 
         public bool Submitted { get; set; }
@@ -245,7 +197,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public string OtherSector { get; set; }
 
-        public TurnoverRanges Turnover;
+        public StatementTurnovers Turnover;
 
         #endregion
 
@@ -316,19 +268,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public string KeyAchievements { get; set; }
 
-        public YearRanges StatementYears { get; set; }
+        public StatementYears StatementYears { get; set; }
 
         #endregion
-
-        public static YearRanges GetStatementYears(Statement statement)
-        {
-            return Enums.GetEnumFromRange<YearRanges>(statement.MinStatementYears, statement.MaxStatementYears == null ? 0 : statement.MaxStatementYears.Value);
-        }
-
-        public static TurnoverRanges GetTurnover(Statement statement)
-        {
-            return Enums.GetEnumFromRange<TurnoverRanges>(statement.MinTurnover, statement.MaxTurnover == null ? 0 : statement.MaxTurnover.Value);
-        }
 
         public bool IsEmpty()
         {
@@ -353,7 +295,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 && string.IsNullOrWhiteSpace(GoalsDetails)
                 && (Sectors == null || !Sectors.Any())
                 && string.IsNullOrWhiteSpace(OtherSector)
-                && Turnover == TurnoverRanges.NotProvided
+                && Turnover == StatementTurnovers.NotProvided
                 && (Policies == null || !Policies.Any())
                 && string.IsNullOrWhiteSpace(OtherPolicies)
                 && (RelevantRisks == null || !RelevantRisks.Any())
@@ -370,7 +312,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 && IncludesMeasuringProgress == null
                 && string.IsNullOrWhiteSpace(ProgressMeasures)
                 && string.IsNullOrWhiteSpace(KeyAchievements)
-                && StatementYears == YearRanges.NotProvided;
+                && StatementYears == StatementYears.NotProvided;
 
         }
     }

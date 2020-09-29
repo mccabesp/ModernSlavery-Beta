@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Net.Http;
+using System.Xml;
 using Autofac;
-using Autofac.Features.AttributeFilters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
+using Microsoft.Net.Http.Headers;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -23,8 +23,8 @@ using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
-using ModernSlavery.Infrastructure.Storage.FileRepositories;
 using ModernSlavery.Infrastructure.Telemetry;
+using ModernSlavery.WebAPI.Public.Classes;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Binding;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
@@ -73,20 +73,23 @@ namespace ModernSlavery.Hosts.Web
             services.AddHttpContextAccessor();
 
             var mvcBuilder = services.AddControllersWithViews(
-                    options =>
-                    {
-                        options.ModelBinderProviders.Insert(0,new DependencyModelBinderSource());
-                        options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
-                        options.ModelMetadataDetailsProviders.Add(
-                            new TrimModelBinder()); //Set DisplayMetadata to input empty strings as null
-                        options.ModelMetadataDetailsProviders.Add(
-                            new DefaultResourceValidationMetadataProvider()); // sets default resource type to use for display text and error messages
-                        if (_responseCachingOptions.Enabled)
-                            _responseCachingOptions.CacheProfiles.ForEach(p =>
-                                options.CacheProfiles.Add(p)); //Load the response cache profiles from options
-                        options.Filters.Add<ErrorHandlingFilter>();
-                    });
+                options =>
+                {
+                    options.OutputFormatters.Add(new CsvMediaTypeFormatter());
+                    options.OutputFormatters.Add(new XmlMediaTypeFormatter());
+                    options.FormatterMappings.SetMediaTypeMappingForFormat("csv", MediaTypeHeaderValue.Parse("text/csv"));
 
+                    options.RespectBrowserAcceptHeader = true; // false by default - Any 'Accept' header gets turned into application/json. If you want to allow the clients to accept different headers, you need to switch that translation off
+                    options.ModelBinderProviders.Insert(0, new DependencyModelBinderSource());
+                    options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
+                    options.ModelMetadataDetailsProviders.Add(new TrimModelBinder()); //Set DisplayMetadata to input empty strings as null
+                    options.ModelMetadataDetailsProviders.Add(new DefaultResourceValidationMetadataProvider()); // sets default resource type to use for display text and error messages
+                    if (_responseCachingOptions.Enabled)_responseCachingOptions.CacheProfiles.ForEach(p =>options.CacheProfiles.Add(p)); //Load the response cache profiles from options
+                    options.Filters.Add<ErrorHandlingFilter>();
+                    options.Filters.Add<HttpExceptionFilter>();
+                });
+
+            mvcBuilder.AddApplicationPart<WebAPI.Public.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Identity.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Account.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Admin.DependencyModule>();
@@ -137,7 +140,7 @@ namespace ModernSlavery.Hosts.Web
                     o.Cookie.SecurePolicy =
                         CookieSecurePolicy.Always; //Equivalent to <httpCookies requireSSL="true" /> from Web.Config
                     o.Cookie.HttpOnly = false; //Always use https cookies
-                    o.Cookie.SameSite = SameSiteMode.Strict;
+                    o.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
                     o.Cookie.Domain =
                         _sharedOptions.WEBSITE_HOSTNAME
                             .BeforeFirst(":"); //Domain cannot be an authority and contain a port number
@@ -254,6 +257,7 @@ namespace ModernSlavery.Hosts.Web
 
         public void RegisterModules(IList<Type> modules)
         {
+            modules.AddDependency<WebAPI.Public.DependencyModule>();
             modules.AddDependency<WebUI.Identity.DependencyModule>();
             modules.AddDependency<WebUI.StaticFiles.DependencyModule>();
             modules.AddDependency<WebUI.Account.DependencyModule>();

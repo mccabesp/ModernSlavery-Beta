@@ -255,7 +255,7 @@
                     @(statementForYear.SubmissionDeadline.ToString("d MMM yyyy"))
                 </th>
                 <td class="govuk-table__cell" rowspan="@(Model.Statements.Count(s => s.SubmissionDeadline == statementForYear.SubmissionDeadline))">
-                    <a href="@Url.ActionArea("Report", "Viewing", "Viewing", new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = statementForYear.SubmissionDeadline.Year})"
+                    <a href="@Url.ActionArea("Statement", "Viewing", "Viewing", new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = statementForYear.SubmissionDeadline.Year})"
                        class="govuk-link">
                         @(statementForYear.SubmissionDeadline.Year)
                     </a>

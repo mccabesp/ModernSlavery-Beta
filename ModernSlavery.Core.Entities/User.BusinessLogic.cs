@@ -101,7 +101,7 @@ namespace ModernSlavery.Core.Entities
             if (EmailVerifiedDate != null) return null;
 
             var verifyCode = Encryption.EncryptQuerystring(UserId + ":" + Created.ToSmallDateTime());
-            var verifyUrl = $"/register/verify-email?code={verifyCode}";
+            var verifyUrl = $"/sign-up/verify-email?code={verifyCode}";
             return verifyUrl;
         }
 

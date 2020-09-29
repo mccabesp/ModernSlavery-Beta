@@ -64,9 +64,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         #endregion
 
         #region Url Methods
-        public string GetOrganisationIdentifier() => RouteData.Values["OrganisationIdentifier"].ToString();
+        private string GetOrganisationIdentifier() => RouteData.Values["OrganisationIdentifier"].ToString();
 
-        public string GetReportingDeadlineYear() => RouteData.Values["Year"].ToString();
+        private string GetReportingDeadlineYear() => RouteData.Values["Year"].ToString();
 
         private object GetOrgAndYearRouteData() => new { OrganisationIdentifier = GetOrganisationIdentifier(), year = GetReportingDeadlineYear() };
 
@@ -229,8 +229,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         #endregion
 
-        #region Session Stack Methods
-        private void StashCancellingViewModel<T>(T model)
+        #region Session Stash Methods
+        private void StashCancellingViewModel<TModel>(TModel model)
         {
             if (model == null)
                 Session.Remove(this + ":CancellingViewModel");
@@ -238,13 +238,16 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 Session[this + ":CancellingViewModel"] = JsonConvert.SerializeObject(model, SubmissionPresenter.JsonSettings);
         }
 
-        private T UnstashCancellingViewModel<T>(bool delete = false) where T : class
+        private TModel UnstashCancellingViewModel<TModel>() where TModel : class
         {
             var json = Session[this + ":CancellingViewModel"].ToStringOrNull();
-            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json, SubmissionPresenter.JsonSettings);
-            if (delete) Session.Remove(this + ":CancellingViewModel");
-
-            return result;
+            Session.Remove(this + ":CancellingViewModel");
+            if (!string.IsNullOrWhiteSpace(json))
+            {
+                var value = JsonConvert.DeserializeObject(json, SubmissionPresenter.JsonSettings);
+                if (value is TModel result) return result;
+            }
+            return default;
         }
 
         private object UnstashCancellingViewModel(bool delete = false)
@@ -266,6 +269,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             //Return full page errors which return to the ManageOrganisation page
             var error = errors.FirstOrDefault();
+            
+            //Clear the cancel stash before leaving journey
+            UnstashCancellingViewModel(true);
+
             switch (error.Error)
             {
                 case StatementErrors.NotFound:
@@ -292,7 +299,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         private async Task<IActionResult> GetAsync<TViewModel>(string organisationIdentifier, int year) where TViewModel : BaseViewModel
         {
             //Try and get the viewmodel from session
-            var viewModel = UnstashCancellingViewModel<TViewModel>(true);
+            var viewModel = UnstashCancellingViewModel<TViewModel>();
             if (viewModel != null)
             {
                 //Make sure we show any validation errors

@@ -253,6 +253,9 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             var statementModel = openOutcome.Result;
             statementModel = SetViewModelToStatementModel(viewModel, statementModel);
 
+            //Remove any child organisations when single submission
+            if (statementModel.GroupSubmission != true) statementModel.StatementOrganisations.Clear();
+
             //Save the new statement containing the updated viewModel
             await _statementBusinessLogic.SaveDraftStatementModelAsync(statementModel);
 

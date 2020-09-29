@@ -20,6 +20,13 @@ namespace ModernSlavery.Core.Extensions
             return Regex.IsMatch(input, "^\\d+$");
         }
 
+        public static bool IsMatch(this string input, string pattern)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return input==pattern;
+
+            return Regex.IsMatch(input, pattern);
+        }
+
         public static bool IsCompanyNumber(this string input, int minLength = 8)
         {
             if (string.IsNullOrWhiteSpace(input)) return false;

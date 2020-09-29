@@ -1,0 +1,11 @@
+﻿// Author: JamesL 
+// Styles for viewing => statement page
+
+.govuk-panel.govuk-panel--highlight {
+    color: govuk-colour("white");
+    background: govuk-colour("blue");
+
+    .govuk-link {
+        color: govuk-colour("white");
+    }
+}

@@ -556,7 +556,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             //Add or remove this organisation to/from the search index
-            await _adminService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(userOrg.Organisation);
+            await _adminService.SearchBusinessLogic.RefreshSearchDocumentsAsync(userOrg.Organisation);
 
             //Save the model for the redirect
             StashModel(model);
@@ -663,7 +663,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 SharedBusinessLogic.DataRepository.Delete(userOrg.Organisation);
             }
 
-            var searchRecords = await _adminService.SearchBusinessLogic.GetOrganisationSearchIndexesAsync(userOrg.Organisation);
+            var searchRecords = await _adminService.SearchBusinessLogic.ListSearchDocumentsAsync(userOrg.Organisation);
             SharedBusinessLogic.DataRepository.Delete(userOrg);
 
             //Send the declined email to the applicant
@@ -683,7 +683,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Remove this organisation from the search index
-            await _adminService.SearchBusinessLogic.RemoveSearchIndexesAsync(searchRecords);
+            await _adminService.SearchBusinessLogic.RemoveSearchDocumentsAsync(searchRecords);
 
             //Save the model for the redirect
             StashModel(model);

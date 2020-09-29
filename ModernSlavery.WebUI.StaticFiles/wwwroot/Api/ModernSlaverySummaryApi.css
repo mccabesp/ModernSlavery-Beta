@@ -1,0 +1,35 @@
+﻿.topbar-wrapper img[alt="Swagger UI"], .topbar-wrapper span {
+    visibility: hidden;
+}
+
+.topbar-wrapper .link {
+    background: url(images/gov.uk_logotype_crown.png) no-repeat;
+    background-position: 0 0;
+    background-size: 35px 31px;
+    padding-left: 25px;
+    border-bottom: 1px solid transparent;
+    color: white;
+    float: left;
+    font-size: 30px;
+    font-weight: bold;
+    height: 30px;
+    line-height: 1em;
+    margin-bottom: -3px;
+    overflow: visible;
+    padding-top: 2px;
+    position: relative;
+    text-decoration: none;
+    text-rendering: optimizeLegibility;
+    top: -1px;
+    vertical-align: baseline;
+}
+
+.topbar-wrapper .link:after {
+    content: 'GOV.UK'; 
+    color: #fff;
+    visibility: visible;
+    display: block;
+    position: absolute;
+    padding: 15px;
+
+}

@@ -319,6 +319,9 @@
             <dependencyFromLayerToLayer Id="fa47e688-90b8-47f4-a1c3-0a0b7956f028" direction="Forward">
               <layerMoniker Id="cbc299c3-6929-473c-896d-39fb5a1b2863" />
             </dependencyFromLayerToLayer>
+            <dependencyFromLayerToLayer Id="a42caa51-f84c-4d9d-9fa2-975a28728170" direction="Forward">
+              <layerMoniker Id="711c36a6-0de4-441b-8690-8af4b5eb34d1" />
+            </dependencyFromLayerToLayer>
           </dependencyToLayers>
           <references>
             <reference Id="1beed731-1014-4577-873e-9d460e18f838" name="ModernSlavery.Infrastructure.Hosts">

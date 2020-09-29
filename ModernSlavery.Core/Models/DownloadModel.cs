@@ -31,7 +31,7 @@ namespace ModernSlavery.Core.Models
                 SicCodes = statement.Organisation?.GetSicCodeIdsString(statement.StatusDate, "," + Environment.NewLine),
                 StatementUrl = statement.StatementUrl,
                 ApprovingPerson = statement.ApprovingPerson,
-                Turnover = statement.GetAttribute<DisplayAttribute>().Name,
+                Turnover = statement.GetStatementTurnover().GetDisplayDescription(),
                 CurrentName = statement.Organisation?.OrganisationName,
                 SubmittedAfterTheDeadline = statement.IsLateSubmission,
                 DueDate = statement.SubmissionDeadline.AddYears(1),
