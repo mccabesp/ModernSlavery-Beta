@@ -59,7 +59,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Continue");
 
             ExpectHeader("There is a problem");
-            Expect("There's a problem with your employer reference or security code");
+            Expect("There's a problem with your organisation reference or security code");
             await Task.CompletedTask;
         }
 

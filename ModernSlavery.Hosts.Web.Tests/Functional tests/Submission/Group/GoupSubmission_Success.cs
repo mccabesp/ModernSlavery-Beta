@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting Submission merge")]
+    [TestFixture]
 
     public class GroupSubmission_Success : CreateAccount
     {
@@ -52,7 +52,20 @@ namespace ModernSlavery.Hosts.Web.Tests
             RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "No");
             await Task.CompletedTask;
         }
+        [Test, Order(35)]
+        public async Task StartSubmission()
+        {
+            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
+            Click("Start Draft");
+
+
+            ExpectHeader("Before you start");
+            Click("Start now");
+
+            ExpectHeader("Who is your statement for?");
+            await Task.CompletedTask;
+        }
         [Test, Order(36)]
         public async Task ChooseGroupSubmission()
         {
@@ -66,11 +79,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             for (int i = 1; i < 5; i++)
             {
-                Set("Search").To(TestData.Organisations[i].OrganisationName);
+                SetXPath("//input[@class = 'gov-uk-c-searchbar__input']").To(TestData.Organisations[i].OrganisationName);
                 Click("Search");
-                ExpectRow(TestData.Organisations[i].OrganisationName);
-                AtRow(TestData.Organisations[i].OrganisationName).Expect(TestData.Organisations[i].CompanyNumber);
-                AtRow(TestData.Organisations[i].OrganisationName).Click("Include");
+                Below(What.Contains, "Can't find the organisation you're looking for?").Expect(TestData.Organisations[i].OrganisationName);
+                Below(What.Contains, "Can't find the organisation you're looking for?").RightOf(TestData.Organisations[i].OrganisationName).Expect(TestData.Organisations[i].CompanyNumber);
+                Below(What.Contains, "Can't find the organisation you're looking for?").RightOf(TestData.Organisations[i].OrganisationName).Click(The.Top, "Include");
+                //Expect(i + "  organisations included");
             }
 
             await Task.CompletedTask;
@@ -79,12 +93,13 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(40)]
         public async Task ViewGroup()
         {
-            Click("View your group");
+//            Expect("4  organisations included");
+            Click("See which organisations you've selected");
             ExpectHeader("Review the organisations in your group statement");
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 1; i < 5; i++)
             {
-                BelowHeader(TestData.Organisations[i].OrganisationName).Expect(TestData.Organisations[i].GetAddressString(DateTime.Now));
+                //BelowHeader(TestData.Organisations[i].OrganisationName).Expect(TestData.Organisations[i].GetAddressString(DateTime.Now));
                 BelowHeader(TestData.Organisations[i].OrganisationName).Expect("Company number: " + TestData.Organisations[i].CompanyNumber);
             }
 

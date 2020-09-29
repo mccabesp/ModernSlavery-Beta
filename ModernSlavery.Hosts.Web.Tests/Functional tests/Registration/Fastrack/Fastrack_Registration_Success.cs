@@ -32,13 +32,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task GoToRegistrationPage()
         {
             Org = Testing.Helpers.Extensions.OrganisationHelper.GetOrganisation(TestRunSetup.TestWebHost, TestData.OrgName);
-            Testing.Helpers.Extensions.OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(Org, new DateTime(2021, 6, 10));
+            await Testing.Helpers.Extensions.OrganisationHelper.SetSecurityCode(TestRunSetup.TestWebHost, Org, new DateTime(2022, 01, 01));
 
             Click("Register an organisation");
 
-            await ModernSlavery.Testing.Helpers.Extensions.OrganisationHelper
-                .GetOrganisationBusinessLogic(TestRunSetup.TestWebHost)
-                .SetUniqueOrganisationReferenceAsync(Org);
 
             ExpectHeader("Registration Options");
 
