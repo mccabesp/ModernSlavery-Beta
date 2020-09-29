@@ -249,7 +249,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
         #region Statements
 
-        [HttpGet("Statement/{organisationIdentifier}/{year}")]
+        [HttpGet("statement-summary/{organisationIdentifier}/{year}")]
         public async Task<IActionResult> Statement(string organisationIdentifier, int year)
         {
             //Get the latest statement data for this organisation, reporting year
@@ -258,6 +258,17 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
             var viewModel = openResult.Result;
             return View("Statement-Summary", viewModel);
+        }
+
+        [HttpGet("statement/{organisationIdentifier}/{year}/group")]
+        public async Task<IActionResult> StatementGroup(string organisationIdentifier, int year)
+        {
+            //Get the latest statement data for this organisation, reporting year
+            var openResult = await ViewingPresenter.GetStatementSummaryGroupViewModel(organisationIdentifier, year);
+            if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
+
+            var viewModel = openResult.Result;
+            return View("StatementSummaryGroup", viewModel);
         }
 
         #endregion
