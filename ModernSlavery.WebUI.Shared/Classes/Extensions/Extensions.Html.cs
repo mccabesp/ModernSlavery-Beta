@@ -105,6 +105,21 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             return new HtmlString(string.Join("\r\n", hidden));
         }
 
+        public static HtmlString EnumDisplayNameFor<T>(this T item)
+            where T : Enum
+        {
+            var type = item.GetType();
+            var member = type.GetField(item.ToString());
+            var displayName = (DisplayAttribute)member.GetCustomAttributes(typeof(DisplayAttribute), false).FirstOrDefault();
+
+            if (displayName != null)
+            {
+                return new HtmlString(displayName.Description);
+            }
+
+            return new HtmlString(item.ToString());
+        }
+
         #region Validation messages
 
         public static async Task<IHtmlContent> CustomValidationSummaryAsync(this IHtmlHelper helper,
