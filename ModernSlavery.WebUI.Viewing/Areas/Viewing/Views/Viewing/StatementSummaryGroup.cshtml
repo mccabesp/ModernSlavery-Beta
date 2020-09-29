@@ -1,0 +1,42 @@
+﻿@model List<StatementSummaryViewModel>
+@{
+    Layout = "~/Views/GdsLayout.cshtml";
+    var first = Model.First();
+    var parentName = first.ParentName;
+    var reportingYears = $"{first.SubmissionDeadlineYear - 1} to {first.SubmissionDeadlineYear}";
+}
+
+@section BeforeMain {
+    @* Model.BackUrl needs creating and setting *@
+    <a class="govuk-back-link"
+       asp-controller="Viewing" asp-action="StatementSummary"
+       asp-route-organisationIdentifier="@first.ParentOrganisationId"
+       asp-route-year="@first.SubmissionDeadlineYear">Back</a>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">
+            Organisations covered in @parentName group stament (@reportingYears)
+        </h1>
+
+        <div class="govuk-body govuk-!-font-size-24">
+            Below are the organisations covered in
+            <a asp-controller="Viewing" asp-action="StatementSummary"
+               asp-route-organisationIdentifier="@first.ParentOrganisationId"
+               asp-route-year="@first.SubmissionDeadlineYear">@parentName statement (@reportingYears)</a>
+        </div>
+
+        <h2 class="govuk-heading-s app">Organisation</h2>
+        <hr class="govuk-section-break govuk-section-break--visible">
+        @foreach (var item in Model)
+        {
+            <div class="govuk-!-margin-top-2">
+                <h3 class="govuk-heading-s">@item.OrganisationName</h3>
+                <div class="govuk-body">@item.Address.GetFullAddress()</div>
+                <div class="govuk-body">Company number: @item.CompanyNumber</div>
+                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+            </div>
+        }
+    </div>
+</div>

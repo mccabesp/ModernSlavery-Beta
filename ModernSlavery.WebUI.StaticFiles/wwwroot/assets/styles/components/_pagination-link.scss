@@ -49,13 +49,14 @@
         color: $govuk-brand-colour;
     }
 
-    button.pagination-button {
+    .pagination-button {
         border: none;
         background: none;     
         cursor: pointer;
         color: $govuk-brand-colour;
         font-size: 19px;
         text-align:left;
+        text-decoration:none;
 
         .pagination-numbers{
             text-decoration:underline;

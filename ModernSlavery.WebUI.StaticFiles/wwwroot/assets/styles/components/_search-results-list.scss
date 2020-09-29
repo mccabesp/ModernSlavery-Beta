@@ -1,0 +1,23 @@
+﻿.search-results-list {
+    .govuk-grid-row {
+        border-bottom: solid 1px $govuk-border-colour;
+        margin: 15px 0px;
+    }
+
+    .govuk-grid-column-one-third, .govuk-grid-column-two-thirds {
+        padding: 0px;       
+    }
+
+    .blue-header a {
+        color: $govuk-link-colour;
+        text-decoration: none;
+    }
+
+    .govuk-grid-column-one-third p {
+        float: right;
+    }
+
+    .grey-text {
+      color:  $govuk-border-colour;
+    }
+}

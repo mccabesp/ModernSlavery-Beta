@@ -39,7 +39,11 @@
             The summary does not replace the full statement.
             @if (Model.GroupSubmission)
             {
-                <text>This statement covers a <a class="govuk-link" href="">a group of organisations</a>.</text>
+                <text>This statement covers a
+                    <a class="govuk-link"
+                       asp-controller="Viewing" asp-action="StatementSummaryGroup"
+                       asp-route-organisationIdentifier="@Model.ParentOrganisationId"
+                       asp-route-year="@Model.SubmissionDeadlineYear">a group of organisations</a>.</text>
             }
         </p>
 
@@ -92,30 +96,57 @@
             <h2 class="govuk-heading-m">
                 Statement period and sign-off details
             </h2>
+            @if (Model.StatementStartDate.HasValue && Model.StatementEndDate.HasValue)
+            {
+                <p class="govuk-body govuk-!-font-weight-bold">
+                    The statement covers the following period:
+                </p>
 
-            <p class="govuk-body govuk-!-font-weight-bold">
-                The statement covers the following period:
-            </p>
+                <p class="govuk-body">
+                    @Model.StatementStartDate.Value.ToString("d MMMM yyyy") to @Model.StatementEndDate.Value.ToString("d MMMM yyyy")
+                </p>
+            }
+            else
+            {
+                <p class="govuk-body">
+                    The organisation did not tell us which period the statement covers.
+                </p>
+            }
 
-            <p class="govuk-body">
-                @Model.StatementStartDate.Value.ToString("d MMMM yyyy") to @Model.StatementEndDate.Value.ToString("d MMMM yyyy")
-            </p>
+            @if (!string.IsNullOrWhiteSpace(Model.ApprovingPerson))
+            {
+                <p class="govuk-body govuk-!-font-weight-bold">
+                    The name of the director (or equivalent) that signed off the statement is:
+                </p>
 
-            <p class="govuk-body govuk-!-font-weight-bold">
-                The name of the director (or equivalent) that signed off the statement is:
-            </p>
+                <p class="govuk-body">
+                    @Model.ApprovingPerson
+                </p>
+            }
+            else
+            {
+                <p class="govuk-body">
+                    The organisation did not tell us name of the director (or equivalent) that signed off the statement.
+                </p>
+            }
 
-            <p class="govuk-body">
-                @Model.ApprovingPerson
-            </p>
 
-            <p class="govuk-body govuk-!-font-weight-bold">
-                The statement was approved by the board or equivalent management body on:
-            </p>
+            @if (Model.ApprovedDate.HasValue)
+            {
+                <p class="govuk-body govuk-!-font-weight-bold">
+                    The statement was approved by the board or equivalent management body on:
+                </p>
 
-            <p class="govuk-body">
-                @Model.ApprovedDate.Value.ToString("d MMMM yyyy")
-            </p>
+                <p class="govuk-body">
+                    @Model.ApprovedDate.Value.ToString("d MMMM yyyy")
+                </p>
+            }
+            else
+            {
+                <p class="govuk-body">
+                    The organisation did not tell us the date the statement was approved by the board or equivalent management body.
+                </p>
+            }
 
         </div>
 
@@ -128,67 +159,76 @@
                 Government guidance encourages organisations to cover a range of areas in their modern slavery statements.
             </p>
 
-            <p class="govuk-body govuk-!-font-weight-bold">
-                The statement covers the following recommended areas:
-            </p>
+            @if (Model.HasAnyAreaCovered())
+            {
+                <p class="govuk-body govuk-!-font-weight-bold">
+                    The statement covers the following recommended areas:
+                </p>
 
-            <ul class="govuk-list govuk-list--bullet">
-                @if (Model.IncludesStructure.Value)
-                {
-                    <li>The organisation’s structure, business and supply chains</li>
-                }
-                @if (Model.IncludesPolicies.Value)
-                {
-                    <li>Policies</li>
-                }
-                @if (Model.IncludesRisks.Value)
-                {
-                    <li>Risk assessment and management</li>
-                }
-                @if (Model.IncludesDueDiligence.Value)
-                {
-                    <li>Due diligence processes</li>
-                }
-                @if (Model.IncludesTraining.Value)
-                {
-                    <li>Staff training about slavery and human trafficking</li>
-                }
-                @if (Model.IncludesGoals.Value)
-                {
-                    <li>Goals and key performance indicators (KPIs) to measure progress over time, and the effectiveness of the organisation’s actions</li>
-                }
-            </ul>
+                <ul class="govuk-list govuk-list--bullet">
+                    @if (Model.IncludesStructure.HasValue && Model.IncludesStructure.Value)
+                    {
+                        <li>The organisation’s structure, business and supply chains</li>
+                    }
+                    @if (Model.IncludesPolicies.HasValue && Model.IncludesPolicies.Value)
+                    {
+                        <li>Policies</li>
+                    }
+                    @if (Model.IncludesRisks.HasValue && Model.IncludesRisks.Value)
+                    {
+                        <li>Risk assessment and management</li>
+                    }
+                    @if (Model.IncludesDueDiligence.HasValue && Model.IncludesDueDiligence.Value)
+                    {
+                        <li>Due diligence processes</li>
+                    }
+                    @if (Model.IncludesTraining.HasValue && Model.IncludesTraining.Value)
+                    {
+                        <li>Staff training about slavery and human trafficking</li>
+                    }
+                    @if (Model.IncludesGoals.HasValue && Model.IncludesGoals.Value)
+                    {
+                        <li>Goals and key performance indicators (KPIs) to measure progress over time, and the effectiveness of the organisation’s actions</li>
+                    }
+                </ul>
 
-            <p class="govuk-body govuk-!-font-weight-bold">
-                The statement does not cover the following area(s):
-            </p>
+                <p class="govuk-body govuk-!-font-weight-bold">
+                    The statement does not cover the following area(s):
+                </p>
 
-            <ul class="govuk-list govuk-list--bullet">
-                @if (!Model.IncludesStructure.Value)
-                {
-                    <li>The organisation’s structure, business and supply chains</li>
-                }
-                @if (!Model.IncludesPolicies.Value)
-                {
-                    <li>Policies</li>
-                }
-                @if (!Model.IncludesRisks.Value)
-                {
-                    <li>Risk assessment and management</li>
-                }
-                @if (!Model.IncludesDueDiligence.Value)
-                {
-                    <li>Due diligence processes</li>
-                }
-                @if (!Model.IncludesTraining.Value)
-                {
-                    <li>Staff training about slavery and human trafficking</li>
-                }
-                @if (!Model.IncludesGoals.Value)
-                {
-                    <li>Goals and key performance indicators (KPIs) to measure progress over time, and the effectiveness of the organisation’s actions</li>
-                }
-            </ul>
+                <ul class="govuk-list govuk-list--bullet">
+                    @if (Model.IncludesStructure.HasValue && !Model.IncludesStructure.Value)
+                    {
+                        <li>The organisation’s structure, business and supply chains</li>
+                    }
+                    @if (Model.IncludesPolicies.HasValue && !Model.IncludesPolicies.Value)
+                    {
+                        <li>Policies</li>
+                    }
+                    @if (Model.IncludesRisks.HasValue && !Model.IncludesRisks.Value)
+                    {
+                        <li>Risk assessment and management</li>
+                    }
+                    @if (Model.IncludesDueDiligence.HasValue && !Model.IncludesDueDiligence.Value)
+                    {
+                        <li>Due diligence processes</li>
+                    }
+                    @if (Model.IncludesTraining.HasValue && !Model.IncludesTraining.Value)
+                    {
+                        <li>Staff training about slavery and human trafficking</li>
+                    }
+                    @if (Model.IncludesGoals.HasValue && !Model.IncludesGoals.Value)
+                    {
+                        <li>Goals and key performance indicators (KPIs) to measure progress over time, and the effectiveness of the organisation’s actions</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="govuk-body">
+                    The organisation did not tell us which areas the statement covered.
+                </p>
+            }
         </div>
 
         <div id="sectors">
@@ -216,13 +256,13 @@
                 </p>
             }
 
-            @if (Model.Turnover != StatementTurnovers.NotProvided)
+            @if (Model.Turnover != null && Model.Turnover != StatementTurnovers.NotProvided)
             {
                 <p class="govuk-body govuk-!-font-weight-bold">
                     Its turnover or budget in the financial accounting year of this statement was:
                 </p>
                 <p class="govuk-body">
-                    @Model.Turnover
+                    @Model.Turnover.Value.EnumDisplayNameFor()
                 </p>
             }
             else
@@ -438,21 +478,18 @@
                     @Model.ForcedLabourDetails
                 </div>
             }
-            else
+            else if (Model.ForcedLabourDetails == string.Empty)
             {
                 <div class="govuk-body">
                     The organisation did not identify any potential indicators of forced labour or modern slavery in its business or supply chains during this period.
                 </div>
             }
-            @*
-                TODO - What about the not provided case?
-                else
-                {
-                    <div class="govuk-body">
-                        The organisation did not tell us whether it identified any potential indicators of forced labour or modern slavery in its business or supply chains during this period.
-                    </div>
-                }
-            *@
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us whether it identified any potential indicators of forced labour or modern slavery in its business or supply chains during this period.
+                </div>
+            }
 
             @if (!string.IsNullOrWhiteSpace(Model.SlaveryInstanceDetails))
             {
@@ -465,21 +502,18 @@
                     @Model.SlaveryInstanceDetails
                 </div>
             }
-            else
+            else if (Model.SlaveryInstanceDetails == string.Empty)
             {
                 <div class="govuk-body">
                     The organisation did not find any instances of modern slavery in its business or supply chains.
                 </div>
             }
-            @*
-                TODO - What about the not provided case?
-                else
-                {
-                    <div class="govuk-body">
-                        The organisation did not tell us whether it found instances of modern slavery in its business or supply chains.
-                    </div>
-                }
-            *@
+            else
+            {
+                <div class="govuk-body">
+                    The organisation did not tell us whether it found instances of modern slavery in its business or supply chains.
+                </div>
+            }
         </div>
 
         <div id="training">
@@ -558,14 +592,14 @@
                 </div>
             }
 
-            @if (Model.StatementYears != StatementYears.NotProvided)
+            @if (Model.StatementYears != null && Model.StatementYears != StatementYears.NotProvided)
             {
                 <div class="govuk-body govuk-!-font-weight-bold">
                     The organisation has been producing modern slavery statements for:
                 </div>
 
                 <div class="govuk-body">
-                    @Model.StatementYears
+                    @Model.StatementYears.Value.EnumDisplayNameFor()
                 </div>
             }
             else
