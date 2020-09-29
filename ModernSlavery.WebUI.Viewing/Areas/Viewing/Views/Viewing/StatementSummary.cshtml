@@ -39,7 +39,11 @@
             The summary does not replace the full statement.
             @if (Model.GroupSubmission)
             {
-                <text>This statement covers a <a class="govuk-link" href="">a group of organisations</a>.</text>
+                <text>This statement covers a
+                    <a class="govuk-link"
+                       asp-controller="Viewing" asp-action="StatementSummaryGroup"
+                       asp-route-organisationIdentifier="@Model.ParentOrganisationId"
+                       asp-route-year="@Model.SubmissionDeadlineYear">a group of organisations</a>.</text>
             }
         </p>
 

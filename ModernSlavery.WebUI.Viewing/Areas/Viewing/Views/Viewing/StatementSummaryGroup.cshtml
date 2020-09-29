@@ -9,7 +9,7 @@
 @section BeforeMain {
     @* Model.BackUrl needs creating and setting *@
     <a class="govuk-back-link"
-       asp-controller="Viewing" asp-action="Statement"
+       asp-controller="Viewing" asp-action="StatementSummary"
        asp-route-organisationIdentifier="@first.ParentOrganisationId"
        asp-route-year="@first.SubmissionDeadlineYear">Back</a>
 }
@@ -22,7 +22,7 @@
 
         <div class="govuk-body govuk-!-font-size-24">
             Below are the organisations covered in
-            <a asp-controller="Viewing" asp-action="Statement"
+            <a asp-controller="Viewing" asp-action="StatementSummary"
                asp-route-organisationIdentifier="@first.ParentOrganisationId"
                asp-route-year="@first.SubmissionDeadlineYear">@parentName statement (@reportingYears)</a>
         </div>

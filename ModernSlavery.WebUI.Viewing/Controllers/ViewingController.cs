@@ -238,30 +238,20 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         #endregion
 
         #region Statement Summary
-        [NoCache]
-        [HttpGet("~/StatementSummary/{organisationIdentifier}/{reportingDeadlineYear}")]
-        public IActionResult StatementSummary(string organisationIdentifier, int reportingDeadlineYear)
-        {
-            return View();
-        }
-
-        #endregion
-
-        #region Statements
 
         [HttpGet("statement-summary/{organisationIdentifier}/{year}")]
-        public async Task<IActionResult> Statement(string organisationIdentifier, int year)
+        public async Task<IActionResult> StatementSummary(string organisationIdentifier, int year)
         {
             //Get the latest statement data for this organisation, reporting year
             var openResult = await ViewingPresenter.GetStatementSummaryViewModel(organisationIdentifier, year);
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             var viewModel = openResult.Result;
-            return View("Statement-Summary", viewModel);
+            return View("StatementSummary", viewModel);
         }
 
-        [HttpGet("statement/{organisationIdentifier}/{year}/group")]
-        public async Task<IActionResult> StatementGroup(string organisationIdentifier, int year)
+        [HttpGet("statement-summary/{organisationIdentifier}/{year}/group")]
+        public async Task<IActionResult> StatementSummaryGroup(string organisationIdentifier, int year)
         {
             //Get the latest statement data for this organisation, reporting year
             var openResult = await ViewingPresenter.GetStatementSummaryGroupViewModel(organisationIdentifier, year);
