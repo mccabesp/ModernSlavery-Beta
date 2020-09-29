@@ -1,5 +1,7 @@
-﻿// OptionSelect: 
-(function($) {
+﻿/* Taken from https://github.com/alphagov/finder-frontend/blob/master/app/assets/javascripts/components/option-select.js */
+
+// OptionSelect:
+(function ($) {
     "use strict";
     window.GOVUK = window.GOVUK || {};
 
@@ -10,184 +12,240 @@
         */
 
         this.$optionSelect = options.$el;
-        this.$options = this.$optionSelect.find("input[type='checkbox']");
-        this.$labels = this.$optionSelect.find("label");
-        this.$optionsContainer = this.$optionSelect.find(".options-container");
-        this.$optionList = this.$optionsContainer.children(".js-auto-height-inner");
+        this.$options = this.$optionSelect.find("input[type='checkbox']")
+        this.$optionsContainer = this.$optionSelect.find('.js-options-container')
+        this.$optionList = this.$optionsContainer.children('.js-auto-height-inner')
+        this.$allCheckboxes = this.$optionsContainer.find('.govuk-checkboxes__item')
+        this.hasFilter = this.$optionSelect.data('filter-element') || ''
+        this.checkedCheckboxes = []
 
-        this.setCheckboxAriaControlsAttributes();
-        this.attachCheckedCounter();
+        if (this.hasFilter.length) {
+            var filterEl = document.createElement('div')
+            filterEl.innerHTML = this.hasFilter
 
-        // Performance in ie 6/7 is not good enough to support animating the opening/closing
-        // so do not allow option-selects to be collapsible in this case
-        var allowCollapsible = (typeof ieVersion == "undefined" || ieVersion > 7) ? true : false;
-        if (allowCollapsible) {
+            $('<div class="app-c-option-select__filter"/>')
+                .html(filterEl.innerHTML)
+                .insertBefore(this.$optionsContainer)
 
-            // Attach listener to update checked count
-            this.$options.on("click", this.updateCheckedCount.bind(this));
+            this.$filter = this.$optionSelect.find('input[name="option-select-filter"]')
+            this.$filterCount = $('#' + this.$filter.attr('aria-describedby'))
+            this.filterTextSingle = ' ' + this.$filterCount.data('single')
+            this.filterTextMultiple = ' ' + this.$filterCount.data('multiple')
+            this.filterTextSelected = ' ' + this.$filterCount.data('selected')
+            this.checkboxLabels = []
+            this.filterTimeout = 0
+            var that = this
 
-            // Replace div.container-head with a button
-            this.replaceHeadWithButton();
+            this.getAllCheckedCheckboxes()
+            this.$allCheckboxes.each(function () {
+                that.checkboxLabels.push(that.cleanString($(this).text()))
+            })
 
-            // Add js-collapsible class to parent for CSS
-            this.$optionSelect.addClass("js-collapsible");
+            this.$filter.on('keyup', function (e) {
+                e.stopPropagation()
+                var ENTER_KEY = 13
 
-            // Add open/close listeners
-            this.$optionSelect.find(".js-container-head").on("click", this.toggleOptionSelect.bind(this));
+                if (e.keyCode !== ENTER_KEY) {
+                    clearTimeout(that.filterTimeout)
+                    that.filterTimeout = setTimeout(
+                        function () { this.doFilter(this) }.bind(that),
+                        300
+                    )
+                } else {
+                    e.preventDefault() // prevents finder forms from being submitted when user presses ENTER
+                }
+            })
+        }
 
-            // Add key listeners the option-select is fully usable with a keyboard
-            this.$optionSelect.on("focus", this.listenForKeys.bind(this));
-            this.$optionSelect.on("blur", this.stopListeningForKeys.bind(this));
+        // Attach listener to update checked count
+        this.$optionSelect.on('change', "input[type='checkbox']", this.updateCheckedCount.bind(this))
 
-            // Add a listener to the checkboxes so if you navigate to them with the keyboard you can definitely see them
-            this.$options.on("focus", this.open.bind(this));
+        // Replace div.container-head with a button
+        this.replaceHeadingSpanWithButton()
 
-            if (this.$optionSelect.data("closed-on-load") == true) {
-                this.close();
-            } else {
-                this.setupHeight();
-            }
+        // Add js-collapsible class to parent for CSS
+        this.$optionSelect.addClass('js-collapsible')
+
+        // Add open/close listeners
+        this.$optionSelect.find('.js-container-button').on('click', this.toggleOptionSelect.bind(this))
+
+        if (this.$optionSelect.data('closed-on-load') === true) {
+            this.close()
+        } else {
+            this.setupHeight()
+        }
+
+        var checkedString = this.checkedString()
+        if (checkedString) {
+            this.attachCheckedCounter(checkedString)
         }
     }
 
-    OptionSelect.prototype.replaceHeadWithButton = function replaceHeadWithButton() {
-        /* Replace the div at the head with a button element. This is based on feedback from Léonie Watson.
+    OptionSelect.prototype.cleanString = function cleanString(text) {
+        text = text.replace(/&/g, 'and')
+        text = text.replace(/[’',:–-]/g, '') // remove punctuation characters
+        text = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // escape special characters
+        return text.trim().replace(/\s\s+/g, ' ').toLowerCase() // replace multiple spaces with one
+    }
+
+    OptionSelect.prototype.getAllCheckedCheckboxes = function getAllCheckedCheckboxes() {
+        this.checkedCheckboxes = []
+        var that = this
+
+        this.$allCheckboxes.each(function (i) {
+            if ($(this).find('input[type=checkbox]').is(':checked')) {
+                that.checkedCheckboxes.push(i)
+            }
+        })
+    }
+
+    OptionSelect.prototype.doFilter = function doFilter(obj) {
+        var filterBy = obj.cleanString(obj.$filter.val())
+        var showCheckboxes = obj.checkedCheckboxes.slice()
+
+        for (var i = 0; i < obj.$allCheckboxes.length; i++) {
+            if (showCheckboxes.indexOf(i) === -1 && obj.checkboxLabels[i].search(filterBy) !== -1) {
+                showCheckboxes.push(i)
+            }
+        }
+
+        obj.$allCheckboxes.hide()
+        for (var j = 0; j < showCheckboxes.length; j++) {
+            obj.$allCheckboxes.eq(showCheckboxes[j]).show()
+        }
+
+        var len = showCheckboxes.length || 0
+        var lenChecked = obj.$optionsContainer.find('.govuk-checkboxes__input:checked').length
+        obj.$filterCount.html(len + (len === 1 ? obj.filterTextSingle : obj.filterTextMultiple) + ', ' + lenChecked + obj.filterTextSelected)
+    }
+
+    OptionSelect.prototype.replaceHeadingSpanWithButton = function replaceHeadingSpanWithButton() {
+        /* Replace the span within the heading with a button element. This is based on feedback from Léonie Watson.
          * The button has all of the accessibility hooks that are used by screen readers and etc.
          * We do this in the JavaScript because if the JavaScript is not active then the button shouldn't
          * be there as there is no JS to handle the click event.
         */
-        var $containerHead = this.$optionSelect.find(".js-container-head");
-        var jsContainerHeadHTML = $containerHead.html();
+        var $containerHead = this.$optionSelect.find('.js-container-button')
+        var jsContainerHeadHTML = $containerHead.html()
 
         // Create button and replace the preexisting html with the button.
-        var $button = $("<button>");
-        $button.addClass("js-container-head");
-        //Add type button to override default type submit when this component is used within a form
-        $button.attr("type", "button");
-        $button.attr("aria-expanded", this.isClosed());
-        $button.attr("aria-controls", this.$optionSelect.find(".options-container").attr("id"));
-        $button.html(jsContainerHeadHTML);
-        $containerHead.replaceWith($button);
+        var $button = $('<button>')
+        $button.addClass('js-container-button app-c-option-select__title app-c-option-select__button')
+        // Add type button to override default type submit when this component is used within a form
+        $button.attr('type', 'button')
+        $button.attr('aria-expanded', true)
+        $button.attr('id', $containerHead.attr('id'))
+        $button.attr('aria-controls', this.$optionsContainer.attr('id'))
+        $button.html(jsContainerHeadHTML)
+        $containerHead.replaceWith($button)
+    }
 
-    };
-
-    OptionSelect.prototype.setCheckboxAriaControlsAttributes = function setCheckboxAriaControlsAttributes() {
-        var controls = this.$optionSelect.data("input-aria-controls");
-        if (typeof controls === "string" && $("#" + controls).length > 0) {
-            this.$optionSelect.find('input[type="checkbox"]').each(function() {
-                $(this).attr("aria-controls", controls);
-            });
-        }
-    };
-
-    OptionSelect.prototype.attachCheckedCounter = function attachCheckedCounter() {
-        this.$optionSelect.find(".js-container-head")
-            .append('<div class="js-selected-counter">' + this.checkedString() + "</div>");
-    };
+    OptionSelect.prototype.attachCheckedCounter = function attachCheckedCounter(checkedString) {
+        this.$optionSelect.find('.js-container-button')
+            .after('<div class="app-c-option-select__selected-counter js-selected-counter">' + checkedString + '</div>')
+    }
 
     OptionSelect.prototype.updateCheckedCount = function updateCheckedCount() {
-        this.$optionSelect.find(".js-selected-counter").text(this.checkedString());
-    };
+        var checkedString = this.checkedString()
+        var checkedStringElement = this.$optionSelect.find('.js-selected-counter')
+
+        if (checkedString) {
+            if (checkedStringElement.length) {
+                checkedStringElement.text(checkedString)
+            } else {
+                this.attachCheckedCounter(checkedString)
+            }
+        } else {
+            checkedStringElement.remove()
+        }
+    }
 
     OptionSelect.prototype.checkedString = function checkedString() {
-        var count = this.$options.filter(":checked").size();
-        var checkedString = "";
+        this.getAllCheckedCheckboxes()
+        var count = this.checkedCheckboxes.length
+        var checkedString = false
         if (count > 0) {
-            checkedString = count + " selected";
+            checkedString = count + ' selected'
         }
 
-        return checkedString;
-    };
-
+        return checkedString
+    }
 
     OptionSelect.prototype.toggleOptionSelect = function toggleOptionSelect(e) {
         if (this.isClosed()) {
-            this.open();
+            this.open()
         } else {
-            this.close();
+            this.close()
         }
-        e.preventDefault();
-    };
+        e.preventDefault()
+    }
 
     OptionSelect.prototype.open = function open() {
         if (this.isClosed()) {
-            this.$optionSelect.find(".js-container-head").attr("aria-expanded", true);
-            this.$optionSelect.removeClass("js-closed");
-            if (!this.$optionsContainer.prop("style").height) {
-                this.setupHeight();
+            this.$optionSelect.find('.js-container-button').attr('aria-expanded', true)
+            this.$optionSelect.removeClass('js-closed')
+            this.$optionSelect.addClass('js-opened')
+            if (!this.$optionsContainer.prop('style').height) {
+                this.setupHeight()
             }
         }
-    };
+    }
 
     OptionSelect.prototype.close = function close() {
-        this.$optionSelect.addClass("js-closed");
-        this.$optionSelect.find(".js-container-head").attr("aria-expanded", false);
-    };
+        this.$optionSelect.removeClass('js-opened')
+        this.$optionSelect.addClass('js-closed')
+        this.$optionSelect.find('.js-container-button').attr('aria-expanded', false)
+    }
 
     OptionSelect.prototype.isClosed = function isClosed() {
-        return this.$optionSelect.hasClass("js-closed");
-    };
+        return this.$optionSelect.hasClass('js-closed')
+    }
 
     OptionSelect.prototype.setContainerHeight = function setContainerHeight(height) {
         this.$optionsContainer.css({
-            'max-height': "none", // Have to clear the 'max-height' set by the CSS in order for 'height' to be applied
             'height': height
-        });
-    };
+        })
+    }
 
-    OptionSelect.prototype.isLabelVisible = function isLabelVisible(index, option) {
-        var $label = $(option);
-        var initialOptionContainerHeight = this.$optionsContainer.height();
-        var optionListOffsetTop = this.$optionList.offset().top;
-        var distanceFromTopOfContainer = $label.offset().top - optionListOffsetTop;
-        return distanceFromTopOfContainer < initialOptionContainerHeight;
-    };
+    OptionSelect.prototype.isCheckboxVisible = function isCheckboxVisible(index, option) {
+        var $checkbox = $(option)
+        var initialOptionContainerHeight = this.$optionsContainer.height()
+        var optionListOffsetTop = this.$optionList.offset().top
+        var distanceFromTopOfContainer = $checkbox.offset().top - optionListOffsetTop
+        return distanceFromTopOfContainer < initialOptionContainerHeight
+    }
 
-    OptionSelect.prototype.getVisibleLabels = function getVisibleLabels() {
-        return this.$labels.filter(this.isLabelVisible.bind(this));
-    };
+    OptionSelect.prototype.getVisibleCheckboxes = function getVisibleCheckboxes() {
+        var visibleCheckboxes = this.$options.filter(this.isCheckboxVisible.bind(this))
+        // add an extra checkbox, if the label of the first is too long it collapses onto itself
+        visibleCheckboxes = visibleCheckboxes.add(this.$options[visibleCheckboxes.length])
+        return visibleCheckboxes
+    }
 
     OptionSelect.prototype.setupHeight = function setupHeight() {
-        var initialOptionContainerHeight = this.$optionsContainer.height();
-        var height = this.$optionList.height();
-        var lastVisibleLabel, position, topBorder, topPadding, lineHeight;
+        var initialOptionContainerHeight = this.$optionsContainer.height()
+        var height = this.$optionList.outerHeight(true)
 
+        // check whether this is hidden by progressive disclosure,
+        // because height calculations won't work
+        if (this.$optionsContainer[0].offsetParent === null) {
+            initialOptionContainerHeight = 200
+            height = 200
+        }
+
+        // Resize if the list is only slightly bigger than its container
         if (height < initialOptionContainerHeight + 50) {
-            // Resize if the list is only slightly bigger than its container
-            this.setContainerHeight(height);
-            return;
+            this.setContainerHeight(height + 1)
+            return
         }
 
         // Resize to cut last item cleanly in half
-        lastVisibleLabel = this.getVisibleLabels().last();
-        position = lastVisibleLabel.position().top;
-        topBorder = parseInt(lastVisibleLabel.css("border-top-width"), 10);
-        topPadding = parseInt(lastVisibleLabel.css("padding-top"), 10);
-        if ("normal" == lastVisibleLabel.css("line-height")) {
-            lineHeight = parseInt(lastVisibleLabel.css("font-size"), 10);
-        } else {
-            lineHeight = parseInt(lastVisibleLabel.css("line-height"), 10);
-        }
+        var lastVisibleCheckbox = this.getVisibleCheckboxes().last()
+        var position = lastVisibleCheckbox.parent()[0].offsetTop // parent element is relative
+        this.setContainerHeight(position + (lastVisibleCheckbox.height() / 1.5))
+    }
 
-        this.setContainerHeight(position + topBorder + topPadding + (lineHeight / 2));
 
-    };
-
-    OptionSelect.prototype.listenForKeys = function listenForKeys() {
-        this.$optionSelect.keypress(this.checkForSpecialKeys.bind(this));
-    };
-
-    OptionSelect.prototype.checkForSpecialKeys = function checkForSpecialKeys(e) {
-        if (e.keyCode == 13) {
-
-            // keyCode 13 is the return key.
-            this.toggleOptionSelect();
-        }
-    };
-
-    OptionSelect.prototype.stopListeningForKeys = function stopListeningForKeys() {
-        this.$optionSelect.unbind("keypress");
-    };
 
     GOVUK.OptionSelect = OptionSelect;
 })(jQuery);
