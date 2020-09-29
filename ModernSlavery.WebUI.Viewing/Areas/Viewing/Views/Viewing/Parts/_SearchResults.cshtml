@@ -38,7 +38,7 @@
                                     <p class="govuk-body govuk-!-margin-bottom-2 grey-text">Reported as group</p>
                                 }
                             }
-                            <p class="govuk-body govuk-!-margin-bottom-2">@organisation.Address</p>
+                            <p class="govuk-body govuk-!-margin-bottom-2">@organisation.Address.GetFullAddress()</p>
                             @if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
                             {
                                 <p class="govuk-body govuk-!-margin-bottom-2">Company number: @organisation.CompanyNumber</p>

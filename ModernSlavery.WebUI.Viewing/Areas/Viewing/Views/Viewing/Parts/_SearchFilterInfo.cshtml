@@ -2,19 +2,19 @@
 
 @for (var i = 0; i < Model.Count - 1; i++)
 {
-    <strong>@(Model[i])</strong>
+    <button class="filter"><span class="govuk-body">@(Model[i])</span></button>
     if (Model.Count > 1 && i < Model.Count - 2)
     {
-        <span>, </span>
+        <span class="govuk-body">or </span>
     }
 }
 
 @if (Model.Count == 1)
 {
-    <strong>@Model[0]</strong>
+    <button class="filter"><span class="govuk-body">@(Model[0])</span></button>
 }
 else
 {
-    <span> or </span>
-    <strong>@Model[Model.Count - 1]</strong>
+    <span class="govuk-body"> or </span>
+    <button class="filter"><span class="govuk-body">@Model[Model.Count - 1]</span></button>  
 }

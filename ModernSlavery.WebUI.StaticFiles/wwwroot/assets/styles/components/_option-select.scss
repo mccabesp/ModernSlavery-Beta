@@ -177,6 +177,37 @@
 .finder .result-info {
     border-bottom: solid 1px $govuk-input-border-colour;
     padding-bottom: 15px;
+
+    .filters {
+
+        .filter-box {
+           
+            &:nth-child(2n+1) {
+                background: #dfe1e1;//25% tint of $govuk-border-colour;
+            }
+        }
+
+        .filter {
+            border: 1px solid $govuk-border-colour;
+            border-radius: 5px;
+            padding: 5px;
+            background:inherit;
+            margin-top:10px;
+        }
+
+        .filter-button {
+            &:before {
+                display: inline-block;
+                content: "\00d7";
+                font-size: 30px;
+                margin-right: 5px;
+            }
+
+            span {
+                vertical-align: text-bottom;
+            }
+        }
+    }
 }
 
 /* custom styling for mobile*/

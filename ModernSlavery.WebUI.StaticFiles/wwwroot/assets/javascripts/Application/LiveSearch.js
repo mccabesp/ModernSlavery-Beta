@@ -17,6 +17,10 @@
         this.$loadingBlock = options.$results.find("#loading");
         this.action = this.$form.attr("action") + "-js";
         this.$atomAutodiscoveryLink = options.$atomAutodiscoveryLink;
+        this.$filters = options.$results.find('.filter');
+
+        //Add filter-button class to filters
+        this.$filters.addClass('filter-button');
 
         if (GOVUK.support.history()) {
             //save the initial state

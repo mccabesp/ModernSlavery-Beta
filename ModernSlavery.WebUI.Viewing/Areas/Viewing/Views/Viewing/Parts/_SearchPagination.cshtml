@@ -12,24 +12,24 @@
         <div class="govuk-grid-column-two-thirds" data-pagecount="@Model.Organisations.PageCount" data-currentpage="@Model.Organisations.CurrentPage">
             @if (showPrev)
             {
-                <div class="pagination pagination-prev">
-                    <button type="submit" class="pagination-button" name="command" href="@Url.WithQuery("SearchResults", new {p = Model.Organisations.CurrentPage - 1})">                     
-                            <span class="prev-arrow"></span>
-                            <span class="govuk-body govuk-!-font-weight-bold">Previous page </span><br />
-                            <span class="pagination-numbers" data-total="@Model.Organisations.PageCount">@(Model.Organisations.CurrentPage - 1) of @Model.Organisations.PageCount</span>
-                    </button>
-                </div>
+            <div class="pagination pagination-prev">
+                <a class="pagination-button" href="@Url.WithQuery("SearchResults", new {p = Model.Organisations.CurrentPage - 1})">
+                        <span class="prev-arrow"></span>
+                        <span class="govuk-body govuk-!-font-weight-bold">Previous page </span><br />
+                        <span class="govuk-body pagination-numbers" data-total="@Model.Organisations.PageCount">@(Model.Organisations.CurrentPage - 1) of @Model.Organisations.PageCount</span>
+                 </a>
+            </div>
             }
             @if (showNext)
             {
 
-                <div class="pagination pagination-next" display: table-row;>
-                    <button type="submit" class="pagination-button" name="command" href="@Url.WithQuery("SearchResults", new {p = Model.Organisations.CurrentPage + 1})">
-                        <span class="next-arrow"></span>
-                        <span class="govuk-body govuk-!-font-weight-bold">Next page </span><br />
-                        <span class="pagination-numbers" data-total="@Model.Organisations.PageCount">@(Model.Organisations.CurrentPage + 1) of @Model.Organisations.PageCount</span>
-                    </button>
-                </div>
+        <div class="pagination pagination-next" display: table-row;>
+            <a class="pagination-button" href="@Url.WithQuery("SearchResults", new {p = Model.Organisations.CurrentPage + 1})">
+                  <span class="next-arrow"></span>
+                    <span class="govuk-body govuk-!-font-weight-bold">Next page </span><br />
+                    <span class="govuk-body pagination-numbers" data-total="@Model.Organisations.PageCount">@(Model.Organisations.CurrentPage + 1) of @Model.Organisations.PageCount</span>
+                </a>
+        </div>
             }
         </div>
     </div>
