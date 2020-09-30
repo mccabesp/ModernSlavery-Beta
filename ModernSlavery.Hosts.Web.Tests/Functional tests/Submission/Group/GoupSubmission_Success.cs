@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Group")]
 
     public class GroupSubmission_Success : CreateAccount
     {
