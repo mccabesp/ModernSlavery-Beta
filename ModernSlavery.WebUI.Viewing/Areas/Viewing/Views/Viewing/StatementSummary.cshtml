@@ -504,7 +504,7 @@
             @if (!string.IsNullOrWhiteSpace(Model.ForcedLabourDetails))
             {
                 <div class="govuk-body govuk-!-font-weight-bold">
-                    The organisation identified potential indicators of forced labour or modern slavery in its business or supply chains during this period:
+                    The organisation identified the following potential indicators of forced labour or modern slavery in its business or supply chains during this period:
                 </div>
 
                 <div class="govuk-body">
@@ -530,9 +530,17 @@
                     The organisation found 1 instance of modern slavery:
                 </div>
                 <div class="govuk-body">
-                    @* TODO James - remediation ? *@
                     @Model.SlaveryInstanceDetails
                 </div>
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    The organisation took the following remediation action in response:
+                </div>
+                <ul>
+                    @foreach (var item in Model.RemediationTypes)
+                    {
+                        <li>@item</li>
+                    }
+                </ul>
             }
             else if (Model.SlaveryInstanceDetails == string.Empty)
             {
@@ -583,10 +591,16 @@
                     The organisation told us its statement for this period includes goals relating to how it would tackle modern slavery risks in its business and supply chains.
                 </div>
             }
+            else if (Model.IncludesMeasuringProgress == false)
+            {
+                <div class="govuk-body">
+                    The organisation told us its statement for this period does not include goals relating to how it would tackle modern slavery risks in its business and supply chains.
+                </div>
+            }
             else
             {
                 <div class="govuk-body">
-                    @* TODO James - Should there be content here? *@
+                    The organisation did not tell us about its goals relating to how it would tackle modern slavery risks in its business and supply chains.
                 </div>
             }
 
