@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Azure.Management.WebSites.Models;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
 namespace ModernSlavery.WebUI.Submission.Models
 {
@@ -48,8 +44,10 @@ namespace ModernSlavery.WebUI.Submission.Models
         }
 
         [Required]
-        [MaxLength(256)]
+        [MaxLength(1000)]
         public string OtherReason { get; set; }
+
+        public long ReasonMaxLength = 1000;
 
         [Required]
         public string TurnOver { get; set; }

@@ -1,28 +1,38 @@
 ﻿@model SearchViewModel
-    <div id="SearchByKeywordsGroup" class="govuk-form-group" style="position: relative;">     
-        <fieldset class="govuk-fieldset">
-            <h1 class="govuk-heading-xl">
-                Modern slavery statements
+
+<div id="SearchByKeywordsGroup" class="govuk-form-group" style="position: relative;">
+    <fieldset class="govuk-fieldset">
+        @if (ViewBag.Title != null)
+        {
+            <h1 class="govuk-heading-xl govuk-!-margin-bottom-3">
+                @ViewBag.Title
             </h1>
-            <div class="gov-uk-c-searchbar">
-                <div class="gov-uk-l-searchbar__table">
-                    <div class="gov-uk-l-searchbar__cell">
-                        <input id="FinderKeywords"
-                               value="@(Model.Keywords)"
-                               aria-expanded="false"
-                               class="gov-uk-c-searchbar__input"
-                               name="search"
-                               type="text"
-                               autocomplete="off"
-                               spellcheck="false"
-                               maxlength="100" />
-                    </div>
-                    <div class="gov-uk-l-searchbar__cell">
-                        <button class="gov-uk-c-searchbar__submit gov-uk-c-searchbar__submit--blue" id="NextStep" type="submit">Search</button>
-                    </div>
-
+        }
+        @if (ViewBag.SubTitle != null)
+        {
+            <span class="govuk-hint">
+                @ViewBag.SubTitle
+            </span>
+        }
+        <div class="gov-uk-c-searchbar ">
+            <div class="gov-uk-l-searchbar__table">
+                <div class="gov-uk-l-searchbar__cell">
+                    <input id="FinderKeywords"
+                           value="@(Model.Keywords)"
+                           aria-expanded="false"
+                           class="gov-uk-c-searchbar__input"
+                           name="search"
+                           type="text"
+                           autocomplete="off"
+                           spellcheck="false"
+                           maxlength="100" />
                 </div>
-            </div>
-        </fieldset>
+                <div class="gov-uk-l-searchbar__cell">
+                    <button class="gov-uk-c-searchbar__submit gov-uk-c-searchbar__submit--blue" id="NextStep" type="submit">Search</button>
+                </div>
 
-    </div>
+            </div>
+        </div>
+    </fieldset>
+
+</div>
