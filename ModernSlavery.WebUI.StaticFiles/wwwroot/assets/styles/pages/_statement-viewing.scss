@@ -1,4 +1,4 @@
-﻿// Author: JamesL 
+﻿// Author: JamesL
 // Styles for viewing => statement page
 
 .govuk-panel {
@@ -17,6 +17,20 @@
 
         .govuk-link {
             color: govuk-colour("white");
+        }
+    }
+}
+
+.govuk-list {
+    &.govuk-list--hyphen {
+
+        li:before {
+            content: '–';
+            margin-right: 5px;
+        }
+
+        a.govuk-link {
+            text-decoration: none;
         }
     }
 }
