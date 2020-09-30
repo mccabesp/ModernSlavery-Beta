@@ -699,10 +699,10 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         }
 
         [NonAction]
-        protected void StashModel<TController, TModel>(TController controller, TModel model)
-            where TController : Type
+        protected void StashModel<TModel>(Controller controller, TModel model)
         {
-            var controllerType = controller?.GetType() ?? typeof(TController);
+            var controllerType = controller.GetType();
+
             var modelType = typeof(TModel);
 
             var keyName = $"{controllerType}:{modelType}:Model";
@@ -751,9 +751,10 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         }
 
         [NonAction]
-        protected TModel UnstashModel<TModel>(Type controller, bool delete = false) where TModel : class
+        protected TModel UnstashModel<TModel>(Controller controller, bool delete = false) where TModel : class
         {
             var controllerType = controller.GetType();
+
             var modelType = typeof(TModel);
 
             var keyName = $"{controllerType}:{modelType}:Model";
