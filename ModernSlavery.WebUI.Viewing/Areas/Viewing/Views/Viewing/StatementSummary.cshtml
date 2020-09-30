@@ -30,7 +30,19 @@
                 </span>
             </summary>
             <div class="govuk-details__text">
-
+                @{ var address = Model.Address.GetAddressList(); }
+                @for (var i = 0; i < address.Count; i++)
+                {
+                    if (i < address.Count - 1)
+                    {
+                        <text>@address[i],</text>
+                        <br>
+                    }
+                    else // last element doesnt need a comma or line break
+                    {
+                        <text>@address[i]</text>
+                    }
+                }
             </div>
         </details>
 
@@ -70,29 +82,53 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <div class="govuk-panel govuk-panel--highlight">
-            <div class="govuk-panel__body govuk-!-font-size-24">
-                <strong>Link to full statement</strong>
+        @{ var workingUrl = !string.IsNullOrWhiteSpace(Model.StatementUrl); }
+        <div class="govuk-panel @(workingUrl ? "govuk-panel--blue" : "govuk-panel--grey")">
+            <div class="govuk-panel__body govuk-!-font-size-16">
+                <strong class="govuk-!-font-size-24">Link to full statement</strong>
                 <br>
-                <a class="govuk-link govuk-!-font-size-16" href="@Model.StatementUrl" rel="noreferrer noopener">Go to full modern slavery statement on organisation’s website</a>
+                @if (workingUrl)
+                {
+                    <a class="govuk-link govuk-!-font-size-16" href="@Model.StatementUrl" rel="noreferrer noopener">Go to full modern slavery statement on organisation’s website</a>
+                }
+                else
+                {
+                    <text>The URL linking to the statement on the organisation’s website is not working.</text>
+                }
             </div>
         </div>
+        @if (!workingUrl)
+        {
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                        What to do if the URL is not working
+                    </span>
+                </summary>
+                <div class="govuk-details__text">
+                    If the URL linking to the statement isn’t working, try again later – or go to the homepage of the organisation’s website and search for the statement from there.
+                </div>
+            </details>
+        }
 
-        <ul class="govuk-list govuk-list--hyphen">
-            <li><a class="govuk-link" href="#statement-period">Statement period and sign-off details</a></li>
-            <li><a class="govuk-link" href="#areas-covered">Areas covered by statement</a></li>
-            <li><a class="govuk-link" href="#sectors">Organisation sector(s) and turnover</a></li>
-            <li><a class="govuk-link" href="#policies">Policies relating to modern slavery</a></li>
-            <li><a class="govuk-link" href="#risks">Assessing modern slavery risks</a></li>
-            <li><a class="govuk-link" href="#high-risks">Highest risks identified</a></li>
-            <li><a class="govuk-link" href="#geographic-risks">Geographic risks</a></li>
-            <li><a class="govuk-link" href="#monitoring">Monitoring working conditions</a></li>
-            <li><a class="govuk-link" href="#indicators">Indicators and instances of modern slavery</a></li>
-            <li><a class="govuk-link" href="#training">Training on modern slavery</a></li>
-            <li><a class="govuk-link" href="#progress">Monitoring progress</a></li>
-        </ul>
+        <div class="contents govuk-!-margin-top-8">
+            <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-bottom-1">Contents</p>
+            <ul class="govuk-list govuk-list--hyphen govuk-!-font-size-16">
+                <li><a class="govuk-link" href="#statement-period">Statement period and sign-off details</a></li>
+                <li><a class="govuk-link" href="#areas-covered">Areas covered by statement</a></li>
+                <li><a class="govuk-link" href="#sectors">Organisation sector(s) and turnover</a></li>
+                <li><a class="govuk-link" href="#policies">Policies relating to modern slavery</a></li>
+                <li><a class="govuk-link" href="#risks">Assessing modern slavery risks</a></li>
+                <li><a class="govuk-link" href="#high-risks">Highest risks identified</a></li>
+                <li><a class="govuk-link" href="#geographic-risks">Geographic risks</a></li>
+                <li><a class="govuk-link" href="#monitoring">Monitoring working conditions</a></li>
+                <li><a class="govuk-link" href="#indicators">Indicators and instances of modern slavery</a></li>
+                <li><a class="govuk-link" href="#training">Training on modern slavery</a></li>
+                <li><a class="govuk-link" href="#progress">Monitoring progress</a></li>
+            </ul>
+        </div>
 
-        <div id="statement-period">
+        <div class="govuk-!-margin-top-8" id="statement-period">
             <h2 class="govuk-heading-m">
                 Statement period and sign-off details
             </h2>
@@ -150,7 +186,7 @@
 
         </div>
 
-        <div id="areas-covered">
+        <div class="govuk-!-margin-top-8" id="areas-covered">
             <h2 class="govuk-heading-m">
                 Areas covered by statement
             </h2>
@@ -231,7 +267,7 @@
             }
         </div>
 
-        <div id="sectors">
+        <div class="govuk-!-margin-top-8" id="sectors">
             <h2 class="govuk-heading-m">
                 Organisation sector(s) and turnover
             </h2>
@@ -274,7 +310,7 @@
 
         </div>
 
-        <div id="policies">
+        <div class="govuk-!-margin-top-8" id="policies">
             <h2 class="govuk-heading-m">
                 Policies relating to modern slavery
             </h2>
@@ -300,7 +336,7 @@
 
         </div>
 
-        <div id="risks">
+        <div class="govuk-!-margin-top-8" id="risks">
             <h2 class="govuk-heading-m">
                 Assessing modern slavery risks
             </h2>
@@ -344,7 +380,7 @@
 
         </div>
 
-        <div id="high-risks">
+        <div class="govuk-!-margin-top-8" id="high-risks">
             <h2 class="govuk-heading-m">
                 Highest risks identified
             </h2>
@@ -388,7 +424,7 @@
 
         </div>
 
-        <div id="geographic-risks">
+        <div class="govuk-!-margin-top-8" id="geographic-risks">
             <h2 class="govuk-heading-m">
                 Geographic risks
             </h2>
@@ -423,7 +459,7 @@
 
         </div>
 
-        <div id="monitoring">
+        <div class="govuk-!-margin-top-8" id="monitoring">
             <h2 class="govuk-heading-m">
                 Monitoring working conditions
             </h2>
@@ -463,7 +499,7 @@
 
         </div>
 
-        <div id="indicators">
+        <div class="govuk-!-margin-top-8" id="indicators">
             <h2 class="govuk-heading-m">
                 Indicators and instances of modern slavery
             </h2>
@@ -471,7 +507,7 @@
             @if (!string.IsNullOrWhiteSpace(Model.ForcedLabourDetails))
             {
                 <div class="govuk-body govuk-!-font-weight-bold">
-                    The organisation identified potential indicators of forced labour or modern slavery in its business or supply chains during this period:
+                    The organisation identified the following potential indicators of forced labour or modern slavery in its business or supply chains during this period:
                 </div>
 
                 <div class="govuk-body">
@@ -496,11 +532,18 @@
                 <div class="govuk-body govuk-!-font-weight-bold">
                     The organisation found 1 instance of modern slavery:
                 </div>
-
                 <div class="govuk-body">
-                    @* TODO James - remediation ? *@
                     @Model.SlaveryInstanceDetails
                 </div>
+                <div class="govuk-body govuk-!-font-weight-bold">
+                    The organisation took the following remediation action in response:
+                </div>
+                <ul>
+                    @foreach (var item in Model.RemediationTypes)
+                    {
+                        <li>@item</li>
+                    }
+                </ul>
             }
             else if (Model.SlaveryInstanceDetails == string.Empty)
             {
@@ -516,7 +559,7 @@
             }
         </div>
 
-        <div id="training">
+        <div class="govuk-!-margin-top-8" id="training">
             <h2 class="govuk-heading-m">
                 Training on modern slavery
             </h2>
@@ -541,7 +584,7 @@
             }
         </div>
 
-        <div id="progress">
+        <div class="govuk-!-margin-top-8" id="progress">
             <h2 class="govuk-heading-m">
                 Monitoring progress
             </h2>
@@ -551,10 +594,16 @@
                     The organisation told us its statement for this period includes goals relating to how it would tackle modern slavery risks in its business and supply chains.
                 </div>
             }
+            else if (Model.IncludesMeasuringProgress == false)
+            {
+                <div class="govuk-body">
+                    The organisation told us its statement for this period does not include goals relating to how it would tackle modern slavery risks in its business and supply chains.
+                </div>
+            }
             else
             {
                 <div class="govuk-body">
-                    @* TODO James - Should there be content here? *@
+                    The organisation did not tell us about its goals relating to how it would tackle modern slavery risks in its business and supply chains.
                 </div>
             }
 
