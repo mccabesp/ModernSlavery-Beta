@@ -11,6 +11,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Submission.Models;
@@ -276,13 +277,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             switch (error.Error)
             {
                 case StatementErrors.NotFound:
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1152, error));
+                    return new HttpNotFoundResult(error.Message);
                 case StatementErrors.Unauthorised:
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1153));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1153, new { organisationIdentifier = GetOrganisationIdentifier() }));
                 case StatementErrors.Locked:
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1154, error));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1154, new { organisationIdentifier = GetOrganisationIdentifier() }));
                 case StatementErrors.TooLate:
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1155));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1155,new { organisationIdentifier= GetOrganisationIdentifier() }));
                 case StatementErrors.DuplicateName:
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(3901, new { organisationName = error.Message }));
                 case StatementErrors.CoHoTransientError:
@@ -304,6 +305,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             {
                 //Make sure we show any validation errors
                 TryValidateModel(viewModel);
+                //Dont validate the group search or organisation name
+                if (viewModel is GroupSearchViewModel) ModelState.Exclude($"{nameof(GroupSearchViewModel.GroupResults)}.{nameof(GroupSearchViewModel.GroupResults.SearchKeywords)}", $"{nameof(GroupSearchViewModel.GroupResults)}.{nameof(GroupSearchViewModel.GroupResults.OrganisationName)}");
                 return View(viewModel);
             }
 
@@ -890,10 +893,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             //Ensure the viewmodel is valid before saving
             ModelState.Clear();
+
             if (!TryValidateModel(pageViewModel))
             {
-                viewModel.ErrorCount = ModelState.ErrorCount;
-                return View(viewModel);
+                //Dont validate the group search organisation name
+                if (pageViewModel is GroupSearchViewModel) ModelState.Exclude($"{nameof(GroupSearchViewModel.GroupResults)}.{nameof(GroupSearchViewModel.GroupResults.SearchKeywords)}", $"{nameof(GroupSearchViewModel.GroupResults)}.{nameof(GroupSearchViewModel.GroupResults.OrganisationName)}");
+
+                if (!ModelState.IsValid)
+                {
+                    viewModel.ErrorCount = ModelState.ErrorCount;
+                    return View(viewModel);
+                }
             }
 
             //Cancel immediately if no changes
@@ -959,6 +969,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     //Save the viewmodel
                     switch (pageViewModel)
                     {
+                        case GroupStatusViewModel vm:
+                            viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
+                            break;
+                        case GroupSearchViewModel vm:
+                            viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
+                            break;
+                        case GroupReviewViewModel vm:
+                            viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
+                            break;
                         case YourStatementPageViewModel vm:
                             viewModelResult = await SubmissionPresenter.SaveViewModelAsync(vm, organisationIdentifier, year, VirtualUser.UserId);
                             break;
