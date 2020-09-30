@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temporary Ignore")]
+    [TestFixture]
 
 
     public class Submission_Complete_Mandatory_Sections : Private_Registration_Success
     {
-
+        [Test, Order(40)]
         public async Task StartSubmission()
         {
 
@@ -24,6 +24,8 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Before you start");
             Click("Start Now");
+
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
 
             await Task.CompletedTask;
         }
@@ -112,7 +114,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(48)]
         public async Task ExpectButtons()
         {
-            ExpectButton("Confirm and submit");
+            ExpectButton("Submit for publication");
             ExpectButton("Exit and save Changes");
             ExpectButton("Exit and lose Changes");
             await Task.CompletedTask;

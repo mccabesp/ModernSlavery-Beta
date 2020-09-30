@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temporary Ignore")]
+    [TestFixture]
 
 
     public class Submission_Areas_Cancel_Unsaved_Data_Save : Private_Registration_Success
@@ -24,6 +24,8 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Before you start");
             Click("Start now");
+
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
 
             ExpectHeader("Your modern slavery statement");
             await Task.CompletedTask;
