@@ -106,7 +106,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
             //Remove those models not for the selected statementDeadlineYear
             if (statementDeadlineYear > 0) newSearchModels = newSearchModels.Where(m => m.SubmissionDeadlineYear == statementDeadlineYear);
 
-             //Get the old indexes for statements
+            //Get the old indexes for statements
             var retiredModels = await ListSearchDocumentsAsync(organisation, statementDeadlineYear);
 
             //Batch update the included organisations
@@ -144,12 +144,12 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
             //Get the old indexes for statements
             var filter = $"{nameof(OrganisationSearchModel.ParentOrganisationId)} eq {organisation.OrganisationId}";
-            if (submissionDeadlineYear>0)filter += $" and {nameof(OrganisationSearchModel.SubmissionDeadlineYear)} eq {submissionDeadlineYear}";
+            if (submissionDeadlineYear > 0) filter += $" and {nameof(OrganisationSearchModel.SubmissionDeadlineYear)} eq {submissionDeadlineYear}";
 
             return await _organisationSearchRepository.ListDocumentsAsync(selectFields: keyOnly ? nameof(OrganisationSearchModel.SearchDocumentKey) : null, filter: filter);
         }
 
-        public async Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(IEnumerable<int> submissionDeadlineYears=null)
+        public async Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(IEnumerable<int> submissionDeadlineYears = null)
         {
             //Get the old indexes for statements
             var filter = $"{nameof(OrganisationSearchModel.StatementId)} ne null";
@@ -157,8 +157,8 @@ namespace ModernSlavery.BusinessDomain.Viewing
             {
                 string yearFilter = null;
                 var deadlineQuery = submissionDeadlineYears.Select(x => $"{nameof(OrganisationSearchModel.SubmissionDeadlineYear)} eq {x}");
-                yearFilter+=string.Join(" or ", deadlineQuery);
-                if (!string.IsNullOrWhiteSpace(yearFilter))filter += $" and ({yearFilter})";
+                yearFilter += string.Join(" or ", deadlineQuery);
+                if (!string.IsNullOrWhiteSpace(yearFilter)) filter += $" and ({yearFilter})";
             }
 
             return await _organisationSearchRepository.ListDocumentsAsync(filter: filter);
@@ -298,7 +298,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
             yield return parentStatementModel.SetSearchDocumentKey();
 
-            if (submittedStatement!=null)
+            if (submittedStatement != null)
                 foreach (var childOrganisation in submittedStatement.StatementOrganisations.Where(go => go.Included))
                 {
                     var childStatementModel = _autoMapper.Map<OrganisationSearchModel>(parentStatementModel);
@@ -417,12 +417,12 @@ namespace ModernSlavery.BusinessDomain.Viewing
         public async Task<PagedSearchResult<OrganisationSearchModel>> SearchOrganisationsAsync(
             string keywords,
             IEnumerable<byte> turnovers,
-            IEnumerable<short> sectors=null,
+            IEnumerable<short> sectors = null,
             IEnumerable<int> deadlineYears = null,
-            bool submittedOnly=true,
+            bool submittedOnly = true,
             bool returnFacets = false,
             bool returnAllFields = false,
-            int currentPage=1,
+            int currentPage = 1,
             int pageSize = 20)
         {
 
@@ -466,14 +466,14 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
             #region Build the sort criteria
             var hasFilter = sectors.Any() || turnovers.Any() || deadlineYears.Any();
-            var orderBy=(string.IsNullOrWhiteSpace(keywords) && !hasFilter) 
+            var orderBy = (string.IsNullOrWhiteSpace(keywords) && !hasFilter)
                 ? $"{nameof(OrganisationSearchModel.Modified)} desc, {nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.SubmissionDeadlineYear)} desc"
                 : $"{nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.SubmissionDeadlineYear)} desc";
             #endregion
 
             #region Specify the facet filters
-            var facetFields = !returnFacets 
-                ? null 
+            var facetFields = !returnFacets
+                ? null
                 : string.Join(',',
                     $"{nameof(OrganisationSearchModel.Turnover)}/{nameof(OrganisationSearchModel.KeyName.Key)}",
                     $"{nameof(OrganisationSearchModel.SectorType)}/{nameof(OrganisationSearchModel.KeyName.Key)}",
@@ -485,17 +485,17 @@ namespace ModernSlavery.BusinessDomain.Viewing
             var queryFilter = new List<string>();
 
             //Add the turnover filter
-            if (turnovers!=null && turnovers.Any())
+            if (turnovers != null && turnovers.Any())
             {
                 var turnoverQuery = turnovers.Select(x => $"{nameof(OrganisationSearchModel.Turnover)}/{nameof(OrganisationSearchModel.KeyName.Key)} eq {x}");
                 queryFilter.Add($"({string.Join(" or ", turnoverQuery)})");
             }
 
             //Add the sector filter
-            if (sectors!=null && sectors.Any())
+            if (sectors != null && sectors.Any())
             {
                 var sectorQuery = sectors.Select(x => $"{nameof(OrganisationSearchModel.Sectors)}/{nameof(OrganisationSearchModel.KeyName.Key)} eq {x}");
-                queryFilter.Add($"{nameof(OrganisationSearchModel.Sectors)}/any(sector: {string.Join(" or ", sectorQuery)})");
+                queryFilter.Add($"{nameof(OrganisationSearchModel.Sectors)}/any(Sectors: {string.Join(" or ", sectorQuery)})");
             }
 
             //Add the years filter
@@ -506,13 +506,13 @@ namespace ModernSlavery.BusinessDomain.Viewing
             }
 
             //Only show submitted organisations
-            if (submittedOnly)queryFilter.Add($"{nameof(OrganisationSearchModel.StatementId)} ne null");
-            
+            if (submittedOnly) queryFilter.Add($"{nameof(OrganisationSearchModel.StatementId)} ne null");
+
             string filter = string.Join(" and ", queryFilter);
             #endregion
 
             //Execute the search
-            return await _organisationSearchRepository.SearchDocumentsAsync(keywords,currentPage,pageSize,selectFields: selectFields, facetFields:facetFields, orderBy: orderBy, filter:filter);
+            return await _organisationSearchRepository.SearchDocumentsAsync(keywords, currentPage, pageSize, selectFields: selectFields, facetFields: facetFields, orderBy: orderBy, filter: filter);
         }
         #endregion
 

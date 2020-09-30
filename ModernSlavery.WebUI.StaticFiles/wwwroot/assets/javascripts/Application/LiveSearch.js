@@ -125,7 +125,7 @@
             liveSearch.displayResults(response, this.searchState);
             liveSearch.clearLoadingIndicator();
         }).error(function () {
-            window.location = "/error/1146";
+            window.location.href = "/error/408";
         });
         //} else {
         //this.displayResults(cachedResultData, searchState);
