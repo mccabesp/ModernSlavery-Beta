@@ -108,6 +108,28 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
         #region Search
 
+        [NoCache]
+        [HttpGet("~/search")]
+        [HttpGet("search")]
+        public async Task<IActionResult> Search(SearchQueryModel searchQuery)
+        {
+            //Ensure search service is enabled
+            if (ViewingService.SearchBusinessLogic.Disabled)
+                return View("CustomError",
+                    WebService.ErrorViewModelFactory.Create(1151, new { featureName = "Search Service" }));
+
+            // ensure parameters are valid
+            if (!searchQuery.TryValidateSearchParams(out var result)) return result;
+
+            // generate result view model
+            // var model = await ViewingPresenter.SearchAsync(searchQuery);
+            var model = ViewingPresenter.GetSearchViewModel(searchQuery);
+
+            ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
+
+            return View("Search", model);
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="searchQuery"></param>
@@ -119,7 +141,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             //Ensure search service is enabled
             if (ViewingService.SearchBusinessLogic.Disabled)
                 return View("CustomError",
-                    WebService.ErrorViewModelFactory.Create(1151, new {featureName = "Search Service"}));
+                    WebService.ErrorViewModelFactory.Create(1151, new { featureName = "Search Service" }));
 
 
             //Clear the default back url of the organisation hub pages
@@ -164,7 +186,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("~/download")]
         public async Task<IActionResult> Download()
         {
-            var model = new DownloadViewModel {Downloads = new List<DownloadViewModel.Download>()};
+            var model = new DownloadViewModel { Downloads = new List<DownloadViewModel.Download>() };
 
             const string filePattern = "GPGData_????-????.csv";
             foreach (var file in await SharedBusinessLogic.FileRepository.GetFilesAsync(
@@ -178,7 +200,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
                     Size = Numeric.FormatFileSize(await SharedBusinessLogic.FileRepository.GetFileSizeAsync(file))
                 };
 
-                download.Url = Url.Action("DownloadData", new {year = download.Title.BeforeFirst("-")});
+                download.Url = Url.Action("DownloadData", new { year = download.Title.BeforeFirst("-") });
                 model.Downloads.Add(download);
             }
 
@@ -215,7 +237,8 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             //Setup the HTTP response
             var contentDisposition = new ContentDisposition
             {
-                FileName = $"UK Modern Slavery statement - {year} to {year + 1}.csv", Inline = false
+                FileName = $"UK Modern Slavery statement - {year} to {year + 1}.csv",
+                Inline = false
             };
             HttpContext.SetResponseHeader("Content-Disposition", contentDisposition.ToString());
 
@@ -223,7 +246,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             var lastWriteTime = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(file);
             if (lastWriteTime.AddMonths(12) < VirtualDateTime.Now)
                 Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue
-                    {MaxAge = TimeSpan.FromDays(1), Public = true};
+                { MaxAge = TimeSpan.FromDays(1), Public = true };
 
             /* No Longer required as AspNetCore has response buffering on by default
             Response.BufferOutput = true;
