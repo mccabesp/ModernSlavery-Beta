@@ -190,7 +190,8 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             await Cache.RemoveAsync($"{UserHostAddress}:{retryLockKey}:Count");
         }
 
-        public async Task TrackPageViewAsync(string pageTitle = null, string pageUrl = null)
+        [NonAction]
+        protected async Task TrackPageViewAsync(string pageTitle = null, string pageUrl = null)
         {
             if (string.IsNullOrWhiteSpace(pageTitle)) pageTitle = ViewBag.Title;
 
@@ -397,7 +398,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         #endregion
 
-        #region Authorisation Methods
+        #region Authorisation Properties
 
         private User _OriginalUser;
 
@@ -668,7 +669,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         #region Exception handling methods
 
         [NonAction]
-        public void AddModelError(int errorCode, string propertyName = null, object parameters = null)
+        protected void AddModelError(int errorCode, string propertyName = null, object parameters = null)
         {
             ModelState.AddModelError(errorCode, propertyName, parameters);
         }
@@ -687,58 +688,78 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         #region Session Handling
 
-        public void StashModel<T>(T model)
+        [NonAction]
+        protected void StashModel<TModel>(TModel model)
         {
-            var keyName = $"{this.GetType()}:{typeof(T)}:Model";
+            var controllerType = this.GetType();
+            var modelType = typeof(TModel);
+
+            var keyName = $"{controllerType}:{modelType}:Model";
             Session[keyName] = Core.Extensions.Json.SerializeObjectDisposed(model);
         }
 
-        public void StashModel<KeyT, ModelT>(KeyT keyController, ModelT model)
+        [NonAction]
+        protected void StashModel<TController, TModel>(TController controller, TModel model)
+            where TController : Type
         {
-            var keyName = $"{typeof(KeyT)}:{typeof(ModelT)}:Model";
+            var controllerType = controller?.GetType() ?? typeof(TController);
+            var modelType = typeof(TModel);
+
+            var keyName = $"{controllerType}:{modelType}:Model";
             Session[keyName] = Core.Extensions.Json.SerializeObjectDisposed(model);
         }
 
-        public void ClearStash()
+        [NonAction]
+        protected void ClearStash()
         {
             var controllerType = this.GetType();
             
             foreach (var key in Session.Keys.ToList())
-                if (key.StartsWithI($"{controllerType}:") && key.EndsWithI(":Model"))
+                if (key.IsMatch($"{controllerType}:[0-9A-Za-z]*Model$"))
                     Session.Remove(key);
         }
 
         public void ClearStash<TController>(Controller controller=null)where TController : Controller
         {
-            var controllerType = controller == null ? typeof(TController) : controller.GetType();
+            var controllerType = controller?.GetType() ?? typeof(TController);
 
             foreach (var key in Session.Keys.ToList())
-                if (key.StartsWithI($"{controllerType}:") && key.EndsWithI(":Model"))
+                if (key.IsMatch($"{controllerType}:[0-9A-Za-z]*Model$"))
                     Session.Remove(key);
         }
 
-        public void ClearAllStashes()
+        [NonAction]
+        protected void ClearAllStashes()
         {
             foreach (var key in Session.Keys.ToList())
-                if (key.EndsWithI(":Model"))
+                if (key.IsMatch(":[0-9A-Za-z]*Model$"))
                     Session.Remove(key);
         }
 
-        public T UnstashModel<T>(bool delete = false) where T : class
+        [NonAction]
+        protected TModel UnstashModel<TModel>(bool delete = false) where TModel : class
         {
-            var keyName = $"{this.GetType()}:{typeof(T)}:Model";
+            var controllerType = this.GetType();
+            var modelType = typeof(TModel);
+
+            var keyName = $"{controllerType}:{modelType}:Model";
             var json = Session[keyName].ToStringOrNull();
-            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json);
+            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<TModel>(json);
             if (delete) Session.Remove(keyName);
 
             return result;
         }
 
-        public T UnstashModel<T>(Type keyController, bool delete = false) where T : class
+        [NonAction]
+        protected TModel UnstashModel<TModel>(Type controller, bool delete = false) where TModel : class
         {
-            var keyName = $"{this.GetType()}:{typeof(T)}:Model";
+            var controllerType = controller.GetType();
+            var modelType = typeof(TModel);
+
+            var keyName = $"{controllerType}:{modelType}:Model";
+
             var json = Session[keyName].ToStringOrNull();
-            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json);
+            var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<TModel>(json);
             if (delete) Session.Remove(keyName);
 
             return result;

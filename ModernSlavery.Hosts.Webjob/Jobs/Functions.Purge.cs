@@ -183,7 +183,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 }),
                             null);
 
-                        var searchRecords = await _searchBusinessLogic.GetOrganisationSearchIndexesAsync(org);
+                        var searchRecords = await _searchBusinessLogic.ListSearchDocumentsAsync(org);
 
                         await _dataRepository.ExecuteTransactionAsync(
                             async () =>
@@ -211,7 +211,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 }
                             }).ConfigureAwait(false);
                         //Remove this organisation from the search index
-                        await _organisationSearchRepository.RemoveFromIndexAsync(searchRecords).ConfigureAwait(false);
+                        await _organisationSearchRepository.DeleteDocumentsAsync(searchRecords).ConfigureAwait(false);
 
                         await _manualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
                         count++;

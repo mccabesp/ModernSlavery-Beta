@@ -11,7 +11,6 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "statement/I4qQEhsh/2020/group-search",
       "environmentVariables": {
         "WEBSITE_HOSTNAME": "localhost:44371",
         "ASPNETCORE_ENVIRONMENT": "Development",

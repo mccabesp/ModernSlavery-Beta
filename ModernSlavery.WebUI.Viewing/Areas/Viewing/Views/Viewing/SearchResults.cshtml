@@ -1,6 +1,6 @@
 ﻿@model SearchViewModel
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Modern Slavery search results";
     ViewBag.pageDescription = "Organisations that have published their Modern Slavery statement.";
     if (string.IsNullOrWhiteSpace(ViewBag.ReturnUrl))
@@ -8,21 +8,21 @@
         ViewBag.ReturnUrl = Context.GetUri().PathAndQuery;
     }
 }
-<div class="grid-row">
-    <div class="column-full">
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
         @using (Html.BeginForm("SearchResults", "Viewing", FormMethod.Get, new { id = "FinderForm", @class = "js-live-search-form" }))
         {
-            <div class="grid-row finder">
-                <div class="column-two-thirds">
+            <div class="govuk-grid-row finder">
+                <div class="govuk-grid-column-two-thirds">
                     <partial name="Parts/_SearchKeywords" model="Model" />
                 </div>
             </div>
 
-            <div class="grid-row finder">
-                <div class="column-one-third">
+            <div class="govuk-grid-row finder search-content">
+                <div class="govuk-grid-column-one-third search-filter">
                     <partial name="Parts/_SearchFilter" model="Model" />
                 </div>
-                <div class="column-two-thirds js-live-search-results-block" aria-live="assertive">
+                <div class="govuk-grid-column-two-thirds js-live-search-results-block" aria-live="assertive">
                     <div id="loading"></div>
                     <div id="main">
                         <partial name="Parts/_SearchMainContent" model="Model" />
@@ -33,16 +33,11 @@
     </div>
 </div>
 
-@section Scripts {
+@section AfterLoadedCompiledScripts {
     <script src="/assets/javascripts/typeahead.bundle.min.js" type="text/javascript"></script>
     <script>
         (function() {
             "use strict";
-
-            new GOVUK.SuggestOrganisation({
-                formId: "FinderForm",
-                keywordsId: "FinderKeywords"
-            });
 
             // bind to the finder filter collapse link (used for mobile)
             GOVUK.Collapsible.bindElements("#ChangeFiltersCollapsible.js-collapsible");
@@ -51,7 +46,7 @@
             GOVUK.stickAtTopWhenScrolling.init();
 
             // Instantiate an option select for each one found on the page
-            var filters = $('#FinderForm .govuk-option-select').map(function() {
+            var filters = $('#FinderForm .app-c-option-select').map(function() {
                 return new GOVUK.OptionSelect({ $el: $(this) });
             });
 
@@ -62,14 +57,14 @@
                 onRefresh: function() {
                     $("#AddAllOrgsToCompare").toggle();
                 }
-            });
+            });         
 
             new GOVUK.Ajaxify({
                 onRefresh: function() {
                     GOVUK.stickAtTopWhenScrolling.init();
                 },
                 onError: function(errorCode, error, errorThrown) {
-                    window.location.href = '/error/1146';
+                    window.location.href = '/error/408';
                 }
             });
 

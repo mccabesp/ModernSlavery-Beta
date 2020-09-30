@@ -148,7 +148,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             }
 
             await ScopeBusinessLogic.SaveScopesAsync(org, newScopes);
-            await _searchBusinessLogic.UpdateOrganisationSearchIndexAsync(org);
+            await _searchBusinessLogic.RefreshSearchDocumentsAsync(org);
         }
 
         public virtual async Task SavePresumedScopeAsync(ScopingViewModel model, int reportingDeadlineYear)

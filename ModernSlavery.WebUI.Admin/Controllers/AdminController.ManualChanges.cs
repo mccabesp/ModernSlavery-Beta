@@ -486,7 +486,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 //todo: writer.WriteLine(Color.Green, $"INFO: Changes saved to database, attempting to update search index.");
 
-                await _adminService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(listOfModifiedOrgs.ToArray());
+                await _adminService.SearchBusinessLogic.RefreshSearchDocumentsAsync(listOfModifiedOrgs.ToArray());
                 //todo: writer.WriteLine(Color.Green, $"INFO: Search index updated successfully.");
             }
 
@@ -1469,7 +1469,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     await _adminService.ManualChangeLog.WriteAsync(manualChangeLogModel);
                     await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-                    await _adminService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(org);
+                    await _adminService.SearchBusinessLogic.RefreshSearchDocumentsAsync(org);
                 }
 
                 count++;
@@ -1550,7 +1550,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
                         //Add or remove this organisation to/from the search index
-                        await _adminService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(org);
+                        await _adminService.SearchBusinessLogic.RefreshSearchDocumentsAsync(org);
                     }
                 }
 

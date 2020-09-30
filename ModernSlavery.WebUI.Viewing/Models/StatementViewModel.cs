@@ -17,7 +17,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
             CreateMap<StatementModel.RisksModel, StatementViewModel.RiskViewModel>();
             CreateMap<StatementModel.DiligenceModel, StatementViewModel.DueDiligenceViewModel>();
 
-            CreateMap<StatementModel, StatementViewModel>().DisableCtorValidation();
+            CreateMap<StatementModel, StatementViewModel>();
         }
     }
 
@@ -44,6 +44,11 @@ namespace ModernSlavery.WebUI.Viewing.Models
             TrainingTypes = trainingTypes;
         }
 
+        public StatementViewModel()
+        {
+
+        }
+
         #region Types
         public class RiskViewModel
         {
@@ -55,48 +60,16 @@ namespace ModernSlavery.WebUI.Viewing.Models
             public short Id { get; set; }
             public string Details { get; set; }
         }
-        public enum TurnoverRanges : byte
-        {
-            //Not Provided
-            NotProvided = 0,
 
-            [Display(Description = "Under £36 million")]
-            Under36Million = 1,
-
-            [Display(Description = "£36 million to £60 million")]
-            From36to60Million = 2,
-
-            [Display(Description = "£60 million to £100 million")]
-            From60to100Million = 3,
-
-            [Display(Description = "£100 million to £500 million")]
-            From100to500Million = 4,
-
-            [Display(Description = "Over £500 million")]
-            Over500Million = 5,
-        }
-
-        public enum YearRanges : byte
-        {
-            NotProvided = 0,
-
-            [Display(Description = "This is the first time")]
-            Year1 = 1,
-
-            [Display(Description = "1 to 5 years")]
-            Years1To5 = 2,
-
-            [Display(Description = "More than 5 years")]
-            Over5Years = 3,
-        }
         #endregion
 
         #region General Properties
         public long StatementId { get; set; }
-        [IgnoreMap]
-        public DateTime StatementDeadline { get; set; }
+        public DateTime SubmissionDeadline { get; set; }
         public long OrganisationId { get; set; }
         public string OrganisationName { get; set; }
+        [IgnoreMap]
+        public string OrganisationAddress { get; set; }
         [IgnoreMap]
         public string EncryptedOrganisationId { get; set; }
         [IgnoreMap]
@@ -118,8 +91,9 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public string StatementUrl { get; set; }
         public DateTime StatementStartDate { get; set; }
         public DateTime StatementEndDate { get; set; }
-        [IgnoreMap]
-        public string Approver { get; set; }
+        public string ApproverFirstName { get; set; }
+        public string ApproverLastName { get; set; }
+        public string ApproverJobTitle { get; set; }
         public DateTime ApprovedDate { get; set; }
         #endregion
 
@@ -148,7 +122,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
 
         public string OtherSector { get; set; }
 
-        public TurnoverRanges? Turnover { get; set; }
+        public StatementTurnovers? Turnover { get; set; }
         #endregion
 
         #region Policies
@@ -234,7 +208,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public bool? IncludesMeasuringProgress { get; set; }
         public string ProgressMeasures { get; set; }
         public string KeyAchievements { get; set; }
-        public YearRanges? StatementYears { get; set; }
+        public StatementYears? StatementYears { get; set; }
         #endregion
     }
 }

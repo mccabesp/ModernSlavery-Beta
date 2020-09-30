@@ -40,6 +40,7 @@
     <ProjectReference Include="..\ModernSlavery.Core.Extensions\ModernSlavery.Core.Extensions.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Logging\ModernSlavery.Infrastructure.Logging.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Telemetry\ModernSlavery.Infrastructure.Telemetry.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebAPI.Public\ModernSlavery.WebAPI.Public.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Account\ModernSlavery.WebUI.Account.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.CompaniesHouse\ModernSlavery.Infrastructure.CompaniesHouse.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Configuration\ModernSlavery.Infrastructure.Configuration.csproj" />
@@ -100,6 +101,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="bin\Debug\netcoreapp3.1\wwwroot\Api\" />
   </ItemGroup>
 
   <!-- *** THIS IS REQUIRED TO DEPLY WebjobS WITH WEBUI ON AZURE *** -->

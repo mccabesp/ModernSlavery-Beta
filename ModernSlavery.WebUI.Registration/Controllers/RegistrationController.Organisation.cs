@@ -852,7 +852,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             return await SelectOrganisation(VirtualUser, model, organisationIndex, nameof(SelectOrganisation));
         }
 
-        public async Task<IActionResult> SelectOrganisation(User VirtualUser,
+        [NonAction]
+        protected async Task<IActionResult> SelectOrganisation(User VirtualUser,
             OrganisationViewModel model,
             int organisationIndex,
             string returnAction)
@@ -1620,7 +1621,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             #region Update search indexes, log bad SIC codes and send registration request
 
             //Add or remove this organisation to/from the search index
-            if (saved && !_registrationService.SearchBusinessLogic.SearchOptions.Disabled) await _registrationService.SearchBusinessLogic.UpdateOrganisationSearchIndexAsync(userOrg.Organisation);
+            if (saved && !_registrationService.SearchBusinessLogic.SearchOptions.Disabled) await _registrationService.SearchBusinessLogic.RefreshSearchDocumentsAsync(userOrg.Organisation);
 
             //Log the bad sic codes here to ensure organisation identifiers have been created when saved
             if (badSicCodes.Count > 0) await _registrationService.OrganisationBusinessLogic.LogBadSicCodesAsync(org, badSicCodes);
