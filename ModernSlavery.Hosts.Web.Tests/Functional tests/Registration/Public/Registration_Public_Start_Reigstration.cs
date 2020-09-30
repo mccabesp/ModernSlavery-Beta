@@ -27,6 +27,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task NavigateToOrgPage()
         {
+            Goto("/manage-organisations");
             Click("Register an organisation");
 
             ExpectHeader("Registration Options");

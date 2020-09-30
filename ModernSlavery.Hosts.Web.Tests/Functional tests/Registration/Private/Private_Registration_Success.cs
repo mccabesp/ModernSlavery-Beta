@@ -31,7 +31,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task GoToPrivateRegistrationPage()
         {
-
+            Goto("/manage-organisations");
             Click("Register an organisation");
 
 
@@ -98,8 +98,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task VerifyPin()
         {
 
-            Goto("/");
-            Click("Manage Organisations");
+            Goto("/manage-organisations");
+            //Click("Manage Organisations");
             ExpectHeader("Select an organisation");
 
 
