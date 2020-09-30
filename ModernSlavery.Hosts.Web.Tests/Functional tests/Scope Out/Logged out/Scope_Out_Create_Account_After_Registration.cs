@@ -25,7 +25,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(50)]
         public async Task ClickingCreateAccountLeadsToCreateAccountPage()
         {
-            Click("Create an acount");
+              Click("Create an account");
 
             ExpectHeader("Create an Account");
 
