@@ -13,6 +13,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Testing.Helpers.Extensions;
+using ModernSlavery.Infrastructure.Database;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -24,16 +25,21 @@ namespace ModernSlavery.Hosts.Web.Tests
        protected string EmployerReference;
         private bool TestRunFailed = false;
 
-        [OneTimeSetUp]
-        
+        [OneTimeSetUp]      
 
-        [SetUp]
-        public void SetUp()
-        { 
-            
+        
+        public void OTSetUp()
+        {
+            //(TestRunSetup.TestWebHost.GetDbContext() as Microsoft.EntityFrameworkCore.DbContext)
+
             TestData.Organisation = TestRunSetup.TestWebHost
                 .Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
+           
+        }
+        [SetUp]
+        public void SetUp()
+        {
             if (TestRunFailed)
                 Assert.Inconclusive("Previous test failed");
             else

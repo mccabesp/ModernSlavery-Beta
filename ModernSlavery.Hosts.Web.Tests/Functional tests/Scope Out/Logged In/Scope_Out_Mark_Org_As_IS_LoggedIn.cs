@@ -61,7 +61,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(30)]
         public async Task GoToManageOrgPage()
         {
-            Goto("/");
+            Goto("/manage-organisations");
 
             Click("Manage organisations");
             ExpectHeader(That.Contains, "Select an organisation");

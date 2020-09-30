@@ -79,7 +79,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task EnteringAlreadyRegisteredOrgDetailsLeadsToAlreadyRegisteredPage()
         {
             Click("Confirm and continue");
-            ExpectHeader("Your organisation has already been registered on our service");
+            ExpectHeader(That.Contains, "Your organisation has already been registered on our service");
 
             await Task.CompletedTask;
         }

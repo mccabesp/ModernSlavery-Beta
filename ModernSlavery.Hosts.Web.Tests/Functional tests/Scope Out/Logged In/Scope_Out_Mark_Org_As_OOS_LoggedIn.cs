@@ -21,7 +21,6 @@ namespace ModernSlavery.Hosts.Web.Tests
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
-        string Pin;
 
         [OneTimeSetUp]
         public async Task SetUp()
@@ -44,7 +43,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(30)]
         public async Task GoToManageOrgPage()
         {
-            Goto("/");
+            Goto("/manage-organisations");
 
             Click("Manage organisations");
             ExpectHeader(That.Contains, "Select an organisation");
