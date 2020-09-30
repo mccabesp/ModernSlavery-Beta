@@ -2,6 +2,8 @@
 using NUnit.Framework;
 using System.Threading.Tasks;
 using ModernSlavery.Testing;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -10,6 +12,13 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     public class Submission_Areas_Cancel_Unsaved_Data_Exit : Private_Registration_Success
     {
+        [OneTimeSetUp]
+        public async Task SetUp()
+        {
+            TestData.Organisation = TestRunSetup.TestWebHost
+                .Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
+        }
         [Test, Order(40)]
         public async Task StartSubmission()
         {

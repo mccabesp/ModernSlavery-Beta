@@ -1,12 +1,40 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temporary Ignore")]
-    public class Submission_Complete_All_Sections : Private_Registration_Success
+    [TestFixture]
+    public class Submission_Complete_All_Sections : CreateAccount
     {
+        const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
+
+
+
+        [OneTimeSetUp]
+        public async Task SetUp()
+        {
+            TestData.Organisation = TestRunSetup.TestWebHost
+                .Find<Organisation>(org => org.LatestRegistrationUserId == null);
+
+        }
+
+        public Submission_Complete_All_Sections() : base(_firstname, _lastname, _title, _email, _password)
+        {
+
+
+        }
+
+        [Test, Order(29)]
+        public async Task RegisterOrg()
+        {
+            await TestRunSetup.TestWebHost.RegisterUserOrganisationAsync(TestData.Organisation.OrganisationName, UniqueEmail);
+            RefreshPage();
+
+            await Task.CompletedTask;
+        }
         [Test, Order(40)]
         public async Task StartSubmission()
         {
@@ -22,6 +50,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Before you start");
             Click("Start Now");
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
 
             await Task.CompletedTask;
         }
@@ -297,11 +326,11 @@ namespace ModernSlavery.Hosts.Web.Tests
             RightOf("Your organisation").Expect("Completed");
             RightOf("Policies").Expect("Completed");
             RightOf("Supply chain risks and due diligence (part 1)").Expect("Completed");
-            RightOf("Supply chain risks and due diligence (part 2)").Expect("Comzpleted");
+            RightOf("Supply chain risks and due diligence (part 2)").Expect("Completed");
             RightOf("Training").Expect("Completed");
             RightOf("Monitoring progress").Expect("Completed");
 
-            ExpectButton("Confirm and submit");
+            ExpectButton("Submit for Publication");
             ExpectButton("Exit and save Changes");
             ExpectButton("Exit and lose Changes");
 
