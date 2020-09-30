@@ -88,7 +88,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(30)]
         public async Task VerifyLinkURL()
         {
-            ExpectXPath("//a [@href='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/')]");
+            ExpectXPath("//a [@href='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/']");
             await Task.CompletedTask;
         }
     }
