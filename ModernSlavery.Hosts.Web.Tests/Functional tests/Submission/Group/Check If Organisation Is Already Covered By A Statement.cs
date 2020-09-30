@@ -1,13 +1,37 @@
 ﻿using Geeks.Pangolin;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Group")]
 
     public class CheckIfOrganisationIsAlreadyCoveredByAStatement : UITest
     {
+
+        private bool TestRunFailed = false;
+
+        [SetUp]
+        public void SetUp()
+        {
+            if (TestRunFailed)
+                Assert.Inconclusive("Previous test failed");
+            else
+                SetupTest(TestContext.CurrentContext.Test.Name);
+        }
+
+
+
+
+
+        [TearDown]
+        public void TearDown()
+        {
+
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
+
+        }
         //DATA NEEDED: Organisation already covered by two or more group statements for submission year 2020-2021 - Fly Jet England published 01/06/2020 and Fly Jet Australia published 01/09/2020
 
 

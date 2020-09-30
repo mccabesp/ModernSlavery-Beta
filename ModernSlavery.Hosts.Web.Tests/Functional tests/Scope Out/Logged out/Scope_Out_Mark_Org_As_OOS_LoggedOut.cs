@@ -22,15 +22,34 @@ namespace ModernSlavery.Hosts.Web.Tests
     public class Scope_Out_Mark_Org_As_OOS_LoggedOut : UITest
     {
        protected string EmployerReference;
+        private bool TestRunFailed = false;
 
         [OneTimeSetUp]
-        public async Task SetUp()
-        {
+        
+
+        [SetUp]
+        public void SetUp()
+        { 
+            
             TestData.Organisation = TestRunSetup.TestWebHost
                 .Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
+            if (TestRunFailed)
+                Assert.Inconclusive("Previous test failed");
+            else
+                SetupTest(TestContext.CurrentContext.Test.Name);
         }
 
+
+
+
+        [TearDown]
+        public void TearDown()
+        {
+
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
+
+        }
         [Test, Order(20)]
         public async Task SetSecurityCode()
         {

@@ -19,18 +19,38 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     [TestFixture]
 
+
     public class Scope_Out_Infomation_Not_Correct : UITest
     {
         private string EmployerReference;
-
+private bool TestRunFailed = false;
         [OneTimeSetUp]
-        public async Task SetUp()
+        
+        
+
+        [SetUp]
+        public void SetUp()
         {
+            
             TestData.Organisation = TestRunSetup.TestWebHost
                 .Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
+            if (TestRunFailed)
+                Assert.Inconclusive("Previous test failed");
+            else
+                SetupTest(TestContext.CurrentContext.Test.Name);
         }
 
+
+
+
+        [TearDown]
+        public void TearDown()
+        {
+
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
+
+        }
         private bool CanBeSetOutOfScope(Organisation org)
             => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope);
 

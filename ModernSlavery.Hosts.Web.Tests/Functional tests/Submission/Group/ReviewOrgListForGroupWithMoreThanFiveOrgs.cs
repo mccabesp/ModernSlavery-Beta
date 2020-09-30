@@ -12,6 +12,16 @@ namespace ModernSlavery.Hosts.Web.Tests
         //DATA NEEDED: Report 5+ group organisations added to this group report
         // Fly Jet - (Fly Jet Australia, Fly Jet Sweeden, Fly Jet Switzerland, Fly Jet England, Fly Jet France, Fly Jet Germany
         //Date of submissions 2020-2021 period, 01/09/2020
+        private bool TestRunFailed = false;
+
+        [SetUp]
+        public void SetUp()
+        {
+            if (TestRunFailed)
+                Assert.Inconclusive("Previous test failed");
+            else
+                SetupTest(TestContext.CurrentContext.Test.Name);
+        }
 
         [Test, Order(1)]
         public async Task CheckContentFor6PlusOrganisations()

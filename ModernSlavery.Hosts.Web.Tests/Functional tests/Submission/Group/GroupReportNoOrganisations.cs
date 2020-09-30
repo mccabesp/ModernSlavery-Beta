@@ -4,12 +4,25 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Group")]
 
     public class GroupReportNoOrganisations : UITest
 
+
     //DATA NEEDED: Group report submission with no current added organisations
     {
+
+        private bool TestRunFailed = false;
+
+        [SetUp]
+        public void SetUp()
+        {
+            if (TestRunFailed)
+                Assert.Inconclusive("Previous test failed");
+            else
+                SetupTest(TestContext.CurrentContext.Test.Name);
+        }
+
         [Test, Order(1)]
         public async Task CheckContentForNoOrgReviewPage()
         {

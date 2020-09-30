@@ -15,11 +15,35 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-
+    
     [TestFixture]
 
+    
     public class MVP1_Start_Page : UITest
-    {//test case for checking the temporary mocked gds start page
+    {
+        private bool TestRunFailed;
+        [SetUp]
+        public void SetUp()
+        {
+            if (TestRunFailed)
+                Assert.Inconclusive("Previous test failed");
+            else
+                SetupTest(TestContext.CurrentContext.Test.Name);
+        }
+
+
+
+
+        [TearDown]
+        public void TearDown()
+        {
+
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
+
+        }
+
+
+        //test case for checking the temporary mocked gds start page
         [Test, Order(20)]
         public async Task NavigateToStartPage()
         {

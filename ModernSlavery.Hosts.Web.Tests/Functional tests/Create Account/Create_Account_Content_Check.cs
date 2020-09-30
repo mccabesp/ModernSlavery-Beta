@@ -12,7 +12,29 @@ namespace ModernSlavery.Hosts.Web.Tests
 {
     public class Create_Account_Content_Check : UITest
     {
-        
+        private bool TestRunFailed = false;
+
+        [SetUp]
+        public void SetUp()
+        {
+            if (TestRunFailed)
+                Assert.Inconclusive("Previous test failed");
+            else
+                SetupTest(TestContext.CurrentContext.Test.Name);
+        }
+
+
+
+
+        [TearDown]
+        public void TearDown()
+        {
+
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
+
+        }
+
+
         [Test, Order(1)]
         public async Task GoToCreateAccountPage()
         {
