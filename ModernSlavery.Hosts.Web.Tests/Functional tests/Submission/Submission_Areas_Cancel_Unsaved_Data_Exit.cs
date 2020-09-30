@@ -1,10 +1,11 @@
 ﻿using Geeks.Pangolin;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using ModernSlavery.Testing;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temporary Ignore")]
+    [TestFixture]
 
 
     public class Submission_Areas_Cancel_Unsaved_Data_Exit : Private_Registration_Success
@@ -25,7 +26,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Before you start");
             Click("Start now");
 
-            ExpectHeader("Your modern slavery statement");
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
             await Task.CompletedTask;
         }
 
@@ -80,6 +81,8 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Before you start");
             Click("Start now");
+
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
 
             ExpectHeader("Your modern slavery statement");
 
