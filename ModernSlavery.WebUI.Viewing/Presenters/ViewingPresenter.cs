@@ -30,6 +30,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(string organisationIdentifier, int reportingDeadlineYear);
         Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(string organisationIdentifier, int reportingDeadlineYear);
         Task<Outcome<StatementErrors, List<StatementSummaryViewModel>>> GetStatementSummaryGroupViewModel(string organisationIdentifier, int reportingDeadlineYear);
+        SearchViewModel GetSearchViewModel(SearchQueryModel searchQuery);
     }
 
     public class ViewingPresenter : IViewingPresenter
@@ -67,6 +68,21 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         #endregion
 
         #region Search methods
+
+        public SearchViewModel GetSearchViewModel(SearchQueryModel searchQuery)
+        {
+            return new SearchViewModel
+            {
+                TurnoverOptions = GetTurnoverOptions(searchQuery.Turnovers),
+                SectorOptions = GetSectorOptions(searchQuery.Sectors),
+                ReportingYearOptions = GetReportingYearOptions(searchQuery.Years),
+                Keywords = searchQuery.Keywords,
+                Sectors = searchQuery.Sectors,
+                Turnovers = searchQuery.Turnovers,
+                Years = searchQuery.Years
+            };
+        }
+
         public async Task<SearchViewModel> SearchAsync(SearchQueryModel searchQuery)
         {
             //Execute the search
