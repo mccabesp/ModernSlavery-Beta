@@ -13,7 +13,7 @@ namespace ModernSlavery.Hosts.Web.Tests
     {
         public static void NavigateTo_SubmissionStarted(UIContext ui, string Organistion, string YearFromTo, string SectionText)
         {
-            ui.Goto("/");
+            ui.Goto("/manage-organisations");
 
             //navigate to org page
             ui.Click("Manage Organisations");
@@ -32,7 +32,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public static void NavigateYourMSStatement(UIContext ui, string Organistion, string Year)
         {
-            ui.Goto("/");
+            ui.Goto("/manage-organisations");
             ui.ExpectHeader("Select an organisation");
 
             ui.Click(Organistion);
@@ -43,6 +43,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ui.ExpectHeader("Before you start");
             ui.Click("Start now");
+                    ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(ui, OrgName: Organistion);
             ui.ExpectHeader("Your modern slavery statement");
         }
         public static void NavigateToAreasCovered(UIContext ui, string Organistion, string Year)
