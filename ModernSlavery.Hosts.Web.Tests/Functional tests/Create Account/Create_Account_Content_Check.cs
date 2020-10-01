@@ -38,6 +38,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(1)]
         public async Task GoToCreateAccountPage()
         {
+            Click("Sign in");
             BelowHeader("No account yet?");
             Click("Create an account");
 

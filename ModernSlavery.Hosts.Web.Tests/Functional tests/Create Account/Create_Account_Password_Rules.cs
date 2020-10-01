@@ -39,6 +39,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task GoToCreateAccountPage()
         {
             Goto("/");
+            Click("Sign in");
             Click("Create an account");
             ExpectHeader("Create an Account");
             await Task.CompletedTask;
