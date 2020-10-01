@@ -38,9 +38,17 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// Retrieves a readonly StatementModel of the latest submitted data
         /// </summary>
         /// <param name="organisationId">The Id of the organisation who owns the statement data to delete</param>
+        /// <param name="reportingDeadline">The reporting deadline year of the statement data to retrieve</param>
+        /// <returns>The latest submitted statement model or a list of errors</returns>
+        Task<Outcome<StatementErrors, StatementModel>> GetLatestSubmittedStatementModelAsync(long organisationId, int reportingDeadlineYear);
+
+        /// <summary>
+        /// Retrieves a readonly StatementModel of the latest submitted data
+        /// </summary>
+        /// <param name="organisationId">The organisation who owns the statement data to delete</param>
         /// <param name="reportingDeadline">The reporting deadline of the statement data to retrieve</param>
         /// <returns>The latest submitted statement model or a list of errors</returns>
-        Task<Outcome<StatementErrors, StatementModel>> GetLatestSubmittedStatementModelAsync(long organisationId, DateTime reportingDeadline);
+        Task<Outcome<StatementErrors, StatementModel>> GetLatestSubmittedStatementModelAsync(Organisation organisation, DateTime reportingDeadline);
 
         /// <summary>
         /// Returns list of modifications between the specified statementModel and the draft backup)
@@ -78,28 +86,55 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// Attempts to open an existing or create a new draft StaementModel for a specific user, organisation and reporting deadline
         /// </summary>
         /// <param name="organisationId">The Id of the organisation who owns the statement data</param>
+        /// <param name="reportingDeadlineYear">The reporting deadline of the statement data to retrieve</param>
+        /// <param name="userId">The Id of the user who wishes to edit the statement data</param>
+        /// <returns>The statement model or a list of errors</returns>
+        Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(long organisationId, int  reportingDeadlineYear, long userId);
+
+        /// <summary>
+        /// Attempts to open an existing or create a new draft StaementModel for a specific user, organisation and reporting deadline
+        /// </summary>
+        /// <param name="organisation">The organisation who owns the statement data</param>
         /// <param name="reportingDeadline">The reporting deadline of the statement data to retrieve</param>
         /// <param name="userId">The Id of the user who wishes to edit the statement data</param>
         /// <returns>The statement model or a list of errors</returns>
-        Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId);
+        Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId);
 
         /// <summary>
         /// Unlocks a open draft statement mode from a particular user 
         /// </summary>
         /// <param name="organisationId">The Id of the organisation who owns the statement data</param>
+        /// <param name="reportingDeadlineYear">The reporting deadline year of the statement data to retrieve</param>
+        /// <param name="userId">The Id of the user who currently owns the statement data</param>
+        /// <returns></returns>
+        Task<Outcome<StatementErrors>> CloseDraftStatementModelAsync(long organisationId, int reportingDeadlineYear, long userId);
+
+        /// <summary>
+        /// Unlocks a open draft statement mode from a particular user 
+        /// </summary>
+        /// <param name="organisationId">The organisation who owns the statement data</param>
         /// <param name="reportingDeadline">The reporting deadline of the statement data to retrieve</param>
         /// <param name="userId">The Id of the user who currently owns the statement data</param>
         /// <returns></returns>
-        Task<Outcome<StatementErrors>> CloseDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId);
+        Task<Outcome<StatementErrors>> CloseDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId);
 
         /// <summary>
         /// Deletes any previously opened draft StatementModel and restores the backup (if any)
         /// </summary>
         /// <param name="organisationId">The Id of the organisation who owns the statement data to delete</param>
+        /// <param name="reportingDeadlineYear">The reporting deadline of the statement data to retrieve</param>
+        /// <param name="userId">The Id of the user who wishes to submit the draft statement data</param>
+        /// <returns>Nothing</returns>
+        Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(long organisationId, int reportingDeadlineYear, long userId);
+
+        /// <summary>
+        /// Deletes any previously opened draft StatementModel and restores the backup (if any)
+        /// </summary>
+        /// <param name="organisationId">The organisation who owns the statement data to delete</param>
         /// <param name="reportingDeadline">The reporting deadline of the statement data to retrieve</param>
         /// <param name="userId">The Id of the user who wishes to submit the draft statement data</param>
         /// <returns>Nothing</returns>
-        Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId);
+        Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId);
 
 
         /// <summary>
@@ -111,15 +146,23 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <returns>Nothing</returns>
         Task SaveDraftStatementModelAsync(StatementModel statementModel, bool createBackup = false);
 
-
         /// <summary>
         /// Saves a statement model as submitted data to storage and deletes any deletes any draft data and draft backups.
         /// </summary>
         /// <param name="organisationId">The Id of the organisation who owns the draft statement data to submit</param>
+        /// <param name="reportingDeadlineYear">The reporting deadline year of the statement data to submit</param>
+        /// <param name="user">The the user who wishes to submit the draft statement data</param>
+        /// <returns>???</returns>
+        Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(long organisationId, int reportingDeadlineYear, long userId = -1);
+
+        /// <summary>
+        /// Saves a statement model as submitted data to storage and deletes any deletes any draft data and draft backups.
+        /// </summary>
+        /// <param name="organisationId">The organisation who owns the draft statement data to submit</param>
         /// <param name="reportingDeadline">The reporting deadline of the statement data to submit</param>
         /// <param name="user">The the user who wishes to submit the draft statement data</param>
         /// <returns>???</returns>
-        Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId = -1);
+        Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId = -1);
 
         /// <summary>
         /// Gets a summary about any submissions a statement model as submitted data to storage and deletes any deletes any draft data and draft backups.
@@ -128,6 +171,12 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="reportingDeadlineYear">The reporting deadline </param>      
         /// <returns>A summary about any existing submissions or drafts for this organisation</returns>
         Task<string> GetExistingStatementInformation(long organisationId, DateTime reportingDeadline);
-
+        
+        /// <summary>
+        /// Checks if a reporting deadline has passed any reporting extensions
+        /// </summary>
+        /// <param name="reportingDeadline">The reporting deadline to check</param>
+        /// <returns>True if the reporting deadline has passed false if it is still OK to report</returns>
+        bool ReportingDeadlineHasExpired(DateTime reportingDeadline);
     }
 }

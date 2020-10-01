@@ -119,7 +119,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             bool saveToDatabase)
         {
             var oldOrgScope = organisation.GetActiveScope(reportingDeadline);
-            if (oldOrgScope == null) throw new ArgumentOutOfRangeException($"Cannot find an scope with status 'Active' for reporting deadling '{reportingDeadline}' linked to organisation '{organisation.OrganisationName}', organisationReference '{organisation.OrganisationReference}'.");
+            if (oldOrgScope == null) throw new ArgumentOutOfRangeException($"Cannot find an scope with status 'Active' for reporting deadline '{reportingDeadline}' linked to organisation '{organisation.OrganisationName}', organisationReference '{organisation.OrganisationReference}'.");
 
             if (oldOrgScope.ScopeStatus == newStatus)
                 return new CustomResult<OrganisationScope>(InternalMessages.SameScopesCannotBeUpdated(newStatus, oldOrgScope.ScopeStatus, reportingDeadline));
