@@ -274,7 +274,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public bool IsEmpty()
         {
-            return string.IsNullOrWhiteSpace(StatementUrl)
+            return GroupSubmission==null
+                && (StatementOrganisations==null || !StatementOrganisations.Any())
+                && string.IsNullOrWhiteSpace(StatementUrl)
                 && StatementStartDate == null
                 && StatementEndDate == null
                 && string.IsNullOrWhiteSpace(ApproverFirstName)

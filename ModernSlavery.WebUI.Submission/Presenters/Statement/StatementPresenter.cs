@@ -202,8 +202,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public async Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
         {
             long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
-            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisationId, reportingDeadlineYear);
-            var openOutcome = await _statementBusinessLogic.OpenDraftStatementModelAsync(organisationId, reportingDeadline, userId);
+            var openOutcome = await _statementBusinessLogic.OpenDraftStatementModelAsync(organisationId, reportingDeadlineYear, userId);
             if (openOutcome.Fail) return new Outcome<StatementErrors, StatementModel>(openOutcome.Errors);
 
             if (openOutcome.Result == null) throw new ArgumentNullException(nameof(openOutcome.Result));
@@ -217,22 +216,19 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public async Task<Outcome<StatementErrors>> CloseDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
         {
             long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
-            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisationId, reportingDeadlineYear);
-            return await _statementBusinessLogic.CloseDraftStatementModelAsync(organisationId, reportingDeadline, userId);
+            return await _statementBusinessLogic.CloseDraftStatementModelAsync(organisationId, reportingDeadlineYear, userId);
         }
 
         public async Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
         {
             long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
-            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisationId, reportingDeadlineYear);
-            return await _statementBusinessLogic.CancelDraftStatementModelAsync(organisationId, reportingDeadline, userId);
+            return await _statementBusinessLogic.CancelDraftStatementModelAsync(organisationId, reportingDeadlineYear, userId);
         }
 
         public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
         {
             long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
-            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisationId, reportingDeadlineYear);
-            return await _statementBusinessLogic.SubmitDraftStatementModelAsync(organisationId, reportingDeadline, userId);
+            return await _statementBusinessLogic.SubmitDraftStatementModelAsync(organisationId, reportingDeadlineYear, userId);
         }
 
         public async Task<Outcome<StatementErrors, TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId) where TViewModel : BaseViewModel

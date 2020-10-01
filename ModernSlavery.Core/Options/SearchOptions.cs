@@ -2,6 +2,7 @@
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 
 namespace ModernSlavery.Core.Options
@@ -22,7 +23,17 @@ namespace ModernSlavery.Core.Options
 
         public void Validate() 
         {
-            if (BatchSize < 1 || MaxBatchSize > 1000) throw new ConfigurationException("SearchService:BatchSize must be between 1 and 1000");
+            var exceptions = new List<Exception>();
+            
+            if (BatchSize < 1 || MaxBatchSize > 1000) exceptions.Add(new ConfigurationException("SearchService:BatchSize must be between 1 and 1000"));
+
+            if (exceptions.Count > 0)
+            {
+                if (exceptions.Count == 1) throw exceptions[0];
+                throw new AggregateException(exceptions);
+            }
+            
+
         }
 
     }

@@ -12,7 +12,7 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
-
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -24,6 +24,13 @@ namespace ModernSlavery.Hosts.Web.Tests
         public Registration_Public_Start_Reigstration() : base(_firstname, _lastname, _title, _email, _password)
         {
         }
+
+        [OneTimeSetUp]
+        public async Task SetUp()
+        {
+            TestData.Organisation = TestRunSetup.TestWebHost.Find<Organisation>(o => o.SectorType == SectorTypes.Public);
+        }
+
         [Test, Order(20)]
         public async Task NavigateToOrgPage()
         {
@@ -45,12 +52,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(22)]
         public async Task SearchForOrg()
         { 
-            SetXPath("//input[@id='SearchText']").To(Registration.OrgName_Blackpool);
+            SetXPath("//input[@id='SearchText']").To(TestData.Organisation.OrganisationName);
             Click(The.Bottom, "Search");
 
 
-            ExpectRow("Organisation name and registered address");
-            ExpectRow(That.Contains, Registration.OrgName_Blackpool);
+            Expect("Organisation name and registered address");
+            ExpectRow(That.Contains, TestData.Organisation.OrganisationName);
             
 
             //message should not appear with single result 

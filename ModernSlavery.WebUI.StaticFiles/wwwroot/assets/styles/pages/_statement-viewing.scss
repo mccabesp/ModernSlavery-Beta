@@ -1,11 +1,36 @@
-﻿// Author: JamesL 
+﻿// Author: JamesL
 // Styles for viewing => statement page
 
-.govuk-panel.govuk-panel--highlight {
-    color: govuk-colour("white");
-    background: govuk-colour("blue");
-
-    .govuk-link {
+.govuk-panel {
+    &.govuk-panel--blue {
         color: govuk-colour("white");
+        background: govuk-colour("blue");
+
+        .govuk-link {
+            color: govuk-colour("white");
+        }
+    }
+
+    &.govuk-panel--grey {
+        color: govuk-colour("white");
+        background: #797979;
+
+        .govuk-link {
+            color: govuk-colour("white");
+        }
+    }
+}
+
+.govuk-list {
+    &.govuk-list--hyphen {
+
+        li:before {
+            content: '–';
+            margin-right: 5px;
+        }
+
+        a.govuk-link {
+            text-decoration: none;
+        }
     }
 }
