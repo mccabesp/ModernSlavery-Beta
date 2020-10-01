@@ -23,7 +23,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             {
                 ui.ClickLabel("a group of organisations");
                 ui.Click("Continue");
-                ui.ExpectHeader("Which organisations are included in your group statement?");
+                ui.ExpectHeader(That.Contains, "Which organisations are included in your group statement?");
             }
             else
             {
