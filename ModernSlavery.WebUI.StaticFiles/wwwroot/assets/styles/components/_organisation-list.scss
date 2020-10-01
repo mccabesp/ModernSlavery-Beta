@@ -18,6 +18,10 @@
     .govuk-blue {
         color: $govuk-brand-colour;
     } 
+
+    .buttons button.link-button{
+        float:right;
+    }
 }
 
 button.link-button{
@@ -26,7 +30,7 @@ button.link-button{
     text-decoration: underline;
     cursor: pointer;
     color: $govuk-brand-colour;
-    font-size: 19px;
+    font-size: 19px;    
 
     &.find-organisation {
         padding:0px;
@@ -83,6 +87,9 @@ button#organisation-accordion span {
         position: absolute;
         top: 0;
         right: 0;
+    }
+    .govuk-summary-list__value {
+        max-width: 80%;
     }
 
     .govuk-summary-list__value.wide {
