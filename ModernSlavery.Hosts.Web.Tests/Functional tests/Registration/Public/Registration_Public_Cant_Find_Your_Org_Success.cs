@@ -16,7 +16,7 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temporary igore")]
+    [TestFixture]
 
     public class Registration_Public_Cant_Find_Your_Org_Success : CreateAccount
     {
@@ -26,46 +26,124 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
         }
         [Test, Order(20)]
-        public async Task Registration_Public_Cant_Find_Your_Org_Successful()
+        public async Task GoToPrivateRegistrationPage()
         {
+            Goto("/manage-organisations");
 
-            ClickText("Register an organisation");
+            Click("Register an organisation");
+
 
             ExpectHeader("Registration Options");
 
-            ClickLabel("Public Sector Organisation");
-
+            ClickLabel(That.Contains, "Private or voluntary sector organisation");
             Click("Continue");
 
             ExpectHeader("Find your organisation");
+            await Task.CompletedTask;
 
-            SetXPath("//input[@id='SearchText']").To("Not a real organisation name");
-            Click(The.Bottom, "Search");
+        }
+
+        [Test, Order(21)]
+
+        public async Task SearchForOrganisation()
+        {
+            SetXPath("//*[@id='SearchText']").To(Registration.OrgName_CantFind);
+            Click("Search");
 
 
-            Expect("0 organisations found that match your search");
+            await Task.CompletedTask;
 
-            //message should not appear with single result 
-            ExpectNo(What.Contains, "Showing 1-");
+        }
 
-            Click("Can't find your organisation?");
+        [Test, Order(22)]
+
+        public async Task CantFindOrgLeadsToDetailsPage()
+        {
+            ClickText("Can't find your organisation?");
             Click("Tell us about your organisation");
 
-            ExpectHeader(That.Contains, "Details of the organisation you want to register");
+            ExpectHeader("Details of the organisation you want to register");
+            await Task.CompletedTask;
 
-            //org name pre-filled by search
-            AtField("Organisation name").Expect("Not a real organisation name");
-
-
-            Expect("Enter one or more unique references to help identify your organisation:");
-
-            Set("Company number").To("12345678");
-
-            Click("Other reference?");
-            Set("Name or type (e.g., 'DUNS ')").To("DUNS");
-            Set("Unique number or value (e.g., '987654321')").To("01233345555");
-            Click("Continue");
-            ExpectHeader("Select your organisation");
         }
+        [Test, Order(24)]
+
+        public async Task ExpectOrgNameFieldPrePopulated()
+        {
+            AtField("Organisation name").Expect(Registration.OrgName_CantFind);
+            await Task.CompletedTask;
+        }
+        [Test, Order(26)]
+
+        public async Task FillReference()
+        {
+            Expect("Enter one or more unique references to help identify your organisation:");
+            Set("Company number").To(Registration.CompanyNumber_CantFind);
+            await Task.CompletedTask;
+        }
+        [Test, Order(28)]
+        public async Task ClickingcContinueNavigatesToAddressPage()
+        {
+            Click("Continue");
+            ExpectHeader("Your organisation's address");
+
+            await Task.CompletedTask;
+        }
+        [Test, Order(30)]
+
+        public async Task FillInAddressFields()
+        {
+            Expect("Enter the correspondence address of the organisation you want to register.");
+            Set("Address 1").To(Registration.Address1_Blackpool);
+            Set("Address 2").To(Registration.Address2_Blackpool);
+            Set("Address 3").To(Registration.Address3_Blackpool);
+            Set("Postcode").To(Registration.PostCode_Blackpool);
+            await Task.CompletedTask;
+        }
+        [Test, Order(32)]
+        public async Task ClickingcContinueNavigatesToContactDetailsPage()
+        {
+            Click("Continue");
+
+            ExpectHeader("Your contact details");
+            await Task.CompletedTask;
+        }
+
+        [Test, Order(34)]
+        public async Task ExpectPrePopulatedDetailsFields()
+        {
+            Expect("Enter your contact details.");
+
+            //fields pre-populated
+            AtField("First name").Expect(Create_Account.roger_first);
+            AtField("Last name").Expect(Create_Account.roger_last);
+            AtField("Email address").Expect(UniqueEmail);
+            AtField("Job title").Expect(Create_Account.roger_job_title);
+            Set("Telephone number").To("01413334444");
+            await Task.CompletedTask;
+        }
+
+        [Test, Order(36)]
+        public async Task SubmitOrg()
+        {
+            Click("Continue");
+
+            ExpectHeader("Confirm your organisation’s details");
+            RightOfText("Organisation name").Expect(Registration.CompanyNumber_CantFind);
+            RightOfText("Registered address").Expect(Registration.Address1_Blackpool +", " + Registration.Address2_Blackpool + ", " + Registration.Address3_Blackpool + ", " + Registration.PostCode_Blackpool);
+            ExpectRow("Your contact details");
+            RightOfText("Your name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last + " (" + Create_Account.roger_job_title + ")");
+            RightOfText("Email").Expect(UniqueEmail);
+            RightOfText("Telephone").Expect("01413334444");
+            Click("Confirm");
+            ExpectHeader(That.Contains, "We’ve got your details.");
+            ExpectHeader(That.Contains, "We will review them and get in touch to let you know if your registration was successful.");
+            Click("Manage organisations");
+            ExpectHeader(That.Contains, "Select an organisation");
+            RightOfText(Registration.OrgName_CantFind).Expect("Awaiting registration approval");
+
+            await Task.CompletedTask;
+        }
+
     }
 }
