@@ -184,7 +184,7 @@
     @(Html.GovUkFooter(new FooterViewModel { MetaNavigation = new FooterMetaNavigationViewModel() { Links = links.ToArray() } }))
     <script src="/assets/scripts/jquery-1.11.3.js"></script> 
 
-    <environment exclude="Development, DEV, TEST, QA, PROD, PREPROD, UR">
+    <environment exclude="Development, DEV, TEST, QAT, PROD, PREPROD, UR">
         <script src="/assets/scripts/app.min.js" type="text/javascript" asp-append-version="true"></script>
         <script src="/assets/javascripts/**/*.min.js" type="text/javascript" asp-append-version="true"></script>
     </environment>
