@@ -91,7 +91,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
                 searchQuery.Turnovers,
                 searchQuery.Sectors,
                 searchQuery.Years,
-                false,
+                true,
                 false,
                 false,
                 searchQuery.PageNumber,
