@@ -117,7 +117,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task WebTestHost_SeleniumHelper_TestMethods_OK()
         {
             //Go to the landing page
-            Goto(_webAuthority);
+            Goto("/manage-organisations");
 
             //Check for the landing page header
             Expect(What.Contains,_sharedOptions.ServiceName);
