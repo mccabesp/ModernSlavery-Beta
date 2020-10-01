@@ -577,7 +577,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 latestScope.ScopeStatus.IsAny(ScopeStatuses.PresumedInScope, ScopeStatuses.InScope);
 
             // Stash the model for the scope controller
-            StashModel(typeof(ScopeController), stateModel);
+            StashModel(stateModel);
 
             if (stateModel.IsOutOfScopeJourney) return RedirectToAction("EnterOutOfScopeAnswers", "Scope");
 

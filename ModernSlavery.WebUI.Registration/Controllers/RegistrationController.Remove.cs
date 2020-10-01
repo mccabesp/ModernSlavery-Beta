@@ -166,7 +166,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         public IActionResult RemoveOrganisationCompleted()
         {
             // Unstash and clear the remove model
-            var model = UnstashModel<RemoveOrganisationModel>(typeof(RegistrationController), true);
+            var model = UnstashModel<RemoveOrganisationModel>(true);
 
             // When model is null then return session expired view
             if (model == null) return SessionExpiredView();

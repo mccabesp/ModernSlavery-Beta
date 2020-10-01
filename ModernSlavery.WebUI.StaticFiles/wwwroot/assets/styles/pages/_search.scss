@@ -1,0 +1,47 @@
+﻿// Author:Charlotte W
+// Styles for viewing => search page
+
+details.advanced-search-details[open] summary::after {
+    content: attr(data-open);
+}
+
+details.advanced-search-details:not([open]) summary::after {
+    content: attr(data-close);
+}
+
+details.advanced-search-details summary:focus {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+details.advanced-search-details .govuk-details__text {
+    border-left: none;
+}
+
+.download {
+    background: url("/assets/images/icon-file-download.png") no-repeat;
+    background-size:contain;   
+    span{
+       margin-left:25px;
+    }
+}
+
+.advanced-search-checkboxes__list {
+    padding-left: 0px;
+}
+
+.two-columns{
+   columns:2;
+   margin-bottom:0px;
+   .govuk-checkboxes__item{
+     break-inside:avoid;
+   }
+}
+
+.right{
+    float: right;
+    margin-bottom:15px;
+}
+
+
+

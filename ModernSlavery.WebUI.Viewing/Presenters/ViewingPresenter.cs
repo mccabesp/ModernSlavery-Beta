@@ -30,6 +30,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(string organisationIdentifier, int reportingDeadlineYear);
         Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(string organisationIdentifier, int reportingDeadlineYear);
         Task<Outcome<StatementErrors, List<StatementSummaryViewModel>>> GetStatementSummaryGroupViewModel(string organisationIdentifier, int reportingDeadlineYear);
+        SearchViewModel GetSearchViewModel(SearchQueryModel searchQuery);
     }
 
     public class ViewingPresenter : IViewingPresenter
@@ -67,6 +68,21 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         #endregion
 
         #region Search methods
+
+        public SearchViewModel GetSearchViewModel(SearchQueryModel searchQuery)
+        {
+            return new SearchViewModel
+            {
+                TurnoverOptions = GetTurnoverOptions(searchQuery.Turnovers),
+                SectorOptions = GetSectorOptions(searchQuery.Sectors),
+                ReportingYearOptions = GetReportingYearOptions(searchQuery.Years),
+                Keywords = searchQuery.Keywords,
+                Sectors = searchQuery.Sectors,
+                Turnovers = searchQuery.Turnovers,
+                Years = searchQuery.Years
+            };
+        }
+
         public async Task<SearchViewModel> SearchAsync(SearchQueryModel searchQuery)
         {
             //Execute the search
@@ -75,7 +91,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
                 searchQuery.Turnovers,
                 searchQuery.Sectors,
                 searchQuery.Years,
-                false,
+                true,
                 false,
                 false,
                 searchQuery.PageNumber,
@@ -171,8 +187,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         public async Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(string organisationIdentifier, int reportingDeadlineYear)
         {
             long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
-            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisationId, reportingDeadlineYear);
-            var openOutcome = await _statementBusinessLogic.GetLatestSubmittedStatementModelAsync(organisationId, reportingDeadline);
+            var openOutcome = await _statementBusinessLogic.GetLatestSubmittedStatementModelAsync(organisationId, reportingDeadlineYear);
             if (openOutcome.Fail) return new Outcome<StatementErrors, StatementViewModel>(openOutcome.Errors);
 
             if (openOutcome.Result == null) throw new ArgumentNullException(nameof(openOutcome.Result));
