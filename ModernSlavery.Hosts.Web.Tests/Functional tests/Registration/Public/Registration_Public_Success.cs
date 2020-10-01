@@ -102,10 +102,10 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect(What.Contains, "We’ve got your details.");
             Expect(What.Contains, "We will review them and get in touch to let you know if your registration was successful.");
 
-            ExpectHeader("What happens next");
+            Expect(What.Contains, "What happens next");
             Expect("If we need more information to complete your registration, we will call or email you.");
             Expect(What.Contains, "If there is still no email from us, or for any other help with your registration, contact");
-            Expect("For help with your registration, please contact modernslaveryteam@gov.co.uk");
+            Expect(What.Contains, "If there is still no email from us, or for any other help with your registration, contact");
             ExpectXPath("//a[@href='mailto:modernslaverystatements@homeoffice.gov.uk']");
             Click(The.Bottom, "Manage Organisations");
             Expect(TestData.Organisation.OrganisationName);
