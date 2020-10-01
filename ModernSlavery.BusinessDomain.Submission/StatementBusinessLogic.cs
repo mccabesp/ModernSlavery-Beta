@@ -66,12 +66,9 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Get the draft filepath for this organisation and reporting deadline
             var draftFilePath = GetDraftFilepath(organisationId, reportingDeadline.Year);
 
-            //Return null if no draft file exists
-            if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath)) return null;
-
             //Return the draft StatementModel deserialized from file
-            var draftJson = await _sharedBusinessLogic.FileRepository.ReadAsync(draftFilePath);
-            var statementModel = JsonConvert.DeserializeObject<StatementModel>(draftJson);
+            var statementModel = await LoadStatementModelFromFile(draftFilePath);
+
             //TODO: Check all TypeIds are still valid in case some new ones or old retired
             return statementModel;
         }
@@ -87,12 +84,9 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Get the draft filepath for this organisation and reporting deadline
             var backupFilePath = GetDraftBackupFilepath(organisationId, reportingDeadline.Year);
 
-            //Return null if no draft file exists
-            if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(backupFilePath)) return null;
-
             //Return the draft StatementModel deserialized from file
-            var draftJson = await _sharedBusinessLogic.FileRepository.ReadAsync(backupFilePath);
-            var statementModel = JsonConvert.DeserializeObject<StatementModel>(draftJson);
+            var statementModel = await LoadStatementModelFromFile(backupFilePath);
+
             //TODO: Check all TypeIds are still valid in case some new ones or old retired
             return statementModel;
         }
@@ -283,6 +277,22 @@ namespace ModernSlavery.BusinessDomain.Submission
             var currentDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
 
             if (reportingDeadline < firstDeadline || reportingDeadline > currentDeadline.AddDays(1)) throw new ArgumentOutOfRangeException(nameof(reportingDeadline));
+        }
+
+        /// <summary>
+        /// Deserialises a json file to a StatementModel 
+        /// </summary>
+        /// <param name="draftFilePath">The target filepath to loafd the json from</param>
+        /// <returns>The deserialised statementmodel from the file</returns>
+        private async Task<StatementModel> LoadStatementModelFromFile(string draftFilePath)
+        {
+            //Return null if no draft file exists
+            if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath)) return null;
+
+            //Return the draft StatementModel deserialized from file
+            var draftJson = await _sharedBusinessLogic.FileRepository.ReadAsync(draftFilePath);
+            var statementModel = JsonConvert.DeserializeObject<StatementModel>(draftJson);
+            return statementModel;
         }
 
         /// <summary>
@@ -597,10 +607,12 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Get the backup draft filepath
             var draftBackupFilePath = GetDraftBackupFilepath(organisation.OrganisationId, reportingDeadline.Year);
 
-            if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
+            var backupStatementModel = await LoadStatementModelFromFile(draftFilePath);
+            if (backupStatementModel != null)
             {
-                //Restore the original draft from the backup
-                await _sharedBusinessLogic.FileRepository.CopyFileAsync(draftBackupFilePath, draftFilePath, true);
+                //Restore the original draft from the backup unlkess its empty
+                if (!backupStatementModel.IsEmpty())
+                    await _sharedBusinessLogic.FileRepository.CopyFileAsync(draftBackupFilePath, draftFilePath, true);
 
                 //Delete the backup draft
                 await _sharedBusinessLogic.FileRepository.DeleteFileAsync(draftBackupFilePath);
