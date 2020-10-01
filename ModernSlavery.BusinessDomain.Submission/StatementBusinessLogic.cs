@@ -66,12 +66,9 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Get the draft filepath for this organisation and reporting deadline
             var draftFilePath = GetDraftFilepath(organisationId, reportingDeadline.Year);
 
-            //Return null if no draft file exists
-            if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath)) return null;
-
             //Return the draft StatementModel deserialized from file
-            var draftJson = await _sharedBusinessLogic.FileRepository.ReadAsync(draftFilePath);
-            var statementModel = JsonConvert.DeserializeObject<StatementModel>(draftJson);
+            var statementModel = await LoadStatementModelFromFile(draftFilePath);
+
             //TODO: Check all TypeIds are still valid in case some new ones or old retired
             return statementModel;
         }
@@ -87,12 +84,9 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Get the draft filepath for this organisation and reporting deadline
             var backupFilePath = GetDraftBackupFilepath(organisationId, reportingDeadline.Year);
 
-            //Return null if no draft file exists
-            if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(backupFilePath)) return null;
-
             //Return the draft StatementModel deserialized from file
-            var draftJson = await _sharedBusinessLogic.FileRepository.ReadAsync(backupFilePath);
-            var statementModel = JsonConvert.DeserializeObject<StatementModel>(draftJson);
+            var statementModel = await LoadStatementModelFromFile(backupFilePath);
+
             //TODO: Check all TypeIds are still valid in case some new ones or old retired
             return statementModel;
         }
@@ -262,13 +256,43 @@ namespace ModernSlavery.BusinessDomain.Submission
             });
         }
 
+        private async Task<Outcome<StatementErrors, (Organisation Organisation, DateTime ReportingDeadline)>> GetOrganisationAndDeadlineAsync(long organisationId, int reportingDeadlineYear)
+        {
+            //Validate method parameters
+            if (organisationId <= 0) throw new ArgumentOutOfRangeException(nameof(organisationId));
+
+            //Try and get the organisation
+            var organisation = await _organisationBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId);
+            if (organisation == null) return new Outcome<StatementErrors, (Organisation, DateTime)>(StatementErrors.NotFound);
+
+            //Get the reporting deadline
+            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType, reportingDeadlineYear);
+
+            return new Outcome<StatementErrors, (Organisation, DateTime)>((organisation, reportingDeadline));
+        }
+
         private void CheckReportingDeadline(Organisation organisation, DateTime reportingDeadline)
         {
             var firstDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType, _sharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear);
             var currentDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
 
             if (reportingDeadline < firstDeadline || reportingDeadline > currentDeadline.AddDays(1)) throw new ArgumentOutOfRangeException(nameof(reportingDeadline));
+        }
 
+        /// <summary>
+        /// Deserialises a json file to a StatementModel 
+        /// </summary>
+        /// <param name="draftFilePath">The target filepath to loafd the json from</param>
+        /// <returns>The deserialised statementmodel from the file</returns>
+        private async Task<StatementModel> LoadStatementModelFromFile(string draftFilePath)
+        {
+            //Return null if no draft file exists
+            if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath)) return null;
+
+            //Return the draft StatementModel deserialized from file
+            var draftJson = await _sharedBusinessLogic.FileRepository.ReadAsync(draftFilePath);
+            var statementModel = JsonConvert.DeserializeObject<StatementModel>(draftJson);
+            return statementModel;
         }
 
         /// <summary>
@@ -406,15 +430,23 @@ namespace ModernSlavery.BusinessDomain.Submission
             }
         }
 
-        public async Task<Outcome<StatementErrors, StatementModel>> GetLatestSubmittedStatementModelAsync(long organisationId, DateTime reportingDeadline)
+        public async Task<Outcome<StatementErrors, StatementModel>> GetLatestSubmittedStatementModelAsync(long organisationId, int reportingDeadlineYear)
         {
-            var statement = await FindLatestSubmittedStatementAsync(organisationId, reportingDeadline);
-            if (statement == null) return new Outcome<StatementErrors, StatementModel>(StatementErrors.NotFound, $"Cannot find statement summary for Organisation:{organisationId} due for reporting deadline {reportingDeadline}");
+            //Get the organisation and reporting deadline
+            var outcome = await GetOrganisationAndDeadlineAsync(organisationId, reportingDeadlineYear);
+            if (outcome.Fail) new Outcome<StatementErrors, StatementModel>(outcome.Errors);
 
-            var statementModel = new StatementModel();
+            //Get the latest statement
+            return await GetLatestSubmittedStatementModelAsync(outcome.Result.Organisation, outcome.Result.ReportingDeadline);
+        }
+
+        public async Task<Outcome<StatementErrors, StatementModel>> GetLatestSubmittedStatementModelAsync(Organisation organisation, DateTime reportingDeadline)
+        {
+            var statement = await FindLatestSubmittedStatementAsync(organisation, reportingDeadline);
+            if (statement == null) return new Outcome<StatementErrors, StatementModel>(StatementErrors.NotFound, $"Cannot find statement summary for Organisation:{organisation.OrganisationId} due for reporting deadline {reportingDeadline}");
 
             //Copy the statement properties to the model
-            _mapper.Map(statement, statementModel);
+            var statementModel = _mapper.Map<StatementModel>(statement);
 
             //Return the successful model
             return new Outcome<StatementErrors, StatementModel>(statementModel);
@@ -464,21 +496,33 @@ namespace ModernSlavery.BusinessDomain.Submission
             return backupStatementModel;
         }
 
-        public async Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId)
+        public async Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(long organisationId, int reportingDeadlineYear, long userId)
         {
-            //Validate method parameters
-            if (organisationId <= 0) throw new ArgumentOutOfRangeException(nameof(organisationId));
-            if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
+            //Get the organisation and reporting deadline
+            var outcome = await GetOrganisationAndDeadlineAsync(organisationId, reportingDeadlineYear);
+            if (outcome.Fail) new Outcome<StatementErrors, StatementModel>(outcome.Errors);
 
-            //Try and get the organisation
-            var organisation = await _organisationBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId);
-            if (organisation == null) throw new ArgumentOutOfRangeException(nameof(organisationId), $"Invalid organisationId {organisationId}");
+            //Get the open draft
+            return await OpenDraftStatementModelAsync(outcome.Result.Organisation, outcome.Result.ReportingDeadline, userId);
+        }
+
+        public bool ReportingDeadlineHasExpired(DateTime reportingDeadline)
+        {
+            if (_submissionOptions.DeadlineExtensionMonths == -1 || _submissionOptions.DeadlineExtensionMonths == -1)
+                return false;
+
+            return reportingDeadline.Date.AddMonths(_submissionOptions.DeadlineExtensionMonths).AddDays(_submissionOptions.DeadlineExtensionDays) < VirtualDateTime.Now.Date;
+        }
+
+        public async Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId)
+        {
+            if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
 
             //Check the reporting deadlin
             CheckReportingDeadline(organisation, reportingDeadline);
 
             //Check if it is too late to edit
-            if (reportingDeadline.Date.AddDays(0 - _submissionOptions.DeadlineExtensionDays) < VirtualDateTime.Now.Date)
+            if (ReportingDeadlineHasExpired(reportingDeadline))
                 return new Outcome<StatementErrors, StatementModel>(StatementErrors.TooLate);
 
             //Check the user can edit this statement
@@ -486,36 +530,36 @@ namespace ModernSlavery.BusinessDomain.Submission
                 return new Outcome<StatementErrors, StatementModel>(StatementErrors.Unauthorised);
 
             //Try and get the draft first
-            var draftStatement = await FindDraftStatementModelAsync(organisationId, reportingDeadline);
+            var draftStatement = await FindDraftStatementModelAsync(organisation.OrganisationId, reportingDeadline);
+
+            //Get the statement to map from
+            var submittedStatement = await FindSubmittedStatementAsync(organisation.OrganisationId, reportingDeadline);
 
             var createBackup = false;
-            if (draftStatement == null)
-            {
-                //Create a new draft statement
-                draftStatement = new StatementModel();
 
-                //Get the statement to map from
-                var submittedStatement = await FindSubmittedStatementAsync(organisationId, reportingDeadline);
-                if (submittedStatement == null)
-                {
-                    submittedStatement = GetEmptyStatement(organisation, reportingDeadline);
-                }
-
-                //Load the statement entity into the statementmodel
-                _mapper.Map(submittedStatement, draftStatement);
-            }
-
-            else
+            if (draftStatement != null)
             {
                 //Check if the existing draft lock has expired
                 var draftExpired = draftStatement.EditTimestamp.AddMinutes(_submissionOptions.DraftTimeoutMinutes) < VirtualDateTime.Now;
 
-                //If the draft has expired then remember to create a backup
-                createBackup = true;
-
                 //Check the existing draft is not still locked by another user
                 if (draftStatement.EditorUserId > 0 && draftStatement.EditorUserId != userId && !draftExpired)
                     return new Outcome<StatementErrors, StatementModel>(StatementErrors.Locked);
+
+                createBackup = submittedStatement==null;
+            }
+            else
+            {
+                if (submittedStatement != null)
+                    //Create a draft from previously submitted data
+                    draftStatement = _mapper.Map<StatementModel>(submittedStatement);
+                else
+                {
+                    //Create an empty draft statement
+                    draftStatement = _mapper.Map<StatementModel>(GetEmptyStatement(organisation, reportingDeadline));
+                    //Create a backup for non-submitted drafts
+                    createBackup = true;
+                }
             }
 
             //Set the key priorities
@@ -539,25 +583,36 @@ namespace ModernSlavery.BusinessDomain.Submission
             return new Outcome<StatementErrors, StatementModel>(draftStatement);
         }
 
-        public async Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId)
+        public async Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(long organisationId, int reportingDeadlineYear, long userId)
+        {
+            //Get the organisation and reporting deadline
+            var outcome = await GetOrganisationAndDeadlineAsync(organisationId, reportingDeadlineYear);
+            if (outcome.Fail) new Outcome<StatementErrors>(outcome.Errors);
+
+            //Cancel the draft
+            return await CancelDraftStatementModelAsync(outcome.Result.Organisation, outcome.Result.ReportingDeadline, userId);
+        }
+
+        public async Task<Outcome<StatementErrors>> CancelDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId)
         {
             //Validate the parameters
-            if (organisationId <= 0) throw new ArgumentOutOfRangeException(nameof(organisationId));
             if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
 
-            var openOutcome = await OpenDraftStatementModelAsync(organisationId, reportingDeadline, userId);
+            var openOutcome = await OpenDraftStatementModelAsync(organisation, reportingDeadline, userId);
             if (openOutcome.Fail) return new Outcome<StatementErrors>(openOutcome.Errors);
 
             //Get the current draft filepath
-            var draftFilePath = GetDraftFilepath(organisationId, reportingDeadline.Year);
+            var draftFilePath = GetDraftFilepath(organisation.OrganisationId, reportingDeadline.Year);
 
             //Get the backup draft filepath
-            var draftBackupFilePath = GetDraftBackupFilepath(organisationId, reportingDeadline.Year);
+            var draftBackupFilePath = GetDraftBackupFilepath(organisation.OrganisationId, reportingDeadline.Year);
 
-            if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
+            var backupStatementModel = await LoadStatementModelFromFile(draftFilePath);
+            if (backupStatementModel != null)
             {
-                //Restore the original draft from the backup
-                await _sharedBusinessLogic.FileRepository.CopyFileAsync(draftBackupFilePath, draftFilePath, true);
+                //Restore the original draft from the backup unlkess its empty
+                if (!backupStatementModel.IsEmpty())
+                    await _sharedBusinessLogic.FileRepository.CopyFileAsync(draftBackupFilePath, draftFilePath, true);
 
                 //Delete the backup draft
                 await _sharedBusinessLogic.FileRepository.DeleteFileAsync(draftBackupFilePath);
@@ -572,13 +627,21 @@ namespace ModernSlavery.BusinessDomain.Submission
             return new Outcome<StatementErrors>();
         }
 
-        public async Task<Outcome<StatementErrors>> CloseDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId)
+        public async Task<Outcome<StatementErrors>> CloseDraftStatementModelAsync(long organisationId, int reportingDeadlineYear, long userId)
+        {
+            var outcome = await GetOrganisationAndDeadlineAsync(organisationId, reportingDeadlineYear);
+            if (outcome.Fail) new Outcome<StatementErrors>(outcome.Errors);
+
+            //Close the draft
+            return await CloseDraftStatementModelAsync(outcome.Result.Organisation, outcome.Result.ReportingDeadline, userId);
+        }
+
+        public async Task<Outcome<StatementErrors>> CloseDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId)
         {
             //Validate the parameters
-            if (organisationId <= 0) throw new ArgumentOutOfRangeException(nameof(organisationId));
             if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
 
-            var openOutcome = await OpenDraftStatementModelAsync(organisationId, reportingDeadline, userId);
+            var openOutcome = await OpenDraftStatementModelAsync(organisation, reportingDeadline, userId);
             if (openOutcome.Fail) return new Outcome<StatementErrors>(openOutcome.Errors);
 
             var statementModel = openOutcome.Result;
@@ -595,7 +658,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 await SaveStatementModelToFileAsync(statementModel, draftFilePath);
 
             //Get the backup draft filepath
-            var draftBackupFilePath = GetDraftBackupFilepath(organisationId, reportingDeadline.Year);
+            var draftBackupFilePath = GetDraftBackupFilepath(statementModel.OrganisationId, reportingDeadline.Year);
 
             if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
             {
@@ -631,30 +694,42 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (createBackup)
             {
                 var draftBackupFilePath = GetDraftBackupFilepath(statementModel.OrganisationId, statementModel.SubmissionDeadline.Year);
-                if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath) && await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath))
-                    await _sharedBusinessLogic.FileRepository.CopyFileAsync(draftFilePath, draftBackupFilePath, false);
+                if (!await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
+                {
+                    if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftFilePath))
+                        await _sharedBusinessLogic.FileRepository.CopyFileAsync(draftFilePath, draftBackupFilePath, false);
+                    else
+                        await SaveStatementModelToFileAsync(statementModel, draftBackupFilePath);
+                }
             }
-
             await SaveStatementModelToFileAsync(statementModel, draftFilePath);
         }
 
-        public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(long organisationId, DateTime reportingDeadline, long userId = -1)
+        public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(long organisationId, int reportingDeadlineYear, long userId = -1)
+        {
+            var outcome = await GetOrganisationAndDeadlineAsync(organisationId, reportingDeadlineYear);
+            if (outcome.Fail) new Outcome<StatementErrors>(outcome.Errors);
+
+            //Submit the draft
+            return await SubmitDraftStatementModelAsync(outcome.Result.Organisation, outcome.Result.ReportingDeadline, userId);
+        }
+
+        public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId = -1)
         {
             //Validate the parameters
-            if (organisationId <= 0) throw new ArgumentOutOfRangeException(nameof(organisationId));
             if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
 
-            var openOutcome = await OpenDraftStatementModelAsync(organisationId, reportingDeadline, userId);
+            var openOutcome = await OpenDraftStatementModelAsync(organisation, reportingDeadline, userId);
             if (openOutcome.Fail) return new Outcome<StatementErrors>(openOutcome.Errors);
 
             if (openOutcome.Result == null) throw new ArgumentNullException(nameof(openOutcome.Result));
             var statementModel = openOutcome.Result;
 
-            var previousStatement = await FindSubmittedStatementAsync(organisationId, reportingDeadline);
+            var previousStatement = await FindSubmittedStatementAsync(organisation.OrganisationId, reportingDeadline);
             previousStatement?.SetStatus(StatementStatuses.Retired, userId);
 
             var newStatement = new Statement();
-            newStatement.Organisation = previousStatement == null ? await _organisationBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId) : previousStatement.Organisation;
+            newStatement.Organisation = previousStatement == null ? await _organisationBusinessLogic.DataRepository.GetAsync<Organisation>(organisation.OrganisationId) : previousStatement.Organisation;
             newStatement.SetStatus(StatementStatuses.Submitted, userId);
 
             await _organisationBusinessLogic.DataRepository.BeginTransactionAsync(
@@ -662,8 +737,8 @@ namespace ModernSlavery.BusinessDomain.Submission
                 {
                     try
                     {
-                         //Save new group organisations from companies house
-                         var newOrganisations = statementModel.StatementOrganisations.Where(o => o.OrganisationId == null && !string.IsNullOrWhiteSpace(o.CompanyNumber));
+                        //Save new group organisations from companies house
+                        var newOrganisations = statementModel.StatementOrganisations.Where(o => o.OrganisationId == null && !string.IsNullOrWhiteSpace(o.CompanyNumber));
                         foreach (var groupOrganisation in newOrganisations)
                         {
                             var organisation = _organisationBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefault(o => o.CompanyNumber == groupOrganisation.CompanyNumber);
@@ -673,7 +748,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                                 organisation = _organisationBusinessLogic.CreateOrganisation(groupOrganisation.OrganisationName, "CoHo", SectorTypes.Private, OrganisationStatuses.Active, groupOrganisation.Address, AddressStatuses.Active, groupOrganisation.CompanyNumber, groupOrganisation.DateOfCessation, userId: userId);
                                 await _organisationBusinessLogic.SaveOrganisationAsync(organisation);
                             }
-                            else if (organisation.OrganisationId == organisationId)
+                            else if (organisation.OrganisationId == organisation.OrganisationId)
                                 throw new Exception("Attempt to add the a child group organisation to the same parent organisation");
 
                             groupOrganisation.OrganisationId = organisation.OrganisationId;
@@ -703,7 +778,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                         await _organisationBusinessLogic.DataRepository.SaveChangesAsync();
 
                         //Delete the draft file and its backup
-                        await DeleteDraftStatementModelAsync(organisationId, reportingDeadline);
+                        await DeleteDraftStatementModelAsync(organisation.OrganisationId, reportingDeadline);
 
                         _organisationBusinessLogic.DataRepository.CommitTransaction();
                     }
@@ -716,7 +791,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 });
 
             //Update the search indexes
-            await _searchBusinessLogic.RefreshSearchDocumentsAsync(newStatement.Organisation,newStatement.SubmissionDeadline.Year);
+            await _searchBusinessLogic.RefreshSearchDocumentsAsync(newStatement.Organisation, newStatement.SubmissionDeadline.Year);
 
             return new Outcome<StatementErrors>();
         }
@@ -732,10 +807,8 @@ namespace ModernSlavery.BusinessDomain.Submission
                 var organisation = await _organisationBusinessLogic.DataRepository.GetAsync<Organisation>(newStatementModel.OrganisationId);
                 var statement = GetEmptyStatement(organisation, newStatementModel.SubmissionDeadline);
 
-                oldStatementModel = new StatementModel();
-
                 //Copy the statement properties to the model
-                _mapper.Map(statement, oldStatementModel);
+                oldStatementModel = _mapper.Map<StatementModel>(statement);
             }
 
             //Return the modifications
@@ -785,7 +858,6 @@ namespace ModernSlavery.BusinessDomain.Submission
             return null;
 
         }
-
         #endregion
     }
 }

@@ -86,20 +86,14 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         /// </summary>
         /// <param name="errors">A List of Statement Errors and their description</param>
         /// <returns>The IActionResult to execute</returns>
-        private IActionResult HandleStatementErrors(IEnumerable<(StatementErrors Error, string Message)> errors)
+        private IActionResult HandleStatementViewErrors(IEnumerable<(StatementErrors Error, string Message)> errors)
         {
             //Return full page errors which return to the ManageOrganisation page
             var error = errors.FirstOrDefault();
             switch (error.Error)
             {
                 case StatementErrors.NotFound:
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1152, error));
-                case StatementErrors.Unauthorised:
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1153));
-                case StatementErrors.Locked:
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1154, error));
-                case StatementErrors.TooLate:
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1155));
+                    return new HttpNotFoundResult(error.Message);
                 default:
                     throw new NotImplementedException($"{nameof(StatementErrors)} type '{error.Error}' is not recognised");
             }
@@ -267,7 +261,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         {
             //Get the latest statement data for this organisation, reporting year
             var openResult = await ViewingPresenter.GetStatementSummaryViewModel(organisationIdentifier, year);
-            if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
+            if (openResult.Fail) return HandleStatementViewErrors(openResult.Errors);
 
             var viewModel = openResult.Result;
             return View("StatementSummary", viewModel);
@@ -278,7 +272,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         {
             //Get the latest statement data for this organisation, reporting year
             var openResult = await ViewingPresenter.GetStatementSummaryGroupViewModel(organisationIdentifier, year);
-            if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
+            if (openResult.Fail) return HandleStatementViewErrors(openResult.Errors);
 
             var viewModel = openResult.Result;
             return View("StatementSummaryGroup", viewModel);

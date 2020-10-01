@@ -29,9 +29,6 @@ namespace ModernSlavery.BusinessDomain.Shared
         DateTime GetReportingStartDate(SectorTypes sectorType, int year = 0);
         DateTime GetReportingDeadline(SectorTypes sectorType, int year = 0);
         IList<DateTime> GetReportingDeadlines(SectorTypes sectorType, int recentYears = 0);
-
-        DateTime GetReportingDeadline(long organisationId, int year);
-        DateTime GetReportingDeadline(string organisationIdentifier, int year);
     }
 
     public class SharedBusinessLogic : ISharedBusinessLogic
@@ -87,21 +84,5 @@ namespace ModernSlavery.BusinessDomain.Shared
         {
             return _snapshotDateHelper.GetReportingDeadlines(sectorType, recentYears);
         }
-
-        public DateTime GetReportingDeadline(long organisationId, int year)
-        {
-            var organisation = DataRepository.Get<Organisation>(organisationId);
-            if (organisation == null) throw new ArgumentOutOfRangeException(nameof(organisationId));
-            return GetReportingDeadline(organisation.SectorType, year);
-        }
-        public DateTime GetReportingDeadline(string organisationIdentifier, int year)
-        {
-            long organisationId = Obfuscator.DeObfuscate(organisationIdentifier);
-            var organisation = DataRepository.Get<Organisation>(organisationId);
-            if (organisation == null) throw new ArgumentOutOfRangeException(nameof(organisationId));
-            return GetReportingDeadline(organisation.SectorType, year);
-        }
-
-    
     }
 }
