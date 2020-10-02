@@ -20,6 +20,7 @@ namespace ModernSlavery.Core.Classes.StatementTypeIndexes
             public short Id { get; set; }
             public short? ParentId { get; set; }
             public string Description { get; set; }
+            public DiligenceType Clone() => (DiligenceType)MemberwiseClone();
         }
 
     }
