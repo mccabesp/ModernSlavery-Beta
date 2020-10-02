@@ -67,7 +67,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         #region Url Methods
         private string GetOrganisationIdentifier() => RouteData.Values["OrganisationIdentifier"].ToString();
 
-        private string GetReportingDeadlineYear() => RouteData.Values["Year"].ToString();
+        private int GetReportingDeadlineYear() => RouteData.Values["Year"].ToInt32();
 
         private object GetOrgAndYearRouteData() => new { OrganisationIdentifier = GetOrganisationIdentifier(), year = GetReportingDeadlineYear() };
 
@@ -331,16 +331,22 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 var stashedViewModel = UnstashModel<GroupSearchViewModel>();
                 if (stashedViewModel != null) searchViewModel.GroupResults = stashedViewModel.GroupResults;
 
+                //Populate the extra submission info
+                await SubmissionPresenter.GetOtherSubmissionsInformationAsync(searchViewModel, GetReportingDeadlineYear());
+
                 //Add the group search model to session
                 StashModel(searchViewModel);
             }
             else if (viewModel is GroupReviewViewModel)
             {
                 var reviewViewModel = viewModel as GroupReviewViewModel;
-
+                
                 //Copy changes to the review model
                 var searchViewModel = UnstashModel<GroupSearchViewModel>();
                 if (searchViewModel != null) reviewViewModel.StatementOrganisations = searchViewModel.StatementOrganisations;
+
+                //Populate the extra submission info
+                await SubmissionPresenter.GetOtherSubmissionsInformationAsync(reviewViewModel, GetReportingDeadlineYear());
 
                 //Add the group search model to session
                 StashModel(reviewViewModel);
@@ -533,6 +539,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                 //showBanner when including/removing organisation
                 viewModel.ShowBanner = true;
+
+                //Populate the extra submission info
+                await SubmissionPresenter.GetOtherSubmissionsInformationAsync(viewModel, GetReportingDeadlineYear());
 
                 //Copy changes to the search review model
                 var reviewViewModel = UnstashModel<GroupReviewViewModel>();
