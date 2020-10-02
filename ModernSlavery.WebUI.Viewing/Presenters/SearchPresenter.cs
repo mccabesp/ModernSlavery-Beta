@@ -5,6 +5,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Viewing.Controllers;
 using ModernSlavery.WebUI.Viewing.Models;
+using System.Linq;
 
 namespace ModernSlavery.WebUI.Viewing.Presenters
 {
@@ -53,6 +54,11 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         ///     Returns the relative Url of the last search including querystring
         /// </summary>
         public string GetLastSearchUrl()
-            => Session[SEARCH_KEY].ToString();
+        {
+            if (Session.Keys.Contains(SEARCH_KEY))
+                return Session[SEARCH_KEY].ToString();
+
+            return UrlHelper.Action(nameof(ViewingController.SearchResults), "Viewing");
+        }
     }
 }
