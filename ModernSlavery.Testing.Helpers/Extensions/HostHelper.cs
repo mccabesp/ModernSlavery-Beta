@@ -37,19 +37,38 @@ namespace ModernSlavery.Testing.Helpers
             return host.Services.GetRequiredService<T>();
         }
 
+        public static IServiceScopeFactory GetServiceScopeFactory(this IHost host)
+        {
+            return host.Services.GetRequiredService<IServiceScopeFactory>();
+        }
+
+        public static IServiceScope CreateServiceScope(this IServiceScopeFactory serviceScopeFactory)
+        {
+            return serviceScopeFactory.CreateScope();
+        }
+
+        public static IServiceScope CreateServiceScope(this IHost host)
+        {
+            var serviceScopeFactory= host.GetServiceScopeFactory();
+            return serviceScopeFactory.CreateScope();
+        }
+
         public static IConfiguration GetConfiguration(this IHost host)
         {
             return host.Services.GetRequiredService<IConfiguration>();
         }
 
-        public static IDataRepository GetDataRepository(this IHost host)
+        public static IDataRepository GetDataRepository(this IHost host, IServiceScope serviceScope=null)
         {
-            return host.Services.GetRequiredService<IDataRepository>();
+            //if (serviceScope == null) serviceScope = host.CreateServiceScope(); //May need this to create a new scope every time but needs chekcing first
+            var serviceProvider = serviceScope?.ServiceProvider ?? host.Services;
+            return serviceProvider.GetRequiredService<IDataRepository>();
         }
 
-        public static IDbContext GetDbContext(this IHost host)
+        public static IDbContext GetDbContext(this IHost host, IServiceScope serviceScope = null)
         {
-            return host.Services.GetRequiredService<IDbContext>();
+            var serviceProvider = serviceScope?.ServiceProvider ?? host.Services;
+            return serviceProvider.GetRequiredService<IDbContext>();
         }
 
         public static IFileRepository GetFileRepository(this IHost host)

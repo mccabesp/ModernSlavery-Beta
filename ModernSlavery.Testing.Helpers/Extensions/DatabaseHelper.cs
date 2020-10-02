@@ -64,11 +64,15 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             dataImporter.ImportPrivateOrganisationsAsync(-1, 100).Wait();
             dataImporter.ImportPublicOrganisationsAsync(-1, 100).Wait();
 
+            //Set the full reset time to now (rounded up to nearest minute)
+            var importTime = DateTime.Now;
+            importTime = importTime.AddMinutes(1).AddSeconds(0 - importTime.Second);
+
             //Set the last database reset
             if (string.IsNullOrWhiteSpace(vaultName))
-                Environment.SetEnvironmentVariable(LastFullDatabaseResetKey, DateTime.Now.ToString());
+                Environment.SetEnvironmentVariable(LastFullDatabaseResetKey, importTime.ToString());
             else
-                host.SetKeyVaultSecret(vaultName, LastFullDatabaseResetKey, DateTime.Now.ToString());
+                host.SetKeyVaultSecret(vaultName, LastFullDatabaseResetKey, importTime.ToString());
         }
 
         /// <summary>

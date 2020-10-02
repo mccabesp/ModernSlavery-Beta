@@ -56,7 +56,8 @@ namespace ModernSlavery.Infrastructure.Azure.KeyVault
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
 
             var secret = GetSecret(name, secrets);
-            var latestValue = secret?.ListVersions().LastOrDefault();
+            var versions = secret?.ListVersions().ToList();
+            var latestValue = versions?.OrderByDescending(v => v.Attributes.Created).FirstOrDefault();
             return latestValue?.Value;
         }
 
