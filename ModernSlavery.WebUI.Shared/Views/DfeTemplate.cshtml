@@ -30,10 +30,10 @@
     <script src="/assets/javascripts/jquery-1.11.3.min.js"></script>
     <script src="/assets/javascripts/jquery.tablesorter.min.js"></script>
 
-    <environment exclude="Development, DEV, TEST">
+    <environment exclude="Development, DEV, TEST, QAT, PROD, PREPROD, UR">
         <script src="/assets/javascripts/application.min.js" type="text/javascript" asp-append-version="true"></script>
     </environment>
-    <environment include="Development, DEV, TEST">
+    <environment include="Development, DEV, TEST, QAT, PROD, PREPROD, UR">
         <script asp-src-include="/assets/javascripts/**/*.js" asp-src-exclude="/assets/javascripts/**/*.min.js" type="text/javascript"></script>
     </environment>
 

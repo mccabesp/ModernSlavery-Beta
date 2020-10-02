@@ -607,7 +607,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Get the backup draft filepath
             var draftBackupFilePath = GetDraftBackupFilepath(organisation.OrganisationId, reportingDeadline.Year);
 
-            var backupStatementModel = await LoadStatementModelFromFile(draftFilePath);
+            var backupStatementModel = await LoadStatementModelFromFile(draftBackupFilePath);
             if (backupStatementModel != null)
             {
                 //Restore the original draft from the backup unlkess its empty
