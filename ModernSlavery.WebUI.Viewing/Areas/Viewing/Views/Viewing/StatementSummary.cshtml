@@ -13,8 +13,7 @@
 }
 
 @section BeforeMain {
-    @* Model.BackUrl needs creating and setting *@
-    <a class="govuk-back-link" href="">Back</a>
+    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
 
 <div class="govuk-grid-row">
@@ -55,7 +54,7 @@
                     <a class="govuk-link"
                        asp-controller="Viewing" asp-action="StatementSummaryGroup"
                        asp-route-organisationIdentifier="@Model.ParentOrganisationId"
-                       asp-route-year="@Model.SubmissionDeadlineYear">a group of organisations</a>.</text>
+                       asp-route-year="@Model.SubmissionDeadlineYear">group of organisations</a>.</text>
             }
         </p>
 

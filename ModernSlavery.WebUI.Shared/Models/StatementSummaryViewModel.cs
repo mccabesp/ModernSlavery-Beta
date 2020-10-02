@@ -23,7 +23,8 @@ namespace ModernSlavery.WebUI.Shared.Models
             public AutoMapperProfile()
             {
                 CreateMap<OrganisationSearchModel, StatementSummaryViewModel>()
-                    .ForMember(d=>d.StatementSummaryUrl, opt=>opt.Ignore())
+                    .ForMember(d => d.StatementSummaryUrl, opt => opt.Ignore())
+                    .ForMember(d => d.BackUrl, opt => opt.Ignore())
                     .AfterMap<ObfuscateAction>();
             }
 
@@ -31,7 +32,7 @@ namespace ModernSlavery.WebUI.Shared.Models
             {
                 private readonly IUrlHelper _urlHelper;
                 private readonly IObfuscator _obfuscator;
-                
+
                 public ObfuscateAction(IUrlHelper urlHelper, IObfuscator obfuscator)
                 {
                     _urlHelper = urlHelper;
@@ -40,8 +41,8 @@ namespace ModernSlavery.WebUI.Shared.Models
                 public void Process(OrganisationSearchModel source, StatementSummaryViewModel destination, ResolutionContext context)
                 {
                     destination.ParentOrganisationId = _obfuscator.Obfuscate(source.ParentOrganisationId);
-                    destination.ChildOrganisationId = source.ChildOrganisationId==null ? null : _obfuscator.Obfuscate(source.ChildOrganisationId.Value);
-                    destination.StatementSummaryUrl = _urlHelper.ActionArea("StatementSummary","Viewing", "Viewing", new {organisationIdentifier= destination.ParentOrganisationId, reportingDeadlineYear= source.SubmissionDeadlineYear }, "https");
+                    destination.ChildOrganisationId = source.ChildOrganisationId == null ? null : _obfuscator.Obfuscate(source.ChildOrganisationId.Value);
+                    destination.StatementSummaryUrl = _urlHelper.ActionArea("StatementSummary", "Viewing", "Viewing", new { organisationIdentifier = destination.ParentOrganisationId, reportingDeadlineYear = source.SubmissionDeadlineYear }, "https");
                 }
             }
         }
@@ -58,6 +59,7 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         public string CompanyNumber { get; set; }
         public DateTime Modified { get; set; } = VirtualDateTime.Now;
+        public string BackUrl { get; set; }
 
         #endregion
 
