@@ -894,7 +894,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Ensure the viewmodel is valid before saving
             ModelState.Clear();
 
-            if (!TryValidateModel(pageViewModel))
+
+            if (!statementModel.IsEmpty() && !TryValidateModel(pageViewModel))
             {
                 //Dont validate the group search organisation name
                 if (pageViewModel is GroupSearchViewModel) ModelState.Exclude($"{nameof(GroupSearchViewModel.GroupResults)}.{nameof(GroupSearchViewModel.GroupResults.SearchKeywords)}", $"{nameof(GroupSearchViewModel.GroupResults)}.{nameof(GroupSearchViewModel.GroupResults.OrganisationName)}");
