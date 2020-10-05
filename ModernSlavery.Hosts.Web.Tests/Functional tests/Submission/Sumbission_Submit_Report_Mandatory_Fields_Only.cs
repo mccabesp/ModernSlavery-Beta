@@ -6,22 +6,11 @@ using System.Threading.Tasks;
 namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
-    public class Sumbission_Submit_Report_Mandatory_Fields_Only : CreateAccount
+    public class Sumbission_Submit_Report_Mandatory_Fields_Only : Submission_Complete_Mandatory_Sections
     {
-        const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
+        
 
-        string Pin;
-        public Sumbission_Submit_Report_Mandatory_Fields_Only() : base(_firstname, _lastname, _title, _email, _password)
-        {
-
-
-        }
-
-        [Test, Order(29)]
-        public async Task RegisterOrgAndSetScope()
-        {
-            await OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, TestData.OrgName, UniqueEmail);
-        }
+       
 
         [Test, Order(50)]
         public async Task NavigateToSubmissionPage()
@@ -61,9 +50,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(56)]
         public async Task SubmitFormWithOptionalSections()
         {
-            Click("Confirm and submit");
-
-            Expect("You've submitted your Modern Slavery statement for 2019 to 2020");
+            Click("Submit for publication");
+            Expect("Submission complete");
+            Expect(What.Contains, "You have submitted your modern slavery statement");
+            Expect(What.Contains, "for 2019 to 2020");
 
             Click("Finish and Sign out");
 
