@@ -191,7 +191,7 @@
                 <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled="@(!Model.CanSubmit())" name="command" value="@BaseViewModel.CommandType.Submit">
                     Submit for publication
                 </button>
-                @if (Model.HasChanged())
+                @if (Model.HasDraftChanged())
                 {
                     <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" name="command" value="@BaseViewModel.CommandType.SaveAndExit">
                         Exit and save changes
