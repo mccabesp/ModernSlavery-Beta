@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Needs setup added")]
+
 
     public class ReviewOrgListForGroupWithMoreThanFiveOrgs : UITest
     {
