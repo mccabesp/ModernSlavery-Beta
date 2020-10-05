@@ -209,7 +209,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("download-data/{year:int=0}")]
         public async Task<IActionResult> DownloadData(int year = 0)
         {
-            if (year == 0) year = ViewingService.SharedBusinessLogic.GetReportingStartDate(SectorTypes.Private).Year;
+            if (year == 0) year = ViewingService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(SectorTypes.Private).Year;
 
             //Ensure we have a directory
             if (!await SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(SharedBusinessLogic.SharedOptions

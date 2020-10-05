@@ -163,7 +163,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         public List<OptionSelect> GetReportingYearOptions(IEnumerable<int> filterSnapshotYears)
         {
             // setup the filters
-            var reportingDeadlines = _sharedBusinessLogic.GetReportingDeadlines(SectorTypes.Public);
+            var reportingDeadlines = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadlines(SectorTypes.Public);
             var sources = new List<OptionSelect>();
             foreach (var reportingDeadline in reportingDeadlines)
             {
