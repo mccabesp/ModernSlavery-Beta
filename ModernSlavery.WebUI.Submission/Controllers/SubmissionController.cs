@@ -102,9 +102,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var currentReportingDeadline = SharedBusinessLogic.GetReportingDeadline(userOrg.Organisation.SectorType);
 
             //Make sure we have an explicit scope for last and year for organisations new to this year
-            if (userOrg.PINConfirmedDate != null && userOrg.Organisation.Created >= currentReportingDeadline)
+            //TODO: May need refactoring for new multiyear scope - SMc
+            if (userOrg.PINConfirmedDate != null && userOrg.Organisation.Created >= currentReportingDeadline.AddYears(-1))
             {
-                var scopeStatus = await _SubmissionService.ScopeBusinessLogic.GetScopeStatusByReportingDeadlineOrLatestAsync(organisationId, currentReportingDeadline.AddYears(-1));
+                var scopeStatus = await _SubmissionService.ScopeBusinessLogic.GetScopeStatusByReportingDeadlineOrLatestAsync(organisationId, currentReportingDeadline.AddYears(-2));
                 if (!scopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.OutOfScope))
                     return RedirectToAction(nameof(ScopeController.DeclareScope), "Scope", new { organisationIdentifier });
             }

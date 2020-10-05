@@ -17,7 +17,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             CreateMap<StatementModel, GroupStatusViewModel>()
                 .IncludeBase<StatementModel, GroupOrganisationsViewModel>()
-                .ForMember(d => d.StatemsentOrganisations, opt => opt.Ignore());
+                .ForMember(d => d.StatementOrganisations, opt => opt.Ignore());
         }
     }
 
