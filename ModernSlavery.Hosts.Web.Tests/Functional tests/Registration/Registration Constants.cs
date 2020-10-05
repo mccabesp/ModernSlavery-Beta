@@ -29,7 +29,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public const string OrgName_Blackpool = "Blackpool Council";
         public const string RegisteredAddress_Blackpool = "PO Box 4, Blackpool, FY1 1NA";
         public const string Address1_Blackpool = "PO Box 4";
-        public const string Address2_Blackpool = "";
+        public const string Address2_Blackpool = "The Lane";
         public const string Address3_Blackpool = "Blackpool";
         public const string PostCode_Blackpool = "FY1 1NA";
         //codes 1, 84110
@@ -52,7 +52,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
         public const string OrgName_CantFind = "QWERTYUIOPQWERTYUIOP";
-        public const string CompanyNumber_CantFind = "";
+        public const string CompanyNumber_CantFind = "12345678";
         public const string CharityNumber_CantFind = "";
         public const string MutualPartnerShipNumber_CantFind = "";
         public const string DUNS_CantFind = "";
