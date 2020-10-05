@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting fix for public registration in 3113")]
+    [TestFixture]
 
     public class Registration_Public_Failure_Duplicate_Organisation : Registration_Public_Success
     {
@@ -30,7 +30,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //error should appear
 
             Expect("The following errors were detected");
-            Expect("You have already registered this organisation");
+            Expect("You have already started registering for this organisation");
 
             await Task.CompletedTask;
 

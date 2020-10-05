@@ -16,9 +16,9 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temporary igore")]
+    [TestFixture]
 
-    public class Registration_Public_Failure_Already_Started : Registration_Public_Start_Reigstration
+    public class Registration_Public_Failure_Already_Started : Registration_Public_Success
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
@@ -31,7 +31,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             await Task.CompletedTask;
         }
-        [Test, Order(30)]
+        [Test, Order(32)]
 
         public async Task SelectingDuplicateOrgCausesValidation()
         {
@@ -39,6 +39,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //org already started
             //error should appear
+            Click("Continue");
             Expect("The following errors were detected");
             Expect("You have already started registering for this organisation");
             await Task.CompletedTask;
