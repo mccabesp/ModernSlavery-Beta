@@ -1657,7 +1657,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Send a verification link to the email address
             var reviewCode = userOrg.GetReviewCode();
-            var reviewUrl = Url.ActionArea("ReviewRequest", "Admin", "Admin", new { code = reviewCode });
+            var reviewUrl = Url.ActionArea("ReviewRequest", "Admin", "Admin", new { code = reviewCode }, protocol: "https");
 
             //If the email address is a test email then simulate sending
             if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)) return;
