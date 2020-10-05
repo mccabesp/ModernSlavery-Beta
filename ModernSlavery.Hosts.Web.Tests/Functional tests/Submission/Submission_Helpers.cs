@@ -165,7 +165,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //expect all sectors in order
             for (int i = 0; i < Sectors.Length - 1; i++)
             {
-                ui.BelowLabel(Sectors[i]).ExpectLabel(Sectors[i + 1]);
+                ui.BelowLabel(The.Bottom, Sectors[i], Casing.Exact).ExpectLabel(That.Contains, Sectors[i + 1]);
             }
         }
 
@@ -174,7 +174,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //expect all financial options in order
             for (int i = 0; i < Financials.Length - 1; i++)
             {
-                ui.BelowLabel(Financials[i]).ExpectLabel(Financials[i + 1]);
+                ui.BelowLabel(That.Contains, Financials[i], Casing.Exact).ExpectLabel(That.Contains, Financials[i + 1]);
             }
         }
 
@@ -183,7 +183,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //expect all financial options in order
             for (int i = 0; i < Financials.Length; i++)
             {
-                ui.Set("What was your turnover or budget during the last financial accounting year?").To(Financials[i]);
+                ui.Below("What was your turnover or budget during the last financial accounting year?").ClickLabel(Financials[i]);
             }
         }
 

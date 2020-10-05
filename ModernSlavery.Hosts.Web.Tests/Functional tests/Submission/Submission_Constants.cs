@@ -43,7 +43,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         //codes 1, 84110
         public const string SicCodes_InterFloor = "Public Sector, General public administration activities";
 
-        public static readonly string[] Sectors = new string[] { "All", "Administrative and support service activities", "Your organisation", "Agriculture, Forestry and Fishing", "Arts,", "entertainment and recreation", "Construction", "Education", "Electricity, gas, steam and air conditioning supply", "Financial and insurance activities", "Human health and social work activities", "Information and communication", "Manufacturing", "Mining and Quarrying", "Other service activities", "Professional scientific and technical activities", "Public administration and defence", "Public sector", "Real estate activities", "Transportation and storage", "Water supply,", "sewerage, waste management and remediation activities", "Wholesale and retail trade" } ;
+        public static readonly string[] Sectors = new string[] { "Automotive, machinery and heavy electrical equipment", "Charitable / not-for-profit activities", "Cleaning and security services", "Construction, civil engineering and building products", "Consumer services, including accommodation, hospitality, tourism and leisure", "Cosmetics and toiletries", "Defence and aerospace", "Durable consumer goods, including electronics and appliances, home furnishings and other accessories", "Education and research", "Fashion, textiles, apparel and luxury goods", "Financial, insurance and real estate activities", "Food and beverages, agriculture and fishing", "Forestry, timber products, paper and containers and packaging", "Healthcare and pharmaceuticals", "Information technology and telecommunication", "Media, publishing, arts and entertainment", "Mining, metals, chemicals and resources (including oil and gas)", "Professional and administrative services and supplies, including legal, consulting and accounting services", "Public sector", "Transportation, logistics, and storage", "Utilities: gas, water and electricity", "Waste management and recycling", "Other" } ;
 
 
         public static readonly string[] GoodsAndServices = new string[] { "Goods for resale", "Goods not for resale", "Services for sale", "Services used for operational purposes" };
@@ -54,7 +54,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
 
-        public static readonly string[] Financials = new string[] { "Under £36 million", "£36 million - £60 million", "£60 million - £100 million", "£100 million - £500 million", "£500 million+" };
+        public static readonly string[] Financials = new string[] { "Under £36 million", "£36 million to £60 million", "£60 million to £100 million", "£100 million to £500 million", "Over £500 million" };
         
 
         public static readonly string[] SupplyChainSectors = new string[] { "Domestic work", "Construction", "Manufacturing", "Agriculture, forestries and fishing", "Accommodation and food service activities", "Wholesale and trade", "Personal services", "Mining and quarrying", "Other sector" };
