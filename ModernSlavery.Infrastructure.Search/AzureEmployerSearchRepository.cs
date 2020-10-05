@@ -12,6 +12,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.Rest.Azure;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
@@ -361,9 +362,16 @@ namespace ModernSlavery.Infrastructure.Search
 
             var indexClient = await _indexClient.Value;
 
-            var result = await indexClient.Documents.GetAsync<OrganisationSearchModel>(key, selectedFields);
+            try
+            {
+                var result = await indexClient.Documents.GetAsync<OrganisationSearchModel>(key, selectedFields);
 
-            return result;
+                return result;
+            }
+            catch (CloudException cex)when (cex?.Response?.StatusCode==System.Net.HttpStatusCode.NotFound)
+            {
+                return null;
+            }
         }
 
         public async Task<IList<OrganisationSearchModel>> ListDocumentsAsync(string selectFields = null, string filter=null)

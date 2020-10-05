@@ -350,7 +350,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             StashModel(stateModel);
 
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            var currentDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
+            var currentDeadlineDate = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(organisation.SectorType);
 
             if (stateModel.UserIsRegistered)
             {
@@ -449,7 +449,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     $"User {VirtualUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.OrganisationReference}");
 
             //Get the current snapshot date
-            var reportingDeadline = SharedBusinessLogic.GetReportingDeadline(userOrg.Organisation.SectorType).AddYears(-2);
+            var reportingDeadline = SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(userOrg.Organisation.SectorType).AddYears(-1);
             if (reportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear)
                 return new HttpBadRequestResult($"Snapshot year {reportingDeadline} is invalid");
 

@@ -18,22 +18,12 @@ namespace ModernSlavery.BusinessDomain.Shared
         INotificationService NotificationService { get; }
         IAuthorisationBusinessLogic AuthorisationBusinessLogic { get; }
         IAuthenticationBusinessLogic AuthenticationBusinessLogic { get; }
+        IReportingDeadlineHelper ReportingDeadlineHelper { get; }
         IObfuscator Obfuscator { get; }
-
-        /// <summary>
-        ///     Returns the accounting start date for the specified sector and year
-        /// </summary>
-        /// <param name="sectorType">The sector type of the organisation</param>
-        /// <param name="year">The starting year of the accounting period. If 0 then uses current accounting period</param>
-        /// <returns></returns>
-        DateTime GetReportingStartDate(SectorTypes sectorType, int year = 0);
-        DateTime GetReportingDeadline(SectorTypes sectorType, int year = 0);
-        IList<DateTime> GetReportingDeadlines(SectorTypes sectorType, int recentYears = 0);
     }
 
     public class SharedBusinessLogic : ISharedBusinessLogic
     {
-        private readonly IReportingDeadlineHelper _snapshotDateHelper;
         public IObfuscator Obfuscator { get; }
         public SharedOptions SharedOptions { get; }
         public IFileRepository FileRepository { get; }
@@ -43,8 +33,8 @@ namespace ModernSlavery.BusinessDomain.Shared
         public INotificationService NotificationService { get; }
         public IAuthorisationBusinessLogic AuthorisationBusinessLogic { get; }
         public IAuthenticationBusinessLogic AuthenticationBusinessLogic { get; }
-
-        public SharedBusinessLogic(SharedOptions sharedOptions, IReportingDeadlineHelper snapshotDateHelper,
+        public IReportingDeadlineHelper ReportingDeadlineHelper { get; }
+        public SharedBusinessLogic(SharedOptions sharedOptions, IReportingDeadlineHelper reportingDeadlineHelper,
             ISourceComparer sourceComparer,
             ISendEmailService sendEmailService, 
             INotificationService notificationService, 
@@ -53,7 +43,7 @@ namespace ModernSlavery.BusinessDomain.Shared
             IFileRepository fileRepository, IDataRepository dataRepository, IObfuscator obfuscator)
         {
             SharedOptions = sharedOptions;
-            _snapshotDateHelper = snapshotDateHelper;
+            ReportingDeadlineHelper = reportingDeadlineHelper;
             SourceComparer = sourceComparer;
             SendEmailService = sendEmailService;
             NotificationService = notificationService;
@@ -62,27 +52,6 @@ namespace ModernSlavery.BusinessDomain.Shared
             FileRepository = fileRepository;
             DataRepository = dataRepository;
             Obfuscator = obfuscator;
-        }
-
-        /// <summary>
-        ///     Returns the accounting start date for the specified sector and year
-        /// </summary>
-        /// <param name="sectorType">The sector type of the organisation</param>
-        /// <param name="year">The starting year of the accounting period. If 0 then uses current accounting period</param>
-        /// <returns></returns>
-        public DateTime GetReportingStartDate(SectorTypes sectorType, int year = 0)
-        {
-            return _snapshotDateHelper.GetReportingStartDate(sectorType, year);
-        }
-
-        public DateTime GetReportingDeadline(SectorTypes sectorType, int year = 0)
-        {
-            return _snapshotDateHelper.GetReportingDeadline(sectorType, year);
-        }
-
-        public IList<DateTime> GetReportingDeadlines(SectorTypes sectorType, int recentYears = 0)
-        {
-            return _snapshotDateHelper.GetReportingDeadlines(sectorType, recentYears);
         }
     }
 }

@@ -277,15 +277,15 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (organisation == null) return new Outcome<StatementErrors, (Organisation, DateTime)>(StatementErrors.NotFound);
 
             //Get the reporting deadline
-            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType, reportingDeadlineYear);
+            var reportingDeadline = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(organisation.SectorType, reportingDeadlineYear);
 
             return new Outcome<StatementErrors, (Organisation, DateTime)>((organisation, reportingDeadline));
         }
 
         private void CheckReportingDeadline(Organisation organisation, DateTime reportingDeadline)
         {
-            var firstDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType, _sharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear);
-            var currentDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
+            var firstDeadline = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(organisation.SectorType, _sharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear);
+            var currentDeadline = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(organisation.SectorType);
 
             if (reportingDeadline < firstDeadline || reportingDeadline > currentDeadline.AddDays(1)) throw new ArgumentOutOfRangeException(nameof(reportingDeadline));
         }
@@ -431,8 +431,8 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public async IAsyncEnumerable<StatementInfoModel> GetStatementInfoModelsAsync(Organisation organisation)
         {
-            var reportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType, _sharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear);
-            var currentReportingDeadline = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
+            var reportingDeadline = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(organisation.SectorType, _sharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear);
+            var currentReportingDeadline = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(organisation.SectorType);
             while (reportingDeadline <= currentReportingDeadline)
             {
                 yield return await GetStatementInfoModelAsync(organisation, reportingDeadline);
