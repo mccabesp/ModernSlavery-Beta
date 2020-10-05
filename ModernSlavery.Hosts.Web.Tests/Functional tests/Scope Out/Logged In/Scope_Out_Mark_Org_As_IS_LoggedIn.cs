@@ -51,7 +51,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             await OrganisationHelper.GetOrganisationBusinessLogic(TestRunSetup.TestWebHost).CreateOrganisationSecurityCodeAsync(Registration.Organisation.OrganisationReference, new DateTime(2030, 1, 10));
 
             User CurrentUser = await TestRunSetup.TestWebHost.GetDataRepository().SingleOrDefaultAsync<User>(o => o.EmailAddress == UniqueEmail);
-            await OrganisationHelper.GetOrganisationBusinessLogic(TestRunSetup.TestWebHost).SetAsScopeAsync(Registration.Organisation.OrganisationReference, 2020, "Updated by test case", CurrentUser, ScopeStatuses.OutOfScope, true);
+            await OrganisationHelper.GetOrganisationBusinessLogic(TestRunSetup.TestWebHost).SetAsScopeAsync(TestData.Organisation.OrganisationReference, 2020, "Updated by test case", CurrentUser, ScopeStatuses.OutOfScope, true);
 
 
 
@@ -92,7 +92,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(34)]
         public async Task VerifyOrgDetails()
         {
-            RightOfText("Organisation Reference").Expect(Registration.Organisation.OrganisationReference);
+            RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference);
             RightOfText("Organisation Name").Expect(TestData.OrgName);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");

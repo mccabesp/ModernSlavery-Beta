@@ -54,13 +54,12 @@ private bool TestRunFailed = false;
         private bool CanBeSetOutOfScope(Organisation org)
             => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope);
 
-        [Test, Order(18)]
-        public async Task SetScope()
+        [Test, Order(20)]
+        public async Task SetSecurityCode()
         {
 
-            await OrganisationHelper.GetOrganisationBusinessLogic(TestRunSetup.TestWebHost).CreateOrganisationSecurityCodeAsync(Registration.Organisation.OrganisationReference, new DateTime(2030, 1, 10));
 
-
+            await OrganisationHelper.SetSecurityCode(TestRunSetup.TestWebHost, TestData.Organisation, new DateTime(2021, 6, 10));
 
 
             await Task.CompletedTask;
@@ -69,7 +68,7 @@ private bool TestRunFailed = false;
         [Test, Order(22)]
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
         {
-            Goto(ScopeConstants.ScopeUrl);
+            Goto(TestData.ScopeUrl);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
             await Task.CompletedTask;
         }
@@ -77,8 +76,8 @@ private bool TestRunFailed = false;
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Organisation Reference").To(EmployerReference);
-            Set("Security Code").To("ABCD1234");
+            Set("Organisation Reference").To(TestData.Organisation.OrganisationReference);
+            Set("Security Code").To(TestData.Organisation.SecurityCode);
             await Task.CompletedTask;
         }
 
@@ -89,7 +88,7 @@ private bool TestRunFailed = false;
             ExpectHeader("Confirm your organisation’s details");
             await Task.CompletedTask;
         }
-               
+
 
         [Test, Order(38)]
         public async Task CheckIncorrectDetailsLink()
@@ -97,7 +96,7 @@ private bool TestRunFailed = false;
             //info not correct, click link
             ExpectLink("modernslaverystatements@homeoffice.gov.uk");
 
-            ExpectXPath("//a[@href = 'modernslaverystatements@homeoffice.gov.uk'");
+            ExpectXPath("//a[contains(@href, 'mailto:modernslaverystatements@homeoffice.gov.uk')]");
 
             await Task.CompletedTask;
         }

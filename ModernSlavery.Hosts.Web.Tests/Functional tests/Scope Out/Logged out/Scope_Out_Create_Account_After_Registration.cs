@@ -20,6 +20,8 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     public class Scope_Out_Create_Account_After_Registration : Scope_Out_Mark_Org_As_OOS_LoggedOut
     {
+
+
         private string URL;
 
         [Test, Order(50)]
@@ -103,32 +105,11 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Continue");
 
 
-            ExpectHeader("Confirm your organisation`s details");
+            ExpectHeader(That.Contains,"Select an organisation");
 
             await Task.CompletedTask;
 
         }
 
-        [Test, Order(62)]
-        public async Task ConfrimOrgDetails()
-        {
-            RightOfText("Name").Expect(TestData.OrgName);
-            RightOfText("Company number").Expect("1");
-            //todo await helper implementation for address logic
-            RightOfText("Registered address").Expect("");
-
-            Click("Confirm");
-
-            ExpectHeader("You can now submit a modern slavery statement for this organisation");
-            await Task.CompletedTask;
-        }
-        [Test, Order(64)]
-        public async Task VerifyOrgRegistered()
-        {
-            Click("Continue");
-
-            Expect(TestData.OrgName);
-            await Task.CompletedTask;
-        }
     }
 }
