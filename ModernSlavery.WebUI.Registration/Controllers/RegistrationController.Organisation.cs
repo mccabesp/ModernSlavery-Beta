@@ -1232,7 +1232,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     new CompleteViewModel
                     {
                         OrganisationId = userOrg.OrganisationId,
-                        AccountingDate = _registrationService.SharedBusinessLogic.GetReportingStartDate(sector.Value)
+                        AccountingDate = _registrationService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(sector.Value)
                     });
 
                 //BUG: the return keyword was missing here so no redirection would occur

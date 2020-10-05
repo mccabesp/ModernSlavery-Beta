@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using AutoMapper;
@@ -115,15 +116,40 @@ namespace ModernSlavery.WebUI.Shared.Models
         #region Supply Chain Risks
         public List<RiskTypeIndex.RiskType> RelevantRisks { get; set; } = new List<RiskTypeIndex.RiskType>();
 
+        public List<short> GetRelevantRiskParentIds()
+        {
+            var parentIds = RelevantRisks.Where(d => d.ParentId != null).OrderBy(d => d.Description).Select(d => d.ParentId.Value).Distinct().ToList();
+            return parentIds;
+        }
+
         public string OtherRelevantRisks { get; set; }
         public List<RiskTypeIndex.RiskType> HighRisks { get; set; } = new List<RiskTypeIndex.RiskType>();
+        public List<short> GetHighRiskParentIds()
+        {
+            var parentIds = HighRisks.Where(d => d.ParentId != null).OrderBy(d => d.Description).Select(d => d.ParentId.Value).Distinct().ToList();
+            return parentIds;
+        }
+
+
         public string OtherHighRisks { get; set; }
 
         public List<RiskTypeIndex.RiskType> LocationRisks { get; set; } = new List<RiskTypeIndex.RiskType>();
+
+        public List<short> GetLocationRiskParentIds()
+        {
+            var parentIds = LocationRisks.Where(d => d.ParentId != null).OrderBy(d => d.Description).Select(d => d.ParentId.Value).Distinct().ToList();
+            return parentIds;
+        }
+
         #endregion
 
         #region Due Diligence
         public List<DiligenceTypeIndex.DiligenceType> DueDiligences { get; set; } = new List<DiligenceTypeIndex.DiligenceType>();
+        public List<short> GetDiligenceParentIds()
+        {
+            var parentIds = DueDiligences.Where(d => d.ParentId != null).OrderBy(d => d.Description).Select(d => d.ParentId.Value).Distinct().ToList();
+            return parentIds;
+        }
 
         public string ForcedLabourDetails { get; set; }
         public string SlaveryInstanceDetails { get; set; }

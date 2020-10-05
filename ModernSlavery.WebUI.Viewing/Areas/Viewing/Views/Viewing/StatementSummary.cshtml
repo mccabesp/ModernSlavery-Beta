@@ -345,19 +345,16 @@
                 <div class="govuk-body govuk-!-font-weight-bold">
                     The organisation told us it considered the following areas to be relevant when assessing its supply chain for modern slavery risks:
                 </div>
-                var relevantRiskGroups = Model.RelevantRisks
-                    .GroupBy(r => r.ParentId)
-                    .ToDictionary(g => g.Key, g => g.ToList());
-                @foreach (var group in relevantRiskGroups)
+                @foreach (var parentId in Model.GetRelevantRiskParentIds())
                 {
-                    var parent = _riskTypeIndex.SingleOrDefault(i => i.Id == group.Key);
+                    var parent = _riskTypeIndex.First(d => d.Id == parentId);
                     <div class="govuk-body">
                         @parent.Description
                     </div>
                     <ul class="govuk-list govuk-list--bullet">
-                        @foreach (var risk in group.Value)
+                        @foreach (var item in Model.RelevantRisks.Where(d => d.ParentId == parentId))
                         {
-                            <li>@risk.Description</li>
+                            <li>@item.Description</li>
                         }
                     </ul>
                 }
@@ -389,19 +386,16 @@
                 <div class="govuk-body govuk-!-font-weight-bold">
                     The organisation told us it considered the following areas to be relevant when assessing its supply chain for modern slavery risks:
                 </div>
-                var highRiskGroups = Model.HighRisks
-                    .GroupBy(hr => hr.ParentId)
-                    .ToDictionary(g => g.Key, g => g.ToList());
-                @foreach (var group in highRiskGroups)
+                @foreach (var parentId in Model.GetHighRiskParentIds())
                 {
-                    var parent = _riskTypeIndex.SingleOrDefault(i => i.Id == group.Key);
+                    var parent = _riskTypeIndex.First(d => d.Id == parentId);
                     <div class="govuk-body">
                         @parent.Description
                     </div>
                     <ul class="govuk-list govuk-list--bullet">
-                        @foreach (var highRisk in group.Value)
+                        @foreach (var item in Model.HighRisks.Where(d => d.ParentId == parentId))
                         {
-                            <li>@highRisk.Description</li>
+                            <li>@item.Description</li>
                         }
                     </ul>
                 }
@@ -432,19 +426,16 @@
                 <div class="govuk-body govuk-!-font-weight-bold">
                     During the period of the statement, the organisation considered the following geographic areas in its business and supply chains to be at highest risk of modern slavery:
                 </div>
-                var locationRiskGroups = Model.LocationRisks
-                    .GroupBy(lr => lr.ParentId)
-                    .ToDictionary(g => g.Key, g => g.ToList());
-                @foreach (var group in locationRiskGroups)
+                @foreach (var parentId in Model.GetLocationRiskParentIds())
                 {
-                    var parent = _riskTypeIndex.SingleOrDefault(i => i.Id == group.Key);
+                    var parent = _riskTypeIndex.First(d => d.Id == parentId);
                     <div class="govuk-body">
                         @parent.Description
                     </div>
                     <ul class="govuk-list govuk-list--bullet">
-                        @foreach (var locationRisk in group.Value)
+                        @foreach (var item in Model.LocationRisks.Where(d => d.ParentId == parentId))
                         {
-                            <li>@locationRisk.Description</li>
+                            <li>@item.Description</li>
                         }
                     </ul>
                 }
@@ -468,21 +459,15 @@
                 <div class="govuk-body govuk-!-font-weight-bold">
                     The organisation used the following methods and processes to monitor working conditions in its business and supply chains during this period:
                 </div>
-                var diligenceGroups = Model.DueDiligences
-                    .Select(d =>
-                    {
-                        var parent = _diligenceTypeIndex.SingleOrDefault(t => t.Id == d.ParentId);
-                        return new { d.Id, d.Description, Category = parent.Description };
-                    })
-                    .GroupBy(hr => hr.Category)
-                    .ToDictionary(g => g.Key, g => g.ToList());
-                @foreach (var group in diligenceGroups)
+             
+                @foreach (var parentId in Model.GetDiligenceParentIds())
                 {
+                    var parent = _diligenceTypeIndex.First(d => d.Id == parentId);
                     <div class="govuk-body">
-                        @group.Key
+                        @parent.Description
                     </div>
                     <ul class="govuk-list govuk-list--bullet">
-                        @foreach (var item in group.Value)
+                        @foreach (var item in Model.DueDiligences.Where(d=>d.ParentId==parentId))
                         {
                             <li>@item.Description</li>
                         }
