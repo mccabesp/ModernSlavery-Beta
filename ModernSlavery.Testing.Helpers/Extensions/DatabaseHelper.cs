@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace ModernSlavery.Testing.Helpers.Extensions
 {
@@ -28,7 +29,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             if (!force)
             {
                 var lastFullDatabaseReset = string.IsNullOrWhiteSpace(vaultName) ? Environment.GetEnvironmentVariable(LastFullDatabaseResetKey).ToDateTime() : host.GetKeyVaultSecret(vaultName, LastFullDatabaseResetKey).ToDateTime();
-                if (lastFullDatabaseReset > DateTime.MinValue)
+                if (lastFullDatabaseReset > DateTime.MinValue && lastFullDatabaseReset.Date==DateTime.Now.Date)
                 {
                     host.ResetDatabase(lastFullDatabaseReset);
                     return;
@@ -64,9 +65,9 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             dataImporter.ImportPrivateOrganisationsAsync(-1, 100).Wait();
             dataImporter.ImportPublicOrganisationsAsync(-1, 100).Wait();
 
-            //Set the full reset time to now (rounded up to nearest minute)
+            //Set the full reset time to now (+15 seconds grace)
+            Thread.Sleep(15);
             var importTime = DateTime.Now;
-            importTime = importTime.AddMinutes(1).AddSeconds(0 - importTime.Second);
 
             //Set the last database reset
             if (string.IsNullOrWhiteSpace(vaultName))
