@@ -42,6 +42,7 @@ namespace ModernSlavery.Testing.Helpers
             return host.Services.GetRequiredService<IServiceScopeFactory>();
         }
 
+
         public static IServiceScope CreateServiceScope(this IServiceScopeFactory serviceScopeFactory)
         {
             return serviceScopeFactory.CreateScope();
@@ -58,11 +59,20 @@ namespace ModernSlavery.Testing.Helpers
             return host.Services.GetRequiredService<IConfiguration>();
         }
 
+        private static IServiceScope _dbScope=null;
         public static IDataRepository GetDataRepository(this IHost host, IServiceScope serviceScope=null)
         {
             //if (serviceScope == null) serviceScope = host.CreateServiceScope(); //May need this to create a new scope every time but needs chekcing first
+            if (serviceScope == null) serviceScope = _dbScope ?? (_dbScope=host.CreateServiceScope()); //Use the static scope or create a new one
+
             var serviceProvider = serviceScope?.ServiceProvider ?? host.Services;
             return serviceProvider.GetRequiredService<IDataRepository>();
+        }
+
+        //Reset the static db scope
+        public static void ResetDbScope()
+        {
+            _dbScope = null;
         }
 
         public static IDbContext GetDbContext(this IHost host, IServiceScope serviceScope = null)
