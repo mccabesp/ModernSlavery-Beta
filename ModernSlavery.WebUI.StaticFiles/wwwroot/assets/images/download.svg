@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="109px" height="150px" viewBox="0 0 109 150" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Group 2</title>
+    <defs>
+        <rect id="path-1" x="5" y="5" width="99" height="140"></rect>
+        <filter x="-1.5%" y="-1.1%" width="105.1%" height="104.3%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="0.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.796078431   0 0 0 0 0.796078431   0 0 0 0 0.796078431  0 0 0 1 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-2">
+            <rect id="Rectangle-Copy-5" fill="#E6E6E6" x="0" y="0" width="109" height="150"></rect>
+            <g id="Rectangle">
+                <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+            </g>
+            <path d="M17,18 L92,18 L92,45 L17,45 L17,18 Z M17,65 L26,65 L26,74 L17,74 L17,65 Z M17,83 L26,83 L26,92 L17,92 L17,83 Z M17,101 L26,101 L26,110 L17,110 L17,101 Z M17,119 L26,119 L26,128 L17,128 L17,119 Z M35,65 L92,65 L92,74 L35,74 L35,65 Z M35,83 L74,83 L74,92 L35,92 L35,83 Z M35,101 L92,101 L92,110 L35,110 L35,101 Z M35,119 L83,119 L83,128 L35,128 L35,119 Z" id="Shape" fill="#B1B4B6" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>
