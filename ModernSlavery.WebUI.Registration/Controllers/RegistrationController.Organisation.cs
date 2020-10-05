@@ -977,6 +977,19 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             s.SicSectionId != "X");
                         organisation.SicCodeIds = sic?.SicCodeId.ToString();
                     }
+                    else if (organisation.OrganisationId > 0)
+                    {
+                        var org= await SharedBusinessLogic.DataRepository.GetAsync<Organisation>(organisation.OrganisationId);
+                        if (org != null)
+                        {
+                            var sicCodes = org.GetLatestSicCodes();
+                            if (sicCodes.Any())
+                            {
+                                organisation.SicCodeIds = sicCodes.OrderBy(s => s.SicCodeId).Select(s => s.SicCodeId).ToDelimitedString();
+                                organisation.SicSource = sicCodes.First().Source;
+                            }
+                        }
+                    }
                     else
                     {
                         try
