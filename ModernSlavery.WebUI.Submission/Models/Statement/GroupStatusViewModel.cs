@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -20,7 +17,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             CreateMap<StatementModel, GroupStatusViewModel>()
                 .IncludeBase<StatementModel, GroupOrganisationsViewModel>()
-                .ForMember(d => d.StatementOrganisations, opt => opt.Ignore());
+                .ForMember(d => d.StatemsentOrganisations, opt => opt.Ignore());
         }
     }
 

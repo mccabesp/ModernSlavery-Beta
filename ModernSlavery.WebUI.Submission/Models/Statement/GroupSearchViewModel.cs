@@ -1,15 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -30,7 +25,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     }
 
     public class GroupSearchViewModel : GroupOrganisationsViewModel
-    {
+    {  
         public override string PageTitle => "Which organisations are included in your group statement?";
         [IgnoreMap]
         [BindNever]

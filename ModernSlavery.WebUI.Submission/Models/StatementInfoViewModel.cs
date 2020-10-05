@@ -31,10 +31,8 @@ namespace ModernSlavery.WebUI.Submission.Models
                     return "Start draft";
                 if (!SubmissionAvailable && DraftAvailable)
                     return "Continue";
-                if (SubmissionAvailable && !DraftAvailable)
+                if (SubmissionAvailable)
                     return "Edit and republish";
-                if (SubmissionAvailable && DraftAvailable)
-                    return "Continue";
                 return null;
             }
         }

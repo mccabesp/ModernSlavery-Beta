@@ -1,14 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Text;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -18,7 +16,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public GroupOrganisationsViewModelMapperProfile()
         {
             CreateMap<StatementModel.StatementOrganisationModel, GroupOrganisationsViewModel.StatementOrganisationViewModel>()
-                .ForMember(s => s.OtherSubmissionsInformation, opt => opt.Ignore());
+                .ForMember(d => d.OtherSubmissionsInformation, opt => opt.Ignore());
 
             CreateMap<GroupOrganisationsViewModel.StatementOrganisationViewModel, StatementModel.StatementOrganisationModel>();
 
@@ -51,7 +49,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             public AddressModel Address { get; set; }
             public string CompanyNumber { get; set; }
             public DateTime? DateOfCessation { get; set; }
-            public string OtherSubmissionsInformation { get; set; }
+
+            [NotMapped]
+            [BindNever]
+            public List<string> OtherSubmissionsInformation { get; set; }
         }
         #endregion
 
