@@ -23,7 +23,7 @@
                                 else
                                 {
                                     <span>Included in @(Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation.Count) other organisations’ group statements</span>
-                                    <details class="govuk-details" data-module="govuk-details" open="">
+                                    <details class="govuk-details" data-module="govuk-details">
                                         <summary class="govuk-details__summary">
                                             <span class="govuk-details__summary-text">
                                                 Which other statements include this organisation?
@@ -33,7 +33,7 @@
                                             Included in:
                                             @foreach (var otherSubmissionsInformation in Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation)
                                             {
-                                                <div>@Html.Raw(otherSubmissionsInformation.ReplaceI("\n", "<br />"))</div>
+                                                <div class="govuk-!-padding-top-1">@Html.Raw(otherSubmissionsInformation.ReplaceI("\n", "<br />"))</div>
                                             }
                                         </div>
                                     </details>
