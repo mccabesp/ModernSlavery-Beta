@@ -72,6 +72,7 @@ namespace ModernSlavery.Testing.Helpers
         //Reset the static db scope
         public static void ResetDbScope()
         {
+            _dbScope?.Dispose();
             _dbScope = null;
         }
 
