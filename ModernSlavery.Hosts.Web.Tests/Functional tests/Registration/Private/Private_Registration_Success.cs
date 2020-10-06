@@ -12,7 +12,7 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
-
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -28,6 +28,15 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
+        private Organisation org;
+        [OneTimeSetUp]
+        public async Task OTSetUp()
+        {
+            //HostHelper.ResetDbScope();
+            org = TestRunSetup.TestWebHost
+                .Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            await Task.CompletedTask;
+        }
         [Test, Order(20)]
         public async Task GoToPrivateRegistrationPage()
         {

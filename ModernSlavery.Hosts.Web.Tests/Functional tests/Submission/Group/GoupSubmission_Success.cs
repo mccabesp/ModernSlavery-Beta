@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Group")]
+    [TestFixture]
 
     public class GroupSubmission_Success : CreateAccount
     {
@@ -33,7 +33,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(32)]
         public async Task GoToManageOrgPage()
         {
-            Goto("/");
+            Goto("/manage-organisations");
 
             Click("Manage organisations");
             ExpectHeader(That.Contains, "Select an organisation");
@@ -99,7 +99,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             for (int i = 1; i < 5; i++)
             {
                 //BelowHeader(TestData.Organisations[i].OrganisationName).Expect(TestData.Organisations[i].GetAddressString(DateTime.Now));
-                BelowHeader(TestData.Organisations[i].OrganisationName).Expect("Company number: " + TestData.Organisations[i].CompanyNumber);
+                Below(TestData.Organisations[i].OrganisationName).Expect("Company number: " + TestData.Organisations[i].CompanyNumber);
             }
 
             await Task.CompletedTask;

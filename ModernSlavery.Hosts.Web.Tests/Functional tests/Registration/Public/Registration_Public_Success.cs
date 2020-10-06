@@ -1,8 +1,12 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Extensions;
 //using ModernSlavery.WebUI.Viewing.Views.ActionHub.Old.EffectiveParts;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
+using ModernSlavery.Testing;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -13,14 +17,25 @@ namespace ModernSlavery.Hosts.Web.Tests
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
+        private Organisation org;
+        [OneTimeSetUp]
+        public async Task OTSetUp()
+        {
+            //HostHelper.ResetDbScope();
+            org = TestRunSetup.TestWebHost
+                .Find<Organisation>(org => org.LatestRegistrationUserId == null && org.SectorType.IsAny(SectorTypes.Public));
+            await Task.CompletedTask;
+        }
+        
         [Test, Order(30)]
         public async Task ExpectAddressFields()
         {
 
 
+//            ClickButton(That.Contains, "Choose");
             ExpectHeader("Your organisation's address");
 
-            var OrgAdress = TestData.Organisation.GetAddress(DateTime.Now);
+            var OrgAdress = org.GetAddress(DateTime.Now);
             //fields pre-populated
             //todo discuss address issue - RegistrationController.Manual
             //AtField("Address 1").Expect(OrgAdress.Address1);
@@ -66,8 +81,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ExpectOrgDetailsFields()
         {
 
-            RightOfText("Organisation name").Expect(TestData.Organisation.OrganisationName);
-            //RightOfText("Registered address").Expect(TestData.Organisation.GetAddressString(DateTime.Now));
+            RightOfText("Organisation name").Expect(org.OrganisationName);
+            //RightOfText("Registered address").Expect(org.GetAddressString(DateTime.Now));
 
             ExpectRow("Your contact details");
             RightOfText("Your name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last + " (" + Create_Account.roger_job_title+ ")");
@@ -108,7 +123,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect(What.Contains, "If there is still no email from us, or for any other help with your registration, contact");
             ExpectXPath("//a[@href='mailto:modernslaverystatements@homeoffice.gov.uk']");
             Click(The.Bottom, "Manage Organisations");
-            Expect(TestData.Organisation.OrganisationName);
+            Expect(org.OrganisationName);
             await Task.CompletedTask;
 
         }

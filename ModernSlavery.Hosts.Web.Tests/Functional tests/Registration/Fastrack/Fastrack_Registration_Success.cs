@@ -28,11 +28,23 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
         private Organisation Org;
+
+        [OneTimeSetUp]
+        public async Task OTSetUp()
+        {
+            //HostHelper.ResetDbScope();
+            Org = TestRunSetup.TestWebHost
+                .Find<Organisation>(org => org.LatestRegistrationUserId == null);
+
+            await Testing.Helpers.Extensions.OrganisationHelper.SetSecurityCode(TestRunSetup.TestWebHost, Org, new DateTime(2022, 01, 01));
+            await Task.CompletedTask;
+        }
+
         [Test, Order(20)]
         public async Task GoToRegistrationPage()
         {
-            Org = this.GetOrganisation(TestData.OrgName);
-            await this.SetSecurityCode(Org, new DateTime(2022, 01, 01));
+           
+            
 
             Click("Register an organisation");
 

@@ -1,4 +1,7 @@
 ﻿using Geeks.Pangolin;
+using Microsoft.Azure.Management.CosmosDB.Fluent.Models;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -9,6 +12,16 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     public class Submission_Complete_Mandatory_Sections : Private_Registration_Success
     {
+        private Organisation org;
+        [OneTimeSetUp]
+        public async Task SetUp()
+        {
+            //HostHelper.ResetDbScope();
+            org = TestRunSetup.TestWebHost
+                .Find<Organisation>(org => org.LatestRegistrationUserId == null);
+
+        }
+
         [Test, Order(40)]
         public async Task StartSubmission()
         {

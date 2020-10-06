@@ -86,6 +86,8 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             {
                 userOrganisation = new UserOrganisation { UserId = userId, OrganisationId = organisationId };
                 dataRepository.Insert(userOrganisation);
+                //todo fix this helper properly
+                organisation.LatestRegistrationUserId = user.UserId;
             }
             if (string.IsNullOrWhiteSpace(pin))
             {

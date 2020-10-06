@@ -25,10 +25,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
         }
 
+        private Organisation org;
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            TestData.Organisation = this.Find<Organisation>(o => o.SectorType == SectorTypes.Public);
+            org = TestRunSetup.TestWebHost.Find<Organisation>(o => o.SectorType == SectorTypes.Public);
         }
 
         [Test, Order(20)]
@@ -52,12 +53,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(22)]
         public async Task SearchForOrg()
         { 
-            SetXPath("//input[@id='SearchText']").To(TestData.Organisation.OrganisationName);
+            SetXPath("//input[@id='SearchText']").To(org.OrganisationName);
             Click(The.Bottom, "Search");
 
 
             Expect("Organisation name and registered address");
-            ExpectRow(That.Contains, TestData.Organisation.OrganisationName);
+            ExpectRow(That.Contains, org.OrganisationName);
             
 
             //message should not appear with single result 
@@ -69,7 +70,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task SelectOrg()
         {
-            ClickButton(That.Contains, "Choose");
+            ClickButton(The.Top, That.Contains, "Choose");
 
             ExpectHeader("Your organisation's address");
             ExpectText("Enter the correspondence address of the organisation you want to register.");
