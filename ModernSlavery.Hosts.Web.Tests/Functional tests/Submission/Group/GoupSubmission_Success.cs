@@ -21,7 +21,14 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
         }
-
+        [OneTimeSetUp]
+        public async Task OTSetUp()
+        {
+            //HostHelper.ResetDbScope();
+            TestData.Organisation = TestRunSetup.TestWebHost
+                .Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            await Task.CompletedTask;
+        }
         [Test, Order(30)]
         public async Task RegisterOrg()
         {
@@ -110,9 +117,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ContinueToSubmission()
         {
             Click("Confirm and continue");
-            ExpectHeader("Before you start");
-            Click("Start Now");
-            ExpectHeader("Your modern slavery statement");
+            //ExpectHeader("Before you start");
+            //Click("Start Now");
+            ExpectHeader(That.Contains, "Your modern slavery statement");
 
             await Task.CompletedTask;
         }
