@@ -44,7 +44,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Select an organisation");
 
-            Click(TestData.OrgName);
+            Click(org.OrganisationName);
 
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
