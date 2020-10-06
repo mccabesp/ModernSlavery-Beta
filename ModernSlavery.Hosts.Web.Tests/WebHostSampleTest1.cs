@@ -1,10 +1,12 @@
 using Geeks.Pangolin;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Testing.Helpers;
+using ModernSlavery.Testing.Helpers.Classes;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using System;
@@ -17,15 +19,14 @@ namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
     [Parallelizable]
-    public class WebHostSampleTest1: UITest
+    public class WebHostSampleTest1: BaseUITest
     {
-        public WebHostSampleTest1():base(TestRunSetup.WebDriverService)
+        public WebHostSampleTest1():base(TestRunSetup.TestWebHost,TestRunSetup.WebDriverService)
         {
             
         }
 
         private string _webAuthority;
-        private IDataRepository _dataRepository;
         private IFileRepository _fileRepository;
         private SharedOptions _sharedOptions;
 
@@ -33,14 +34,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         public void RunBeforeAnyTests()
         {
             //Get the url from the test web host
-            _webAuthority = TestRunSetup.TestWebHost.GetHostAddress();
+            _webAuthority = _testWebHost.GetHostAddress();
             TestContext.Progress.WriteLine($"Kestrel authority: {_webAuthority}");
 
-            //Get the data repository from the test web host
-            _dataRepository = TestRunSetup.TestWebHost.GetDataRepository();
-
             //Get the file repository from the test web host
-            _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
+            _fileRepository = _testWebHost.GetDependency<IFileRepository>();
             TestContext.Progress.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
 
             //Get the shared options
@@ -77,8 +75,13 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test]
         public void WebTestHost_DataRepository_Exists()
         {
+            var datarepo = _testWebHost.Services.GetFileRepository();
+            datarepo = ServiceScope.ServiceProvider.GetFileRepository();
+
             //Check we got the data repository from the test web server
-            Assert.IsNotNull(_dataRepository);
+            var dataRepository = ServiceScope.GetDataRepository();
+
+            Assert.IsNotNull(dataRepository);
         }
 
         [Test]

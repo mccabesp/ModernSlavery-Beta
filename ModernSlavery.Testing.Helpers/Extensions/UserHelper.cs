@@ -1,6 +1,8 @@
 ﻿using EFCore.BulkExtensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,21 +17,21 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 {
     public static class UserHelper
     {
-        public static User GetUser(this IHost host, string firstName, string lastName)
+        public static User GetUser(this BaseUITest uiTest, string firstName, string lastName)
         {
-            var dataRepository = host.GetDataRepository();
+            var dataRepository = uiTest.ServiceScope.GetDataRepository();
             return dataRepository.GetAll<User>().SingleOrDefault(u => u.Firstname == firstName && u.Lastname == lastName);
         }
 
-        public static IEnumerable<User> ListUsers(this IHost host)
+        public static IEnumerable<User> ListUsers(this BaseUITest uiTest)
         {
-            var dataRepository = host.GetDataRepository();
+            var dataRepository = uiTest.ServiceScope.GetDataRepository();
             return dataRepository.GetAll<User>();
         }
 
-        public static User DeleteUser(this IHost host, string firstName, string lastName)
+        public static User DeleteUser(this BaseUITest uiTest, string firstName, string lastName)
         {
-            var dataRepository = host.GetDataRepository();
+            var dataRepository = uiTest.ServiceScope.GetDataRepository();
             var user = dataRepository.GetAll<User>().SingleOrDefault(u => u.Firstname == firstName && u.Lastname == lastName);
             var userId = user.UserId;
             var email = user.EmailAddress.ToLower();
@@ -54,13 +56,13 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         }
 
         //Gets the currently logged in user using the session Id
-        public static User GetSignedInUser(this IHost host, string sessionId)
+        public static User GetSignedInUser(this BaseUITest uiTest, string sessionId)
         {
             throw new NotImplementedException();
         }
 
         //Signs the user into the host and returns the session cookie
-        public static string SignInUser(this IHost host, User user)
+        public static string SignInUser(this BaseUITest uiTest, User user)
         {
             throw new NotImplementedException();
         }

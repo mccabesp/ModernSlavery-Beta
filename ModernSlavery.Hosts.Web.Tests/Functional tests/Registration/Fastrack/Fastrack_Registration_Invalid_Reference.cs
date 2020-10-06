@@ -47,8 +47,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Fast track registration");
 
             //todo ensure valid security code added here
-            Set("Organisation reference").To(Registration.InvalidEmployerReference);
-            Set("Security code").To(Registration.ValidSecurityCode);
+            Set("Organisation reference").To(RegistrationTestData.InvalidEmployerReference);
+            Set("Security code").To(RegistrationTestData.ValidSecurityCode);
             await Task.CompletedTask;
         }
 

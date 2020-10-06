@@ -15,10 +15,10 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
     public static class FileHelper
     {
-        public static async Task DeleteDraftsAsync(this IHost host)
+        public static async Task DeleteDraftsAsync(this IServiceProvider serviceProvider)
         {
-            var fileRepository = host.GetFileRepository();
-            var submissionOptions = host.Services.GetService<SubmissionOptions>();
+            var fileRepository = serviceProvider.GetFileRepository();
+            var submissionOptions = serviceProvider.GetService<SubmissionOptions>();
 
             if (!await fileRepository.GetDirectoryExistsAsync(submissionOptions.DraftsPath)) return;
 
@@ -29,15 +29,15 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             }
         }
 
-        public static async Task DeleteDraftAsync(this IHost host, string organisationIdentifier, long reportingDeadlineYear)
+        public static async Task DeleteDraftAsync(this IServiceProvider serviceProvider, string organisationIdentifier, long reportingDeadlineYear)
         {
-            var fileRepository = host.GetFileRepository();
-            var submissionOptions = host.Services.GetService<SubmissionOptions>();
-            
-            var obfuscator = host.Services.GetService<IObfuscator>();
+            var fileRepository = serviceProvider.GetFileRepository();
+            var submissionOptions = serviceProvider.GetService<SubmissionOptions>();
+
+            var obfuscator = serviceProvider.GetService<IObfuscator>();
             long organisationId = obfuscator.DeObfuscate(organisationIdentifier);
 
-            var filePattern =$"{organisationId}_{reportingDeadlineYear}.*";
+            var filePattern = $"{organisationId}_{reportingDeadlineYear}.*";
 
             var files = await fileRepository.GetFilesAsync(submissionOptions.DraftsPath, filePattern);
             foreach (var file in files)

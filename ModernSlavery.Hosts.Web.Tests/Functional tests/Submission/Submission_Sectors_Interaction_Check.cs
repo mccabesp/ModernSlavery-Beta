@@ -17,8 +17,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            TestData.Organisation = TestRunSetup.TestWebHost
-                .Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            TestData.Organisation = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
 
         }
 
@@ -31,7 +30,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(29)]
         public async Task RegisterOrg()
         {
-            await TestRunSetup.TestWebHost.RegisterUserOrganisationAsync(TestData.Organisation.OrganisationName, UniqueEmail);
+            await this.RegisterUserOrganisationAsync(TestData.Organisation.OrganisationName, UniqueEmail);
             RefreshPage();
 
             await Task.CompletedTask;

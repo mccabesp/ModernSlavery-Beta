@@ -12,13 +12,20 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Classes;
 
 namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
 {
     [TestFixture]
 
-    class Scope_Out_Tell_Us_Why_Validation_Check : UITest
+    class Scope_Out_Tell_Us_Why_Validation_Check : BaseUITest
     {
+        protected readonly OrganisationTestData TestData;
+        public Scope_Out_Tell_Us_Why_Validation_Check() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+            TestData = new OrganisationTestData(this);
+        }
+
         protected string EmployerReference;
 
         [Test, Order(20)]

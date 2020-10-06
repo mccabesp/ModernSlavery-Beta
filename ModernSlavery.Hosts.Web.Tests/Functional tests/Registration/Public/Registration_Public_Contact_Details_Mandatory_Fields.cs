@@ -41,12 +41,12 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Find your organisation");
 
-            SetXPath("//input[@id='SearchText']").To(Registration.OrgName_Blackpool);
+            SetXPath("//input[@id='SearchText']").To(RegistrationTestData.OrgName_Blackpool);
             Click("Search");
             
 
             ExpectRow("Organisation name and registered address");
-            ExpectRow(That.Contains, Registration.OrgName_Blackpool);
+            ExpectRow(That.Contains, RegistrationTestData.OrgName_Blackpool);
             ExpectRow(That.Contains, "PO Box 4, Blackpool, Lancashire, United Kingdom, FY1 1NA");
 
             //message should not appear with single result 
@@ -58,10 +58,10 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectText("Enter the correspondence address for the organisation whose Modern Slavery statement you’re reporting.");
 
             //fields pre-populated
-            AtField("Address 1").Expect(Registration.Address1_Blackpool);
-            AtField("Address 2").Expect(Registration.Address2_Blackpool);
-            AtField("Address 3").Expect(Registration.Address3_Blackpool);
-            AtField("Postcode").Expect(Registration.PostCode_Blackpool);
+            AtField("Address 1").Expect(RegistrationTestData.Address1_Blackpool);
+            AtField("Address 2").Expect(RegistrationTestData.Address2_Blackpool);
+            AtField("Address 3").Expect(RegistrationTestData.Address3_Blackpool);
+            AtField("Postcode").Expect(RegistrationTestData.PostCode_Blackpool);
 
             Click("Continue");
 

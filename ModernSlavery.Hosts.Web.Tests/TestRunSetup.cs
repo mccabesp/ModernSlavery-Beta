@@ -11,6 +11,8 @@ using System.Net;
 using System.IO;
 using System;
 using ModernSlavery.Testing.Helpers.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -30,28 +32,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task RunBeforeAnyTestsAsync()
         {
-            DevOpsAgent.LogGroupStart("Logging test group");
-            DevOpsAgent.LogError("This is a test error");
-            DevOpsAgent.LogWarning("This is a test warning");
-            DevOpsAgent.LogInformation("This is test information");
-            DevOpsAgent.LogDebug("This is a test debug");
-            DevOpsAgent.LogGroupEnd();
-
             //Delete all previous log files
-            if (Directory.Exists(LogsFilepath))
-            {
-                var logs = Directory.GetFiles(LogsFilepath, "*.*", SearchOption.AllDirectories);
-                foreach (var log in logs)
-                    File.Delete(log);
-            }
+            LoggingHelper.DeleteFiles(LogsFilepath);
 
             //Delete all previous screenshots
-            if (Directory.Exists(ScreenshotsFilepath))
-            {
-                var screenshots = Directory.GetFiles(ScreenshotsFilepath, "*.*", SearchOption.AllDirectories);
-                foreach (var screenshot in screenshots)
-                    File.Delete(screenshot);
-            }
+            LoggingHelper.DeleteFiles(ScreenshotsFilepath);
 
             //Create the test host usign the default dependency module and override with a test module
             TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>(applicationName: "ModernSlavery.Hosts.Web");
@@ -63,20 +48,15 @@ namespace ModernSlavery.Hosts.Web.Tests
             await TestWebHost.StartAsync().ConfigureAwait(false);
 
             //Reset the database - this must be after host start so seed data files are copied
-            TestWebHost.ResetDatabase();
+            await TestWebHost.ResetDatabaseAsync();
 
-            await OrganisationHelper.GetOrganisationBusinessLogic(TestWebHost).FixLatestAddressesAsync();
-            await OrganisationHelper.GetOrganisationBusinessLogic(TestWebHost).SetUniqueOrganisationReferencesAsync();
-            await OrganisationHelper.GetOrganisationBusinessLogic(TestWebHost).FixLatestAddressesAsync();
-            await OrganisationHelper.GetScopeBusinessLogic(TestWebHost).SetPresumedScopesAsync();
-            await OrganisationHelper.GetOrganisationBusinessLogic(TestWebHost).FixLatestScopesAsync();
-            await TestWebHost.DeleteDraftsAsync();
+            //Delete all the draft files
+            await TestWebHost.Services.DeleteDraftsAsync();
 
             //Start the Selenium client
             var baseUrl = TestWebHost.GetHostAddress();
             TestContext.Progress.WriteLine($"Test Host started on endpoint: {baseUrl}");
             WebDriverService = UITest.SetupWebDriverService(baseUrl: baseUrl);
-
         }
         
 
@@ -99,29 +79,11 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //NOTE: these dont seem yet to upload so using DevOps task to publish instead till we can get working
             //Publish all log files on failure
-            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed
-               && Directory.Exists(LogsFilepath))
-            {
-                var logs = Directory.GetFiles(LogsFilepath, "*.*", SearchOption.AllDirectories);
-                foreach (var log in logs)
-                {
-                    var filename = Path.GetFileName(log);
-                    TestContext.AddTestAttachment(log, $"[LOG]: {filename}");
-                    TestContext.Progress.WriteLine($"Added test attachment: {filename}");
-                }
-            }
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed)
+                LoggingHelper.AttachFiles(LogsFilepath,"LOG");
 
             //Publish all screenshots
-            if (Directory.Exists(ScreenshotsFilepath))
-            {
-                var screenshots = Directory.GetFiles(ScreenshotsFilepath, "*.*", SearchOption.AllDirectories);
-                foreach (var screenshot in screenshots)
-                {
-                    var filename = Path.GetFileName(screenshot);
-                    TestContext.AddTestAttachment(screenshot, $"[SCREENSHOT]: {filename}");
-                    TestContext.Progress.WriteLine($"Added test attachment: {filename}");
-                }
-            }
+            LoggingHelper.AttachFiles(LogsFilepath, "SCREENSHOT");
         }
     }
 }

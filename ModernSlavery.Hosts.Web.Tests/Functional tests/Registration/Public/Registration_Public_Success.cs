@@ -13,7 +13,7 @@ namespace ModernSlavery.Hosts.Web.Tests
     [TestFixture]
 
 
-    public class Registration_Public_Success : Registration_Public_Start_Reigstration
+    public class Registration_Public_Success : Registration_Public_Start_Registration
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
@@ -22,8 +22,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task OTSetUp()
         {
             //HostHelper.ResetDbScope();
-            org = TestRunSetup.TestWebHost
-                .Find<Organisation>(org => org.LatestRegistrationUserId == null && org.SectorType.IsAny(SectorTypes.Public));
+            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null && org.SectorType.IsAny(SectorTypes.Public));
             await Task.CompletedTask;
         }
         

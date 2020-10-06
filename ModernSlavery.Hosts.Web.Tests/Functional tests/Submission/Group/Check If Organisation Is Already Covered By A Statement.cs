@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Classes;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using System.Threading.Tasks;
@@ -7,8 +8,12 @@ namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture, Ignore("Group")]
 
-    public class CheckIfOrganisationIsAlreadyCoveredByAStatement : UITest
+    public class CheckIfOrganisationIsAlreadyCoveredByAStatement : BaseUITest
     {
+        public CheckIfOrganisationIsAlreadyCoveredByAStatement() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+
+        }
 
         private bool TestRunFailed = false;
 

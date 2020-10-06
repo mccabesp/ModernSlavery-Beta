@@ -13,30 +13,35 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Testing.Helpers.Extensions;
+using ModernSlavery.Testing.Helpers.Classes;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
     [TestFixture]
 
-    public class Scope_Out_Confirm_Details_Back_Button_Check : UITest
+    public class Scope_Out_Confirm_Details_Back_Button_Check : BaseUITest
     {
+        protected readonly OrganisationTestData TestData;
+        public Scope_Out_Confirm_Details_Back_Button_Check() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+            TestData = new OrganisationTestData(this);
+        }
         protected string EmployerReference;
 
         [Test, Order(20)]
         public async Task SetSecurityCode()
         {
-            TestData.Organisation = TestRunSetup.TestWebHost
-                .Find<Organisation>(org => TestData.Organisation.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            TestData.Organisation = this.Find<Organisation>(org => TestData.Organisation.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
 
-            var result = Testing.Helpers.Extensions.OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
+            var result = this.GetSecurityCodeBusinessLogic().CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
 
             if (result.Failed)
             {
                 throw new Exception("Unable to set security code");
             }
 
-            await Testing.Helpers.Extensions.OrganisationHelper.SaveAsync(TestRunSetup.TestWebHost);
+            await this.SaveDatabaseAsync();
 
             await Task.CompletedTask;
         }

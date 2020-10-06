@@ -12,14 +12,19 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Classes;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
     [TestFixture]
 
-    public class User_Searches_By_Org_Name_And_Filters : UITest
+    public class User_Searches_By_Org_Name_And_Filters : BaseUITest
     {
+        public User_Searches_By_Org_Name_And_Filters() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+
+        }
         //Information that needs adding: 
         //Group submission with atleast 2 active organisations and a retired child organisation - Fly Jet, Fly Jet Switzerland, Fly Jet Australia (retired)
         //Organisation that has ceased trading - Pepsi & a submitted statement for company

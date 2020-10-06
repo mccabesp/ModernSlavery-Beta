@@ -9,27 +9,35 @@ using System;
 using ModernSlavery.Testing.Helpers;
 using ModernSlavery.Core.Interfaces;
 using NUnit.Framework.Interfaces;
+using ModernSlavery.Testing.Helpers.Classes;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
 
-    public abstract class CreateAccount : UITest
+    public abstract class CreateAccount : BaseUITest
     {
+        public CreateAccount():base(TestRunSetup.TestWebHost,TestRunSetup.WebDriverService)
+        {
+            
+        }
+
         string _firstname; string _lastname; string _title; string _email; string _password;
         private string _webAuthority;
         private IDataRepository _dataRepository;
         private IFileRepository _fileRepository;
         private string URL;
         public string UniqueEmail;
-        public CreateAccount(string firstname, string lastname, string title, string email, string password) : base()
+        protected readonly OrganisationTestData TestData;
+        public CreateAccount(string firstname, string lastname, string title, string email, string password) : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
         {
             UniqueEmail = email + DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
             _firstname = firstname; _lastname = lastname; _title = title; _email = UniqueEmail; _password = password;
 
-
+            TestData = new OrganisationTestData(this);
         }
 
+        
         private bool TestRunFailed = false;
 
         [SetUp]

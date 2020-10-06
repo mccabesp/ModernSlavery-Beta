@@ -33,10 +33,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task OTSetUp()
         {
             //HostHelper.ResetDbScope();
-            Org = TestRunSetup.TestWebHost
-                .Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            Org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
 
-            await Testing.Helpers.Extensions.OrganisationHelper.SetSecurityCode(TestRunSetup.TestWebHost, Org, new DateTime(2022, 01, 01));
+            await this.SetSecurityCode(Org, new DateTime(2022, 01, 01));
             await Task.CompletedTask;
         }
 
@@ -73,7 +72,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //expect organisation details
             AtRow("Organisation name").Expect(Org.OrganisationName);
             AtRow("Company number").Expect(Org.CompanyNumber);
-            AtRow("Registered address").Expect(Registration.Organisation.GetAddressString(DateTime.Now));
+            AtRow("Registered address").Expect(TestData.Organisation.GetAddressString(DateTime.Now));
 
             
 

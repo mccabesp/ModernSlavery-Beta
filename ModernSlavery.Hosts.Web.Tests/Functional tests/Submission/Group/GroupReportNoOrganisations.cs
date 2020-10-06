@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Classes;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -6,11 +7,13 @@ namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture, Ignore("Group")]
 
-    public class GroupReportNoOrganisations : UITest
-
-
-    //DATA NEEDED: Group report submission with no current added organisations
+    public class GroupReportNoOrganisations : BaseUITest
     {
+        //DATA NEEDED: Group report submission with no current added organisations
+        public GroupReportNoOrganisations() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+
+        }
 
         private bool TestRunFailed = false;
 

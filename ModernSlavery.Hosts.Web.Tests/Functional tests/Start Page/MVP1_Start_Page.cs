@@ -12,6 +12,7 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Classes;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -19,8 +20,12 @@ namespace ModernSlavery.Hosts.Web.Tests
     [TestFixture]
 
     
-    public class MVP1_Start_Page : UITest
+    public class MVP1_Start_Page : BaseUITest
     {
+        public MVP1_Start_Page() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+
+        }
         private bool TestRunFailed;
         [SetUp]
         public void SetUp()
