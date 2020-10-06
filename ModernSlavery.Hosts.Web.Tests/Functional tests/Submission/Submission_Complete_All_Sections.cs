@@ -18,8 +18,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SetUp()
         {
             //HostHelper.ResetDbScope();
-            org = TestRunSetup.TestWebHost
-                .Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
 
         }
 
@@ -32,10 +31,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(29)]
         public async Task RegisterOrg()
         {
-            await TestRunSetup.TestWebHost.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
             RefreshPage();
 
-            DatabaseHelper.SaveChangesAsync(TestRunSetup.TestWebHost);
+            await this.SaveDatabaseAsync();
 
             await Task.CompletedTask;
         }

@@ -22,8 +22,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task OTSetUp()
         {
             //HostHelper.ResetDbScope();
-            org = TestRunSetup.TestWebHost
-                .Find<Organisation>(org => org.LatestRegistrationUserId == null && org.SectorType.IsAny(SectorTypes.Public));
+            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null && org.SectorType.IsAny(SectorTypes.Public));
             await Task.CompletedTask;
         }
         

@@ -29,7 +29,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            org = TestRunSetup.TestWebHost.Find<Organisation>(o => o.SectorType == SectorTypes.Public);
+            org = this.Find<Organisation>(o => o.SectorType == SectorTypes.Public);
         }
 
         [Test, Order(20)]
