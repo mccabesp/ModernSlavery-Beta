@@ -13,6 +13,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Testing.Helpers.Extensions;
+using ModernSlavery.Testing.Helpers.Classes;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -20,8 +21,14 @@ namespace ModernSlavery.Hosts.Web.Tests
     [TestFixture]
 
 
-    public class Scope_Out_Infomation_Not_Correct : UITest
+    public class Scope_Out_Infomation_Not_Correct : BaseUITest
     {
+        protected readonly OrganisationTestData TestData;
+        public Scope_Out_Infomation_Not_Correct() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+            TestData = new OrganisationTestData(this);
+        }
+
         private string EmployerReference;
 private bool TestRunFailed = false;
         [OneTimeSetUp]
@@ -32,8 +39,7 @@ private bool TestRunFailed = false;
         public void SetUp()
         {
             
-            TestData.Organisation = TestRunSetup.TestWebHost
-                .Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            TestData.Organisation = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
             if (TestRunFailed)
                 Assert.Inconclusive("Previous test failed");
@@ -59,7 +65,7 @@ private bool TestRunFailed = false;
         {
 
 
-            await OrganisationHelper.SetSecurityCode(TestRunSetup.TestWebHost, TestData.Organisation, new DateTime(2021, 6, 10));
+            await this.SetSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
 
 
             await Task.CompletedTask;

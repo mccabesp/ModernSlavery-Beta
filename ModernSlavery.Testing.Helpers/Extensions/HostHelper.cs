@@ -6,6 +6,8 @@ using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
+using System;
+using Microsoft.AspNetCore.Http;
 
 namespace ModernSlavery.Testing.Helpers
 {
@@ -32,63 +34,46 @@ namespace ModernSlavery.Testing.Helpers
             return testWebHostBuilder.Build();
         }
 
-        public static T GetDependency<T>(this IHost host)
-        {
-            return host.Services.GetRequiredService<T>();
-        }
-
-        public static IServiceScopeFactory GetServiceScopeFactory(this IHost host)
+        private static IServiceScopeFactory GetServiceScopeFactory(this IHost host)
         {
             return host.Services.GetRequiredService<IServiceScopeFactory>();
         }
 
-
-        public static IServiceScope CreateServiceScope(this IServiceScopeFactory serviceScopeFactory)
-        {
-            return serviceScopeFactory.CreateScope();
-        }
-
         public static IServiceScope CreateServiceScope(this IHost host)
         {
-            var serviceScopeFactory= host.GetServiceScopeFactory();
+            var serviceScopeFactory = host.GetServiceScopeFactory();
             return serviceScopeFactory.CreateScope();
         }
 
-        public static IConfiguration GetConfiguration(this IHost host)
+        public static T GetDependency<T>(this IHost host)
         {
-            return host.Services.GetRequiredService<IConfiguration>();
+            if (host == null) throw new ArgumentNullException(nameof(host));
+            return host.Services.GetRequiredService<T>();
+        }
+        public static T GetDependency<T>(this IServiceScope serviceScope)
+        {
+            if (serviceScope == null) throw new ArgumentNullException(nameof(serviceScope));
+            return serviceScope.ServiceProvider.GetRequiredService<T>();
         }
 
-        private static IServiceScope _dbScope=null;
-        public static IDataRepository GetDataRepository(this IHost host, IServiceScope serviceScope=null)
+        public static IConfiguration GetConfiguration(this IServiceProvider serviceProvider)
         {
-            //if (serviceScope == null) serviceScope = host.CreateServiceScope(); //May need this to create a new scope every time but needs chekcing first
-            if (serviceScope == null) serviceScope = _dbScope ?? (_dbScope=host.CreateServiceScope()); //Use the static scope or create a new one
-
-            var serviceProvider = serviceScope?.ServiceProvider ?? host.Services;
-            return serviceProvider.GetRequiredService<IDataRepository>();
+            return serviceProvider.GetRequiredService<IConfiguration>();
         }
 
-        //Reset the static db scope
-        public static void ResetDbScope()
+        public static IDataRepository GetDataRepository(this IServiceScope serviceScope)
         {
-            _dbScope = null;
+            return serviceScope.GetDependency<IDataRepository>();
         }
 
-        public static IDbContext GetDbContext(this IHost host, IServiceScope serviceScope = null)
+        public static IDbContext GetDbContext(this IServiceScope serviceScope)
         {
-            var serviceProvider = serviceScope?.ServiceProvider ?? host.Services;
-            return serviceProvider.GetRequiredService<IDbContext>();
+            return serviceScope.GetDependency<IDbContext>();
         }
 
-        public static IFileRepository GetFileRepository(this IHost host)
+        public static IFileRepository GetFileRepository(this IServiceProvider serviceProvider)
         {
-            return host.Services.GetRequiredService<IFileRepository>();
-        }
-
-        public static IHttpSession GetHttpSession(this IHost host)
-        {
-            return host.Services.GetRequiredService<IHttpSession>();
+            return serviceProvider.GetRequiredService<IFileRepository>();
         }
     }
 }

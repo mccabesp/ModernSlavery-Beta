@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Classes;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -7,8 +8,12 @@ namespace ModernSlavery.Hosts.Web.Tests
     [TestFixture, Ignore("Needs setup added")]
 
 
-    public class ReviewOrgListForGroupWithMoreThanFiveOrgs : UITest
+    public class ReviewOrgListForGroupWithMoreThanFiveOrgs : BaseUITest
     {
+        public ReviewOrgListForGroupWithMoreThanFiveOrgs() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+
+        }
         //DATA NEEDED: Report and 5+ Group organisations
         //DATA NEEDED: Report 5+ group organisations added to this group report
         // Fly Jet - (Fly Jet Australia, Fly Jet Sweeden, Fly Jet Switzerland, Fly Jet England, Fly Jet France, Fly Jet Germany

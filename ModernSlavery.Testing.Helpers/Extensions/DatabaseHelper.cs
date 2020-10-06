@@ -5,10 +5,13 @@ using ModernSlavery.Core.Interfaces;
 using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 using ModernSlavery.Core.Extensions;
-using Microsoft.EntityFrameworkCore;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
+using ModernSlavery.Infrastructure.Database;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using System.Threading.Tasks;
+using ModernSlavery.Testing.Helpers.Classes;
 
 namespace ModernSlavery.Testing.Helpers.Extensions
 {
@@ -21,22 +24,23 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         /// Deletes all tables in the database (except _EFMigrationsHistory) and reimports all seed data
         /// </summary>
         /// <param name="host"></param>
-        public static void ResetDatabase(this IHost host, bool force = false)
+        public static async System.Threading.Tasks.Task ResetDatabaseAsync(this IHost host, bool force = false)
         {
-            var config = host.GetConfiguration();
+            var config = host.Services.GetRequiredService<IConfiguration>();
             var vaultName = config["Vault"];
+
+            var dataRepository = host.Services.GetRequiredService<IDataRepository>();
 
             if (!force)
             {
                 var lastFullDatabaseReset = string.IsNullOrWhiteSpace(vaultName) ? Environment.GetEnvironmentVariable(LastFullDatabaseResetKey).ToDateTime() : host.GetKeyVaultSecret(vaultName, LastFullDatabaseResetKey).ToDateTime();
                 if (lastFullDatabaseReset > DateTime.MinValue && lastFullDatabaseReset.Date==DateTime.Now.Date)
                 {
-                    host.ResetDatabase(lastFullDatabaseReset);
+                    dataRepository.ResetDatabase(lastFullDatabaseReset);
                     return;
                 }
             }
             
-            var dataRepository = host.GetDataRepository();
             dataRepository.SetCommandTimeout(CommandTimeout);//Give the batch command 5 mins to timout - required on Basic SQL tier
             dataRepository.GetAll<AuditLog>().BatchDelete();
             dataRepository.GetAll<Feedback>().BatchDelete();
@@ -65,6 +69,15 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             dataImporter.ImportPrivateOrganisationsAsync(-1, 100).Wait();
             dataImporter.ImportPublicOrganisationsAsync(-1, 100).Wait();
 
+            var organisationBusinessLogic = host.Services.GetRequiredService<IOrganisationBusinessLogic>();
+            await organisationBusinessLogic.FixLatestAddressesAsync();
+            await organisationBusinessLogic.SetUniqueOrganisationReferencesAsync();
+            await organisationBusinessLogic.FixLatestAddressesAsync();
+            var scopeBusinessLogic = host.Services.GetRequiredService<IScopeBusinessLogic>();
+            await scopeBusinessLogic.SetPresumedScopesAsync();
+            organisationBusinessLogic = host.Services.GetRequiredService<IOrganisationBusinessLogic>();
+            await organisationBusinessLogic.FixLatestScopesAsync();
+
             //Set the full reset time to now (+15 seconds grace)
             Thread.Sleep(15);
             var importTime = DateTime.Now;
@@ -80,9 +93,8 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         /// Deletes all records in all tables created after a specified date
         /// </summary>
         /// <param name="host"></param>
-        public static void ResetDatabase(this IHost host, DateTime createdDate)
+        public static void ResetDatabase(this IDataRepository dataRepository, DateTime createdDate)
         {
-            var dataRepository = host.GetDataRepository();
             dataRepository.SetCommandTimeout(CommandTimeout);//Give the batch command 5 mins to timout - required on Basic SQL tier
             dataRepository.GetAll<AuditLog>().Where(r => r.CreatedDate >= createdDate).BatchDelete();
             dataRepository.GetAll<Feedback>().Where(r => r.CreatedDate >= createdDate).BatchDelete();
@@ -108,16 +120,17 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         /// <param name="deadline">If empty deletes all test records</param>
         public static void DeleteAllTestRecords(this IHost host, DateTime? deadline = null)
         {
-            var dbContext = host.GetDbContext();
+            var dbContext = host.Services.GetRequiredService<IDbContext>();
             dbContext.DeleteAllTestRecords(deadline);
         }
 
-        public static async Task SaveChangesAsync(this IHost host)
+        /// <summary>
+        /// Shim for saving when needed, should prob refactor this out.
+        /// </summary>
+        /// <returns></returns>
+        public static async Task SaveDatabaseAsync(this BaseUITest uiTest)
         {
-            var dataRepository = host.GetDataRepository();
-            await dataRepository.SaveChangesAsync();
+            await uiTest.ServiceScope.GetDataRepository().SaveChangesAsync();
         }
-
-
     }
 }

@@ -51,7 +51,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task SearchForOrganisation()
         {
-            SetXPath("//*[@id='SearchText']").To(Registration.OrgName_CantFind);
+            SetXPath("//*[@id='SearchText']").To(RegistrationTestData.OrgName_CantFind);
             Click("Search");
 
 
@@ -74,7 +74,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task ExpectOrgNameFieldPrePopulated()
         {
-            AtField("Organisation name").Expect(Registration.OrgName_CantFind);
+            AtField("Organisation name").Expect(RegistrationTestData.OrgName_CantFind);
             await Task.CompletedTask;
         }
         [Test, Order(26)]
@@ -82,7 +82,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task FillReference()
         {
             Expect("Enter one or more unique references to help identify your organisation:");
-            Set("Company number").To(Registration.CompanyNumber_CantFind);
+            Set("Company number").To(RegistrationTestData.CompanyNumber_CantFind);
             await Task.CompletedTask;
         }
         [Test, Order(28)]
@@ -98,10 +98,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task FillInAddressFields()
         {
             Expect("Enter the correspondence address of the organisation you want to register.");
-            Set("Address 1").To(Registration.Address1_Blackpool);
-            Set("Address 2").To(Registration.Address2_Blackpool);
-            Set("Address 3").To(Registration.Address3_Blackpool);
-            Set("Postcode").To(Registration.PostCode_Blackpool);
+            Set("Address 1").To(RegistrationTestData.Address1_Blackpool);
+            Set("Address 2").To(RegistrationTestData.Address2_Blackpool);
+            Set("Address 3").To(RegistrationTestData.Address3_Blackpool);
+            Set("Postcode").To(RegistrationTestData.PostCode_Blackpool);
             await Task.CompletedTask;
         }
         [Test, Order(32)]

@@ -12,7 +12,7 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
-
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -31,8 +31,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task GoToRegistrationPage()
         {
-            Org = Testing.Helpers.Extensions.OrganisationHelper.GetOrganisation(TestRunSetup.TestWebHost, TestData.OrgName);
-            await Testing.Helpers.Extensions.OrganisationHelper.SetSecurityCode(TestRunSetup.TestWebHost, Org, new DateTime(2022, 01, 01));
+            Org = this.GetOrganisation(TestData.OrgName);
+            await this.SetSecurityCode(Org, new DateTime(2022, 01, 01));
 
             Click("Register an organisation");
 
@@ -61,7 +61,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //expect organisation details
             AtRow("Organisation name").Expect(Org.OrganisationName);
             AtRow("Company number").Expect(Org.CompanyNumber);
-            AtRow("Registered address").Expect(Registration.Organisation.GetAddressString(DateTime.Now));
+            AtRow("Registered address").Expect(TestData.Organisation.GetAddressString(DateTime.Now));
 
             
 

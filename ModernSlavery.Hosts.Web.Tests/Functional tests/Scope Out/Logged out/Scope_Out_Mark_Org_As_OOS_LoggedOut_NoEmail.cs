@@ -13,31 +13,37 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Testing.Helpers.Extensions;
+using ModernSlavery.Testing.Helpers.Classes;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
-    public class Scope_Out_Mark_Org_As_OOS_LoggedOut_NoEmail : UITest
+    public class Scope_Out_Mark_Org_As_OOS_LoggedOut_NoEmail : BaseUITest
     {
+        protected readonly OrganisationTestData TestData;
+        public Scope_Out_Mark_Org_As_OOS_LoggedOut_NoEmail() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+            TestData = new OrganisationTestData(this);
+        }
         protected string EmployerReference;
 
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            TestData.Organisation = TestRunSetup.TestWebHost.GetOrganisation("00032539 Public Limited Company");
+            TestData.Organisation = this.GetOrganisation("00032539 Public Limited Company");
         }
 
         [Test, Order(20)]
         public async Task SetSecurityCode()
         {
-            var result = OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
+            var result = this.GetSecurityCodeBusinessLogic().CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
 
             if (result.Failed)
             {
                 throw new Exception("Unable to set security code");
             }
 
-            await TestRunSetup.TestWebHost.SaveAsync();
+            await this.SaveDatabaseAsync();
 
             await Task.CompletedTask;
         }

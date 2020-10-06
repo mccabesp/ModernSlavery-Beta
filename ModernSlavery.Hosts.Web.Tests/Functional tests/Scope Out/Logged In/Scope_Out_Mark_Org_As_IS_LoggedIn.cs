@@ -26,17 +26,17 @@ namespace ModernSlavery.Hosts.Web.Tests
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
         string Pin;
+
+        protected readonly RegistrationTestData TestData;
         public Scope_Out_Mark_Org_As_IS_LoggedIn() : base(_firstname, _lastname, _title, _email, _password)
         {
-
-
+            TestData = new RegistrationTestData(this);
         }
 
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            TestData.Organisation = TestRunSetup.TestWebHost
-                .Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            TestData.Organisation = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
         }
 
@@ -47,13 +47,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task RegisterOrgAndSetScope()
         {
            
-            await OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, TestData.OrgName, UniqueEmail);
-            await OrganisationHelper.GetOrganisationBusinessLogic(TestRunSetup.TestWebHost).CreateOrganisationSecurityCodeAsync(Registration.Organisation.OrganisationReference, new DateTime(2030, 1, 10));
+            await this.RegisterUserOrganisationAsync(TestData.Organisation.OrganisationName, UniqueEmail);
+            await this.GetOrganisationBusinessLogic().CreateOrganisationSecurityCodeAsync(TestData.Organisation.OrganisationReference, new DateTime(2030, 1, 10));
 
-            User CurrentUser = await TestRunSetup.TestWebHost.GetDataRepository().SingleOrDefaultAsync<User>(o => o.EmailAddress == UniqueEmail);
-            await OrganisationHelper.GetOrganisationBusinessLogic(TestRunSetup.TestWebHost).SetAsScopeAsync(TestData.Organisation.OrganisationReference, 2020, "Updated by test case", CurrentUser, ScopeStatuses.OutOfScope, true);
-
-
+            User CurrentUser = await ServiceScope.GetDataRepository().SingleOrDefaultAsync<User>(o => o.EmailAddress == UniqueEmail);
+            await this.GetOrganisationBusinessLogic().SetAsScopeAsync(TestData.Organisation.OrganisationReference, 2020, "Updated by test case", CurrentUser, ScopeStatuses.OutOfScope, true);
 
             await Task.CompletedTask;
         }
@@ -73,7 +71,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SelectOrg()
         {
 
-            Click(TestData.OrgName);
+            Click(TestData.Organisation.OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "No");
@@ -93,7 +91,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task VerifyOrgDetails()
         {
             RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference);
-            RightOfText("Organisation Name").Expect(TestData.OrgName);
+            RightOfText("Organisation Name").Expect(TestData.Organisation.OrganisationName);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");
 

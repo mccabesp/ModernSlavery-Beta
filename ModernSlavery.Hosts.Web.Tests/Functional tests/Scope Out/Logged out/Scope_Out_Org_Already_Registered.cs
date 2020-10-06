@@ -33,16 +33,16 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task AddSecurityCode()
         {
-           await OrganisationHelper.RegisterUserOrganisationAsync(TestRunSetup.TestWebHost, TestData.OrgName, UniqueEmail);
+           await this.RegisterUserOrganisationAsync(TestData.OrgName, UniqueEmail);
 
-            var result = OrganisationHelper.GetSecurityCodeBusinessLogic(TestRunSetup.TestWebHost).CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
+            var result = this.GetSecurityCodeBusinessLogic().CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
 
             if (result.Failed)
             {
                 throw new Exception("Unable to set security code");
             }
 
-            await OrganisationHelper.SaveAsync(TestRunSetup.TestWebHost);
+            await this.SaveDatabaseAsync();
 
             await Task.CompletedTask;
         }

@@ -17,18 +17,18 @@ using ModernSlavery.Testing.Helpers.Extensions;
 namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
-    public class Registration_Public_Start_Reigstration : CreateAccount
+    public class Registration_Public_Start_Registration : CreateAccount
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
-        public Registration_Public_Start_Reigstration() : base(_firstname, _lastname, _title, _email, _password)
+        public Registration_Public_Start_Registration() : base(_firstname, _lastname, _title, _email, _password)
         {
         }
 
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            TestData.Organisation = TestRunSetup.TestWebHost.Find<Organisation>(o => o.SectorType == SectorTypes.Public);
+            TestData.Organisation = this.Find<Organisation>(o => o.SectorType == SectorTypes.Public);
         }
 
         [Test, Order(20)]

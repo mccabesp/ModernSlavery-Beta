@@ -12,14 +12,20 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Classes;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
     [TestFixture]
 
-    public class Scope_Out_Are_You_Required_To_Publish_Content_Check : UITest
+    public class Scope_Out_Are_You_Required_To_Publish_Content_Check : BaseUITest
     {
+        protected readonly OrganisationTestData TestData;
+        public Scope_Out_Are_You_Required_To_Publish_Content_Check() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+            TestData = new OrganisationTestData(this);
+        }
         private string EmployerReference;
 
         

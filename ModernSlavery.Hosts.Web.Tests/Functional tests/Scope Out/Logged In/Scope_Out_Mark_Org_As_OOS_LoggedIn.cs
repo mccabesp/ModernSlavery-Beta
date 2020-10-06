@@ -25,7 +25,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            TestData.Organisation = TestRunSetup.TestWebHost.Find<Organisation>(o => o.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            TestData.Organisation = this.Find<Organisation>(o => o.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
         }
 
         public Scope_Out_Mark_Org_As_OOS_LoggedIn() : base(_firstname, _lastname, _title, _email, _password)
@@ -37,7 +37,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(29)]
         public async Task RegisterOrg()
         {
-            await TestRunSetup.TestWebHost.RegisterUserOrganisationAsync(TestData.OrgName, UniqueEmail);
+            await this.RegisterUserOrganisationAsync(TestData.OrgName, UniqueEmail);
         }
 
         [Test, Order(30)]

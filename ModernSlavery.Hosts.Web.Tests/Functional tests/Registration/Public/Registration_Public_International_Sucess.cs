@@ -6,7 +6,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture, Ignore("Awaiting fix for public registration in 3113, awaiting confirmation of international registration")]
 
-    public class Registration_Public_International_Success : Registration_Public_Start_Reigstration
+    public class Registration_Public_International_Success : Registration_Public_Start_Registration
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
@@ -19,10 +19,10 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
             //fields pre-populated
-            AtField("Address 1").Expect(Registration.Address1_Blackpool);
-            AtField("Address 2").Expect(Registration.Address2_Blackpool);
-            AtField("Address 3").Expect(Registration.Address3_Blackpool);
-            AtField("Postcode").Expect(Registration.PostCode_Blackpool);
+            AtField("Address 1").Expect(RegistrationTestData.Address1_Blackpool);
+            AtField("Address 2").Expect(RegistrationTestData.Address2_Blackpool);
+            AtField("Address 3").Expect(RegistrationTestData.Address3_Blackpool);
+            AtField("Postcode").Expect(RegistrationTestData.PostCode_Blackpool);
             await Task.CompletedTask;
         }
         [Test, Order(31)]
@@ -61,14 +61,14 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ExpectOrgDetailsFields()
         {
 
-            AtLabel("Organisation name").Expect(Registration.OrgName_Blackpool);
-            AtLabel("Registered address").Expect(Registration.RegisteredAddress_Blackpool);
-            AtLabel("Business Sectors (SIC Codes)").Expect(Registration.SicCodes_Blackpool);
+            AtLabel("Organisation name").Expect(RegistrationTestData.OrgName_Blackpool);
+            AtLabel("Registered address").Expect(RegistrationTestData.RegisteredAddress_Blackpool);
+            AtLabel("Business Sectors (SIC Codes)").Expect(RegistrationTestData.SicCodes_Blackpool);
 
             ExpectHeader("Your contact details");
             AtLabel("Your name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last);
             AtLabel("Email").Expect(Create_Account.roger_email);
-            AtLabel("").Expect(Registration.OrgName_Blackpool);
+            AtLabel("").Expect(RegistrationTestData.OrgName_Blackpool);
             await Task.CompletedTask;
 
         }

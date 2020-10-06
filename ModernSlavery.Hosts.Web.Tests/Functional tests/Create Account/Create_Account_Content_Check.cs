@@ -2,6 +2,7 @@
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Testing.Helpers;
+using ModernSlavery.Testing.Helpers.Classes;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using System;
@@ -10,8 +11,13 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    public class Create_Account_Content_Check : UITest
+    public class Create_Account_Content_Check : BaseUITest
     {
+        public Create_Account_Content_Check() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+
+        }
+
         private bool TestRunFailed = false;
 
         [SetUp]
@@ -23,9 +29,6 @@ namespace ModernSlavery.Hosts.Web.Tests
                 SetupTest(TestContext.CurrentContext.Test.Name);
         }
 
-
-
-
         [TearDown]
         public void TearDown()
         {
@@ -33,7 +36,6 @@ namespace ModernSlavery.Hosts.Web.Tests
             if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
 
         }
-
 
         [Test, Order(1)]
         public async Task GoToCreateAccountPage()

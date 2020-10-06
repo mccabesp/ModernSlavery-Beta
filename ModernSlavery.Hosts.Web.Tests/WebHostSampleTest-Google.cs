@@ -3,13 +3,20 @@ using Geeks.Pangolin;
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Internal;
+using ModernSlavery.Testing.Helpers.Classes;
+using ModernSlavery.Hosts.Web.Tests;
 
 namespace ModernSlavery.Hosts.Web.GoogleTests
 {
     [TestFixture]
     [Parallelizable]
-    public class WebHostSampleTestGoogle: UITest
+    public class WebHostSampleTestGoogle: BaseUITest
     {
+        public WebHostSampleTestGoogle() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+
+        }
+
         [Test]
         public void WebTestHost_Search1()
         {

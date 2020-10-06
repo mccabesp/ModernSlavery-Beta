@@ -14,15 +14,21 @@ using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Testing.Helpers.Extensions;
 using ModernSlavery.Infrastructure.Database;
+using ModernSlavery.Testing.Helpers.Classes;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
     [TestFixture]
 
-    public class Scope_Out_Mark_Org_As_OOS_LoggedOut : UITest
+    public class Scope_Out_Mark_Org_As_OOS_LoggedOut : BaseUITest
     {
-       protected string EmployerReference;
+        protected readonly OrganisationTestData TestData;
+        public Scope_Out_Mark_Org_As_OOS_LoggedOut() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+            TestData = new OrganisationTestData(this);
+        }
+        protected string EmployerReference;
         private bool TestRunFailed = false;
 
         [OneTimeSetUp]      
@@ -32,8 +38,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //(TestRunSetup.TestWebHost.GetDbContext() as Microsoft.EntityFrameworkCore.DbContext)
 
-            TestData.Organisation = TestRunSetup.TestWebHost
-                .Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            TestData.Organisation = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
            
         }
@@ -61,7 +66,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
 
-            await OrganisationHelper.SetSecurityCode(TestRunSetup.TestWebHost, TestData.Organisation, new DateTime(2021, 6, 10));
+            await this.SetSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
 
 
             await Task.CompletedTask;

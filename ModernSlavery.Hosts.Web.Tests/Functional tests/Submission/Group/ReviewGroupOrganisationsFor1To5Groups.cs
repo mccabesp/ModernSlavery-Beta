@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Classes;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -6,14 +7,17 @@ namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture, Ignore("Needs setup added")]
 
-    public class ReviewGroupOrganisationsFor1To5Groups : UITest
-
-    //DATA NEEDED: Report and 1-5 group organisations added to this group report
-    // Fly Jet - (Fly Jet Australia, Fly Jet Sweeden, Fly Jet Switzerland, Fly Jet England)
-    //Date of submissions 2020-2021 period, 01/09/2020
-
-
+    public class ReviewGroupOrganisationsFor1To5Groups : BaseUITest
     {
+        //DATA NEEDED: Report and 1-5 group organisations added to this group report
+        // Fly Jet - (Fly Jet Australia, Fly Jet Sweeden, Fly Jet Switzerland, Fly Jet England)
+        //Date of submissions 2020-2021 period, 01/09/2020
+
+        public ReviewGroupOrganisationsFor1To5Groups() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
+
+        }
+
         [Test, Order(1)]
         public async Task CheckContentForLessThenSixGroupOrganisationReview()
         {

@@ -2,6 +2,7 @@
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Testing.Helpers;
+using ModernSlavery.Testing.Helpers.Classes;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using System;
@@ -10,9 +11,12 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    public class Create_Account_Password_Rules : UITest
+    public class Create_Account_Password_Rules : BaseUITest
     {
+        public Create_Account_Password_Rules() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
+        {
 
+        }
         private bool TestRunFailed = false;
 
         [SetUp]
