@@ -39,6 +39,17 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             return dataRepository.GetAll<T>().FirstOrDefault(query);
         }
 
+        public static Organisation GetOrganisation(this BaseUITest uiTest, long organisationId)
+        {
+            var dataRepository = uiTest.ServiceScope.GetDataRepository();
+            return dataRepository.Get<Organisation>(organisationId);
+        }
+        public static UserOrganisation GetUserOrganisation(this BaseUITest uiTest, long organisationId, long userId)
+        {
+            var dataRepository = uiTest.ServiceScope.GetDataRepository();
+            return dataRepository.Get<UserOrganisation>(userId, organisationId);
+        }
+
         public static Organisation GetOrganisation(this BaseUITest uiTest, string organisationName)
         {
             var dataRepository = uiTest.ServiceScope.GetDataRepository();
