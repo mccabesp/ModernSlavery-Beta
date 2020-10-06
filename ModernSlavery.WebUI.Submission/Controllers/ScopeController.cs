@@ -555,7 +555,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     $"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
 
             // Generate the scope state model
-            var stateModel = ScopePresentation.CreateScopingViewModel(userOrg.Organisation, CurrentUser);
+            var stateModel = ScopePresentation.CreateScopingViewModel(userOrg.Organisation, CurrentUser, reportingDeadlineYear);
 
             // Get the latest scope for the reporting year
             var latestScope = stateModel.ThisScope?.DeadlineDate.Year == reportingDeadlineYear ? stateModel.ThisScope :
@@ -570,7 +570,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             stateModel.StartUrl = Url.Action("ManageOrganisation", "Submission",
                 new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(organisationId.ToString()) });
             stateModel.IsChangeJourney = true;
-            stateModel.DeadlineDate = latestScope.DeadlineDate;
 
             //Set the in/out journey type
             stateModel.IsOutOfScopeJourney =
