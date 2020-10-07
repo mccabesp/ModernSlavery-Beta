@@ -423,7 +423,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             }
 
             //Get group status info
-            var groupStatements = await FindGroupSubmissionStatementsAsync(organisation.OrganisationId);
+            var groupStatements = await FindGroupSubmissionStatementsAsync(organisation.OrganisationId, reportingDeadline.Year);
             if (groupStatements.Any()) statementInfoModel.GroupSubmissionInfo = GetGroupSubmissionInformationString(groupStatements).ToList();
 
             return statementInfoModel;
