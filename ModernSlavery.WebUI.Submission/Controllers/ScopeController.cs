@@ -350,7 +350,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             StashModel(stateModel);
 
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            var currentDeadlineDate = _sharedBusinessLogic.GetReportingDeadline(organisation.SectorType);
+            var currentDeadlineDate = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(organisation.SectorType);
 
             if (stateModel.UserIsRegistered)
             {
@@ -414,7 +414,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return RedirectToAction(
                     "ManageOrganisation",
                     "Submission",
-                    new { id = SharedBusinessLogic.Obfuscator.Obfuscate(stateModel.OrganisationId.ToString()) });
+                    new { organisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(stateModel.OrganisationId.ToString()) });
 
             // when not auth then save codes and return ManageOrganisations redirect
             if (!stateModel.IsSecurityCodeExpired)
@@ -425,17 +425,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
 
         [Authorize]
-        [HttpGet("~/declare-scope/{id}")]
-        public async Task<IActionResult> DeclareScope(string id)
+        [HttpGet("~/declare-scope/{organisationIdentifier}")]
+        public async Task<IActionResult> DeclareScope(string organisationIdentifier)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
             // Decrypt org id
-            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(id);
+            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
             if (organisationId == 0)
-                return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
+                return new HttpBadRequestResult($"Cannot decrypt organisation id {organisationIdentifier}");
 
             // Check the user has permission for this organisation
             var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
@@ -449,7 +449,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     $"User {VirtualUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.OrganisationReference}");
 
             //Get the current snapshot date
-            var reportingDeadline = SharedBusinessLogic.GetReportingDeadline(userOrg.Organisation.SectorType).AddYears(-2);
+            var reportingDeadline = SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(userOrg.Organisation.SectorType).AddYears(-1);
             if (reportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear)
                 return new HttpBadRequestResult($"Snapshot year {reportingDeadline} is invalid");
 
@@ -469,17 +469,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [PreventDuplicatePost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        [HttpPost("~/declare-scope/{id}")]
-        public async Task<IActionResult> DeclareScope(DeclareScopeModel model, string id)
+        [HttpPost("~/declare-scope/{organisationIdentifier}")]
+        public async Task<IActionResult> DeclareScope(DeclareScopeModel model, string organisationIdentifier)
         {
             // Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
             // Decrypt org id
-            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(id);
+            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
             if (organisationId == 0)
-                return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
+                return new HttpBadRequestResult($"Cannot decrypt organisation id {organisationIdentifier}");
 
 
             // Check the user has permission for this organisation

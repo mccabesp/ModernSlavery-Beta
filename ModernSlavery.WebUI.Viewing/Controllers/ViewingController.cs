@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -119,7 +120,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             // var model = await ViewingPresenter.SearchAsync(searchQuery);
             var model = ViewingPresenter.GetSearchViewModel(searchQuery);
 
-            ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
+            SearchPresenter.CacheCurrentSearchUrl();
 
             return View("Search", model);
         }
@@ -137,7 +138,6 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
                 return View("CustomError",
                     WebService.ErrorViewModelFactory.Create(1151, new { featureName = "Search Service" }));
 
-
             //Clear the default back url of the organisation hub pages
             OrganisationBackUrl = null;
             ReportBackUrl = null;
@@ -148,7 +148,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             // generate result view model
             var model = await ViewingPresenter.SearchAsync(searchQuery);
 
-            ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
+            SearchPresenter.CacheCurrentSearchUrl();
 
             return View("SearchResults", model);
         }
@@ -168,7 +168,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             // generate result view model
             var model = await ViewingPresenter.SearchAsync(searchQuery);
 
-            ViewBag.ReturnUrl = SearchPresenter.GetLastSearchUrl();
+            SearchPresenter.CacheCurrentSearchUrl();
 
             return PartialView("Parts/_SearchMainContent", model);
         }
@@ -209,7 +209,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         [HttpGet("download-data/{year:int=0}")]
         public async Task<IActionResult> DownloadData(int year = 0)
         {
-            if (year == 0) year = ViewingService.SharedBusinessLogic.GetReportingStartDate(SectorTypes.Private).Year;
+            if (year == 0) year = ViewingService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(SectorTypes.Private).Year;
 
             //Ensure we have a directory
             if (!await SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(SharedBusinessLogic.SharedOptions
@@ -264,6 +264,9 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             if (openResult.Fail) return HandleStatementViewErrors(openResult.Errors);
 
             var viewModel = openResult.Result;
+            var backUrl = SearchPresenter.GetLastSearchUrl();
+            viewModel.BackUrl = string.IsNullOrEmpty(backUrl) ? "/search" : backUrl;
+
             return View("StatementSummary", viewModel);
         }
 

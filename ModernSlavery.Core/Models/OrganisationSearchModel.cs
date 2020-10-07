@@ -82,7 +82,7 @@ namespace ModernSlavery.Core.Models
 
                     public RiskTypeIndex.RiskType Convert(OrganisationSearchModel.KeyName source, RiskTypeIndex.RiskType destination, ResolutionContext context)
                     {
-                        var type = _riskTypeIndex.FirstOrDefault(riskType => riskType.Id == source.Key);
+                        var type = _riskTypeIndex.FirstOrDefault(riskType => riskType.Id == source.Key)?.Clone();
                         type.Description = source.Name;
                         return type;
                     }
@@ -99,7 +99,7 @@ namespace ModernSlavery.Core.Models
 
                     public DiligenceTypeIndex.DiligenceType Convert(OrganisationSearchModel.KeyName source, DiligenceTypeIndex.DiligenceType destination, ResolutionContext context)
                     {
-                        var type = _diligenceTypeIndex.FirstOrDefault(diligenceType => diligenceType.Id == source.Key);
+                        var type = _diligenceTypeIndex.FirstOrDefault(diligenceType => diligenceType.Id == source.Key)?.Clone();
                         type.Description = source.Name;
                         return type;
                     }
@@ -116,7 +116,7 @@ namespace ModernSlavery.Core.Models
 
                     public TrainingTypeIndex.TrainingType Convert(OrganisationSearchModel.KeyName source, TrainingTypeIndex.TrainingType destination, ResolutionContext context)
                     {
-                        var type = _trainingTypeIndex.FirstOrDefault(trainingType => trainingType.Id == source.Key);
+                        var type = _trainingTypeIndex.FirstOrDefault(trainingType => trainingType.Id == source.Key)?.Clone();
                         type.Description = source.Name;
                         return type;
                     }

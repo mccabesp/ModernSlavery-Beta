@@ -1337,7 +1337,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     continue;
                 }
 
-                var year = number.ToInt32(_adminService.SharedBusinessLogic.GetReportingDeadline(org.SectorType).Year);
+                var year = number.ToInt32(_adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(org.SectorType).Year);
                 var statement = org.Statements.OrderByDescending(o => o.StatusDate)
                     .FirstOrDefault(r => r.Status == StatementStatuses.Submitted && r.SubmissionDeadline.Year == year);
                 if (statement == null)
@@ -1610,7 +1610,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (var statement in org.Statements)
                 {
                     var oldDate = statement.SubmissionDeadline;
-                    var newDate = _adminService.SharedBusinessLogic.GetReportingDeadline(newSector, oldDate.Year);
+                    var newDate = _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badReturnDates = true;
@@ -1621,7 +1621,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (var scope in org.OrganisationScopes)
                 {
                     var oldDate = scope.SubmissionDeadline;
-                    var newDate = _adminService.SharedBusinessLogic.GetReportingDeadline(newSector, oldDate.Year);
+                    var newDate = _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badScopeDates = true;
@@ -1688,7 +1688,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         {
                             var oldDate = statement.SubmissionDeadline;
                             var newDate =
-                                _adminService.SharedBusinessLogic.GetReportingDeadline(newSector, oldDate.Year);
+                                _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
                             statement.SubmissionDeadline = newDate;
@@ -1712,7 +1712,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         {
                             var oldDate = scope.SubmissionDeadline;
                             var newDate =
-                                _adminService.SharedBusinessLogic.GetReportingStartDate(newSector, oldDate.Year);
+                                _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
                             scope.SubmissionDeadline = newDate;
@@ -1791,7 +1791,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (var statement in org.Statements)
                 {
                     var oldDate = statement.SubmissionDeadline;
-                    var newDate = _adminService.SharedBusinessLogic.GetReportingDeadline(newSector, oldDate.Year);
+                    var newDate = _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badReturnDates = true;
@@ -1802,7 +1802,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (var scope in org.OrganisationScopes)
                 {
                     var oldDate = scope.SubmissionDeadline;
-                    var newDate = _adminService.SharedBusinessLogic.GetReportingStartDate(newSector, oldDate.Year);
+                    var newDate = _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badScopeDates = true;
@@ -1874,7 +1874,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         {
                             var oldDate = statement.SubmissionDeadline;
                             var newDate =
-                                _adminService.SharedBusinessLogic.GetReportingDeadline(newSector, oldDate.Year);
+                                _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
                             statement.SubmissionDeadline = newDate;
@@ -1903,7 +1903,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         {
                             var oldDate = scope.SubmissionDeadline;
                             var newDate =
-                                _adminService.SharedBusinessLogic.GetReportingStartDate(newSector, oldDate.Year);
+                                _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
                             scope.SubmissionDeadline = newDate;

@@ -195,7 +195,7 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         [Required(AllowEmptyStrings = false)] public string SicCodeIds { get; set; }
 
-        public List<int> SicCodes { get; set; }
+        public List<int> SicCodes { get; set; } = new List<int>();
         public string SicSource { get; set; }
 
         #endregion

@@ -164,13 +164,14 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <returns>???</returns>
         Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId = -1);
 
+
         /// <summary>
-        /// Gets a summary about any submissions a statement model as submitted data to storage and deletes any deletes any draft data and draft backups.
+        /// Gets summary information about any submissions a statement model as submitted data to storage and deletes any deletes any draft data and draft backups.
         /// </summary>
         /// <param name="organisationId">The Id of the organisation>
-        /// <param name="reportingDeadlineYear">The reporting deadline </param>      
+        /// <param name="reportingDeadlineYear">The reporting deadline year</param>      
         /// <returns>A summary about any existing submissions or drafts for this organisation</returns>
-        Task<string> GetExistingStatementInformation(long organisationId, DateTime reportingDeadline);
+        Task<List<string>> GetExistingStatementInformationAsync(long organisationId, int reportingDeadlineYear);
         
         /// <summary>
         /// Checks if a reporting deadline has passed any reporting extensions

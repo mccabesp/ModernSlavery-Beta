@@ -11,26 +11,48 @@
         @for (var organisationIndex = 0; organisationIndex < Model.StatementOrganisations.Count; organisationIndex++)
         {
             <tr class="govuk-table__row">
-                <td class="govuk-table__cell">                   
-                    @if (Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation != null)
+                <td class="govuk-table__cell">
+                    @if (Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation.Count > 0)
                     {
                         <div class="govuk-inset-text">
-                            <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold govuk-blue">@(Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation) </p>
+                            <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold govuk-blue">
+                                @if (Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation.Count == 1)
+                                {
+                                    <span>Included in the @Html.Raw(Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation[0].ReplaceI("\n","<br />"))</span>
+                                }
+                                else
+                                {
+                                    <span>Included in @(Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation.Count) other organisations’ group statements</span>
+                                    <details class="govuk-details" data-module="govuk-details">
+                                        <summary class="govuk-details__summary">
+                                            <span class="govuk-details__summary-text">
+                                                Which other statements include this organisation?
+                                            </span>
+                                        </summary>
+                                        <div class="govuk-details__text">
+                                            Included in:
+                                            @foreach (var otherSubmissionsInformation in Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation)
+                                            {
+                                                <div class="govuk-!-padding-top-4">the @Html.Raw(otherSubmissionsInformation.ReplaceI("\n", "<br />"))</div>
+                                            }
+                                        </div>
+                                    </details>
+                                }
+                            </p>
                             <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold"> @(Model.StatementOrganisations[organisationIndex].OrganisationName)</p>
                             <p class="govuk-body govuk-!-margin-bottom-2">@(Model.StatementOrganisations[organisationIndex].Address?.GetFullAddress())</p>
                             <p class="govuk-body"> Company number: @(Model.StatementOrganisations[organisationIndex].CompanyNumber)</p>
                         </div>
-
                     }
                     else
                     {
                         <div>
                             <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold"> @(Model.StatementOrganisations[organisationIndex].OrganisationName)</p>
                             <p class="govuk-body govuk-!-margin-bottom-2">@(Model.StatementOrganisations[organisationIndex].Address?.GetFullAddress())</p>
-                           @if (Model.StatementOrganisations[organisationIndex].CompanyNumber != null)
-                           {
-                            <p class="govuk-body govuk-!-margin-bottom-2">Company number: @(Model.StatementOrganisations[organisationIndex].CompanyNumber)</p>
-                           }
+                            @if (Model.StatementOrganisations[organisationIndex].CompanyNumber != null)
+                            {
+                                <p class="govuk-body govuk-!-margin-bottom-2">Company number: @(Model.StatementOrganisations[organisationIndex].CompanyNumber)</p>
+                            }
                         </div>
                     }
                 </td>
