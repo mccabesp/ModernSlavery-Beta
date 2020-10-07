@@ -615,7 +615,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             //Restore draft from backup
             if (await _sharedBusinessLogic.FileRepository.GetFileExistsAsync(draftBackupFilePath))
-            { 
+            {
                 await _sharedBusinessLogic.FileRepository.CopyFileAsync(draftBackupFilePath, draftFilePath, true);
                 await _sharedBusinessLogic.FileRepository.DeleteFileAsync(draftBackupFilePath);
             }
@@ -631,11 +631,11 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// </summary>
         /// <param name="draftFilePath"></param>
         /// <returns>True if the file remains</returns>
-        private async Task<bool> DeleteIfEmptyOrSubmittedAsync(string draftFilePath, StatementModel statementModel=null)
+        private async Task<bool> DeleteIfEmptyOrSubmittedAsync(string draftFilePath, StatementModel statementModel = null)
         {
-            if (statementModel==null)statementModel = await LoadStatementModelFromFile(draftFilePath);
+            if (statementModel == null) statementModel = await LoadStatementModelFromFile(draftFilePath);
             if (statementModel == null) return false;
-            
+
             var delete = statementModel.IsEmpty();
             if (!delete && statementModel.Submitted)
             {
@@ -853,7 +853,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             return GetModifications(oldStatementModel, newStatementModel);
         }
 
- 
+
 
         public async Task<List<string>> GetExistingStatementInformationAsync(long organisationId, int reportingDeadlineYear)
         {
@@ -876,7 +876,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                         var organisation = await _organisationBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId);
                         if (organisation != null)
                             results.Add($"{reportingDeadlineYear - 1} to {reportingDeadlineYear} statement for\n{organisation.OrganisationName}\n" +
-                                $"(Draft submission in progress on our service)");
+                                $"(draft submission in progress on our service)");
                     }
                 }
 

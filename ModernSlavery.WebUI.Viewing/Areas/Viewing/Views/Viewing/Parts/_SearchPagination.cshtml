@@ -8,11 +8,11 @@
 }
 @if (Model.Organisations.Results.Count > 0)
 {
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds" data-pagecount="@Model.Organisations.PageCount" data-currentpage="@Model.Organisations.CurrentPage">
+    <div class="govuk-grid-row pagination">
+        <div class="govuk-grid-column-full" data-pagecount="@Model.Organisations.PageCount" data-currentpage="@Model.Organisations.CurrentPage">
             @if (showPrev)
             {
-            <div class="pagination pagination-prev">
+            <div class="pagination-prev">
                 <a class="pagination-button" href="@Url.WithQuery("SearchResults", new {p = Model.Organisations.CurrentPage - 1})">
                         <span class="prev-arrow"></span>
                         <span class="govuk-body govuk-!-font-weight-bold">Previous page </span><br />
@@ -23,7 +23,7 @@
             @if (showNext)
             {
 
-        <div class="pagination pagination-next" display: table-row;>
+        <div class="pagination-next" display: table-row;>
             <a class="pagination-button" href="@Url.WithQuery("SearchResults", new {p = Model.Organisations.CurrentPage + 1})">
                   <span class="next-arrow"></span>
                     <span class="govuk-body govuk-!-font-weight-bold">Next page </span><br />
