@@ -10,8 +10,6 @@ namespace ModernSlavery.Core.Entities
     {
         public override bool Equals(object obj)
         {
-            if (obj == null) return false;
-
             var address = obj as OrganisationAddress;
             if (address == null) return false;
 
