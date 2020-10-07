@@ -1,8 +1,11 @@
 ﻿using Geeks.Pangolin;
+using Geeks.Pangolin.Helper.UIContext;
 using Geeks.Pangolin.Service.DriverService;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Testing.Helpers;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,6 +23,7 @@ namespace ModernSlavery.Testing.Helpers.Classes
 
         public new void Dispose()
         {
+            WebDriver.Manage().Cookies.DeleteAllCookies();
             ResetServiceScope();
             base.Dispose();
         }
@@ -39,5 +43,25 @@ namespace ModernSlavery.Testing.Helpers.Classes
             _ServiceScope = null;
         }
 
+        public void ClearCookies()
+        {            
+            WebDriver.Manage().Cookies.DeleteAllCookies();
+        }
+
+        //Sets a value to configuration
+        public void ReturntoRoot(UIContext ui)
+        {
+            ui.Goto("/");
+        }
+
+        public void DeleteCookiesAndReturnToRoot(UIContext ui)
+        {
+            ClearCookies();
+            ReturntoRoot(ui);
+        }
+
+        
+
     }
+
 }
