@@ -270,7 +270,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             //Return full page errors which return to the ManageOrganisation page
             var error = errors.FirstOrDefault();
-            
+
             //Clear the cancel stash before leaving journey
             UnstashCancellingViewModel(true);
 
@@ -283,7 +283,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 case StatementErrors.Locked:
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1154, new { organisationIdentifier = GetOrganisationIdentifier() }));
                 case StatementErrors.TooLate:
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1155,new { organisationIdentifier= GetOrganisationIdentifier() }));
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1155, new { organisationIdentifier = GetOrganisationIdentifier() }));
                 case StatementErrors.DuplicateName:
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(3901, new { organisationName = error.Message }));
                 case StatementErrors.CoHoTransientError:
@@ -340,7 +340,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             else if (viewModel is GroupReviewViewModel)
             {
                 var reviewViewModel = viewModel as GroupReviewViewModel;
-                
+
                 //Copy changes to the review model
                 var searchViewModel = UnstashModel<GroupSearchViewModel>();
                 if (searchViewModel != null) reviewViewModel.StatementOrganisations = searchViewModel.StatementOrganisations;
@@ -500,8 +500,23 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 viewModel.GroupResults.ShowResults = !viewModel.GroupResults.ShowResults;
 
                 //Copy the search text to the organisation name
-                if (!viewModel.GroupResults.ShowResults && !string.IsNullOrWhiteSpace(viewModel.GroupResults.SearchKeywords) && string.IsNullOrWhiteSpace(viewModel.GroupResults.OrganisationName))
+                if (!viewModel.GroupResults.ShowResults && !string.IsNullOrWhiteSpace(viewModel.GroupResults.SearchKeywords))
+                {
                     viewModel.GroupResults.OrganisationName = viewModel.GroupResults.SearchKeywords;
+
+                    //Add the group search model to session before removing SearchKeywords
+                    StashModel(viewModel);
+
+                    // remove text from searchbox
+                    viewModel.GroupResults.SearchKeywords = null;
+
+                    //Must clear otherwise hidden for doesnt work
+                    ModelState.Clear();
+
+                    //Return the page
+                    return View(viewModel);
+                }
+
             }
             else if (addIndex > -1 || removeIndex > -1)
             {
@@ -526,15 +541,27 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     //Handle any errors
                     if (!outcome.Success) HandleStatementErrors(outcome.Errors);
 
-                    //Clear the input name
+                    //Clear the input name and searchKeyword
                     viewModel.GroupResults.OrganisationName = null;
+                    stashedModel.GroupResults.SearchKeywords = null;
+
                 }
                 else
                 {
-                    //Add the organisation to the view model
-                    var removeOrg = viewModel.GroupResults.ResultsPage.Results[removeIndex];
-                    var index = viewModel.FindGroupOrganisation(removeOrg);
-                    viewModel.StatementOrganisations.RemoveAt(index);
+                    //removing from manual orgs table
+                    if (!viewModel.GroupResults.ShowResults)
+                    {
+                        //Remove the selected organisation
+                        viewModel.StatementOrganisations.RemoveAt(removeIndex);
+
+                    }
+                    else
+                    {
+                        //Add the organisation to the view model
+                        var removeOrg = viewModel.GroupResults.ResultsPage.Results[removeIndex];
+                        var index = viewModel.FindGroupOrganisation(removeOrg);
+                        viewModel.StatementOrganisations.RemoveAt(index);
+                    }
                 }
 
                 //showBanner when including/removing organisation
