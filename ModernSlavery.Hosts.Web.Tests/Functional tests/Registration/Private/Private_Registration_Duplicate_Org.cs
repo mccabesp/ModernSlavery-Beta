@@ -12,7 +12,7 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
-
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -20,7 +20,14 @@ namespace ModernSlavery.Hosts.Web.Tests
     public class Private_Registration_Duplicate_Org : Private_Registration_Success
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
-               
+        private Organisation org;
+        [OneTimeSetUp]
+        public async Task OTSetUp()
+        {
+            //HostHelper.ResetDbScope();
+            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            await Task.CompletedTask;
+        }
         [Test, Order(30)]
         public async Task SearchForOrg()
         {
@@ -33,7 +40,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(31)]
 
         public async Task SelectDuplicateOrg() { 
-            AtRow(That.Contains, TestData.OrgName).Click(What.Contains, "Choose");
+            AtRow(That.Contains, org.OrganisationName).Click(What.Contains, "Choose");
             await Task.CompletedTask;
 
         }

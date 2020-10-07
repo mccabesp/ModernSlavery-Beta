@@ -57,10 +57,10 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task SearchForOrganisation()
         { 
-            SetXPath("//*[@id='SearchText']").To(TestData.OrgName);
+            SetXPath("//*[@id='SearchText']").To(org.OrganisationName);
             Click("Search");
 
-            ExpectRow(That.Contains, TestData.OrgName);
+            ExpectRow(That.Contains, org.OrganisationName);
 
             await Task.CompletedTask;
 
@@ -69,14 +69,14 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task ChooseOrganisation()
         { 
-        AtRow(That.Contains, TestData.OrgName).Click(What.Contains, "Choose");
+        AtRow(That.Contains, org.OrganisationName).Click(What.Contains, "Choose");
 
             ExpectHeader("Confirm your organisation’s details");
 
-            AtRow("Organisation name").Expect(TestData.OrgName);
+            AtRow("Organisation name").Expect(org.OrganisationName);
             
             //todo investigate address issue
-            //AtRow("Registered address").Expect(TestData.RegisteredAddress;
+            AtRow("Registered address").Expect(org.GetAddressString(DateTime.Now));
             Click("Confirm");
 
             ExpectHeader("We're sending a PIN by post to the following name and address:");
@@ -111,7 +111,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Select an organisation");
 
 
-            ClickText(TestData.OrgName);
+            ClickText(org.OrganisationName);
+
 
             ExpectHeader("Enter your registration PIN");
 
@@ -122,7 +123,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ClickText("Activate and continue");
 
-            AtRow(TestData.OrgName).Expect("Registration complete");
+            AtRow(org.OrganisationName).Expect("Registration complete");
 
             await Task.CompletedTask;
 

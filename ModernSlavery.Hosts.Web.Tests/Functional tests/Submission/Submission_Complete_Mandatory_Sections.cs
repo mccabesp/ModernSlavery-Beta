@@ -27,7 +27,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Select an organisation");
 
-            Click(TestData.OrgName);
+            Click(org.OrganisationName);
 
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
@@ -37,7 +37,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Before you start");
             Click("Start Now");
 
-            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: org.OrganisationName);
 
             await Task.CompletedTask;
         }
