@@ -438,7 +438,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return new HttpBadRequestResult($"Cannot decrypt organisation id {organisationIdentifier}");
 
             // Check the user has permission for this organisation
-            var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
+            var userOrg = VirtualUser.UserOrganisations
+                .FirstOrDefault(uo => uo.OrganisationId == organisationId);
             if (userOrg == null)
                 return new HttpForbiddenResult(
                     $"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
@@ -448,20 +449,30 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return new HttpForbiddenResult(
                     $"User {VirtualUser?.EmailAddress} has not completed registration for organisation {userOrg.Organisation.OrganisationReference}");
 
-            //Get the current snapshot date
-            var reportingDeadline = SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(userOrg.Organisation.SectorType).AddYears(-1);
-            if (reportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear)
-                return new HttpBadRequestResult($"Snapshot year {reportingDeadline} is invalid");
+            var currentReportingDeadline = SharedBusinessLogic.ReportingDeadlineHelper
+                .GetReportingDeadline(userOrg.Organisation.SectorType);
+            var previousReportingDeadline = currentReportingDeadline.AddYears(-1);
 
-            var scopeStatus =
-                await SubmissionService.ScopeBusinessLogic.GetScopeStatusByReportingDeadlineOrLatestAsync(organisationId,
-                    reportingDeadline);
+            // org registered (via pin confirmed date)
+            // must be in first year of registration
+            if (previousReportingDeadline >= userOrg.PINConfirmedDate
+                || currentReportingDeadline < userOrg.PINConfirmedDate)
+                return new HttpBadRequestResult($"Reporting year with deadline {previousReportingDeadline} is invalid");
+
+            if (previousReportingDeadline.Year < SharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear)
+                return new HttpBadRequestResult($"Reporting year with deadline {previousReportingDeadline} is invalid");
+
+            var scopeStatus = await SubmissionService.ScopeBusinessLogic
+                .GetScopeStatusByReportingDeadlineOrLatestAsync(organisationId, previousReportingDeadline);
             if (scopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.OutOfScope))
                 return new HttpBadRequestResult("Explicit scope is already set");
 
             // build the view model
             var model = new DeclareScopeModel
-            { OrganisationName = userOrg.Organisation.OrganisationName, ReportingDeadline = reportingDeadline };
+            {
+                OrganisationName = userOrg.Organisation.OrganisationName,
+                ReportingDeadline = previousReportingDeadline
+            };
 
             return View(model);
         }
