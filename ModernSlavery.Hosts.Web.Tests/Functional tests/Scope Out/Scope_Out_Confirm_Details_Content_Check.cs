@@ -31,6 +31,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task SetUp()
         {
+            DeleteCookiesAndReturnToRoot(this);
+
             TestData.Organisation = this.Find<Organisation>(org => TestData.Organisation.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
 

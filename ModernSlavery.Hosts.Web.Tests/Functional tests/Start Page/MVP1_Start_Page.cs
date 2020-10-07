@@ -52,6 +52,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task NavigateToStartPage()
         {
+            DeleteCookiesAndReturnToRoot(this);
+
             Goto("/start");
             ExpectHeader("Submit a modern slavery statement");
             await Task.CompletedTask;

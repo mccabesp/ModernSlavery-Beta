@@ -38,6 +38,8 @@ namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
         [Test, Order(22)]
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
         {
+            DeleteCookiesAndReturnToRoot(this);
+
             Goto(ScopeConstants.ScopeUrl);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
             await Task.CompletedTask;

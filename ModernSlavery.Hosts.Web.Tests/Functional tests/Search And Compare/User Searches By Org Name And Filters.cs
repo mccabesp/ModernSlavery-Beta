@@ -35,6 +35,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(1)]
         public async Task NavigateToSearchPage()
         {
+            DeleteCookiesAndReturnToRoot(this);
+
             // Route to Search and compare feature to be clarified.
             ExpectHeader("Search modern slavery statements");
 

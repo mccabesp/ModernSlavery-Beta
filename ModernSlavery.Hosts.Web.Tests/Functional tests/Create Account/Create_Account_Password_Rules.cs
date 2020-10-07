@@ -42,7 +42,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(1)]
         public async Task GoToCreateAccountPage()
         {
-            Goto("/");
+            DeleteCookiesAndReturnToRoot(this);
+
             Click("Sign in");
             Click("Create an account");
             ExpectHeader("Create an Account");

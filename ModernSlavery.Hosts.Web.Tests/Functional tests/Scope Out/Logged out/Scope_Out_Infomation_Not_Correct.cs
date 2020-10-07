@@ -53,6 +53,7 @@ private bool TestRunFailed = false;
         [TearDown]
         public void TearDown()
         {
+            DeleteCookiesAndReturnToRoot(this);
 
             if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
 

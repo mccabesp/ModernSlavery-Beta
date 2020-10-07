@@ -32,6 +32,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(1)]
         public async Task CheckContentFor6PlusOrganisations()
         {
+            DeleteCookiesAndReturnToRoot(this);
+
             ExpectHeader("Review the organisations in your group statement");
             ExpectText("You’ve told us your statement is for the following group of organisations. You can add more organisations to the group, or remove organisations, before confirming and continuing.");
             ExpectText("If your statement is for a single organisation, and not a group, you can return to the ‘Who is your statement for?’ page and specify a single organisation.");

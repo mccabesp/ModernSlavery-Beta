@@ -43,6 +43,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(1)]
         public async Task CheckContentForOrganisationsStatementPage()
         {
+            DeleteCookiesAndReturnToRoot(this);
+
             ExpectHeader("Modern slavery statement submissions");
             AtRow("2020-2021").Column("Status of statement published on this service").Expect("Already included in:");
             AtRow("2020-2021").Column("Status of statement published on this service").Expect("Fly Jet Australia's 2020-2021 group submission, published on 1 Sepetember 2020");

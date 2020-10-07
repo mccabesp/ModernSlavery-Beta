@@ -47,6 +47,7 @@ namespace ModernSlavery.Hosts.Web.Tests
                 Assert.Inconclusive("Previous test failed");
             else
                 SetupTest(TestContext.CurrentContext.Test.Name);
+
         }
 
 
@@ -63,7 +64,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(1)]
         public async Task GoToCreateAccountPage()
         {
-            Goto("/");
+
+            DeleteCookiesAndReturnToRoot(this);
+
 
             Click("Sign in");
 

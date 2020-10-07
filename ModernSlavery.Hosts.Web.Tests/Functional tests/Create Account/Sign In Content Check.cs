@@ -20,6 +20,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task NavigateToSignInPage()
         {
+
             Click("Sign out");
             Expect("Signed out");
             Click("Continue");

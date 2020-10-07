@@ -18,7 +18,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task NavigateToCreateAccountPage()
         {
-            Logout();
+
             await GoToCreateAccountPage();
         }
 
