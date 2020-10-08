@@ -13,8 +13,9 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Testing.Helpers.Classes;
+using ModernSlavery.Testing.Helpers.Extensions;
 
-namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
+namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
 
@@ -26,15 +27,49 @@ namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
             TestData = new OrganisationTestData(this);
         }
         protected string EmployerReference;
+        private bool TestRunFailed = false;
+        protected Organisation org;
+        [OneTimeSetUp]
 
-        [Test, Order(20)]
-        public async Task AddOrgToDb()
+
+        public void OTSetUp()
         {
-            //EmployerReference =  ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(TestData.OrgName, "ABCD1234");
+            //(TestRunSetup.TestWebHost.GetDbContext() as Microsoft.EntityFrameworkCore.DbContext)
+
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null);
+            //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
+
+        }
+        [SetUp]
+        public void SetUp()
+        {
+            if (TestRunFailed)
+                Assert.Inconclusive("Previous test failed");
+            else
+                SetupTest(TestContext.CurrentContext.Test.Name);
+        }
+
+
+
+
+        [TearDown]
+        public void TearDown()
+        {
+
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
+
+        }
+        [Test, Order(20)]
+        public async Task SetSecurityCode()
+        {
+            DeleteCookiesAndReturnToRoot(this);
+
+
+            await this.SetSecurityCode(org, new DateTime(2021, 6, 10));
+
 
             await Task.CompletedTask;
         }
-
         [Test, Order(22)]
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
         {
@@ -48,8 +83,8 @@ namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Employer Reference").To(EmployerReference);
-            Set("Security Code").To("ABCD1234");
+            Set("Organisation Reference").To(org.OrganisationReference);
+            Set("Security Code").To(org.SecurityCode);
             await Task.CompletedTask;
         }
 
@@ -63,10 +98,10 @@ namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
         [Test, Order(28)]
         public async Task VerifyOrgDetails()
         {
-            RightOfText("Name").Expect(TestData.OrgName);
-            RightOfText("Reference").Expect(EmployerReference);
+            RightOfText("Organisation Name").Expect(org.OrganisationName);
+            RightOfText("Organisation Reference").Expect(org.OrganisationReference);
             //todo await helper implementation for address logic
-            RightOfText("Registered address").Expect("");
+            //RightOfText("Registered address").Expect("");
             await Task.CompletedTask;
         }
 
@@ -97,15 +132,15 @@ namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
         [Test, Order(34)]
         public async Task CheckFieldVisibility()
         {
-            ExpectNoField("What is your organistion’s annual turnover or budget?");
+            ExpectNoLabel("What is your organisation’s annual turnover or budget?");
             ClickLabel("Its turnover or budget is less than £36 million per year");
-            ExpectField("What is your organistion’s annual turnover or budget?");
+            ExpectLabel("What is your organisation’s annual turnover or budget?");
 
-            ExpectNoField("Please specify");
-            ExpectNo("(Limit is 200 characters)");
+            ExpectNoLabel("Please specify");
+            ExpectNo("You have 1000 characters remaining");
             ClickLabel("Other");
-            ExpectField("Please specify");
-            ExpectNo("(Limit is 200 characters)");
+            ExpectLabel("Please specify");
+            Expect("You have 1000 characters remaining");
 
             await Task.CompletedTask;
         }
@@ -113,13 +148,13 @@ namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
         [Test, Order(36)]
         public async Task CheckContactUsFields()
         {
-            ExpectHeader("Your contact details");
+            Expect("Your contact details");
 
             Try(
-                 () => ExpectField("First name"),
-            () => { ExpectField("Last name"); },
-            () => { ExpectField("Job title"); },
-            () => { ExpectField("Email address"); });
+                 () => ExpectLabel("First name"),
+            () => { ExpectLabel("Last name"); },
+            () => { ExpectLabel("Job title"); },
+            () => { ExpectLabel("Email address"); });
 
             await Task.CompletedTask;
         }

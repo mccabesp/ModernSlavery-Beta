@@ -13,8 +13,9 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Testing.Helpers.Classes;
+using ModernSlavery.Testing.Helpers.Extensions;
 
-namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
+namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
 
@@ -25,13 +26,46 @@ namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
         {
             TestData = new OrganisationTestData(this);
         }
+        private bool TestRunFailed = false;
+        protected Organisation org;
+        [OneTimeSetUp]
 
-        protected string EmployerReference;
 
-        [Test, Order(20)]
-        public async Task AddOrgToDb()
+        public void OTSetUp()
         {
-            //EmployerReference =  ModernSlavery.Testing.Helpers.Testing_Helpers.AddFastrackOrgToDB(TestData.OrgName, "ABCD1234");
+            //(TestRunSetup.TestWebHost.GetDbContext() as Microsoft.EntityFrameworkCore.DbContext)
+
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null);
+            //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
+
+        }
+        [SetUp]
+        public void SetUp()
+        {
+            if (TestRunFailed)
+                Assert.Inconclusive("Previous test failed");
+            else
+                SetupTest(TestContext.CurrentContext.Test.Name);
+        }
+
+
+
+
+        [TearDown]
+        public void TearDown()
+        {
+
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
+
+        }
+        [Test, Order(20)]
+        public async Task SetSecurityCode()
+        {
+            DeleteCookiesAndReturnToRoot(this);
+
+
+            await this.SetSecurityCode(org, new DateTime(2021, 6, 10));
+
 
             await Task.CompletedTask;
         }
@@ -49,8 +83,8 @@ namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Employer Reference").To(EmployerReference);
-            Set("Security Code").To("ABCD1234");
+            Set("Organisation Reference").To(org.OrganisationReference);
+            Set("Security Code").To(org.SecurityCode);
             await Task.CompletedTask;
         }
 
@@ -64,10 +98,10 @@ namespace ModernSlavery.Hosts.Web.Tests.Functional_tests.Scope_Out
         [Test, Order(28)]
         public async Task VerifyOrgDetails()
         {
-            RightOfText("Name").Expect(TestData.OrgName);
-            RightOfText("Reference").Expect(EmployerReference);
+            RightOfText("Organisation Name").Expect(org.OrganisationName);
+            RightOfText("Organisation Reference").Expect(org.OrganisationReference);
             //todo await helper implementation for address logic
-            RightOfText("Registered address").Expect("");
+            //RightOfText("Registered address").Expect("");
             await Task.CompletedTask;
         }
 
