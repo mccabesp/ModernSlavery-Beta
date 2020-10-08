@@ -22,7 +22,7 @@ namespace ModernSlavery.Hosts.Web.Tests
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
-        [Test, Order(30)]
+        [Test, Order(40)]
         public async Task RegisterDuplicateOrg()
         {
             Goto("/");
@@ -31,7 +31,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             await Task.CompletedTask;
         }
-        [Test, Order(32)]
+        [Test, Order(42)]
 
         public async Task SelectingDuplicateOrgCausesValidation()
         {
