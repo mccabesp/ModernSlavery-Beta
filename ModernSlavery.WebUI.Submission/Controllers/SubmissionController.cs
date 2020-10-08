@@ -98,19 +98,22 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return new HttpForbiddenResult(
                     $"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
 
-            //Get the first snapshot date
-            var firstReportingDeadline = SharedBusinessLogic.ReportingDeadlineHelper.GetFirstReportingDeadline(userOrg.Organisation.SectorType);
+            var currentReportingDeadline = SharedBusinessLogic.ReportingDeadlineHelper
+                .GetReportingDeadline(userOrg.Organisation.SectorType);
+            var previousReportingDeadline = currentReportingDeadline.AddYears(-1);
+            var previousScope = userOrg.Organisation.GetActiveScopeStatus(previousReportingDeadline);
 
-            //Make sure we have an explicit scope for last and year for organisations new to this year
-            //TODO: May need refactoring for new multiyear scope - SMc
-            if (userOrg.PINConfirmedDate != null && userOrg.Organisation.Created >= firstReportingDeadline.AddYears(-1))
+            if (userOrg.PINConfirmedDate.HasValue
+                // In the first year they registered
+                && previousReportingDeadline < userOrg.PINConfirmedDate.Value
+                && userOrg.PINConfirmedDate.Value <= currentReportingDeadline
+                // For a year that is after the first reporting year
+                && previousReportingDeadline >= SharedBusinessLogic.ReportingDeadlineHelper.GetFirstReportingDeadline(userOrg.Organisation.SectorType)
+                // For scope status set by system
+                && !previousScope.IsAny(ScopeStatuses.InScope, ScopeStatuses.OutOfScope))
             {
-                //Get the previous snapshot date
-                var previousReportingDeadline = SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(userOrg.Organisation.SectorType).AddYears(-1);
-
-                var scopeStatus = await _SubmissionService.ScopeBusinessLogic.GetScopeStatusByReportingDeadlineOrLatestAsync(organisationId, previousReportingDeadline);
-                if (!scopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.OutOfScope))
-                    return RedirectToAction(nameof(ScopeController.DeclareScope), "Scope", new { organisationIdentifier });
+                // Prompt to enter their scope
+                return RedirectToAction(nameof(ScopeController.DeclareScope), "Scope", new { organisationIdentifier });
             }
 
             // get any associated users for the current org

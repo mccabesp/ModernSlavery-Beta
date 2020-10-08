@@ -483,13 +483,16 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public async IAsyncEnumerable<StatementInfoModel> GetStatementInfoModelsAsync(Organisation organisation)
         {
-            var reportingDeadline = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(organisation.SectorType, _sharedBusinessLogic.SharedOptions.FirstReportingDeadlineYear);
-            var currentReportingDeadline = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(organisation.SectorType);
-            while (reportingDeadline <= currentReportingDeadline)
-            {
-                yield return await GetStatementInfoModelAsync(organisation, reportingDeadline);
+            var earlistReportingDeadline = _sharedBusinessLogic.ReportingDeadlineHelper.GetFirstReportingDeadline(organisation.SectorType);
+            var latestReportingDeadline = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(organisation.SectorType);
 
-                reportingDeadline = reportingDeadline.AddYears(1);
+            var current = latestReportingDeadline;
+
+            while (current >= earlistReportingDeadline)
+            {
+                yield return await GetStatementInfoModelAsync(organisation, current);
+
+                current = current.AddYears(-1);
             }
         }
 
