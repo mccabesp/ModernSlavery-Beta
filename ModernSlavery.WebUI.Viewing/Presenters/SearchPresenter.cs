@@ -1,26 +1,53 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Viewing.Controllers;
 using ModernSlavery.WebUI.Viewing.Models;
+using System.Linq;
 
 namespace ModernSlavery.WebUI.Viewing.Presenters
 {
     public interface ISearchPresenter
     {
-        SearchViewModel LastSearchResults { get; set; }
-
-        string LastSearchParameters { get; }
+        void CacheCurrentSearchUrl();
 
         string GetLastSearchUrl();
     }
 
     public class SearchPresenter : ISearchPresenter
     {
-        public SearchPresenter(IHttpSession session, IUrlHelper urlHelper)
+        #region Dependencies
+
+        public IHttpSession Session { get; }
+
+        public IUrlHelper UrlHelper { get; }
+
+        public IHttpContextAccessor HttpContextAccessor { get; }
+
+        #endregion
+
+        public SearchPresenter(IHttpSession session,
+            IHttpContextAccessor httpContextAccessor,
+            IUrlHelper urlHelper)
         {
             Session = session;
             UrlHelper = urlHelper;
+            HttpContextAccessor = httpContextAccessor;
+        }
+
+        const string SEARCH_KEY = "Last_Search";
+
+        public void CacheCurrentSearchUrl()
+        {
+            var query = HttpContextAccessor.HttpContext.Request.QueryString;
+            // We should always use the search url as that appropriately handles 
+            // the client having JS disabled or enabled
+            var action = UrlHelper.Action(nameof(ViewingController.SearchResults), "Viewing");
+            var url = action + query.Value;
+
+            Session[SEARCH_KEY] = url;
         }
 
         /// <summary>
@@ -28,55 +55,10 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         /// </summary>
         public string GetLastSearchUrl()
         {
-            var routeValues = LastSearchParameters?.FromQueryString();
-            var actionUrl = UrlHelper.Action(nameof(ViewingController.SearchResults), "Viewing");
-            var routeQuery = routeValues?.ToQueryString(true);
-            return $"{actionUrl}?{routeQuery}";
+            if (Session.Keys.Contains(SEARCH_KEY))
+                return Session[SEARCH_KEY].ToString();
+
+            return UrlHelper.Action(nameof(ViewingController.SearchResults), "Viewing");
         }
-
-        #region Dependencies
-
-        public IHttpSession Session { get; }
-
-        public IUrlHelper UrlHelper { get; }
-
-        public bool CacheSearchResults { get; }
-
-        #endregion
-
-        #region Properties
-
-        public SearchViewModel LastSearchResults
-        {
-            get => CacheSearchResults ? Session.Get<SearchViewModel>("LastSearchResults") : null;
-            set
-            {
-                if (CacheSearchResults)
-                {
-                    if (value == null || value.Organisations == null || value.Organisations.Results == null ||
-                        value.Organisations.Results.Count == 0)
-                        Session.Remove("LastSearchResults");
-                    else
-                        Session["LastSearchResults"] = value;
-                }
-            }
-        }
-
-        /// <summary>
-        ///     last search querystring
-        /// </summary>
-        public string LastSearchParameters
-        {
-            get => Session["LastSearchParameters"] as string;
-            set
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                    Session.Remove("LastSearchParameters");
-                else
-                    Session["LastSearchParameters"] = value;
-            }
-        }
-
-        #endregion
     }
 }

@@ -2,6 +2,7 @@
 using ModernSlavery.Core.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ModernSlavery.Core.Classes.StatementTypeIndexes
 {
@@ -27,6 +28,8 @@ namespace ModernSlavery.Core.Classes.StatementTypeIndexes
             public short? ParentId { get; set; }
             public string Description { get; set; }
             public string Category { get; set; }
+
+            public RiskType Clone() => (RiskType)MemberwiseClone();
         }
         public readonly IList<RiskType> Regions;
     }

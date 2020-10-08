@@ -176,7 +176,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 userOrg.ConfirmAttempts = 0;
 
                 model.AccountingDate =
-                    _registrationService.SharedBusinessLogic.GetReportingStartDate(userOrg.Organisation.SectorType);
+                    _registrationService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(userOrg.Organisation.SectorType);
                 model.OrganisationId = userOrg.OrganisationId;
                 StashModel(model);
 

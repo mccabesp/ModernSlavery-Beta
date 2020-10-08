@@ -1,0 +1,7 @@
+{
+  "Webjobs": {
+    "UpdateFromCompaniesHouseAsync": {
+      "Trigger": "01:00:00:00"
+    }
+  }
+}

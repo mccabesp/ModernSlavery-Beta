@@ -1,9 +1,9 @@
 ﻿@model GroupSearchViewModel
-    <div class="govuk-grid-row">       
+    <div class="govuk-grid-row govuk-!-margin-bottom-6 govuk-!-margin-top-7">       
         <div class="govuk-grid-column-two-thirds">
             <div class="organisation-input-table">
                 <div class="organisation-input-cell textbox">
-                    @Html.LabelFor(m => m.GroupResults.OrganisationName, "Tell us the name of the organisation", new { @class = "govuk-label" })<br />
+                    @Html.LabelFor(m => m.GroupResults.OrganisationName, "Tell us the name of the organisation", new { @class = "govuk-label" })
                     @Html.TextBoxFor(m => m.GroupResults.OrganisationName, new { @class = "govuk-input" })<br />
                 </div>
                 <div class="organisation-input-cell">
@@ -15,7 +15,7 @@
 
             </div>          
         </div>
-        </div>
-<button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.ToggleResults">
-    Cancel and return to search results
-</button>
+        </div>  
+        <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.ToggleResults">
+            Cancel and return to search results
+        </button>

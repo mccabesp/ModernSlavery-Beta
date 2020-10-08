@@ -139,6 +139,14 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="addIndex"></param>
         /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
         Task<Outcome<StatementErrors>> IncludeGroupOrganisationAsync(GroupSearchViewModel groupSearchViewModel, int addIndex = 0);
+        
+        /// <summary>
+        /// Get all the information on group organisation submissions
+        /// </summary>
+        /// <param name="groupOrganisationsViewModel"></param>
+        /// <param name="reportingDeadline"></param>
+        /// <returns></returns>
+        Task GetOtherSubmissionsInformationAsync(GroupOrganisationsViewModel groupOrganisationsViewModel, int reportingDeadlineYear);
     }
 
     public class StatementPresenter : IStatementPresenter
@@ -336,10 +344,6 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 newStatementOrganisationViewModel.OrganisationName = groupOrganisation.OrganisationName;
                 newStatementOrganisationViewModel.CompanyNumber = groupOrganisation.CompanyNumber;
                 newStatementOrganisationViewModel.DateOfCessation = groupOrganisation.DateOfCessation;
-                //get info about other submissions/drafts
-                if (groupOrganisation.OrganisationId > 0)
-                    newStatementOrganisationViewModel.OtherSubmissionsInformation = await _statementBusinessLogic.GetExistingStatementInformation(groupOrganisation.OrganisationId, groupSearchViewModel.SubmissionDeadline);
-
             }
             else
             {
@@ -355,6 +359,19 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             //Include the new organisation
             groupSearchViewModel.StatementOrganisations.Add(newStatementOrganisationViewModel);
             return new Outcome<StatementErrors>();
+        }
+
+        public async Task GetOtherSubmissionsInformationAsync(GroupOrganisationsViewModel groupOrganisationsViewModel, int reportingDeadlineYear)
+        {
+            foreach (var statementOrganisation in groupOrganisationsViewModel.StatementOrganisations)
+            {
+                if (statementOrganisation.OtherSubmissionsInformation != null) continue;
+                if (statementOrganisation.OrganisationId==null || statementOrganisation.OrganisationId.Value <= 0)
+                    statementOrganisation.OtherSubmissionsInformation = new List<string>();
+                else
+                    statementOrganisation.OtherSubmissionsInformation = await _statementBusinessLogic.GetExistingStatementInformationAsync(statementOrganisation.OrganisationId.Value, reportingDeadlineYear);
+
+            }
         }
     }
 }

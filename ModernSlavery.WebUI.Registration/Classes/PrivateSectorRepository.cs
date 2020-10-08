@@ -145,7 +145,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
         public async Task<string> GetSicCodesAsync(string companyNumber)
         {
-            return await _CompaniesHouseAPI.GetSicCodesAsync(companyNumber);
+            return !string.IsNullOrWhiteSpace(companyNumber) ? await _CompaniesHouseAPI.GetSicCodesAsync(companyNumber) : null;
         }
 
         public void ClearSearch()

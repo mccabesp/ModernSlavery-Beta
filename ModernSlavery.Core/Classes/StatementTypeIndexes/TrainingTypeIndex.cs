@@ -19,6 +19,7 @@ namespace ModernSlavery.Core.Classes.StatementTypeIndexes
         {
             public short Id { get; set; }
             public string Description { get; set; }
+            public TrainingType Clone() => (TrainingType)MemberwiseClone();
         }
 
     }
