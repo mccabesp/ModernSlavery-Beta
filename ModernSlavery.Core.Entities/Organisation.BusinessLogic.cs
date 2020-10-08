@@ -233,13 +233,13 @@ namespace ModernSlavery.Core.Entities
         public OrganisationScope GetActiveScope(DateTime submissionDeadline)
         {
             return OrganisationScopes
-                .FirstOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline == submissionDeadline);
+                .SingleOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline == submissionDeadline);
         }
 
         public OrganisationScope GetActiveScope(int reportingDeadlineYear)
         {
             return OrganisationScopes
-                .FirstOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline.Year == reportingDeadlineYear);
+                .SingleOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline.Year == reportingDeadlineYear);
         }
 
         public ScopeStatuses GetActiveScopeStatus(DateTime submissionDeadline)
