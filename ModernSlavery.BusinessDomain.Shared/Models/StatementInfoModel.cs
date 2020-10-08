@@ -13,6 +13,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
 
         public DateTime? SubmittedStatementModifiedDate { get; set; }
 
+        public bool IsStatementEditable { get; set;  }
+
         public ScopeStatuses ScopeStatus { get; set; }
 
         public bool RequiredToReport => ScopeStatus != ScopeStatuses.OutOfScope && ScopeStatus != ScopeStatuses.PresumedOutOfScope;
