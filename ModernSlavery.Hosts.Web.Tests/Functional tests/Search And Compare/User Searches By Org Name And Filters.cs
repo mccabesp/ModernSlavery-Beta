@@ -17,7 +17,7 @@ using ModernSlavery.Testing.Helpers.Classes;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture]
+    [TestFixture, Ignore("S+F")]
 
     public class User_Searches_By_Org_Name_And_Filters : BaseUITest
     {

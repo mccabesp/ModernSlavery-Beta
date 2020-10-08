@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Waiting on 4773")]
 
     public class GoupSubmissionEditFromReviewPage : GoupSubmission_SwitchSingleToGroup
 
