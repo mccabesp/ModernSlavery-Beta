@@ -101,7 +101,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var currentReportingDeadline = SharedBusinessLogic.ReportingDeadlineHelper
                 .GetReportingDeadline(userOrg.Organisation.SectorType);
             var previousReportingDeadline = currentReportingDeadline.AddYears(-1);
-            var previousScope = userOrg.Organisation.GetActiveScope(previousReportingDeadline);
+            var previousScope = userOrg.Organisation.GetActiveScopeStatus(previousReportingDeadline);
 
             if (userOrg.PINConfirmedDate.HasValue
                 // In the first year they registered
@@ -110,7 +110,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 // For a year that is after the first reporting year
                 && previousReportingDeadline >= SharedBusinessLogic.ReportingDeadlineHelper.GetFirstReportingDeadline(userOrg.Organisation.SectorType)
                 // For scope status set by system
-                && !previousScope.ScopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.OutOfScope))
+                && !previousScope.IsAny(ScopeStatuses.InScope, ScopeStatuses.OutOfScope))
             {
                 // Prompt to enter their scope
                 return RedirectToAction(nameof(ScopeController.DeclareScope), "Scope", new { organisationIdentifier });
