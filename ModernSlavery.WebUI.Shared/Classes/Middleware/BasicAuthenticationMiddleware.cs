@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             _next = next;
         }
 
+        [DebuggerHidden()]
         public async Task Invoke(HttpContext httpContext)
         {
             var authenticated = GetIsAuthenticated(httpContext);
@@ -62,7 +64,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
                 }
 
             if (authenticated)
-                await _next.Invoke(httpContext);
+                await _next(httpContext);
             else
                 IssueAuthenticationChallenge(httpContext);
         }

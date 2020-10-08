@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using ModernSlavery.Core.Extensions;
 
@@ -15,7 +16,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             _disable = !enable;
         }
 
-        [System.Diagnostics.DebuggerHidden()]
+        [DebuggerHidden()]
         public async Task Invoke(HttpContext httpContext)
         {
             httpContext.Response.OnStarting(
@@ -27,7 +28,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
                     return Task.CompletedTask;
                 });
 
-            await _next.Invoke(httpContext);
+            await _next(httpContext);
         }
     }
 }
