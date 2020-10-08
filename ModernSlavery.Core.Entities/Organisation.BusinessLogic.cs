@@ -14,10 +14,9 @@ namespace ModernSlavery.Core.Entities
         #region Overrides
         public override bool Equals(object obj)
         {
-            // Check for null values and compare run-time types.
-            if (obj == null || GetType() != obj.GetType()) return false;
+            var target = obj as Organisation;
+            if (target == null) return false;
 
-            var target = (Organisation)obj;
             return OrganisationId == target.OrganisationId;
         }
 
@@ -234,13 +233,13 @@ namespace ModernSlavery.Core.Entities
         public OrganisationScope GetActiveScope(DateTime submissionDeadline)
         {
             return OrganisationScopes
-                .FirstOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline == submissionDeadline);
+                .SingleOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline == submissionDeadline);
         }
 
         public OrganisationScope GetActiveScope(int reportingDeadlineYear)
         {
             return OrganisationScopes
-                .FirstOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline.Year == reportingDeadlineYear);
+                .SingleOrDefault(s => s.Status == ScopeRowStatuses.Active && s.SubmissionDeadline.Year == reportingDeadlineYear);
         }
 
         public ScopeStatuses GetActiveScopeStatus(DateTime submissionDeadline)

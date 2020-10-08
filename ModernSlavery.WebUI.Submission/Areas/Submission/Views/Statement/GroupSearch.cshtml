@@ -42,13 +42,14 @@
     }
     else
     {
-        <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+        <button class="govuk-button govuk-!-margin-right-1 govuk-!-margin-bottom-5" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
             Continue
         </button>
     }
-
-    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+<div>
+    <button class="link-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
         Cancel
     </button>
+</div>
 }
 

@@ -16,7 +16,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public GroupOrganisationsViewModelMapperProfile()
         {
             CreateMap<StatementModel.StatementOrganisationModel, GroupOrganisationsViewModel.StatementOrganisationViewModel>()
-                .ForMember(d => d.OtherSubmissionsInformation, opt => opt.Ignore());
+                .ForMember(d => d.OtherSubmissionsInformation, opt => opt.Ignore())
+                .ForMember(d => d.ManuallyAdded, opt => opt.Ignore());
 
             CreateMap<GroupOrganisationsViewModel.StatementOrganisationViewModel, StatementModel.StatementOrganisationModel>();
 
@@ -49,10 +50,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             public AddressModel Address { get; set; }
             public string CompanyNumber { get; set; }
             public DateTime? DateOfCessation { get; set; }
-
             [NotMapped]
             [BindNever]
             public List<string> OtherSubmissionsInformation { get; set; }
+            [NotMapped]
+            [BindNever]
+            public bool? ManuallyAdded { get; set; }
         }
         #endregion
 
