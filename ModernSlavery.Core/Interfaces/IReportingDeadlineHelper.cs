@@ -12,6 +12,7 @@ namespace ModernSlavery.Core.Interfaces
         DateTime PublicReportingDeadline { get; }
         DateTime GetReportingStartDate(SectorTypes sectorType, int year = 0);
         DateTime GetReportingDeadline(SectorTypes sectorType, int year = 0);
+        bool IsReportingYearEditable(SectorTypes sectorType, int year);
         IList<DateTime> GetReportingDeadlines(SectorTypes sectorType, int recentYears = 0);
         DateTime GetFirstReportingDeadline(SectorTypes sectorType);
     }
