@@ -26,17 +26,13 @@ namespace ModernSlavery.Hosts.Web.Tests
         public static IHost TestWebHost { get; private set; }
         public static SeleniumWebDriverService WebDriverService { get; private set; }
 
-        private static string LogsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "LogFiles");
-        private static string ScreenshotsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots");
-
         [OneTimeSetUp]
         public async Task RunBeforeAnyTestsAsync()
         {
-            //Delete all previous log files
-            LoggingHelper.DeleteFiles(LogsFilepath);
-
-            //Delete all previous screenshots
-            LoggingHelper.DeleteFiles(ScreenshotsFilepath);
+            //Delete all previous log files, screenshots and accessibility results
+            LoggingHelper.ClearLogs();
+            LoggingHelper.ClearScreenshots();
+            LoggingHelper.ClearAccessibilityResults();
 
             //Create the test host usign the default dependency module and override with a test module
             TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>(applicationName: "ModernSlavery.Hosts.Web");
@@ -65,6 +61,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             if (TestWebHost == null) return;
 
+            //Attach log files, screenshots and accessibility results as pipeline build artifacts
+            LoggingHelper.AttachLogs();
+            LoggingHelper.AttachScreenshots();
+            LoggingHelper.AttachAccessibilityResults();
+
             //Delete SQL firewall rules for the build agent
             AzureHelpers.CloseSQLFirewall();
 
@@ -76,14 +77,6 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //Dispose of the webdriver service
             WebDriverService?.DisposeService();
-
-            //NOTE: these dont seem yet to upload so using DevOps task to publish instead till we can get working
-            //Publish all log files on failure
-            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed)
-                LoggingHelper.AttachFiles(LogsFilepath,"LOG");
-
-            //Publish all screenshots
-            LoggingHelper.AttachFiles(LogsFilepath, "SCREENSHOT");
         }
     }
 }
