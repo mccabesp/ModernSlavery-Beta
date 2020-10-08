@@ -12,10 +12,12 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     public class Submission_Areas_Cancel_Unsaved_Data_Exit : Private_Registration_Success
     {
+        protected Organisation org;
+
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            TestData.Organisation = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
         }
         [Test, Order(40)]
@@ -23,18 +25,19 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ExpectHeader("Select an organisation");
 
-            Click(TestData.OrgName);
+            Click(org.OrganisationName);
+
+            SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
 
 
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            Click("Start Draft");
-
+            Click(The.Bottom, "Start Draft");
 
             ExpectHeader("Before you start");
-            Click("Start now");
+            Click("Start Now");
 
-            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: org.OrganisationName);
+
             await Task.CompletedTask;
         }
 
@@ -85,12 +88,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(50)]
         public async Task NavigateBackToAreasPage()
         {
-            Click("Start Draft");
+            Click(The.Bottom, "Start Draft");
 
             ExpectHeader("Before you start");
             Click("Start now");
 
-            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: org.OrganisationName);
 
             ExpectHeader("Your modern slavery statement");
 

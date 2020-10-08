@@ -39,7 +39,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToSectorsPage()
         {
 
-            Submission_Helper.NavigateToYourOrganisation(this, TestData.Organisation.OrganisationName, "2019 to 2020");
+            Submission_Helper.NavigateToYourOrganisation(this, TestData.Organisation.OrganisationName, "2019 to 2020", MoreInfoRequired: true);
             await Task.CompletedTask;
         }
 

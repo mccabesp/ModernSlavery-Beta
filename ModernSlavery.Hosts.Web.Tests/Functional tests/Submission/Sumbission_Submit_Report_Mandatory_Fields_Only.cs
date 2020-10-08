@@ -16,7 +16,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToSubmissionPage()
         {
             Click("Manage organisations");
-            Click(TestData.OrgName);
+            Click(org.OrganisationName);
             Click("Continue");
             ExpectHeader("Review before submitting");
     

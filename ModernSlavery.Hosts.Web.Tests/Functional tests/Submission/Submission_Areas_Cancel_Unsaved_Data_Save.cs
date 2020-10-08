@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -14,20 +15,19 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ExpectHeader("Select an organisation");
 
-            Click(TestData.OrgName);
+            Click(org.OrganisationName);
+
+            SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
 
 
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            Click("Start Draft");
-
+            Click(The.Bottom, "Start Draft");
 
             ExpectHeader("Before you start");
-            Click("Start now");
+            Click("Start Now");
 
-            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
+                    ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: org.OrganisationName);
 
-            ExpectHeader("Your modern slavery statement");
             await Task.CompletedTask;
         }
 

@@ -45,11 +45,12 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Select an organisation");
 
             Click(org.OrganisationName);
+            SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
 
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             
-            Click("Start Draft");
+            Click(The.Bottom, "Start Draft");
 
             ExpectHeader("Before you start");
             Click("Start Now");

@@ -30,45 +30,49 @@ namespace ModernSlavery.Hosts.Web.Tests
             ui.Click(SectionText);
         }
 
-        public static void NavigateYourMSStatement(UIContext ui, string Organistion, string Year)
+        public static void NavigateYourMSStatement(UIContext ui, string Organistion, string Year, bool MoreInfoRequired = false)
         {
             ui.Goto("/manage-organisations");
             ui.ExpectHeader("Select an organisation");
 
             ui.Click(Organistion);
 
+            if (MoreInfoRequired)
+            {
+                ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.MoreInformationRequiredComplete(ui, MoreInfoRequired, OrgName: Organistion);
+            }
             ui.ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            ui.RightOf(Year).Click("Start draft");
+            ui.RightOf(Year).Click(The.Bottom, "Start draft");
 
             ui.ExpectHeader("Before you start");
             ui.Click("Start now");
                     ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(ui, OrgName: Organistion);
             ui.ExpectHeader("Your modern slavery statement");
         }
-        public static void NavigateToAreasCovered(UIContext ui, string Organistion, string Year)
+        public static void NavigateToAreasCovered(UIContext ui, string Organistion, string Year,  bool MoreInfoRequired = false)
         {
-            NavigateYourMSStatement(ui, Organistion, Year);
+            NavigateYourMSStatement(ui, Organistion, Year, MoreInfoRequired: MoreInfoRequired);
             ui.Click("Continue");
 
             ui.ExpectHeader("Areas covered by your modern slavery statement");
         }
-        public static void NavigateToYourOrganisation(UIContext ui, string Organistion, string Year)
+        public static void NavigateToYourOrganisation(UIContext ui, string Organistion, string Year, bool MoreInfoRequired = false)
         {
-            NavigateToAreasCovered(ui, Organistion, Year);
+            NavigateToAreasCovered(ui, Organistion, Year, MoreInfoRequired: MoreInfoRequired );
             ui.Click("Continue");
 
             ui.ExpectHeader("Your organisation");
         }
-        public static void NavigateToPolicies(UIContext ui, string Organistion, string Year)
+        public static void NavigateToPolicies(UIContext ui, string Organistion, string Year, bool MoreInfoRequired = false)
         {
-            NavigateToYourOrganisation(ui, Organistion, Year);
+            NavigateToYourOrganisation(ui, Organistion, Year, MoreInfoRequired: MoreInfoRequired);
             ui.Click("Continue");
             ui.ExpectHeader("Policies");
         }
-        public static void NavigateToSupplyChainRisks1(UIContext ui, string Organistion, string Year)
+        public static void NavigateToSupplyChainRisks1(UIContext ui, string Organistion, string Year, bool MoreInfoRequired = false)
         {
-            NavigateToPolicies(ui, Organistion, Year);
+            NavigateToPolicies(ui, Organistion, Year, MoreInfoRequired: MoreInfoRequired);
             ui.Click("Continue");
 
             ui.ExpectHeader(That.Contains, "Supply chain risks and due diligence");
@@ -76,9 +80,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             //there are 2
             ui.Expect("Part 1");
         }
-        public static void NavigateToSupplyChainRisks2(UIContext ui, string Organistion, string Year)
+        public static void NavigateToSupplyChainRisks2(UIContext ui, string Organistion, string Year, bool MoreInfoRequired = false)
         {
-            NavigateToSupplyChainRisks1(ui, Organistion, Year);
+            NavigateToSupplyChainRisks1(ui, Organistion, Year, MoreInfoRequired: MoreInfoRequired);
             ui.Click("Continue");
 
             ui.ExpectHeader(That.Contains, "Supply chain risks and due diligence");
@@ -87,22 +91,22 @@ namespace ModernSlavery.Hosts.Web.Tests
             //there are 2
             ui.Expect("Part 2");
         }
-        public static void NavigateToTraining(UIContext ui, string Organistion, string Year)
+        public static void NavigateToTraining(UIContext ui, string Organistion, string Year, bool MoreInfoRequired = false)
         {
-            NavigateToSupplyChainRisks2(ui, Organistion, Year);
+            NavigateToSupplyChainRisks2(ui, Organistion, Year, MoreInfoRequired: MoreInfoRequired);
             ui.Click("Continue");
 
             ui.ExpectHeader("Training");
         }
-        public static void NavigateToMonitoringProgress(UIContext ui, string Organistion, string Year)
+        public static void NavigateToMonitoringProgress(UIContext ui, string Organistion, string Year, bool MoreInfoRequired = false)
         {
-            NavigateToTraining(ui, Organistion, Year);
+            NavigateToTraining(ui, Organistion, Year, MoreInfoRequired: MoreInfoRequired);
             ui.Click("Continue");
 
             ui.ExpectHeader("Monitoring progress");
         }
 
-        public static void NavigateToSectors(UIContext ui, string Organistion, string Year) {
+        public static void NavigateToSectors(UIContext ui, string Organistion, string Year, bool MoreInfoRequired = false) {
             ui.Click("Mange Organisations");
             ui.ExpectHeader("Select an organisation");
 
@@ -125,7 +129,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ui.SetXPath("(//div//label[contains(text(), 'Day')]/following-sibling::input)[" + Order + "]").To(Day);
         }
 
-        public static void NavigateToSubmission(UIContext ui, string Organistion, string YearFrom, string YearTo)
+        public static void NavigateToSubmission(UIContext ui, string Organistion, string YearFrom, string YearTo, bool MoreInfoRequired = false)
         {
             ui.Click("Manage Organisations");
             ui.ExpectHeader("Select an organisation");
