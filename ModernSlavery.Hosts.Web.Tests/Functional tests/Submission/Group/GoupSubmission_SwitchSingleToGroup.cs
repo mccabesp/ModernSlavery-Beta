@@ -1,4 +1,6 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -14,15 +16,22 @@ namespace ModernSlavery.Hosts.Web.Tests
         //public async Task OTSetUp()
         //{
         //    TestData.Organisation = TestRunSetup.TestWebHost
-        //        .Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+        //        .Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && o.LatestRegistrationUserId == null));
         //    //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
         //}
+
+        [OneTimeSetUp]
+        public async Task SetUp()
+        {
+            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
+
+        }
 
         [Test, Order(50)]
         public async Task NavigateToSubmissionPage()
         {
             Click("Manage organisations");
-            Click(TestData.OrgName);
+            Click(org.OrganisationName);
             Click("Continue");
             ExpectHeader("Review before submitting");
 
@@ -74,7 +83,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Expect("a group of organisations");
             //Click("a group of organisations");
 
-            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, true, TestData.Organisation.OrganisationName, "2019 to 2020");
+                    SubmissionHelper.GroupOrSingleScreenComplete(this, true, org.OrganisationName, "2019 to 2020");
 
             Click("Continue");
             ExpectHeader("Which organisations are included in your group statement?");

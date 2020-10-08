@@ -53,6 +53,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Click(TestData.Organisations[0].OrganisationName);
+            SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "No");
