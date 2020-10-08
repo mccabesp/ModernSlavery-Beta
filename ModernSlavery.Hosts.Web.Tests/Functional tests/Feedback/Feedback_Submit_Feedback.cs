@@ -64,7 +64,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(50)]
         public async Task Return_To_Manage_Orgs()
         {
-            ClickText("Return to manage organistions");
+            ClickText(That.Contains, "Return to manage organisations");
             ExpectHeader(That.Contains, "Select an organisation");
             await Task.CompletedTask;
         }
