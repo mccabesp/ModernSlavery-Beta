@@ -16,7 +16,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
     public interface IScopePresenter
     {
         // inteface
-        ScopingViewModel CreateScopingViewModel(Organisation org, User currentUser);
+        ScopingViewModel CreateScopingViewModel(Organisation org, User currentUser, int reportingYear);
         Task<ScopingViewModel> CreateScopingViewModelAsync(EnterCodesViewModel enterCodes, User currentUser);
         Task SaveScopesAsync(ScopingViewModel model, IEnumerable<int> years);
         Task SavePresumedScopeAsync(ScopingViewModel model, int reportingStartYear);
@@ -52,17 +52,15 @@ namespace ModernSlavery.WebUI.Submission.Classes
             var org = await _organisationBusinessLogic.GetOrganisationByOrganisationReferenceAndSecurityCodeAsync(enterCodes.OrganisationReference, enterCodes.SecurityToken);
             if (org == null) return null;
 
-            var scope = CreateScopingViewModel(org, currentUser);
+            var scope = CreateScopingViewModel(org, currentUser, _sharedBusinessLogic.ReportingDeadlineHelper.CurrentSnapshotYear);
             //TODO: clarify if we should be showing this security token when navigate back to page or if it's a security issue?
             scope.EnterCodes.SecurityToken = org.SecurityCode;
             scope.IsSecurityCodeExpired = org.HasSecurityCodeExpired();
 
             return scope;
-
-
         }
 
-        public virtual ScopingViewModel CreateScopingViewModel(Organisation org, User currentUser)
+        public virtual ScopingViewModel CreateScopingViewModel(Organisation org, User currentUser, int reportingYear)
         {
             if (org == null) throw new ArgumentNullException(nameof(org));
 
@@ -72,7 +70,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
                 DUNSNumber = org.DUNSNumber,
                 OrganisationName = org.OrganisationName,
                 OrganisationAddress = org.LatestAddress?.GetAddressString(),
-                DeadlineDate = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(org.SectorType)
+                DeadlineDate = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(org.SectorType, reportingYear)
             };
             model.EnterCodes.OrganisationReference = org.OrganisationReference;
 

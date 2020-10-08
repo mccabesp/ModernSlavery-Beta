@@ -1,46 +1,54 @@
 ﻿@model DownloadViewModel
+@inject IReportingDeadlineHelper ReportingDeadlineHelper
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Modern Slavery";
 }
-<div class="grid-row">
-    <div class="column-two-thirds">
-        <h1 class="heading-xlarge">
-            Download Modern Slavery statement
+
+@section BeforeMain {
+    @* Back URL needs filling *@
+    <a class="govuk-back-link" href="">Back</a>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">
+            Download modern slavery statement summary data
         </h1>
-        <p>
-            These files are in a CSV (Comma Separated Values) format that can be read by any spreadsheet program or word processor. They are not formatted for printing.
+        <p class="govuk-body govuk-!-font-size-24">
+            You can download modern slavery statement summaries in CSV format.
+            These files contain organisations’ answers to our questions about their modern slavery statements.
         </p>
-        <div>
-            <h2 class="heading-medium">
-                Organisations who have published their Modern Slavery figures
-            </h2>
-            <table class="download-table" data-downloadcount="@Model.Downloads.Count">
-                <thead>
-                <tr>
-                    <th scope="col">Reporting year</th>
-                    <th scope="col" class="numeric">Number of organisations</th>
-                </tr>
-                </thead>
-                <tbody>
-                @if (Model.Downloads.Count < 1)
-                {
-                    <td colspan="2">No downloads found</td>
-                }
-                else
-                {
-                    for (var i = 0; i < Model.Downloads.Count; i++)
-                    {
-                        <tr>
-                            <td data-prefix="Reporting year">
-                                <a download="true" data-name="download" data-index="@i" href="@Model.Downloads[i].Url" target="_blank">@Model.Downloads[i].Title </a><span class="info"> (@Model.Downloads[i].Extension.ToUpper(), @Model.Downloads[i].Size)</span>
-                            </td>
-                            <td data-prefix="Number of organisations" class="numeric"> @Model.Downloads[i].Count </td>
-                        </tr>
-                    }
-                }
-                </tbody>
-            </table>
-        </div>
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    What are CSV files?
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                These files are in a CSV (Comma Separated Values) format that can be read by any spreadsheet program or word processor.
+                They are not formatted for printing.
+            </div>
+        </details>
+    </div>
+    <div class="govuk-grid-column-full">
+        <h2 class="govuk-heading-m">
+            Downloads
+        </h2>
+        @foreach (var deadlineYear in ReportingDeadlineHelper.GetReportingDeadlines(SectorTypes.Public))
+        {
+            var fromYear = deadlineYear.Year - 1;
+            <div class="app-download--row govuk-!-margin-top-3">
+                <img class="app-download--image" src="/assets/images/download.svg" alt="Download">
+                <div class="app-download--text govuk-!-font-size-27">
+                    <a class="govuk-link"
+                       href="/Api/Public/StatementSummaries@($"{fromYear}-{deadlineYear.Year}").csv"
+                       download="true"
+                       data-name="download"
+                       target="_blank">Modern slavery statement summaries (@fromYear to @deadlineYear.Year)</a>
+                    <p class="govuk-body govuk-!-font-size-14 govuk-!-margin-top-2">CSV</p> @* TODO - File size *@
+                </div>
+            </div>
+        }
     </div>
 </div>

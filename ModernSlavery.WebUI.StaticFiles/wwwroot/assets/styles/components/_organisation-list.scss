@@ -1,26 +1,30 @@
 ﻿/*Custom styling for organisation results list used in group submission*/
 
-.organisation-list {
+.organisation-list {  
+
+    .govuk-table__body:first-child {
+        margin-top: 10px;
+        border-top: 1px solid $govuk-border-colour;
+    }
 
     div {
-        p
-        {
-            margin:0px;
+        p {
+            margin: 0px;
         }
     }
 
     .govuk-inset-text {
         border-left: 10px solid $govuk-brand-colour;
         margin-top: 0px;
-        margin-bottom:0px;
+        margin-bottom: 0px;
     }
 
     .govuk-blue {
         color: $govuk-brand-colour;
-    } 
+    }
 
-    .buttons button.link-button{
-        float:right;
+    .buttons button.link-button {
+        float: right;
     }
 }
 
@@ -68,7 +72,7 @@ button#organisation-accordion span {
 }
 
 .govuk-inset-text.floating-summary {
-    background-color: #abcae5; // this is 50% tint of govuk-colour("light-blue");
+    background-color: #DBEFFA; 
     border-left: 10px solid $govuk-brand-colour;
 }
 

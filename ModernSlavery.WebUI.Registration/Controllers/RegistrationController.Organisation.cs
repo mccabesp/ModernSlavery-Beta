@@ -977,6 +977,19 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             s.SicSectionId != "X");
                         organisation.SicCodeIds = sic?.SicCodeId.ToString();
                     }
+                    else if (organisation.OrganisationId > 0)
+                    {
+                        var org= await SharedBusinessLogic.DataRepository.GetAsync<Organisation>(organisation.OrganisationId);
+                        if (org != null)
+                        {
+                            var sicCodes = org.GetLatestSicCodes();
+                            if (sicCodes.Any())
+                            {
+                                organisation.SicCodeIds = sicCodes.OrderBy(s => s.SicCodeId).Select(s => s.SicCodeId).ToDelimitedString();
+                                organisation.SicSource = sicCodes.First().Source;
+                            }
+                        }
+                    }
                     else
                     {
                         try
@@ -1657,7 +1670,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         {
             //Send a verification link to the email address
             var reviewCode = userOrg.GetReviewCode();
-            var reviewUrl = Url.ActionArea("ReviewRequest", "Admin", "Admin", new { code = reviewCode });
+            var reviewUrl = Url.ActionArea("ReviewRequest", "Admin", "Admin", new { code = reviewCode }, protocol: "https");
 
             //If the email address is a test email then simulate sending
             if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)) return;
