@@ -12,7 +12,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     public class Submission_Complete_Mandatory_Sections : Private_Registration_Success
     {
-        private Organisation org;
+        protected Organisation org;
         [OneTimeSetUp]
         public async Task SetUp()
         {
@@ -29,10 +29,11 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click(org.OrganisationName);
 
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
 
 
-            Click("Start Draft");
+
+            Click(The.Bottom, "Start Draft");
 
             ExpectHeader("Before you start");
             Click("Start Now");

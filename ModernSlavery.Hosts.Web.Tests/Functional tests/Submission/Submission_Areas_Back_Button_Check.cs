@@ -14,11 +14,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
 
-
+        private Organisation org;
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            TestData.Organisation = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
 
         }
 
@@ -31,7 +31,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(29)]
         public async Task RegisterOrg()
         {
-            await this.RegisterUserOrganisationAsync(TestData.Organisation.OrganisationName, UniqueEmail);
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
         }
 
 
@@ -42,12 +42,13 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Select an organisation");
 
-            Click(TestData.OrgName);
+            Click(org.OrganisationName);
 
+            SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
 
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            Click("Start Draft");
+            Click(The.Bottom, "Start Draft");
 
 
             ExpectHeader("Before you start");

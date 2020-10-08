@@ -31,16 +31,16 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             TestData = new RegistrationTestData(this);
         }
-
+        protected Organisation org;
         [Test, Order(29)]
         public async Task RegisterOrgAndSetScope()
         {
-
-            await this.RegisterUserOrganisationAsync(TestData.Organisation.OrganisationName, UniqueEmail);
-            await this.GetOrganisationBusinessLogic().CreateOrganisationSecurityCodeAsync(TestData.Organisation.OrganisationReference, new DateTime(2030, 1, 10));
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null);
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
+            await this.GetOrganisationBusinessLogic().CreateOrganisationSecurityCodeAsync(org.OrganisationReference, new DateTime(2030, 1, 10));
 
             User CurrentUser = await this.ServiceScope.GetDataRepository().SingleOrDefaultAsync<User>(o => o.EmailAddress == UniqueEmail);
-            await this.GetOrganisationBusinessLogic().SetAsScopeAsync(TestData.Organisation.OrganisationReference, 2020, "Updated by test case", CurrentUser, ScopeStatuses.OutOfScope, true);
+            await this.GetOrganisationBusinessLogic().SetAsScopeAsync(org.OrganisationReference, 2020, "Updated by test case", CurrentUser, ScopeStatuses.OutOfScope, true);
         }
 
         [Test, Order(30)]
@@ -51,7 +51,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Manage organisations");
             ExpectHeader(That.Contains, "Select an organisation");
 
-            Click(TestData.Organisation.OrganisationName);
+            Click(org.OrganisationName);
+            SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             await Task.CompletedTask;
@@ -72,7 +73,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ChangeOrgStatus()
         {
             User CurrentUser = await ServiceScope.GetDataRepository().SingleOrDefaultAsync<User>(o => o.EmailAddress == UniqueEmail);
-            await this.GetOrganisationBusinessLogic().SetAsScopeAsync(TestData.Organisation.OrganisationReference, 2020, "Updated by test case", CurrentUser, ScopeStatuses.InScope, true);
+            await this.GetOrganisationBusinessLogic().SetAsScopeAsync(org.OrganisationReference, 2020, "Updated by test case", CurrentUser, ScopeStatuses.InScope, true);
 
             await Task.CompletedTask;
         }
