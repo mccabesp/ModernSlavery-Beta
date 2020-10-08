@@ -28,7 +28,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
-        private Organisation org;
+        protected Organisation org;
         [OneTimeSetUp]
         public async Task OTSetUp()
         {
