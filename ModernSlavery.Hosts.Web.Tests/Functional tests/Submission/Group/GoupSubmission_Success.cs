@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, ("Temp Ignore")]
+    [TestFixture, Ignore("Temp Ignore")]
 
     public class GroupSubmission_Success : CreateAccount
     {
