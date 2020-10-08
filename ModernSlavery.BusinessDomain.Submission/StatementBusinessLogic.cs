@@ -458,6 +458,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var statementInfoModel = new StatementInfoModel
             {
                 ReportingDeadline = reportingDeadline,
+                IsStatementEditable = _sharedBusinessLogic.ReportingDeadlineHelper.IsReportingYearEditable(organisation.SectorType, reportingDeadline.Year),
                 ScopeStatus = organisation.GetActiveScopeStatus(reportingDeadline)
             };
 
@@ -564,6 +565,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public bool ReportingDeadlineHasExpired(DateTime reportingDeadline)
         {
+
             if (_submissionOptions.DeadlineExtensionMonths == -1 || _submissionOptions.DeadlineExtensionMonths == -1)
                 return false;
 
@@ -589,6 +591,9 @@ namespace ModernSlavery.BusinessDomain.Submission
 
             //Check if it is too late to edit
             if (ReportingDeadlineHasExpired(reportingDeadline))
+                return new Outcome<StatementErrors, StatementModel>(StatementErrors.TooLate);
+
+            if (!_sharedBusinessLogic.ReportingDeadlineHelper.IsReportingYearEditable(organisation.SectorType, reportingDeadline.Year))
                 return new Outcome<StatementErrors, StatementModel>(StatementErrors.TooLate);
 
             //Check the user can edit this statement
