@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using ModernSlavery.Core.Extensions;
 
@@ -15,14 +16,14 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             _enabled = enabled;
         }
 
-        [System.Diagnostics.DebuggerHidden()]
+        [DebuggerHidden()]
         public async Task Invoke(HttpContext httpContext)
         {
             //Redirect to holding mage if in maintenance mode
             if (_enabled && !httpContext.GetUri().PathAndQuery.StartsWithI(@"/error/service-unavailable"))
                 httpContext.Response.Redirect(@"/error/service-unavailable", true);
 
-            await _next.Invoke(httpContext);
+            await _next(httpContext);
         }
     }
 }

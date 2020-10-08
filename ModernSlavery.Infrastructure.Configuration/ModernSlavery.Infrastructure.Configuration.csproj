@@ -57,35 +57,35 @@
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
-    <Content Include="appsettings.secret.json" Condition="Exists('appsettings.secret.json')">
+    <Content Include="appsettings.development.secret.json" Condition="Exists('appsettings.development.secret.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>appsettings.json</DependentUpon>
+      <DependentUpon>appsettings.development.json</DependentUpon>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
     <Content Include="appsettings.DEV.secret.json" Condition="Exists('appsettings.DEV.secret.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <DependentUpon>appsettings.DEV.json</DependentUpon>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
     <Content Include="appsettings.QAT.secret.json" Condition="Exists('appsettings.QAT.secret.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <DependentUpon>appsettings.QAT.json</DependentUpon>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
     <Content Include="appsettings.PREPROD.secret.json" Condition="Exists('appsettings.PREPROD.secret.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <DependentUpon>appsettings.PREPROD.json</DependentUpon>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
     <Content Include="appsettings.PROD.secret.json" Condition="Exists('appsettings.PROD.secret.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <DependentUpon>appsettings.PROD.json</DependentUpon>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
 
     <Content Include="appsettings.UR.secret.json" Condition="Exists('appsettings.UR.secret.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>appsettings.secret.json</DependentUpon>
+      <DependentUpon>appsettings.UR.json</DependentUpon>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
   </ItemGroup>

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Server.IIS.Core;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
@@ -69,6 +70,12 @@ namespace ModernSlavery.BusinessDomain.Submission
             //Return the draft StatementModel deserialized from file
             var statementModel = await LoadStatementModelFromFile(draftFilePath);
 
+            //Check the contents are correct
+            if (statementModel != null)
+            {
+                if (statementModel.SubmissionDeadline != reportingDeadline) throw new Exception($"Draft SubmissionDeadline: {statementModel.SubmissionDeadline} does not match parameter reportingDeadline: {reportingDeadline}");
+                if (statementModel.OrganisationId != organisationId) throw new Exception($"Draft OrganisationId: {statementModel.OrganisationId} does not match parameter OrganisationId: {organisationId}");
+            }
             //TODO: Check all TypeIds are still valid in case some new ones or old retired
             return statementModel;
         }
@@ -181,7 +188,12 @@ namespace ModernSlavery.BusinessDomain.Submission
                 var sector = statement.Sectors.FirstOrDefault(s => s.StatementSectorTypeId == id);
                 if (sector == null)
                 {
-                    sector = new StatementSector() { StatementSectorTypeId = id, StatementId = statement.StatementId };
+                    sector = new StatementSector() 
+                    { 
+                        StatementSectorTypeId = id,
+                        StatementSectorType = _organisationBusinessLogic.DataRepository.Get<StatementSectorType>(id),
+                        StatementId = statement.StatementId 
+                    };
                     statement.Sectors.Add(sector);
                 }
             });
@@ -193,7 +205,13 @@ namespace ModernSlavery.BusinessDomain.Submission
                 var policy = statement.Policies.FirstOrDefault(s => s.StatementPolicyTypeId == id);
                 if (policy == null)
                 {
-                    policy = new StatementPolicy() { StatementPolicyTypeId = id, StatementId = statement.StatementId };
+                    policy = new StatementPolicy() 
+                    { 
+                        StatementPolicyTypeId = id,
+                        StatementPolicyType = _organisationBusinessLogic.DataRepository.Get<StatementPolicyType>(id),
+                        StatementId = statement.StatementId 
+                    };
+                    
                     statement.Policies.Add(policy);
                 }
             });
@@ -205,7 +223,14 @@ namespace ModernSlavery.BusinessDomain.Submission
                 var relevantRisk = statement.RelevantRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
                 if (relevantRisk == null)
                 {
-                    relevantRisk = new StatementRelevantRisk() { StatementRiskTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
+                    relevantRisk = new StatementRelevantRisk() 
+                    { 
+                        StatementRiskTypeId = model.Id,
+                        StatementRiskType = _organisationBusinessLogic.DataRepository.Get<StatementRiskType>(model.Id),
+                        Details = model.Details, 
+                        StatementId = statement.StatementId 
+                    };
+                    
                     statement.RelevantRisks.Add(relevantRisk);
                 }
                 else
@@ -219,7 +244,14 @@ namespace ModernSlavery.BusinessDomain.Submission
                 var highRisk = statement.HighRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
                 if (highRisk == null)
                 {
-                    highRisk = new StatementHighRisk() { StatementRiskTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
+                    highRisk = new StatementHighRisk() 
+                    { 
+                        StatementRiskTypeId = model.Id,
+                        StatementRiskType = _organisationBusinessLogic.DataRepository.Get<StatementRiskType>(model.Id),
+                        Details = model.Details, 
+                        StatementId = statement.StatementId 
+                    };
+                    
                     statement.HighRisks.Add(highRisk);
                 }
                 else
@@ -233,7 +265,14 @@ namespace ModernSlavery.BusinessDomain.Submission
                 var locationRisk = statement.LocationRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
                 if (locationRisk == null)
                 {
-                    locationRisk = new StatementLocationRisk() { StatementRiskTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
+                    locationRisk = new StatementLocationRisk() 
+                    { 
+                        StatementRiskTypeId = model.Id,
+                        StatementRiskType = _organisationBusinessLogic.DataRepository.Get<StatementRiskType>(model.Id),
+                        Details = model.Details, 
+                        StatementId = statement.StatementId 
+                    };
+                    
                     statement.LocationRisks.Add(locationRisk);
                 }
                 else
@@ -247,7 +286,14 @@ namespace ModernSlavery.BusinessDomain.Submission
                 var diligence = statement.Diligences.FirstOrDefault(s => s.StatementDiligenceTypeId == model.Id);
                 if (diligence == null)
                 {
-                    diligence = new StatementDiligence() { StatementDiligenceTypeId = model.Id, Details = model.Details, StatementId = statement.StatementId };
+                    diligence = new StatementDiligence() 
+                    { 
+                        StatementDiligenceTypeId = model.Id,
+                        StatementDiligenceType = _organisationBusinessLogic.DataRepository.Get<StatementDiligenceType>(model.Id),
+                        Details = model.Details, 
+                        StatementId = statement.StatementId 
+                    };
+                    
                     statement.Diligences.Add(diligence);
                 }
                 else
@@ -261,7 +307,13 @@ namespace ModernSlavery.BusinessDomain.Submission
                 var training = statement.Training.FirstOrDefault(s => s.StatementTrainingTypeId == id);
                 if (training == null)
                 {
-                    training = new StatementTraining() { StatementTrainingTypeId = id, StatementId = statement.StatementId };
+                    training = new StatementTraining() 
+                    { 
+                        StatementTrainingTypeId = id,
+                        StatementTrainingType = _organisationBusinessLogic.DataRepository.Get<StatementTrainingType>(id),
+                        StatementId = statement.StatementId 
+                    };
+                    
                     statement.Training.Add(training);
                 }
             });
@@ -745,8 +797,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var previousStatement = await FindSubmittedStatementAsync(organisation.OrganisationId, reportingDeadline);
             previousStatement?.SetStatus(StatementStatuses.Retired, userId);
 
-            var newStatement = new Statement();
-            newStatement.Organisation = previousStatement == null ? await _organisationBusinessLogic.DataRepository.GetAsync<Organisation>(organisation.OrganisationId) : previousStatement.Organisation;
+            var newStatement = new Statement{Organisation = organisation};
             newStatement.SetStatus(StatementStatuses.Submitted, userId);
 
             await _organisationBusinessLogic.DataRepository.BeginTransactionAsync(
@@ -786,18 +837,18 @@ namespace ModernSlavery.BusinessDomain.Submission
                             newStatement.Modifications = modifications.Any() ? JsonConvert.SerializeObject(modifications, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore }) : null;
                         }
 
-                        newStatement.Organisation.Statements.Add(newStatement);
-
                         //Set whether thestatement is late
                         newStatement.IsLateSubmission = newStatement.GetIsLateSubmission();
 
-                        //Save the changes to the database
+                        //Save the new statement to the database
+                        _organisationBusinessLogic.DataRepository.Insert(newStatement);
                         await _organisationBusinessLogic.DataRepository.SaveChangesAsync();
 
                         //Delete the draft file and its backup
                         await DeleteDraftStatementModelAsync(organisation.OrganisationId, reportingDeadline);
 
                         _organisationBusinessLogic.DataRepository.CommitTransaction();
+
                     }
                     catch (Exception ex)
                     {

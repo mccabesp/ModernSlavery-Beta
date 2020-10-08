@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using ModernSlavery.Core.Extensions;
@@ -18,7 +19,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             _securityHeaders = securityHeaders ?? throw new ArgumentNullException(nameof(securityHeaders));
         }
 
-        [System.Diagnostics.DebuggerHidden()]
+        [DebuggerHidden()]
         public async Task Invoke(HttpContext httpContext)
         {
             httpContext.Response.OnStarting(
@@ -30,7 +31,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
                     return Task.CompletedTask;
                 });
 
-            await _next.Invoke(httpContext);
+            await _next(httpContext);
         }
     }
 }

@@ -114,10 +114,9 @@ namespace ModernSlavery.Core.Entities
 
         public override bool Equals(object obj)
         {
-            // Check for null values and compare run-time types.
-            if (obj == null || GetType() != obj.GetType()) return false;
+            var target = obj as User;
+            if (target == null) return false;
 
-            var target = (User) obj;
             return UserId == target.UserId;
         }
     }

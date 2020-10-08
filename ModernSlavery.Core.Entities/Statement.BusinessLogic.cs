@@ -9,6 +9,22 @@ namespace ModernSlavery.Core.Entities
 {
     partial class Statement
     {
+        #region Overrides
+        public override bool Equals(object obj)
+        {
+            // Check for null values and compare run-time types.
+            var target = obj as Statement;
+            if (target == null) return false;
+
+            return StatementId == target.StatementId;
+        }
+
+        public override int GetHashCode()
+        {
+            return StatementId.GetHashCode();
+        }
+        #endregion
+
         public const int MinComplienceTurnover = 30000000;
         [NotMapped]
         public string ApprovingPerson
