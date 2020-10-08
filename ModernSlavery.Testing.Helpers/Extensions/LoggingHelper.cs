@@ -12,6 +12,13 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         public static string ScreenshotsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots");
         public static string AxeResultsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AxeResults");
 
+        static LoggingHelper()
+        {
+            EnsureDirectoryExists(LogsFilepath);
+            EnsureDirectoryExists(ScreenshotsFilepath);
+            EnsureDirectoryExists(AxeResultsFilepath);
+        }
+
         public static void ClearLogs()
         {
             DeleteFiles(LogsFilepath);
@@ -40,6 +47,15 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             AttachFiles(AxeResultsFilepath, "AxeResult");
         }
 
+        public static void EnsureDirectoryExists(string path)
+        {
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+        }
+        public static void EnsureFilePathExists(string filePath)
+        {
+            var File = new FileInfo(filePath);
+            if (!Directory.Exists(File.DirectoryName)) Directory.CreateDirectory(File.DirectoryName);
+        }
 
         public static void DeleteFiles(string filepath, string filePattern="*.*")
         {

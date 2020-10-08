@@ -33,7 +33,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
             if (!force)
             {
-                var lastFullDatabaseReset = string.IsNullOrWhiteSpace(vaultName) ? Environment.GetEnvironmentVariable(LastFullDatabaseResetKey).ToDateTime() : host.GetKeyVaultSecret(vaultName, LastFullDatabaseResetKey).ToDateTime();
+                var lastFullDatabaseReset = string.IsNullOrWhiteSpace(vaultName) ? RegistryHelper.GetRegistryKey(LastFullDatabaseResetKey).ToDateTime() : host.GetKeyVaultSecret(vaultName, LastFullDatabaseResetKey).ToDateTime();
                 if (lastFullDatabaseReset > DateTime.MinValue && lastFullDatabaseReset.Date==DateTime.Now.Date)
                 {
                     dataRepository.ResetDatabase(lastFullDatabaseReset);
@@ -84,7 +84,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
             //Set the last database reset
             if (string.IsNullOrWhiteSpace(vaultName))
-                Environment.SetEnvironmentVariable(LastFullDatabaseResetKey, importTime.ToString());
+                RegistryHelper.SetRegistryKey(LastFullDatabaseResetKey, importTime.ToString());
             else
                 host.SetKeyVaultSecret(vaultName, LastFullDatabaseResetKey, importTime.ToString());
         }

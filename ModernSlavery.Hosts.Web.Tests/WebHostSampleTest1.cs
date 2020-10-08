@@ -120,11 +120,14 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test]
         public async Task WebTestHost_SeleniumHelper_TestMethods_OK()
         {
+            //Check the accessibility of the current page
+            await this.CheckAccessibilityAsync();
+
             //Go to the landing page
             Goto("/manage-organisations");
 
             //Check the accessibility of the current page
-            this.CheckAccessibility("manage-organisations");
+            await this.CheckAccessibilityAsync("manage-organisations");
 
             //Check for the landing page header
             Expect(What.Contains,_sharedOptions.ServiceName);
