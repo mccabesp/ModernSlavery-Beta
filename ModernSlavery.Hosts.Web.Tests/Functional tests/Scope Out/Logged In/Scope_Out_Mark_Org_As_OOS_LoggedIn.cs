@@ -21,11 +21,11 @@ namespace ModernSlavery.Hosts.Web.Tests
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
-
+        private Organisation org;
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            TestData.Organisation = this.Find<Organisation>(o => o.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            org = this.Find<Organisation>(o => o.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && o.LatestRegistrationUserId == null);
         }
 
         public Scope_Out_Mark_Org_As_OOS_LoggedIn() : base(_firstname, _lastname, _title, _email, _password)
@@ -37,7 +37,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(29)]
         public async Task RegisterOrg()
         {
-            await this.RegisterUserOrganisationAsync(TestData.OrgName, UniqueEmail);
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
         }
 
         [Test, Order(30)]
@@ -55,7 +55,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SelectOrg()
         {
 
-            Click(TestData.OrgName);
+            Click(org.OrganisationName);
+            SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
+
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "Yes");
@@ -65,7 +67,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(32)]
         public async Task ChangeOrgStatus()
         {
-            Click("Change");
+            Click(The.Bottom, "Change");
             ExpectHeader("Tell us why your organisation is not required to publish a modern slavery statement");
             await Task.CompletedTask;
         }
@@ -135,8 +137,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ExpectHeader("Organisation details");
 
-            RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference);
-            RightOfText("Organisation Name").Expect(TestData.OrgName);
+            RightOfText("Organisation Reference").Expect(org.OrganisationReference);
+            RightOfText("Organisation Name").Expect(org.OrganisationName);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");
 

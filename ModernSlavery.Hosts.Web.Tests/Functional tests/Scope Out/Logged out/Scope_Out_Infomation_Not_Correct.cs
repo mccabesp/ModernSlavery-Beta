@@ -31,6 +31,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         private string EmployerReference;
 private bool TestRunFailed = false;
+        private Organisation org;
         [OneTimeSetUp]
         
         
@@ -39,7 +40,7 @@ private bool TestRunFailed = false;
         public void SetUp()
         {
             
-            TestData.Organisation = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null);
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
             if (TestRunFailed)
                 Assert.Inconclusive("Previous test failed");
@@ -53,20 +54,20 @@ private bool TestRunFailed = false;
         [TearDown]
         public void TearDown()
         {
-            DeleteCookiesAndReturnToRoot(this);
 
             if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
 
         }
         private bool CanBeSetOutOfScope(Organisation org)
-            => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope);
+            => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null;
 
         [Test, Order(20)]
         public async Task SetSecurityCode()
         {
+            DeleteCookiesAndReturnToRoot(this);
 
 
-            await this.SetSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
+            await this.SetSecurityCode(org, new DateTime(2021, 6, 10));
 
 
             await Task.CompletedTask;
@@ -83,8 +84,8 @@ private bool TestRunFailed = false;
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Organisation Reference").To(TestData.Organisation.OrganisationReference);
-            Set("Security Code").To(TestData.Organisation.SecurityCode);
+            Set("Organisation Reference").To(org.OrganisationReference);
+            Set("Security Code").To(org.SecurityCode);
             await Task.CompletedTask;
         }
 

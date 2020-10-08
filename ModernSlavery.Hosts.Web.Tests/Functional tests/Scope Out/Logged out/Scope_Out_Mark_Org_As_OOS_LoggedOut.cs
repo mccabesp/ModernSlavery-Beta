@@ -30,7 +30,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
         protected string EmployerReference;
         private bool TestRunFailed = false;
-
+        protected Organisation org;
         [OneTimeSetUp]      
 
         
@@ -38,7 +38,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //(TestRunSetup.TestWebHost.GetDbContext() as Microsoft.EntityFrameworkCore.DbContext)
 
-            TestData.Organisation = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null);
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
            
         }
@@ -67,7 +67,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             DeleteCookiesAndReturnToRoot(this);
 
 
-            await this.SetSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
+            await this.SetSecurityCode(org, new DateTime(2021, 6, 10));
 
 
             await Task.CompletedTask;
@@ -84,8 +84,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Organisation Reference").To(TestData.Organisation.OrganisationReference);
-            Set("Security Code").To(TestData.Organisation.SecurityCode);
+            Set("Organisation Reference").To(org.OrganisationReference);
+            Set("Security Code").To(org.SecurityCode);
             await Task.CompletedTask;
         }
 
@@ -100,8 +100,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(28)]
         public async Task VerifyOrgDetails()
         {
-            RightOfText("Organisation Name").Expect(TestData.OrgName);
-            RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference);
+            RightOfText("Organisation Name").Expect(org.OrganisationName);
+            RightOfText("Organisation Reference").Expect(org.OrganisationReference);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");
             await Task.CompletedTask;
@@ -160,8 +160,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(39)]
         public async Task CheckDetails()
         {
-            RightOfText("Organisation Name").Expect(TestData.OrgName);
-            RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference);
+            RightOfText("Organisation Name").Expect(org.OrganisationName);
+            RightOfText("Organisation Reference").Expect(org.OrganisationReference);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");
 

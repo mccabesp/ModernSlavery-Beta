@@ -28,15 +28,16 @@ namespace ModernSlavery.Hosts.Web.Tests
             TestData = new OrganisationTestData(this);
         }
         protected string EmployerReference;
+        protected Organisation org;
         [OneTimeSetUp]
         public async Task SetUp()
         {
             DeleteCookiesAndReturnToRoot(this);
 
-            TestData.Organisation = this.Find<Organisation>(org => TestData.Organisation.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null);
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
 
-            var result = this.GetSecurityCodeBusinessLogic().CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
+            var result = this.GetSecurityCodeBusinessLogic().CreateSecurityCode(org, new DateTime(2021, 6, 10));
 
             if (result.Failed)
             {
@@ -60,8 +61,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Organisation Reference").To(TestData.Organisation.OrganisationReference);
-            Set("Security Code").To(TestData.Organisation.SecurityCode);
+            Set("Organisation Reference").To(org.OrganisationReference);
+            Set("Security Code").To(org.SecurityCode);
             await Task.CompletedTask;
         }
 
@@ -78,14 +79,14 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //may need fixed due to missing address fields
             Try(() => {
-                RightOfText("Organisation Name").Expect(TestData.Organisation.OrganisationName); ;
+                RightOfText("Organisation Name").Expect(org.OrganisationName); ;
             },
-                    () => { RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference); },
-                    //() => { RightOfText("Registered address").Expect(TestData.Organisation.LatestAddress.Address1); },
-                    //() => { RightOfText("Registered address").Expect(TestData.Organisation.LatestAddress.Address2); },
-                    //() => { RightOfText("Registered address").Expect(TestData.Organisation.LatestAddress.Address3); },
-                    //() => { RightOfText("Registered address").Expect(TestData.Organisation.LatestAddress.TownCity); },
-                    //() => { RightOfText("Registered address").Expect(TestData.Organisation.LatestAddress.PostCode); },
+                    () => { RightOfText("Organisation Reference").Expect(org.OrganisationReference); },
+                    //() => { RightOfText("Registered address").Expect(org.LatestAddress.Address1); },
+                    //() => { RightOfText("Registered address").Expect(org.LatestAddress.Address2); },
+                    //() => { RightOfText("Registered address").Expect(org.LatestAddress.Address3); },
+                    //() => { RightOfText("Registered address").Expect(org.LatestAddress.TownCity); },
+                    //() => { RightOfText("Registered address").Expect(org.LatestAddress.PostCode); },
                     () => { Expect(What.Contains, "If this information is not correct, please email"); },
                     () => { ExpectLink("modernslaverystatements@homeoffice.gov.uk"); },
                     () => { ExpectButton("Confirm and continue"); });

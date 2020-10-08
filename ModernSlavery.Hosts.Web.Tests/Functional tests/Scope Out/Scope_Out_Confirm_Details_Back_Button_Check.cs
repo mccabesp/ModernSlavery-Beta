@@ -29,14 +29,15 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
         protected string EmployerReference;
 
+        protected Organisation org;
         [Test, Order(20)]
         public async Task SetSecurityCode()
         {
             DeleteCookiesAndReturnToRoot(this);
 
-            TestData.Organisation = this.Find<Organisation>(org => TestData.Organisation.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope));
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null);
 
-            var result = this.GetSecurityCodeBusinessLogic().CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
+            var result = this.GetSecurityCodeBusinessLogic().CreateSecurityCode(org, new DateTime(2021, 6, 10));
 
             if (result.Failed)
             {
@@ -59,8 +60,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Organisation Reference").To(TestData.Organisation.OrganisationReference);
-            Set("Security Code").To(TestData.Organisation.SecurityCode);
+            Set("Organisation Reference").To(org.OrganisationReference);
+            Set("Security Code").To(org.SecurityCode);
             await Task.CompletedTask;
         }
 
