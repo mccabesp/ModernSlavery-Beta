@@ -541,9 +541,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     //Handle any errors
                     if (!outcome.Success) HandleStatementErrors(outcome.Errors);
 
-                    //Clear the input name and searchKeyword
+                    //Clear the input name 
                     viewModel.GroupResults.OrganisationName = null;
-                    stashedModel.GroupResults.SearchKeywords = null;
+                    //Clear searchkeywords if manually added an org
+                    if (!viewModel.GroupResults.ShowResults)
+                        viewModel.GroupResults.SearchKeywords = null;
 
                 }
                 else
