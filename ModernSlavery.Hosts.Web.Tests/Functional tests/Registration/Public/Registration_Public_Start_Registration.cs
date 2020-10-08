@@ -13,6 +13,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Testing.Helpers.Extensions;
+using System.Linq;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -25,11 +26,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
         }
 
-        private Organisation org;
+        protected Organisation org;
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            org = this.Find<Organisation>(o => o.SectorType == SectorTypes.Public);
+            org = this.Find<Organisation>(org => org.SectorType.IsAny(SectorTypes.Public) && !org.UserOrganisations.Any());;
         }
 
         [Test, Order(20)]

@@ -16,7 +16,7 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Need to review")]
 
     public class Registration_Public_Failure_Already_Started : Registration_Public_Success
     {

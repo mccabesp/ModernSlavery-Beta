@@ -7,6 +7,7 @@ using System;
 using System.Threading.Tasks;
 using ModernSlavery.Testing;
 using ModernSlavery.Core.Extensions;
+using System.Linq;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -22,7 +23,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task OTSetUp()
         {
             //HostHelper.ResetDbScope();
-            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null && org.SectorType.IsAny(SectorTypes.Public));
+            org = this.Find<Organisation>(org => org.SectorType.IsAny(SectorTypes.Public) && !org.UserOrganisations.Any());
             await Task.CompletedTask;
         }
         

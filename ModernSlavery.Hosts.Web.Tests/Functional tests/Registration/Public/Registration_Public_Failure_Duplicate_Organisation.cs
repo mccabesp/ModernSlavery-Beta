@@ -3,6 +3,7 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
@@ -13,16 +14,13 @@ namespace ModernSlavery.Hosts.Web.Tests
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
-        private Organisation org;
 
+        protected Organisation org;
         [OneTimeSetUp]
-        public async Task OTSetUp()
+        public async Task SetUp()
         {
-            //HostHelper.ResetDbScope();
-            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null && org.SectorType.IsAny(SectorTypes.Public));
-            await Task.CompletedTask;
+            org = this.Find<Organisation>(org => org.SectorType.IsAny(SectorTypes.Public) && !org.UserOrganisations.Any()); ;
         }
-
         [Test, Order(40)]
         public async Task SearchForDuplicateOrg()
         {
