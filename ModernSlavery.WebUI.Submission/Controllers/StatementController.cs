@@ -987,22 +987,29 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                     //Ensure the viewmodel is valid before saving
                     ModelState.Clear();
+
                     if (!TryValidateModel(pageViewModel))
                     {
-                        viewModel.ErrorCount = ModelState.ErrorCount;
+                        // Dont validate the search field or org name of group
+                        if (pageViewModel is GroupSearchViewModel) ModelState.Exclude($"{nameof(GroupSearchViewModel.GroupResults)}.{nameof(GroupSearchViewModel.GroupResults.SearchKeywords)}", $"{nameof(GroupSearchViewModel.GroupResults)}.{nameof(GroupSearchViewModel.GroupResults.OrganisationName)}");
 
-                        //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
-                        var openModelResult = await SubmissionPresenter.OpenDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
+                        if (!ModelState.IsValid)
+                        {
+                            viewModel.ErrorCount = ModelState.ErrorCount;
 
-                        //Handle any StatementErrors
-                        if (openModelResult.Fail) return HandleStatementErrors(openModelResult.Errors);
+                            //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+                            var openModelResult = await SubmissionPresenter.OpenDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
 
-                        //Get the modifications
-                        var statementModel = SubmissionPresenter.SetViewModelToStatementModel(pageViewModel, openModelResult.Result);
-                        viewModel.Modifications = await SubmissionPresenter.CompareToDraftBackupStatement(statementModel);
+                            //Handle any StatementErrors
+                            if (openModelResult.Fail) return HandleStatementErrors(openModelResult.Errors);
 
-                        //Return the errors
-                        return View(viewModel);
+                            //Get the modifications
+                            var statementModel = SubmissionPresenter.SetViewModelToStatementModel(pageViewModel, openModelResult.Result);
+                            viewModel.Modifications = await SubmissionPresenter.CompareToDraftBackupStatement(statementModel);
+
+                            //Return the errors
+                            return View(viewModel);
+                        }
                     }
 
                     //Save the viewmodel
