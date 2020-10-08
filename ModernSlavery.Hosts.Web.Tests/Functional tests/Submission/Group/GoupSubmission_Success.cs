@@ -4,6 +4,7 @@ using ModernSlavery.Testing.Helpers;
 using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
@@ -26,13 +27,13 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task OTSetUp()
         {
             //HostHelper.ResetDbScope();
-            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
             await Task.CompletedTask;
         }
         [Test, Order(30)]
         public async Task RegisterOrg()
         {
-            await this.RegisterUserOrganisationAsync(TestData.Organisations[0].OrganisationName, UniqueEmail);
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
             await this.RegisterUserOrganisationAsync(TestData.Organisations[1].OrganisationName, UniqueEmail);
             await this.RegisterUserOrganisationAsync(TestData.OrgName, UniqueEmail);
         }
@@ -52,7 +53,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SelectOrg()
         {
 
-            Click(TestData.Organisations[0].OrganisationName);
+            Click(org.OrganisationName);
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
@@ -64,7 +65,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            Click("Start Draft");
+            Click(The.Bottom, "Start Draft");
 
 
             ExpectHeader("Before you start");
@@ -76,7 +77,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(36)]
         public async Task ChooseGroupSubmission()
         {
-            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, true, TestData.Organisations[0].OrganisationName, "2019 to 2020");
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, true, org.OrganisationName, "2019 to 2020");
 
             await Task.CompletedTask;
         }
@@ -208,7 +209,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(48)]
         public async Task GroupReviewPage()
         {
-            Expect("2019 to 2020 modern slavery statement for "+ TestData.Organisations[0].OrganisationName + " (group)");
+            Expect("2019 to 2020 modern slavery statement for "+ org.OrganisationName + " (group)");
 
             Expect(What.Contains, "You can ");
             ExpectLink(That.Contains, "review and edit the organisations");
@@ -237,7 +238,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader(That.Contains, "Select an organisation");
 
 
-            Click(TestData.Organisations[0].OrganisationName);
+            Click(org.OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             RightOfText("2019 to 2020").BelowText("Status of statement published on this service").Expect(What.Contains, "Submission complete");
