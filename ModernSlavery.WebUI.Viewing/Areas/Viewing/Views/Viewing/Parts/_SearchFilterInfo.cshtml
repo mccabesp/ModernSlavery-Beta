@@ -1,20 +1,24 @@
-﻿@model List<string>
-
-@for (var i = 0; i < Model.Count - 1; i++)
-{
-    <button class="filter"><span class="govuk-body">@(Model[i])</span></button>
-    if (Model.Count > 1 && i < Model.Count - 2)
+﻿@model FilterGroup
+@{
+    var selections = Model.Selections;
+}
+<div class="facet-tags__group">
+    @for (var i = 0; i < selections.Count; i++)
     {
-        <span class="govuk-body">or </span>
-    }
-}
+        <div class="facet-tags__wrapper">
+            @if (i == 0)
+            {
+                <span class="facet-tags__preposition">@Model.Label</span>
+            }
 
-@if (Model.Count == 1)
-{
-    <button class="filter"><span class="govuk-body">@(Model[0])</span></button>
-}
-else
-{
-    <span class="govuk-body"> or </span>
-    <button class="filter"><span class="govuk-body">@Model[Model.Count - 1]</span></button>  
-}
+            else if (selections.Count > 1 && i < selections.Count)
+            {
+                <span class="facet-tags__preposition"> or </span>
+            }
+            <span class="facet-tag">
+                <span class="facet-tag__text">@(selections[i].Label)</span>
+                <button type="button" class="facet-tag__remove" aria-label="Remove filter @(selections[i].Label)" data-module="remove-filter-link" data-track-label="@(selections[i].Label)" data-facet="@(Model.Id)" data-value="@(selections[i].Value)" data-name="">✕</button>
+            </span>
+        </div>
+    }
+</div>
