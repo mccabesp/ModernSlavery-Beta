@@ -116,6 +116,8 @@
         var liveSearch = this;
         //if (typeof cachedResultData === 'undefined') {
         this.showLoadingIndicator();
+        var onRefresh = this.onRefresh;
+
         return $.ajax({
             url: this.action,
             data: this.state,
@@ -124,9 +126,14 @@
             liveSearch.cache($.param(liveSearch.state), response);
             liveSearch.displayResults(response, this.searchState);
             liveSearch.clearLoadingIndicator();
+            this.onRefresh=onRefresh;
         }).error(function () {
             window.location.href = "/error/408";
+        }).complete(function () {
+            //Call any onrefresh functions
+            if (this.onRefresh) this.onRefresh();
         });
+
         //} else {
         //this.displayResults(cachedResultData, searchState);
         //var out = new $.Deferred()
