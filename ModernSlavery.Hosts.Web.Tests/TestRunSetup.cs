@@ -61,6 +61,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             if (TestWebHost == null) return;
 
+            //Create the Accessibility results summary
+            AxeHelper.SaveResultSummary();
+
             //Attach log files, screenshots and accessibility results as pipeline build artifacts
             LoggingHelper.AttachLogs();
             LoggingHelper.AttachScreenshots();
