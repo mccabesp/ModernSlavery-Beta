@@ -248,7 +248,7 @@ namespace ModernSlavery.Core.Models
                 if (ChildOrganisationId.HasValue)
                     key += $"-{ChildOrganisationId}";
                 else
-                    key += $"-{OrganisationName.ToLower()}";
+                    key += $"-{OrganisationName.ToLower().GetHashCode()}";
             }
             SearchDocumentKey = key;
             return this;
