@@ -135,6 +135,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Check the accessibility of the current page saving results to manage-organisations.html
             await this.CheckAccessibilityAsync("manage-organisations");
 
+            //Check the accessibility of the current page saving results to /statement/group-report/WebTestHost_SeleniumHelper_TestMethods_OK.html
+            await this.CheckAccessibilityAsync($"/statement/group-report/{TestContext.CurrentContext.Test.Name}");
+
             //Check for the landing page header
             Expect(What.Contains,_sharedOptions.ServiceName);
 

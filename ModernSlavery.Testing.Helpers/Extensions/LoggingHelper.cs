@@ -30,7 +30,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
         public static void ClearAccessibilityResults()
         {
-            DeleteFiles(AxeResultsFilepath);
+            DeleteFiles(AxeResultsFilepath,"*.html");
         }
 
         public static void AttachLogs()

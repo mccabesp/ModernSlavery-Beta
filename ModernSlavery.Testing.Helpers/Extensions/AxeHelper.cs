@@ -47,12 +47,16 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
             //Check if we have already analysed this page
             var pageDescriptor = $"{uri.LocalPath}_{httpMethod.ToUpper()}";
-            if (PagesAnalysed.ContainsKey(pageDescriptor)) return;
 
-            if (string.IsNullOrWhiteSpace(filePath)) {
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
                 if (string.IsNullOrWhiteSpace(uiTest.WebDriver.Url)) throw new ArgumentNullException(nameof(filePath));
                 filePath = $"{pageDescriptor}";
             }
+            else
+                pageDescriptor = filePath;
+
+            if (PagesAnalysed.ContainsKey(pageDescriptor)) return;
 
             filePath = ExpandResultsFilePath(filePath);
 
@@ -99,7 +103,10 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         {
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
             if (!FileSystem.IsValidFilePath(filePath)) throw new ArgumentException($"Invalid characters in filepath", nameof(filePath));
-            
+
+            //Fix the characters
+            filePath = filePath.Replace('/',Path.DirectorySeparatorChar);
+
             //Ensure the extension is html
             var extension = Path.GetExtension(filePath);
             if (!extension.EqualsI(".html"))filePath = filePath.Substring(0, filePath.Length - extension.Length) + ".html";
