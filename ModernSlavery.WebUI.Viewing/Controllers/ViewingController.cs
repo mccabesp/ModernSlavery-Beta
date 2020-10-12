@@ -178,28 +178,17 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         #region Downloads
 
         [HttpGet("~/download")]
+        [HttpGet("download")]
         public async Task<IActionResult> Download()
         {
             var model = new DownloadViewModel { Downloads = new List<DownloadViewModel.Download>() };
 
-            const string filePattern = "GPGData_????-????.csv";
-            foreach (var file in await SharedBusinessLogic.FileRepository.GetFilesAsync(
-                SharedBusinessLogic.SharedOptions.DownloadsLocation, filePattern))
-            {
-                var download = new DownloadViewModel.Download
-                {
-                    Title = Path.GetFileNameWithoutExtension(file).AfterFirst("GPGData_"),
-                    Count = await SharedBusinessLogic.FileRepository.GetMetaDataAsync(file, "RecordCount"),
-                    Extension = Path.GetExtension(file).TrimI("."),
-                    Size = Numeric.FormatFileSize(await SharedBusinessLogic.FileRepository.GetFileSizeAsync(file))
-                };
-
-                download.Url = Url.Action("DownloadData", new { year = download.Title.BeforeFirst("-") });
-                model.Downloads.Add(download);
-            }
-
-            //Sort downloads by descending year
-            model.Downloads = model.Downloads.OrderByDescending(d => d.Title).ToList();
+            //returns back to correct search page
+            var history = PageHistory.First();
+            if (history.Contains("search-results-js"))
+                model.BackUrl = SearchPresenter.GetLastSearchUrl();
+            else
+                model.BackUrl = history;
 
             //Return the view with the model
             return View("Download", model);
