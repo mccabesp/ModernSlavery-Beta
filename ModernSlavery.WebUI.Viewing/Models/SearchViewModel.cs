@@ -9,23 +9,37 @@ namespace ModernSlavery.WebUI.Viewing.Models
     [Serializable]
     public class SearchViewModel
     {
-        private List<string> _reportingYearFilterInfo;
-
-        private List<string> _sectorFilterInfo;
-
-        private List<string> _sizeFilterInfo;
-
-        public SearchViewModel()
-        {
-            _sectorFilterInfo = new List<string>();
-            _sizeFilterInfo = new List<string>();
-            _reportingYearFilterInfo = new List<string>();
-        }
-
         public List<OptionSelect> SectorOptions { get; set; }
         public List<OptionSelect> ReportingYearOptions { get; set; }
         public List<OptionSelect> TurnoverOptions { get; internal set; }
 
+        public FilterGroup GetTurnoverGroup() => new FilterGroup
+        {
+            Id = "TurnoverFilter",
+            Group = "t",
+            Label = "Turnover or budget",
+            Expanded = false,
+            Metadata = TurnoverOptions
+        };
+
+        public FilterGroup GetSectorGroup() => new FilterGroup
+        {
+            Id = "SectorFilter",
+            Group = "s",
+            Label = "Industry sector",
+            Expanded = false,
+            Metadata = SectorOptions,
+            MaxHeight = "300px"
+        };
+
+        public FilterGroup GetYearGroup() => new FilterGroup
+        {
+            Id = "ReportingYearFilter",
+            Group = "y",
+            Label = "Statement year",
+            Expanded = false,
+            Metadata = ReportingYearOptions
+        };
         /// <summary>
         /// The keyword to search for
         /// </summary>
@@ -91,38 +105,6 @@ namespace ModernSlavery.WebUI.Viewing.Models
                 return Organisations.CurrentPage - 2;
             }
         }
-
-        public List<string> SectorFilterInfo
-        {
-            get
-            {
-                if (_sectorFilterInfo.Count == 0) _sectorFilterInfo = OptionSelect.GetCheckedString(SectorOptions);
-
-                return _sectorFilterInfo;
-            }
-        }
-
-        public List<string> TurnoverFilterInfo
-        {
-            get
-            {
-                if (_sectorFilterInfo.Count == 0) _sizeFilterInfo = OptionSelect.GetCheckedString(TurnoverOptions);
-
-                return _sizeFilterInfo;
-            }
-        }
-
-        public List<string> ReportingYearFilterInfo
-        {
-            get
-            {
-                if (_sectorFilterInfo.Count == 0)
-                    _reportingYearFilterInfo = OptionSelect.GetCheckedString(ReportingYearOptions);
-
-                return _reportingYearFilterInfo;
-            }
-        }
-
 
         //public OrganisationSearchModel GetOrganisation(string organisationIdentifier)
         //{

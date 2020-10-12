@@ -1,21 +1,49 @@
 ﻿@model GroupSearchViewModel
-    <div class="govuk-grid-row govuk-!-margin-bottom-6 govuk-!-margin-top-7">       
-        <div class="govuk-grid-column-two-thirds">
-            <div class="organisation-input-table">
-                <div class="organisation-input-cell textbox">
-                    @Html.LabelFor(m => m.GroupResults.OrganisationName, "Tell us the name of the organisation", new { @class = "govuk-label" })
-                    @Html.TextBoxFor(m => m.GroupResults.OrganisationName, new { @class = "govuk-input" })<br />
-                </div>
-                <div class="organisation-input-cell">
-                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="addIndex" value="0">
-                        Include
-                    </button>
-                </div>
-                <span asp-validation-for="GroupResults.OrganisationName" class="govuk-error-message"></span>
 
-            </div>          
+<button class="link-button find-organisation" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.ToggleResults">
+   Return to previous search results
+</button>
+
+<div class="govuk-grid-row govuk-!-margin-bottom-6 govuk-!-margin-top-4">
+    <div class="govuk-grid-column-two-thirds">
+
+        @Html.LabelFor(m => m.GroupResults.OrganisationName, "Tell us the name of the organisation", new { @class = "govuk-label" })
+        @if (Model.StatementOrganisations.Any(x => x.OrganisationId == null && x.ManuallyAdded != false))
+        {
+            <table class="govuk-table organisation-list">
+                <tbody class="govuk-table__body">
+                    @for (var organisationIndex = 0; organisationIndex < Model.StatementOrganisations.Count; organisationIndex++)
+                    {
+                        @if (Model.StatementOrganisations[organisationIndex].OrganisationId == null && Model.StatementOrganisations[organisationIndex].ManuallyAdded != false)
+                        {
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell">
+                                    <div>
+                                        <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold"> @(Model.StatementOrganisations[organisationIndex].OrganisationName)</p>
+                                    </div>
+
+                                </td>
+                                <td class="govuk-table__cell buttons">
+                                    <button type="submit" class="link-button" name="removeIndex" value="@organisationIndex">Remove</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+        <div class="organisation-input-table">
+            <div class="organisation-input-cell textbox">
+                @Html.TextBoxFor(m => m.GroupResults.OrganisationName, new { @class = "govuk-input" })<br />
+            </div>
+            <div class="organisation-input-cell">
+                <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="addIndex" value="0">
+                    Include
+                </button>
+            </div>
+            <span asp-validation-for="GroupResults.OrganisationName" class="govuk-error-message"></span>
+
         </div>
-        </div>  
-        <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.ToggleResults">
-            Cancel and return to search results
-        </button>
+    </div>
+</div>
+

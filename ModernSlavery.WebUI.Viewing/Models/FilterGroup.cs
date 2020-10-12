@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace ModernSlavery.WebUI.Viewing.Models
 {
@@ -10,5 +11,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
         public bool Expanded { get; set; }
         public string MaxHeight { get; set; }
         public List<OptionSelect> Metadata { get; set; }
+        public List<OptionSelect> Selections => Metadata.Where(m => m.Checked).ToList();
+
     }
 }

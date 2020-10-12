@@ -22,10 +22,10 @@
                     <ul class="govuk-checkboxes gem-c-checkboxes__list">
                         @foreach (var item in Model.Metadata)
                         {
-                            <li class="govuk-checkboxes__item">
-                                <input type="checkbox" name="@(Model.Group)" id="@(item.Id)" value="@(item.Value)" checked="@(item.Checked)" class="govuk-checkboxes__input" />
-                                <label for="@(item.Id)" class="govuk-label govuk-checkboxes__label">@item.Label</label>
-                            </li>
+                        <li class="govuk-checkboxes__item">
+                            <input type="checkbox" name="@(Model.Group)" id="@(item.Id)" value="@(item.Value)" checked="@(item.Checked)" class="govuk-checkboxes__input" data-track-category="filterClicked" data-uncheck-track-category="filterRemoved" data-track-action="@Model.Label" data-track-label="@item.Label" data-controls="js-search-results-info" aria-controls="js-search-results-info" />
+                            <label for="@(item.Id)" class="govuk-label govuk-checkboxes__label">@item.Label</label>
+                        </li>
                         }
                     </ul>
                 </fieldset>

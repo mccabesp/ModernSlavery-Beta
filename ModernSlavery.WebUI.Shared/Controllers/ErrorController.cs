@@ -20,6 +20,8 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         #endregion
 
+        [HttpPost("/error/")]
+        [HttpPost("/error/{errorCode?}")]
         [HttpGet("/error/")]
         [HttpGet("/error/{errorCode?}")]
         public IActionResult Default(int errorCode = 500)
@@ -54,6 +56,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             return View("CustomError", model);
         }
 
+        [HttpPost("/error/service-unavailable")]
         [HttpGet("/error/service-unavailable")]
         public IActionResult ServiceUnavailable()
         {

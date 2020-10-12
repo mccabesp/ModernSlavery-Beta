@@ -14,10 +14,9 @@ namespace ModernSlavery.Core.Entities
 
         public override bool Equals(object obj)
         {
-            // Check for null values and compare run-time types.
-            if (obj == null || GetType() != obj.GetType()) return false;
+            var target = obj as PublicSectorType;
+            if (target == null) return false;
 
-            var target = (PublicSectorType) obj;
             return PublicSectorTypeId == target.PublicSectorTypeId;
         }
     }

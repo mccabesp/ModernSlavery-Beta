@@ -1,6 +1,7 @@
 ﻿@inject SubmissionOptions SubmissionOptions
 @inject SharedOptions sharedOptions
 @inject IWebService WebService
+@inject ModernSlavery.Core.Interfaces.IReportingDeadlineHelper ReportingDeadlineHelper
 @inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
 @using ModernSlavery.Core.Models
 @using ModernSlavery.BusinessDomain.Shared.Models
@@ -27,7 +28,7 @@
                 </div>
                 <div>
                     <dt style="color: gray; font-size: 0.8em; font-weight: lighter;">
-                        @Html.Raw(Model.LatestAddress.Replace(Environment.NewLine,"&#44;<br/>"))
+                        @Html.Raw(Model.LatestAddress.Replace(Environment.NewLine, "&#44;<br/>"))
                     </dt>
                 </div>
             </dl>
@@ -61,7 +62,7 @@
 
             <div class="gpg-manage-reports__head">
                 <div class="gpg-manage-reports__desc">
-                     Submission Year
+                    Submission Year
                 </div>
                 <div class="gpg-manage-reports__desc">
                     Required by law to publish a statement on your website?
@@ -74,7 +75,7 @@
             </div>
             @await foreach (StatementInfoModel statementInfoModel in Model.StatementInfoModels)
             {
-                @await Html.PartialAsync("StatementInfoViewModel", new StatementInfoViewModel(statementInfoModel, Url, Model.OrganisationIdentifier))
+                @await Html.PartialAsync("StatementInfoViewModel", new StatementInfoViewModel(statementInfoModel, Url, ReportingDeadlineHelper, Model.OrganisationIdentifier))
             }
 
         </div>

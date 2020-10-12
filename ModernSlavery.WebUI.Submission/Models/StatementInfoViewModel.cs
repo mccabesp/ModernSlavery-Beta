@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.WebUI.Submission.Models
 {
@@ -10,22 +12,25 @@ namespace ModernSlavery.WebUI.Submission.Models
         public readonly StatementInfoModel StatementInfo;
         public readonly string OrganisationIdentifier;
         private readonly IUrlHelper _urlHelper;
-        public StatementInfoViewModel(StatementInfoModel statementInfoModel, IUrlHelper urlHelper, string organisationIdentifier)
+        private readonly IReportingDeadlineHelper ReportingDeadlineHelper;
+
+        public StatementInfoViewModel(StatementInfoModel statementInfoModel,
+            IUrlHelper urlHelper,
+            IReportingDeadlineHelper reportingDeadlineHelper,
+            string organisationIdentifier)
         {
             StatementInfo = statementInfoModel;
             _urlHelper = urlHelper;
+            ReportingDeadlineHelper = reportingDeadlineHelper;
             OrganisationIdentifier = organisationIdentifier;
         }
 
-        //TODO CanChangeScope needs repopulating
-        public bool CanChangeScope { get; set; }
-
         public bool SubmissionAvailable => StatementInfo.SubmittedStatementModifiedDate != null;
-        public bool DraftAvailable => StatementInfo.DraftStatementModifiedDate!=null && !StatementInfo.DraftStatementIsEmpty;
+        public bool DraftAvailable => StatementInfo.DraftStatementModifiedDate != null && !StatementInfo.DraftStatementIsEmpty;
 
         public string ButtonText
         {
-            get 
+            get
             {
                 if (!SubmissionAvailable && !DraftAvailable)
                     return "Start draft";
