@@ -335,7 +335,7 @@
                             @if (isOther)
                             {
                                 <br>
-                                @Model.OtherPolicies
+                                <p class="app-statement-summary_free-text">@Model.OtherPolicies</p>
                             }
                         </li>
                     }
@@ -378,7 +378,7 @@
                     <div class="govuk-body">
                         In addition, the organisation specified the following risk area:
                         <br>
-                        @Model.OtherRelevantRisks
+                        <p class="app-statement-summary_free-text">@Model.OtherRelevantRisks</p>
                     </div>
                 }
             }
@@ -413,7 +413,7 @@
                             <li>
                                 @original.Description
                                 <br>
-                                @item.Description
+                                <p class="app-statement-summary_free-text">@item.Description</p>
                             </li>
                         }
                     </ul>
@@ -423,7 +423,7 @@
                     <div class="govuk-body">
                         Other highest risk the organisation specified
                         <br>
-                        @Model.OtherHighRisks
+                        <p class="app-statement-summary_free-text">@Model.OtherHighRisks</p>
                     </div>
                 }
             }
@@ -446,8 +446,8 @@
                     During the period of the statement, the organisation considered the following geographic areas in its business and supply chains to be at highest risk of modern slavery:
                 </div>
                 @* TODO James - This is a very ugly way of solving the problem
-                   preferably update the mapping so this is no longer an issue
-                   or resolve on the view model
+                    preferably update the mapping so this is no longer an issue
+                    or resolve on the view model
                 *@
                 var parentRisks = _riskTypeIndex
                     .Where(r => Model.LocationRisks.Any(lr => lr.ParentId == r.Id || (lr.ParentId == null && lr.Id == r.Id)))
@@ -528,7 +528,7 @@
                 </div>
 
                 <div class="govuk-body">
-                    @Model.ForcedLabourDetails
+                    <p class="app-statement-summary_free-text">@Model.ForcedLabourDetails</p>
                 </div>
             }
             else if (Model.ForcedLabourDetails == string.Empty)
@@ -550,7 +550,7 @@
                     The organisation found 1 instance of modern slavery:
                 </div>
                 <div class="govuk-body">
-                    @Model.SlaveryInstanceDetails
+                    <p class="app-statement-summary_free-text">@Model.SlaveryInstanceDetails</p>
                 </div>
                 <div class="govuk-body govuk-!-font-weight-bold">
                     The organisation took the following remediation action in response:
@@ -595,7 +595,7 @@
                             @if (isOther)
                             {
                                 <br>
-                                @Model.OtherTraining
+                                <p class="app-statement-summary_free-text">@Model.OtherTraining</p>
                             }
                         </li>
                     }
@@ -639,7 +639,7 @@
                 </div>
 
                 <div class="govuk-body">
-                    @Model.ProgressMeasures
+                    <p class="app-statement-summary_free-text">@Model.ProgressMeasures</p>
                 </div>
             }
             else
@@ -656,7 +656,7 @@
                 </div>
 
                 <div class="govuk-body">
-                    @Model.KeyAchievements
+                    <p class="app-statement-summary_free-text">@Model.KeyAchievements</p>
                 </div>
             }
             else
