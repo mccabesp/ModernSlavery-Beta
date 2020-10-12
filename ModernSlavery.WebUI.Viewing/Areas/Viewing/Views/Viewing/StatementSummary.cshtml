@@ -1,4 +1,5 @@
-﻿@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+﻿@using ModernSlavery.Core.Classes.StatementTypeIndexes
+@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
 @inject ModernSlavery.Core.Classes.StatementTypeIndexes.RiskTypeIndex _riskTypeIndex
 @inject ModernSlavery.Core.Classes.StatementTypeIndexes.DiligenceTypeIndex _diligenceTypeIndex
 @{
@@ -426,14 +427,28 @@
                 <div class="govuk-body govuk-!-font-weight-bold">
                     During the period of the statement, the organisation considered the following geographic areas in its business and supply chains to be at highest risk of modern slavery:
                 </div>
-                @foreach (var parentId in Model.GetLocationRiskParentIds())
+                @* TODO James - This is a very ugly way of solving the problem
+                   preferably update the mapping so this is no longer an issue
+                   or resolve on the view model
+                *@
+                var parentRisks = _riskTypeIndex
+                    .Where(r => Model.LocationRisks.Any(lr => lr.ParentId == r.Id || (lr.ParentId == null && lr.Id == r.Id)))
+                    .OrderBy(r => r.Description);
+                var risksDictionary = parentRisks.ToDictionary(r => r, r =>
                 {
-                    var parent = _riskTypeIndex.First(d => d.Id == parentId);
+                    var children = Model.LocationRisks.Where(lr => lr.ParentId == r.Id);
+                    if (children.Any())
+                        return children.OrderBy(c => c.Description).ToList();
+                    else
+                        return _riskTypeIndex.Where(rti => rti.ParentId == r.Id).OrderBy(c => c.Description).ToList();
+                });
+                @foreach (var kvp in risksDictionary)
+                {
                     <div class="govuk-body">
-                        @parent.Description
+                        @kvp.Key.Description
                     </div>
                     <ul class="govuk-list govuk-list--bullet">
-                        @foreach (var item in Model.LocationRisks.Where(d => d.ParentId == parentId))
+                        @foreach (var item in kvp.Value)
                         {
                             <li>@item.Description</li>
                         }
@@ -459,7 +474,7 @@
                 <div class="govuk-body govuk-!-font-weight-bold">
                     The organisation used the following methods and processes to monitor working conditions in its business and supply chains during this period:
                 </div>
-             
+
                 @foreach (var parentId in Model.GetDiligenceParentIds())
                 {
                     var parent = _diligenceTypeIndex.First(d => d.Id == parentId);
@@ -467,7 +482,7 @@
                         @parent.Description
                     </div>
                     <ul class="govuk-list govuk-list--bullet">
-                        @foreach (var item in Model.DueDiligences.Where(d=>d.ParentId==parentId))
+                        @foreach (var item in Model.DueDiligences.Where(d => d.ParentId == parentId))
                         {
                             <li>@item.Description</li>
                         }
