@@ -380,7 +380,6 @@
             <h2 class="govuk-heading-m">
                 Highest risks identified
             </h2>
-
             @if (Model.HighRisks.Any())
             {
                 <div class="govuk-body govuk-!-font-weight-bold">
@@ -395,7 +394,12 @@
                     <ul class="govuk-list govuk-list--bullet">
                         @foreach (var item in Model.HighRisks.Where(d => d.ParentId == parentId))
                         {
-                            <li>@item.Description</li>
+                            var original = _riskTypeIndex.SingleOrDefault(rti => rti.Id == item.Id);
+                            <li>
+                                @original.Description
+                                <br>
+                                @item.Description
+                            </li>
                         }
                     </ul>
                 }
