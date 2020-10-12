@@ -6,6 +6,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
     [Serializable]
     public class DownloadViewModel
     {
+        public string BackUrl { get; set; }
         public List<Download> Downloads { get; set; }
 
         public class Download
