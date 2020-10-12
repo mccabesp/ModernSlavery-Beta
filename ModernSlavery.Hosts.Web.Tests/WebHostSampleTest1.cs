@@ -7,6 +7,7 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Testing.Helpers;
 using ModernSlavery.Testing.Helpers.Classes;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using System;
@@ -119,8 +120,23 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test]
         public async Task WebTestHost_SeleniumHelper_TestMethods_OK()
         {
+            //Check the accessibility of the current page saving results to {UrlPath}_GET.html
+            await this.CheckAccessibilityAsync();
+
+            //Check the accessibility of the current page saving results to {UrlPath}_POST.html
+            await this.CheckAccessibilityAsync(httpMethod:"POST");
+
+            //This one should not write analyse page as it is were still on the same page
+            await this.CheckAccessibilityAsync();
+
             //Go to the landing page
             Goto("/manage-organisations");
+
+            //Check the accessibility of the current page saving results to manage-organisations.html
+            await this.CheckAccessibilityAsync("manage-organisations");
+
+            //Check the accessibility of the current page saving results to /statement/group-report/WebTestHost_SeleniumHelper_TestMethods_OK.html
+            await this.CheckAccessibilityAsync($"/statement/group-report/{TestContext.CurrentContext.Test.Name}");
 
             //Check for the landing page header
             Expect(What.Contains,_sharedOptions.ServiceName);

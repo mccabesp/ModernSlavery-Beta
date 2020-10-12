@@ -30,6 +30,22 @@ namespace ModernSlavery.Core.Extensions
             return path;
         }
 
+        public static bool IsValidFilePath(string filepath)
+        {
+            var file = new FileInfo(filepath);
+            if (!string.IsNullOrWhiteSpace(file.DirectoryName) && !IsValidPathName(file.DirectoryName)) return false;
+            return IsValidFileName(file.Name);
+        }
+
+        public static bool IsValidPathName(string path)
+        {
+            return !string.IsNullOrWhiteSpace(path) && path.IndexOfAny(Path.GetInvalidPathChars()) < 0;
+        }
+        public static bool IsValidFileName(string filename)
+        {
+            return !string.IsNullOrWhiteSpace(filename) && filename.IndexOfAny(Path.GetInvalidFileNameChars()) < 0 ;
+        }
+
         public static string GetMimeMapping(string fileName)
         {
             var provider = new FileExtensionContentTypeProvider();

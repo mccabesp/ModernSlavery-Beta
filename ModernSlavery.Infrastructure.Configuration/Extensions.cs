@@ -254,10 +254,7 @@ namespace ModernSlavery.Infrastructure.Configuration
 
             if (includeSecrets)
             {
-                if (environment.EqualsI("Development")) 
-                    configBuilder.EnsureJsonFile("appsettings.secret.json", true, false);
-                else
-                    configBuilder.EnsureJsonFile($"appsettings.{environment}.secret.json", true, false);
+                configBuilder.EnsureJsonFile($"appsettings.{environment}.secret.json", true, false);
 
                 if (secretSettings!=null && secretSettings.Any())
                 {
