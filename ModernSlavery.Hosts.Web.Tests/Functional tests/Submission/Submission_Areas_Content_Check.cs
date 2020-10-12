@@ -14,6 +14,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(40)]
         public async Task StartSubmission()
         {
+
             ExpectHeader("Select an organisation");
 
             Click(TestData.OrgName);

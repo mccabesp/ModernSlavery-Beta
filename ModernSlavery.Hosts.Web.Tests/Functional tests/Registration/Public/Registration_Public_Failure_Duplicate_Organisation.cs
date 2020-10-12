@@ -19,7 +19,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            org = this.Find<Organisation>(org => org.SectorType.IsAny(SectorTypes.Public) && !org.UserOrganisations.Any()); ;
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
         }
         [Test, Order(40)]
         public async Task SearchForDuplicateOrg()

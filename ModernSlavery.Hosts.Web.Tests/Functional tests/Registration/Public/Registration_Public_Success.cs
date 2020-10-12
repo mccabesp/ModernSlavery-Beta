@@ -23,7 +23,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task OTSetUp()
         {
             //HostHelper.ResetDbScope();
-            org = this.Find<Organisation>(org => org.SectorType.IsAny(SectorTypes.Public) && !org.UserOrganisations.Any());
+            org = this.Find<Organisation>(org => org.SectorType.IsAny(SectorTypes.Public) && org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
             await Task.CompletedTask;
         }
         

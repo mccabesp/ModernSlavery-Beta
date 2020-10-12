@@ -1,7 +1,9 @@
 ﻿using Geeks.Pangolin;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
@@ -13,11 +15,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
 
-
+        protected  Organisation org;
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            TestData.Organisation = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
+
 
         }
 
@@ -30,7 +33,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(29)]
         public async Task RegisterOrg()
         {
-            await this.RegisterUserOrganisationAsync(TestData.Organisation.OrganisationName, UniqueEmail);
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
             RefreshPage();
 
             await Task.CompletedTask;
@@ -39,7 +42,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToSectorsPage()
         {
 
-            Submission_Helper.NavigateToYourOrganisation(this, TestData.Organisation.OrganisationName, "2019 to 2020", MoreInfoRequired: true);
+            Submission_Helper.NavigateToYourOrganisation(this, org.OrganisationName, "2019 to 2020", MoreInfoRequired: true);
             await Task.CompletedTask;
         }
 

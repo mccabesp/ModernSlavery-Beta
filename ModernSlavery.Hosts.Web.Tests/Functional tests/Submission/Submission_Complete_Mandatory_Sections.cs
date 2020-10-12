@@ -1,8 +1,10 @@
 ﻿using Geeks.Pangolin;
 using Microsoft.Azure.Management.CosmosDB.Fluent.Models;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
@@ -17,7 +19,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SetUp()
         {
             //HostHelper.ResetDbScope();
-            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
 
         }
 

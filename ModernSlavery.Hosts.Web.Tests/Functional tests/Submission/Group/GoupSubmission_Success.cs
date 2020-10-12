@@ -1,5 +1,6 @@
 ﻿using Geeks.Pangolin;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Testing.Helpers;
 using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temp Ignore")]
+    [TestFixture]
 
     public class GroupSubmission_Success : CreateAccount
     {
@@ -27,7 +28,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task OTSetUp()
         {
             //HostHelper.ResetDbScope();
-            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
             await Task.CompletedTask;
         }
         [Test, Order(30)]
@@ -35,7 +36,6 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
             await this.RegisterUserOrganisationAsync(TestData.Organisations[1].OrganisationName, UniqueEmail);
-            await this.RegisterUserOrganisationAsync(TestData.OrgName, UniqueEmail);
         }
 
         [Test, Order(32)]
@@ -209,20 +209,24 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(48)]
         public async Task GroupReviewPage()
         {
-            Expect("2019 to 2020 modern slavery statement for "+ org.OrganisationName + " (group)");
+            //Expect("2019 to 2020 modern slavery statement for "+ org.OrganisationName + " (group)");
+
+            Expect("2019 to 2020 modern slavery statement for " + org.OrganisationName);
 
             Expect(What.Contains, "You can ");
             ExpectLink(That.Contains, "review and edit the organisations");
-            Expect(What.Contains, " included in this group statement, or ");
-            ExpectLink(That.Contains, "tell us it’s for a single organisation");
+            Expect(What.Contains, " included in this group statement,"); 
+            Expect(What.Contains, "or");
+            ExpectLink(That.Contains, "tell us it's a single organisation");
             Expect(What.Contains, " instead.");
             await Task.CompletedTask;
         }
         [Test, Order(50)]
         public async Task ExitAndSaveChanges()
         {
-            Expect("Submit");
-            Expect("You've submitted your Modern Slavery statement for 2019 to 2020");
+            Click("Submit for publication");
+            Expect(What.Contains, "You have submitted your modern slavery statement");
+            Expect(What.Contains, "for 2019 to 2020");
 
 
             await Task.CompletedTask;
@@ -232,7 +236,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(52)]
         public async Task CheckSubmission()
         {
-            Goto("/");
+            Goto("/manage-organisations");
 
             Click("Manage organisations");
             ExpectHeader(That.Contains, "Select an organisation");
@@ -241,7 +245,12 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click(org.OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            RightOfText("2019 to 2020").BelowText("Status of statement published on this service").Expect(What.Contains, "Submission complete");
+            DateTime now = DateTime.Now;
+
+            RightOfText("2019 to 2020").BelowText("Status of statement published on this service").Expect(What.Contains, "Published");
+
+
+                RightOfText("2019 to 2020").BelowText("Status of statement published on this service").Expect(What.Contains, "on " + now.Day + " " + now.ToString("MMMM") + " " + now.Year );
 
 
             await Task.CompletedTask;
@@ -251,13 +260,14 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(54)]
         public async Task CheckGroupeeSubmissionStatus()
         {
-            Goto("/");
+            Goto("/manage-organisations");
 
             Click("Manage organisations");
             ExpectHeader(That.Contains, "Select an organisation");
 
 
             Click(TestData.Organisations[1].OrganisationName);
+            SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: TestData.Organisations[1].OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             RightOfText("2019 to 2020").BelowText("Status of statement published on this service").Expect("Already included in "+ TestData.Organisations[1].OrganisationName + "’s 2019 to 2020 group submission, published on " + DateTime.Now.ToString("dd MMMM yyyy")+".");

@@ -13,6 +13,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Testing.Helpers.Extensions;
+using System.Linq;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -29,11 +30,13 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
         }
-
+        private Organisation org;
         [Test, Order(20)]
         public async Task AddSecurityCode()
         {
-           await this.RegisterUserOrganisationAsync(TestData.OrgName, UniqueEmail);
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
+
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
 
             var result = this.GetSecurityCodeBusinessLogic().CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
 
@@ -60,8 +63,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(24)]
         public async Task EnterEmployerReferenceAndSecurityCode()
         {
-            Set("Organisation Reference").To(TestData.Organisation.OrganisationReference);
-            Set("Security Code").To(TestData.Organisation.SecurityCode);
+            Set("Organisation Reference").To(org.OrganisationReference);
+            Set("Security Code").To(org.SecurityCode);
             await Task.CompletedTask;
         }
 
@@ -70,8 +73,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Continue");
             ExpectHeader("Confirm your organisation’s details");
-            RightOfText("Organisation Name").Expect(TestData.OrgName);
-            RightOfText("Organisation Reference").Expect(TestData.Organisation.OrganisationReference);
+            RightOfText("Organisation Name").Expect(org.OrganisationName);
+            RightOfText("Organisation Reference").Expect(org.OrganisationReference);
             await Task.CompletedTask;
         }
 

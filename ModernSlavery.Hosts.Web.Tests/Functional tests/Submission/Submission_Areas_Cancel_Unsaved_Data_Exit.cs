@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using ModernSlavery.Testing;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Testing.Helpers.Extensions;
+using ModernSlavery.Core.Extensions;
+using System.Linq;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -17,7 +19,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
         }
         [Test, Order(40)]

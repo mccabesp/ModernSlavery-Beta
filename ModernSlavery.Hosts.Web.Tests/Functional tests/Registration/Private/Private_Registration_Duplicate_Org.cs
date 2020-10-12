@@ -13,6 +13,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Testing.Helpers.Extensions;
+using System.Linq;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -25,7 +26,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task OTSetUp()
         {
             //HostHelper.ResetDbScope();
-            org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
             await Task.CompletedTask;
         }
         [Test, Order(30)]
