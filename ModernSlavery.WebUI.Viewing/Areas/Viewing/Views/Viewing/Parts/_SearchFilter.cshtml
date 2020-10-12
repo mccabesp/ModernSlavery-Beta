@@ -1,47 +1,18 @@
 ﻿@model SearchViewModel
-@{
-    var turnover = new FilterGroup
-    {
-        Id = "TurnoverFilter",
-        Group = "t",
-        Label = "Turnover or budget",
-        Expanded = false,
-        Metadata = Model.TurnoverOptions
-    };
-
-    var sectors = new FilterGroup
-    {
-        Id = "SectorFilter",
-        Group = "s",
-        Label = "Industry sector",
-        Expanded = false,
-        Metadata = Model.SectorOptions,
-        MaxHeight = "300px"
-    };
-
-    var years = new FilterGroup
-    {
-        Id = "ReportingYearFilter",
-        Group = "y",
-        Label = "Statement year",
-        Expanded = false,
-        Metadata = Model.ReportingYearOptions
-    };
-}
 
 @*<a id="ClearFilters" href="search-results?search=@(Model.Keywords)">Clear all filters</a>
 
 <div class="filter-divider"></div>*@
 
-<partial name="Parts/_SearchOptionSelect" model="sectors" />
+<partial name="Parts/_SearchOptionSelect" model="@Model.GetSectorGroup()" />
 
 <div class="filter-divider"></div>
 
-<partial name="Parts/_SearchOptionSelect" model="turnover" />
+<partial name="Parts/_SearchOptionSelect" model="@Model.GetTurnoverGroup()" />
 
 <div class="filter-divider"></div>
 
-<partial name="Parts/_SearchOptionSelect" model="years" />
+<partial name="Parts/_SearchOptionSelect" model="@Model.GetYearGroup()" />
 
 <div class="filter-divider"></div>
 

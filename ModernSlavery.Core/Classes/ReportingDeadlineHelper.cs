@@ -17,7 +17,7 @@ namespace ModernSlavery.Core.Classes
 
         public ReportingDeadlineHelper(SharedOptions sharedOptions)
         {
-            _sharedOptions= sharedOptions;
+            _sharedOptions = sharedOptions;
         }
 
         public int FirstReportingDeadlineYear
@@ -95,6 +95,15 @@ namespace ModernSlavery.Core.Classes
             return reportingDeadline < now ? reportingDeadline.AddYears(1) : reportingDeadline;
         }
 
+        public bool IsReportingYearEditable(SectorTypes sectorType, int year)
+        {
+            if (year < FirstReportingDeadlineYear)
+                return false;
+
+            var currentYear = GetReportingDeadline(sectorType).Year;
+            return year == currentYear || year == (currentYear - 1);
+        }
+
         public IList<DateTime> GetReportingDeadlines(SectorTypes sectorType, int recentYears = 0)
         {
             var firstReportingDeadline = GetFirstReportingDeadline(sectorType);
@@ -103,10 +112,10 @@ namespace ModernSlavery.Core.Classes
             var deadlines = new SortedSet<DateTime>();
             var deadline = currentReportingDeadline;
             var years = recentYears;
-            while (deadline >= firstReportingDeadline && (recentYears==0 || years>0))
+            while (deadline >= firstReportingDeadline && (recentYears == 0 || years > 0))
             {
                 deadlines.Add(deadline);
-                deadline=deadline.AddYears(-1);
+                deadline = deadline.AddYears(-1);
                 years--;
             }
             return deadlines.ToList();
