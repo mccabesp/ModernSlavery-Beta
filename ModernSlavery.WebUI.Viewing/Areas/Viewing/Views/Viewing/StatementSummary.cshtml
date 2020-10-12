@@ -566,7 +566,15 @@
                 <ul class="govuk-list govuk-list--bullet">
                     @foreach (var item in Model.Training)
                     {
-                        <li>@item.Description</li>
+                        var isOther = item.Description == "Other";
+                        <li>
+                            @item.Description
+                            @if (isOther)
+                            {
+                                <br>
+                                @Model.OtherTraining
+                            }
+                        </li>
                     }
                 </ul>
             }
