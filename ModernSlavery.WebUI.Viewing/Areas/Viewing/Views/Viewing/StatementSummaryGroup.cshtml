@@ -33,7 +33,10 @@
             <div class="govuk-!-margin-top-2">
                 <h3 class="govuk-heading-s">@item.OrganisationName</h3>
                 <div class="govuk-body">@item.Address.GetFullAddress()</div>
-                <div class="govuk-body">Company number: @item.CompanyNumber</div>
+                @if (!string.IsNullOrWhiteSpace(item.CompanyNumber))
+                {
+                    <div class="govuk-body">Company number: @item.CompanyNumber</div>
+                }
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
             </div>
         }
