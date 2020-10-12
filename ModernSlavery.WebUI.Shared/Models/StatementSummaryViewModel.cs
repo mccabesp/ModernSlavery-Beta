@@ -177,5 +177,25 @@ namespace ModernSlavery.WebUI.Shared.Models
                 || IncludesTraining.HasValue
                 || IncludesGoals.HasValue;
         }
+
+        public bool HasAllAreasCovered()
+        {
+            return IncludesStructure.HasValue && IncludesStructure.Value
+                && IncludesPolicies.HasValue && IncludesPolicies.Value
+                && IncludesRisks.HasValue && IncludesRisks.Value
+                && IncludesDueDiligence.HasValue && IncludesDueDiligence.Value
+                && IncludesTraining.HasValue && IncludesTraining.Value
+                && IncludesGoals.HasValue && IncludesGoals.Value;
+        }
+
+        public bool HasNoAreasCovered()
+        {
+            return IncludesStructure.HasValue && !IncludesStructure.Value
+                && IncludesPolicies.HasValue && !IncludesPolicies.Value
+                && IncludesRisks.HasValue && !IncludesRisks.Value
+                && IncludesDueDiligence.HasValue && !IncludesDueDiligence.Value
+                && IncludesTraining.HasValue && !IncludesTraining.Value
+                && IncludesGoals.HasValue && !IncludesGoals.Value;
+        }
     }
 }
