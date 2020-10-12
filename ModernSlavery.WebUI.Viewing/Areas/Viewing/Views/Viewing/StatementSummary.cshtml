@@ -328,7 +328,15 @@
                 <ul class="govuk-list govuk-list--bullet">
                     @foreach (var policy in Model.Policies)
                     {
-                        <li>@policy.Description</li>
+                        var isOther = policy.Description == "Other";
+                        <li>
+                            @policy.Description
+                            @if (isOther)
+                            {
+                                <br>
+                                @Model.OtherPolicies
+                            }
+                        </li>
                     }
                 </ul>
             }
