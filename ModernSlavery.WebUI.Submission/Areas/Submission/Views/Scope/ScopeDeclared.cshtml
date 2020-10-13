@@ -11,13 +11,9 @@
             </h1>
             <div class="govuk-box-highlight">
                 <h1 class="bold-large">
-                    You've confirmed your organisation is <span> @(Model.ScopeStatus == ScopeStatuses.OutOfScope ? "not " : "")required to report for reporting deadline @Model.ReportingDeadline.ToString("d MMMM yyyy").</span>
+                    You've confirmed your organisation was <span> @(Model.ScopeStatus == ScopeStatuses.OutOfScope ? "not " : "")required to publish a modern slavery statement on its website in @Model.ReportingDeadline.Year.</span>
                 </h1>
             </div>
-            <p>
-                Press continue to manage your organisation.
-            </p>
-            <p></p>
             <a class="button" href="@Url.Action("ManageOrganisation", "Submission", new {organisationIdentifier = ViewContext.RouteData.Values["organisationIdentifier"]})" role="button">Continue</a>
         </div>
     </div>
