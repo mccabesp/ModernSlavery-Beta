@@ -445,32 +445,22 @@
                 <div class="govuk-body govuk-!-font-weight-bold">
                     During the period of the statement, the organisation considered the following geographic areas in its business and supply chains to be at highest risk of modern slavery:
                 </div>
-                @* TODO James - This is a very ugly way of solving the problem
-                    preferably update the mapping so this is no longer an issue
-                    or resolve on the view model
-                *@
-                var parentRisks = _riskTypeIndex
-                    .Where(r => Model.LocationRisks.Any(lr => lr.ParentId == r.Id || (lr.ParentId == null && lr.Id == r.Id)))
-                    .OrderBy(r => r.Description);
-                var risksDictionary = parentRisks.ToDictionary(r => r, r =>
+                @foreach (var parentId in Model.GetLocationRiskParentIds())
                 {
-                    var children = Model.LocationRisks.Where(lr => lr.ParentId == r.Id);
-                    if (children.Any())
-                        return children.OrderBy(c => c.Description).ToList();
-                    else
-                        return _riskTypeIndex.Where(rti => rti.ParentId == r.Id).OrderBy(c => c.Description).ToList();
-                });
-                @foreach (var kvp in risksDictionary)
-                {
+                    var parent = _riskTypeIndex.First(d => d.Id == parentId);
                     <div class="govuk-body">
-                        @kvp.Key.Description
+                        @parent.Description
                     </div>
-                    <ul class="govuk-list govuk-list--bullet">
-                        @foreach (var item in kvp.Value)
-                        {
-                            <li>@item.Description</li>
-                        }
-                    </ul>
+                    var children = Model.LocationRisks.Where(d => d.ParentId == parentId);
+                    if (children.Any())
+                    {
+                        <ul class="govuk-list govuk-list--bullet">
+                            @foreach (var child in children)
+                            {
+                                <li>@child.Description</li>
+                            }
+                        </ul>
+                    }
                 }
             }
             else
