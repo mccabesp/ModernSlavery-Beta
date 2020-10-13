@@ -1,4 +1,8 @@
-﻿.search-results-list {
+﻿#FinderForm .govuk-grid-row {
+    clear: both
+}
+
+.search-results-list {
     .govuk-grid-row {
         border-bottom: solid 1px $govuk-border-colour;
         margin: 15px 0px;
@@ -8,7 +12,7 @@
         padding: 0px;       
     }
 
-    .blue-header a {
+    .blue-header a, .blue-header {
         color: $govuk-link-colour;
         text-decoration: none;
     }
@@ -19,5 +23,32 @@
 
     .grey-text {
       color:  $govuk-border-colour;
+    }
+
+    .small{
+        display:none;
+    }
+}
+
+@media (max-width: 40.0525em) {
+      
+    
+    .search-results-list {
+
+        .wide {
+            display: none;
+        }
+
+        .small {
+            display: inline;
+        }
+
+        .address {
+            font-size: 14px;
+        }
+
+        .company-number {
+            font-size: 12px;
+        }
     }
 }
