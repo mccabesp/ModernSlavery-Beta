@@ -22,7 +22,7 @@
                 <span>We need more information</span>
             </h1>
 
-            <p>Was your organisation required to report for reporting deadline @Model.ReportingDeadline.ToString("d MMMM yyyy")?</p>
+            <p>Was your organisation required to publish a modern slavery statement on its website in @Model.ReportingDeadline.Year?</p>
             @Html.ValidationMessageFor(model => model.ScopeStatus, null, new {@class = "error-danger"})
             <div class="form-group @Html.SetErrorClass(model => model.ScopeStatus, "error")">
                 <fieldset>
@@ -37,7 +37,7 @@
                 </fieldset>
             </div>
             <p>
-                If you don't know if your organisation is required to report please read the <a href="@sharedOptions.WhoNeedsToReportGuidanceLink" target="_blank" rel="noopener noreferrer">guidance</a>.
+                If you don't know whether your organisation was required to publish a modern slavery statement, <a href="@sharedOptions.WhoNeedsToReportGuidanceLink" target="_blank" rel="noopener noreferrer">refer to the guidance</a>.
             </p>
 
             <div class="form-group">
