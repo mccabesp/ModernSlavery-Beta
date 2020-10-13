@@ -184,11 +184,12 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             var model = new DownloadViewModel { Downloads = new List<DownloadViewModel.Download>() };
 
             //returns back to correct search page
-            var history = PageHistory.First();
+            var history = PageHistory.FirstOrDefault();
+            var lastSearchUrl = SearchPresenter.GetLastSearchUrl();
             if (history.Contains("search-results-js"))
-                model.BackUrl = SearchPresenter.GetLastSearchUrl();
+                model.BackUrl = string.IsNullOrEmpty(lastSearchUrl) ? "/search" : lastSearchUrl;
             else
-                model.BackUrl = history;
+                model.BackUrl = string.IsNullOrEmpty(history) ? "/search" : history;
 
             //Return the view with the model
             return View("Download", model);
