@@ -47,12 +47,14 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task GoToManageOrgPageAndSelectOrg()
         {
             Goto("/manage-organisations");
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             Click("Manage organisations");
             ExpectHeader(That.Contains, "Select an organisation");
 
             Click(org.OrganisationName);
+            await AxeHelper.CheckAccessibilityAsync(this);
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             await Task.CompletedTask;
@@ -83,6 +85,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ExpectScopeInfoIS()
         {
             RefreshPage();
+            await AxeHelper.CheckAccessibilityAsync(this);
             RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "Yes");
 
             RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").ExpectLink("Change");

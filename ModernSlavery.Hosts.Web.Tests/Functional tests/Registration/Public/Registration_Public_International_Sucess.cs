@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
             ExpectHeader("Address of the organisation you`re reporting for");
-
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             //fields pre-populated
             AtField("Address 1").Expect(RegistrationTestData.Address1_Blackpool);
@@ -29,7 +30,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingContinueNavigatesToContactDetailsPage()
         {
             Click("Continue");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Your contact details");
             ExpectText("Please enter your contact details. The Government Equalities Office may contact you to confirm your registration.");
             await Task.CompletedTask;
@@ -51,6 +52,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingContinueNavigatesToOrgDetailsPage()
         {
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Confirm your organisation’s details");
             await Task.CompletedTask;
@@ -79,6 +81,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             ClickLabel("No");
             //should take you to the international workflow
             Click("Continue");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
             await Task.CompletedTask;
 
             //todo await confirmation of international workflow

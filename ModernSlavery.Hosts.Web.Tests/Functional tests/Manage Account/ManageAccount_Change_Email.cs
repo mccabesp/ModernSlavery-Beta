@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -20,6 +21,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickManageAccount_RedirectsToChangeDetailsPage()
         {
             Click(The.Top, "Manage Account");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Login details");
 
@@ -32,6 +34,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingChangeEmailLeadsToEmailAddressPage()
         {
             Click(The.Top, "Change");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Enter your new email address");
             await Task.CompletedTask;
@@ -46,9 +49,15 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Confirm your email address").To(Create_Account.edited_email);
 
             ClickText("Confirm");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
             ExpectHeader("Your details have been updated successfully");
 
             Click("Manage Account");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             ExpectHeader("Manage your account");
 
             AtRow("Email address").Expect(Create_Account.edited_email);

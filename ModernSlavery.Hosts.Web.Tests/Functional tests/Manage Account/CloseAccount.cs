@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -19,6 +20,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickManageAccount_RedirectsToChangeDetailsPage()
         {
             Click(The.Top, "Manage Account");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Login details");
 
@@ -31,6 +33,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ChangeDetailsPage_ClickCloseYouAccount_GoestoClosePage()
         {
             Click("Close your account");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Close your account");
             await Task.CompletedTask;
@@ -53,6 +56,8 @@ namespace ModernSlavery.Hosts.Web.Tests
            Below("Are you sure you want to close your account?").Set("Enter your password to confirm").To(Create_Account.roger_password);
 
             ClickText("Close account");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
 
             Expect("Your account has been closed");
             Expect("You are now signed out of the Modern Slavery reporting service");

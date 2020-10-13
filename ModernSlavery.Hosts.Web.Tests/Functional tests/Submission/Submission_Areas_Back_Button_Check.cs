@@ -44,7 +44,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Select an organisation");
 
             Click(org.OrganisationName);
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
 
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
@@ -54,7 +54,9 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Before you start");
             Click("Start now");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Your modern slavery statement");
             await Task.CompletedTask;
         }
@@ -67,6 +69,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             await Task.CompletedTask;
         }
 
@@ -82,7 +85,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(46)]
         public async Task VerifyBackButtonNavigation()
         {
-            Click("Back"); 
+            Click("Back");
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Your modern slavery statement");
             await Task.CompletedTask;
 

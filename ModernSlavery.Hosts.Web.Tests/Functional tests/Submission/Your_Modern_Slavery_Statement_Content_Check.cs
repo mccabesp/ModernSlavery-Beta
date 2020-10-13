@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -14,14 +15,17 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Select an organisation");
 
             Click(Submission.OrgName_Blackpool);
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Manage your organisations reporting");
 
             AtRow("2019/20").Click("Draft report");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Before you start");
             Click("Start Now");
 
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Your modern slavery statement");
             await Task.CompletedTask;
         }

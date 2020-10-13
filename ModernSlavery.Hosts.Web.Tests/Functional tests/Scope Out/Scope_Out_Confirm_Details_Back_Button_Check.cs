@@ -53,6 +53,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
         {
             Goto(TestData.ScopeUrl);
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
             await Task.CompletedTask;
         }
@@ -69,6 +71,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SubmittingIndentityFormLeadsToConfirmOrgDetails()
         {
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Confirm your organisation’s details");
             await Task.CompletedTask;
         }
@@ -77,6 +80,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingBackButtonReturnsToIdentifyOrgPage()
         {
             Click("Back");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
             await Task.CompletedTask;
         }

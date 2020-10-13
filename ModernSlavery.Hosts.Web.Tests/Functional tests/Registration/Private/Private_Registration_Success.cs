@@ -41,13 +41,19 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task GoToPrivateRegistrationPage()
         {
             Goto("/manage-organisations");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             Click("Register an organisation");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
 
             ExpectHeader("Registration Options");
 
             ClickLabel(That.Contains, "Private or voluntary sector organisation");
             Click("Continue");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Find your organisation");
             await Task.CompletedTask;
@@ -61,6 +67,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             SetXPath("//*[@id='SearchText']").To(org.OrganisationName);
             Click("Search");
 
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
             ExpectRow(That.Contains, org.OrganisationName);
 
             await Task.CompletedTask;
@@ -72,6 +80,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         { 
         AtRow(That.Contains, org.OrganisationName).Click(What.Contains, "Choose");
 
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             ExpectHeader("Confirm your organisation’s details");
 
             AtRow("Organisation name").Expect(org.OrganisationName);
@@ -79,6 +89,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             //todo investigate address issue
             AtRow("Registered address").Expect(org.GetAddressString(DateTime.Now));
             Click("Confirm");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("We're sending a PIN by post to the following name and address:");
             await Task.CompletedTask;
@@ -108,12 +120,16 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Goto("/manage-organisations");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             //Click("Manage Organisations");
             ExpectHeader("Select an organisation");
 
 
             ClickText(org.OrganisationName);
 
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Enter your registration PIN");
 
@@ -123,6 +139,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Enter PIN").To(Pin);
 
             ClickText("Activate and continue");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             AtRow(org.OrganisationName).Expect("Registration complete");
 

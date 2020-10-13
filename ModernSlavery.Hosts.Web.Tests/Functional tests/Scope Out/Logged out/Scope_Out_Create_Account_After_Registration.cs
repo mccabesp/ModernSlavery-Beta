@@ -12,6 +12,7 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -28,6 +29,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingCreateAccountLeadsToCreateAccountPage()
         {
               Click("Create an account");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Create an Account");
 
@@ -59,6 +62,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingContinueNavigatesToVerification()
         {
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             //ExpectHeader("Verify your email address");
 
             await Task.CompletedTask;
@@ -92,6 +96,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Password").To(Create_Account.roger_password);
 
             Click(The.Bottom, "Sign In");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("You've confirmed your email address");
 
             Expect("To finish creating your account, select continue.");
@@ -104,6 +110,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Continue");
 
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader(That.Contains,"Select an organisation");
 

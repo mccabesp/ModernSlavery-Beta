@@ -51,14 +51,15 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click(org.OrganisationName);
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
             
-            Click(The.Bottom, "Start Draft");
-
+            Click(The.Top, "Start Draft");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Before you start");
             Click("Start Now");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
 
             await Task.CompletedTask;
@@ -82,6 +83,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Submission_Helper.DateSet(this, Submission.YourMSStatement_ApprovalDate_Day, Submission.YourMSStatement_ApprovalDate_Month, Submission.YourMSStatement_ApprovalDate_Year, "3");
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             await Task.CompletedTask;
         }
 
@@ -98,6 +100,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             BelowHeader("Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions").ClickLabel(The.Top, "Yes");
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             await Task.CompletedTask;
         }
 
@@ -116,6 +119,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ClickLabel(Submission.YourOrganisation_Turnover);
             Set("OtherSector").To("Other details");
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             await Task.CompletedTask;
         }
@@ -138,6 +142,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             }
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             await Task.CompletedTask;
         }
 
@@ -233,6 +238,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Submission_Helper.CountrySelect(this, "Antarctica", Submission.SupplyChainRisks_SelectedCountriesAntarctica);
             
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader(That.Contains, "Supply chain risks and due diligence");
 
 
@@ -294,6 +300,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Training");
 
             await Task.CompletedTask;
@@ -310,6 +317,7 @@ namespace ModernSlavery.Hosts.Web.Tests
                 NeedExpand: false);
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Monitoring progress");
             await Task.CompletedTask;
         }
@@ -344,6 +352,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectButton("Exit and lose Changes");
 
             Click("Exit and save Changes");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");            
 
             await Task.CompletedTask;

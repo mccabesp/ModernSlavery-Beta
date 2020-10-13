@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -19,6 +20,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickManageAccount_RedirectsToChangeDetailsPage()
         {
             Click(The.Top, "Manage Account");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
+
 
             ExpectHeader("Login details");
 

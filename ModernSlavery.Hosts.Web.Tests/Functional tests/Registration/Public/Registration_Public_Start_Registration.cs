@@ -40,6 +40,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToOrgPage()
         {
             Goto("/manage-organisations");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             Click("Register an organisation");
 
             ExpectHeader("Registration Options");
@@ -60,6 +63,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             SetXPath("//input[@id='SearchText']").To(org.OrganisationName);
             Click(The.Bottom, "Search");
 
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             Expect("Organisation name and registered address");
             ExpectRow(That.Contains, org.OrganisationName);
@@ -75,6 +79,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SelectOrg()
         {
             ClickButton(The.Top, That.Contains, "Choose");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Your organisation's address");
             ExpectText("Enter the correspondence address of the organisation you want to register.");

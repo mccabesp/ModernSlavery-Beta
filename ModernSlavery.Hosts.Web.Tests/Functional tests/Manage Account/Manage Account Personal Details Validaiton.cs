@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -21,6 +22,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickManageAccount_RedirectsToChangeDetailsPage()
         {
             Click(The.Top, "Manage Account");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Login details");
 
@@ -32,14 +34,11 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task ChangeDetailsPage_ClickChange_GoestoPersonalDetails()
         {
-            //Assign
-
-
-
-            //Act
+            
             Above(The.Bottom, "Change").Click(The.Bottom, "Change");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
-            //Asert
+
             ExpectHeader("Change your personal details");
 
             AtField("First name").Expect(_firstname);
@@ -59,6 +58,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             ClearField("Job title");
 
             Click("Continue");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
 
             //Try(
             //    () => Expect("The following errors were detected"),

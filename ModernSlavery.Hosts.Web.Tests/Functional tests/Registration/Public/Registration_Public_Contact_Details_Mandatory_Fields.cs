@@ -12,7 +12,7 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
-
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -32,18 +32,19 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task Mandatory_Fields()
         {
             ClickText("Register an organisation");
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Registration Options");
 
             ClickLabel("Public Sector Organisation");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             Click("Continue");
 
             ExpectHeader("Find your organisation");
 
             SetXPath("//input[@id='SearchText']").To(RegistrationTestData.OrgName_Blackpool);
             Click("Search");
-            
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectRow("Organisation name and registered address");
             ExpectRow(That.Contains, RegistrationTestData.OrgName_Blackpool);
@@ -54,6 +55,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
             ClickButton(That.Contains, "Choose");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Address of the organisation you're reporting for");
             ExpectText("Enter the correspondence address for the organisation whose Modern Slavery statement you’re reporting.");
 
@@ -64,7 +66,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             AtField("Postcode").Expect(RegistrationTestData.PostCode_Blackpool);
 
             Click("Continue");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Your contact details");
             ExpectText("Please enter your contact details. The Government Equalities Office may contact you to confirm your registration.");
 
@@ -84,7 +86,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ClearField("Telephone");
 
             Click("Continue");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             Expect("Please enter your first name");
             Expect("Please enter your last name");
             Expect("Please enter your email address");

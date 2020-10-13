@@ -92,6 +92,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SubmittingIndentityFormLeadsToConfirmOrgDetails()
         {
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Confirm your organisation’s details");
             await Task.CompletedTask;
         }
@@ -109,7 +110,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ContinueonVerifyDetailsLeadsToTelUsWhy()
         {
             Click("Confirm and Continue");
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Tell us why your organisation is not required to publish a modern slavery statement");
 
 
@@ -121,7 +122,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Click("Continue");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             Expect("The following errors were detected");
             //error message tbc
             Expect("Please select at least one reason why");
@@ -136,6 +137,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ClickLabel("Other");
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             Expect("The following errors were detected");
             //error message tbc
@@ -157,7 +159,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Please specify").To("Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five 1");
 
             Click("Continue");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             Expect("The following errors were detected");
             //error message tbc
             Expect("More than 200 characters entered");
@@ -165,6 +167,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Please specify").To("Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five");
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Check your information before sending");
             await Task.CompletedTask;
         }

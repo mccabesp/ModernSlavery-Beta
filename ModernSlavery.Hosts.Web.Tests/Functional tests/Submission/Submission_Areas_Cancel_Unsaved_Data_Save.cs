@@ -17,18 +17,18 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Select an organisation");
 
             Click(org.OrganisationName);
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
 
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
-
-            Click(The.Bottom, "Start Draft");
-
+            Click(The.Top, "Start Draft");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Before you start");
             Click("Start Now");
-
-                    ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: org.OrganisationName);
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: org.OrganisationName);
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             await Task.CompletedTask;
         }
 
@@ -39,7 +39,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
             Click("Continue");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Areas covered by your modern slavery statement");
 
             await Task.CompletedTask;
@@ -58,7 +58,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //cancel in this route should return to unsaved data screen
             Click("Cancel");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("You have unsaved data, what do you want to do?");
 
             await Task.CompletedTask;
@@ -71,7 +71,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
             Click("Exit and save changes");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
 
@@ -86,7 +86,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Continue");
 
             ExpectHeader("Review before submitting");
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             Click("Areas covered by your modern statement");
 
             ExpectHeader("Areas covered by your modern slavery statement");

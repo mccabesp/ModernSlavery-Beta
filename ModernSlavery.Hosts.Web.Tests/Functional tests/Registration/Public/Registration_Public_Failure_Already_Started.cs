@@ -12,7 +12,7 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
-
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -36,10 +36,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SelectingDuplicateOrgCausesValidation()
         {
             ClickButton(That.Contains, "Choose");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             //org already started
             //error should appear
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             Expect("The following errors were detected");
             Expect("You have already started registering for this organisation");
             await Task.CompletedTask;

@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -15,10 +16,12 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Select an organisation");
 
             Click(Submission.OrgName_Blackpool);
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Manage your organisations reporting");
 
             AtRow("2019/20").Click("Draft report");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Before you start");
             Click("Start Now");
@@ -34,6 +37,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Submission_Helper.DateSet(this, "2", "2", "2019", "2");
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             Expect("There is a problem");
             RefreshPage();
 
@@ -45,6 +49,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //invalid format
             Submission_Helper.DateSet(this, "22", "12", "2020", "3");
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             Expect("There is a problem");
             Expect("Date format is incorrect");
 

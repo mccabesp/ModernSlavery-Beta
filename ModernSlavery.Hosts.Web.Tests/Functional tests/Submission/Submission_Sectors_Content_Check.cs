@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -14,6 +15,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Submission_Helper.NavigateToYourOrganisation(this, TestData.OrgName, "2019 to 2020");
+            await AxeHelper.CheckAccessibilityAsync(this);
             await Task.CompletedTask;
         }
 

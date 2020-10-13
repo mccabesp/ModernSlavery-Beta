@@ -13,6 +13,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Testing.Helpers.Classes;
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -36,6 +37,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             DeleteCookiesAndReturnToRoot(this);
 
             Goto(TestData.ScopeUrl);
+            AxeHelper.CheckAccessibilityAsync(this);
+
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
             await Task.CompletedTask;
         }

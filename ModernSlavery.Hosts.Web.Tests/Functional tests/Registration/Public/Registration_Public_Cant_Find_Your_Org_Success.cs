@@ -12,7 +12,7 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
-
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -30,13 +30,19 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Goto("/manage-organisations");
 
+            await AxeHelper.CheckAccessibilityAsync(this);
+
+
             Click("Register an organisation");
 
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Registration Options");
 
             ClickLabel(That.Contains, "Private or voluntary sector organisation");
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this);
+
 
             ExpectHeader("Find your organisation");
             await Task.CompletedTask;
@@ -50,6 +56,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             SetXPath("//*[@id='SearchText']").To(RegistrationTestData.OrgName_CantFind);
             Click("Search");
 
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             await Task.CompletedTask;
 
@@ -61,6 +68,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ClickText("Can't find your organisation?");
             Click("Tell us about your organisation");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Details of the organisation you want to register");
             await Task.CompletedTask;
@@ -85,6 +93,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingcContinueNavigatesToAddressPage()
         {
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
             ExpectHeader("Your organisation's address");
 
             await Task.CompletedTask;
@@ -98,12 +108,15 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Address 2").To(RegistrationTestData.Address2_Blackpool);
             Set("Address 3").To(RegistrationTestData.Address3_Blackpool);
             Set("Postcode").To(RegistrationTestData.PostCode_Blackpool);
+
+
             await Task.CompletedTask;
         }
         [Test, Order(32)]
         public async Task ClickingcContinueNavigatesToContactDetailsPage()
         {
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Your contact details");
             await Task.CompletedTask;
@@ -127,6 +140,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SubmitOrg()
         {
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Confirm your organisation’s details");
             RightOfText("Organisation name").Expect(RegistrationTestData.CompanyNumber_CantFind);
@@ -136,9 +150,15 @@ namespace ModernSlavery.Hosts.Web.Tests
             RightOfText("Email").Expect(UniqueEmail);
             RightOfText("Telephone").Expect("01413334444");
             Click("Confirm");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
             ExpectHeader(That.Contains, "We’ve got your details.");
             ExpectHeader(That.Contains, "We will review them and get in touch to let you know if your registration was successful.");
             Click("Manage organisations");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             ExpectHeader(That.Contains, "Select an organisation");
             RightOfText(RegistrationTestData.OrgName_CantFind).Expect("Awaiting registration approval");
 

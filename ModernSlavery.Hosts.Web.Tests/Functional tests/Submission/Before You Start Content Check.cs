@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -15,10 +16,11 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Select an organisation");
 
             Click(Submission.OrgName_Blackpool);
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Manage your organisations reporting");
 
             AtRow("2019/20").Click("Draft report");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Before you start");
 
@@ -46,7 +48,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ExpandFirstParagraphAndCheckContent()
         {
             Click("Read more about the information you need to provide");
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             Expect("the name of the organisation, or group of organisations, your statement is for");
             Expect("the period covered by the statement");
             Expect("who signed off the statement, and when");
@@ -87,6 +89,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Expect("Start now");
             Click("Start now");
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Who is this statement for?");
 
             await Task.CompletedTask;

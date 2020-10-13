@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -19,6 +20,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickManageAccount_RedirectsToChangeDetailsPage()
         {
             Click(The.Top, "Manage Account");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Login details");
 
@@ -32,6 +34,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Close your account");
 
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
+
             ExpectHeader("Close your account");
             await Task.CompletedTask;
 
@@ -42,6 +47,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task MandatoryFieldCheck()
         {
             ClickText("Close account");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("There is a problem");
             Expect("You need to enter your password before you can close your account");

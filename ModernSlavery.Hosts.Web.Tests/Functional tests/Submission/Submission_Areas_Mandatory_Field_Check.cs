@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToAreasPage()
         {
             Submission_Helper.NavigateToAreasCovered(this, TestData.OrgName, "2019 to 2020");
-            
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             await Task.CompletedTask;
         }
@@ -30,7 +31,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingContinueTriggersValidation()
         {
             Click("Continue");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("There is a problem");
             Expect("Missing details");
 

@@ -1,6 +1,7 @@
 ﻿using Geeks.Pangolin;
 using Geeks.Pangolin.Core.Helper;
 using Geeks.Pangolin.Helper.UIContext;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -24,10 +25,10 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click("Start Draft");
 
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Before you start");
             Click("Start now");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Your modern slavery statement");
             await Task.CompletedTask;
         }
@@ -39,7 +40,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
             Click("Continue");
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Areas covered by your modern slavery statement");
 
             await Task.CompletedTask;

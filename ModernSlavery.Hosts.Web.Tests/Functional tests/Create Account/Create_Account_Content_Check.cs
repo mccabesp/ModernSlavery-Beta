@@ -3,6 +3,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Testing.Helpers;
 using ModernSlavery.Testing.Helpers.Classes;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using System;
@@ -43,8 +44,12 @@ namespace ModernSlavery.Hosts.Web.Tests
             DeleteCookiesAndReturnToRoot(this);
 
             Click("Sign in");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             BelowHeader("No account yet?");
             Click("Create an account");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Create an Account");
 

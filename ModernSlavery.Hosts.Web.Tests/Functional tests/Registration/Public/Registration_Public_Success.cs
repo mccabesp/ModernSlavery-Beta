@@ -48,6 +48,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingContinueNavigatesToContactDetailsPage()
         {
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Your contact details");
             ExpectText("Enter your contact details.");
@@ -71,6 +72,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingContinueNavigatesToOrgDetailsPage()
         {
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Confirm your organisation’s details");
             await Task.CompletedTask;
@@ -104,6 +106,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingContinueNavigatesToConfirmPage()
         {
             Click("Confirm");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             //Expect("Reporting as " + Registration.OrgName_Blackpool + " " + Registration.Address3_Blackpool);
             await Task.CompletedTask;

@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToTrainingPage()
         {
             Submission_Helper.NavigateToTraining(this, TestData.OrgName, "2019 to 2020");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Training");
             await Task.CompletedTask;
@@ -32,7 +34,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SubmittingFormWithoutOptionsCausesValidation()
         {
             Click("Continue");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             Expect("There is a problem");
             Expect("Missing details");
 
@@ -45,6 +47,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Set("OtherTraining").To("details");
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Monitoring progress");
             await Task.CompletedTask;
 

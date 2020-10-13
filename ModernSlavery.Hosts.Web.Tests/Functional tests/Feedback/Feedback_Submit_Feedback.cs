@@ -1,4 +1,6 @@
 ﻿using Geeks.Pangolin;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -12,6 +14,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToFeedbackPage()
         {
             Click("feedback");
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             ExpectHeader("Send us feedback");
             await Task.CompletedTask;
         }
@@ -53,6 +57,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task Submit_Feedback()
         {
             Click("Submit");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
             ExpectHeader("Thank you");
 
             Expect("Thank you for giving us your feedback about this service. We regularly update the service and pay careful attention to all the comments we receive.");
@@ -65,6 +72,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task Return_To_Manage_Orgs()
         {
             ClickText(That.Contains, "Return to manage organisations");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             ExpectHeader(That.Contains, "Select an organisation");
             await Task.CompletedTask;
         }

@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -20,6 +21,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             await GoToCreateAccountPage();
+            await AxeHelper.CheckAccessibilityAsync(this);
+
         }
 
         [Test, Order(12)]
@@ -27,6 +30,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             await EnterPersonalDetails();
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
+
             await Task.CompletedTask;
 
         }

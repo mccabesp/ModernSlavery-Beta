@@ -1,5 +1,6 @@
 ﻿using Geeks.Pangolin;
 using Geeks.Pangolin.Helper.UIContext;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToSCRPart1()
         {
             Submission_Helper.NavigateToSupplyChainRisks1(this, Submission.OrgName_Blackpool, "2019/2020");
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Supply Chain Risks and due diligence");
             await Task.CompletedTask;
         }
@@ -35,6 +37,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SubmitFormWithoutFillingInOptionDetails()
         {
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             await Task.CompletedTask;
         }
 
@@ -72,6 +75,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //expect new page
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             Expect("Part 2");
             await Task.CompletedTask;
         }
@@ -80,7 +84,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ReturnToPart1()
         {
             GotoCopiedUrl("Part 1");
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             Expect("Part 1");
             await Task.CompletedTask;
         }

@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -12,6 +13,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToSubmissionPage()
         {
             Submission_Helper.NavigateToSubmission(this, Submission.OrgName_Blackpool, "2020", "2021");
+            await AxeHelper.CheckAccessibilityAsync(this);
             await Task.CompletedTask;
         }
 
@@ -31,6 +33,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToYourModernSlaveryStatement()
         {
             Click("Your modern slavery statement");
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Your modern slavery statement");
             await Task.CompletedTask;
         }
@@ -55,7 +58,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingContinueNavigatesBackToReviewwPage()
         {
             Click("Continue");
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Review 2019 to 2020 group report for " + Submission.OrgName_Blackpool);
             await Task.CompletedTask;
         }
@@ -83,7 +86,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingAreasCoveredLabelLeadsToAreasCoveredPage()
         {
             Click("Areas covered by your modern slavery statement");
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Areas covered by your modern slavery statement");
             await Task.CompletedTask;
         }
@@ -106,7 +109,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             await ClickingContinueNavigatesBackToReviewwPage();
 
             Click("Continue");
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Review 2019 to 2020 group report for " + Submission.OrgName_Blackpool);
 
             //both pages complete now

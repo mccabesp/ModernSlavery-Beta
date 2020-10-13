@@ -44,8 +44,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task GoToManageOrgPage()
         {
             Goto("/manage-organisations");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             Click("Manage organisations");
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader(That.Contains, "Select an organisation");
 
             await Task.CompletedTask;
@@ -56,9 +58,13 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Click(org.OrganisationName);
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
 
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "Yes");
             await Task.CompletedTask;
@@ -68,6 +74,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ChangeOrgStatus()
         {
             Click(The.Bottom, "Change");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
             ExpectHeader("Tell us why your organisation is not required to publish a modern slavery statement");
             await Task.CompletedTask;
         }
@@ -128,6 +137,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ContinueOnTellUsWhyFormLeadsToCheckYourAnswers()
         {
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Check your answers before sending");
             await Task.CompletedTask;
         }

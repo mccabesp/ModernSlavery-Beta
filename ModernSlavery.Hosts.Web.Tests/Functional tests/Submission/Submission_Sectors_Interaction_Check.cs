@@ -43,6 +43,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Submission_Helper.NavigateToYourOrganisation(this, org.OrganisationName, "2019 to 2020", MoreInfoRequired: true);
+            await AxeHelper.CheckAccessibilityAsync(this);
             await Task.CompletedTask;
         }
 

@@ -12,7 +12,7 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
-
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -33,8 +33,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task GoToPrivateRegistrationPage()
         {
             Goto("/manage-organisations");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             Click("Register an organisation");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
 
             ExpectHeader("Registration Options");

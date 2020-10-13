@@ -12,7 +12,7 @@ using static ModernSlavery.Core.Extensions.Web;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using ModernSlavery.Core.Entities;
-
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -32,7 +32,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Registration Options");
 
             ClickLabel("Public Sector Organisation");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             Click("Continue");
 
             ExpectHeader("Find your organisation");
@@ -44,7 +44,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //clicking search without field filled should cause validaiton
             Click(The.Bottom, "Search");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             Expect("The following errors were detected");
             Expect("There's a problem with your search");
         }

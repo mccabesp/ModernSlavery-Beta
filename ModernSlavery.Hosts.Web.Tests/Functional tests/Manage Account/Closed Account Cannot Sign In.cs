@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -22,8 +23,14 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task FillInUserNameAndPassword() { 
             Goto("/");
-        Click("Sign in");
-        Set("Email").To(Create_Account.roger_email);
+
+            await AxeHelper.CheckAccessibilityAsync(this);
+
+            Click("Sign in");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
+
+            Set("Email").To(Create_Account.roger_email);
         Set("Password").To(Create_Account.roger_password);
         await Task.CompletedTask;
     }
@@ -33,6 +40,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Click(The.Bottom, "Sign in");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
             Expect("There`s a problem with your email address or password");
             await Task.CompletedTask;
 

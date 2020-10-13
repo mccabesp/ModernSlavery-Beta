@@ -1,5 +1,6 @@
 ﻿using Geeks.Pangolin;
 using Geeks.Pangolin.Helper.UIContext;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -14,6 +15,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Submission_Helper.NavigateToSupplyChainRisks1(this, Submission.OrgName_Blackpool, "2019/2020");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Supply Chain Risks and due diligence");
             await Task.CompletedTask;
         }

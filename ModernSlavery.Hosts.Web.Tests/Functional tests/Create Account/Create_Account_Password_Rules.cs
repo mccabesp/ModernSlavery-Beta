@@ -3,6 +3,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Testing.Helpers;
 using ModernSlavery.Testing.Helpers.Classes;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using System;
@@ -44,8 +45,15 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             DeleteCookiesAndReturnToRoot(this);
 
+            await AxeHelper.CheckAccessibilityAsync(this);
+
+
             Click("Sign in");
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             Click("Create an account");
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             ExpectHeader("Create an Account");
             await Task.CompletedTask;
 
@@ -74,6 +82,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Confirm password").To("test");
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             Expect("The following errors were detected");
 
@@ -91,6 +100,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Confirm password").To("testtest");
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             Expect("The following errors were detected");
 
@@ -105,6 +115,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Confirm password").To("testtest");
 
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             Expect("The following errors were detected");
 

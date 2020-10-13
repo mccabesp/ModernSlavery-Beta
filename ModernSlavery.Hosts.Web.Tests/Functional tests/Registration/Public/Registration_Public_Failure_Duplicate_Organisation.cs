@@ -36,7 +36,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             
             ClickButton(That.Contains, "Choose");
-
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             //org already registered
             //error should appear
 

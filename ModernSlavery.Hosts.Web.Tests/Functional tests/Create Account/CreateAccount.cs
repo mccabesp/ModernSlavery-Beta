@@ -10,6 +10,7 @@ using ModernSlavery.Testing.Helpers;
 using ModernSlavery.Core.Interfaces;
 using NUnit.Framework.Interfaces;
 using ModernSlavery.Testing.Helpers.Classes;
+using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -67,13 +68,19 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             DeleteCookiesAndReturnToRoot(this);
 
+            await AxeHelper.CheckAccessibilityAsync(this);
+
 
             Click("Sign in");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Sign in or create an account");
 
             BelowHeader("No account yet?");
             Click("Create an account");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             ExpectHeader("Create an Account");
 
@@ -106,6 +113,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Continue");
             ExpectHeader("Verify your email address");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             await Task.CompletedTask;
         }
@@ -133,18 +141,29 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //verify email
             Goto(URL);
+            await AxeHelper.CheckAccessibilityAsync(this);
 
             Set("Email").To(_email);
             Set("Password").To(_password);
 
             Click(The.Bottom, "Sign In");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
             ExpectHeader("You've confirmed your email address");
 
             Expect("To finish creating your account, select continue.");
             Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this);
 
-            
+
+            ExpectHeader("Privacy Policy");
+
+            Click("Continue");
+
+
             ExpectHeader("Select an organisation");
+
 
             await Task.CompletedTask;
 

@@ -1,4 +1,5 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -12,6 +13,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToFeedbackPage()
         {
             Click("feedback");
+
+            await AxeHelper.CheckAccessibilityAsync(this);
+
             ExpectHeader("Send us feedback");
             await Task.CompletedTask;
         }

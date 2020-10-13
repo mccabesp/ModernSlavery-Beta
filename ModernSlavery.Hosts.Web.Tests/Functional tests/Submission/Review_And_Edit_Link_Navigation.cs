@@ -1,5 +1,6 @@
 ﻿using Geeks.Pangolin;
 using Geeks.Pangolin.Helper.UIContext;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -15,7 +16,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToSubmissionPage()       
         {
             Submission_Helper.NavigateToSubmission(this, Submission.OrgName_Blackpool, "2020", "2021");
-
+            await AxeHelper.CheckAccessibilityAsync(this);
             ExpectHeader("Review 2019 to 2020 group report for " + Submission.OrgName_Blackpool);
             await Task.CompletedTask;
         }
