@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temporary igore")]
+    [TestFixture]
 
     public class Manage_Account_Personal_Details_Validation : CreateAccount
     {
@@ -35,7 +35,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ChangeDetailsPage_ClickChange_GoestoPersonalDetails()
         {
             
-            Above(The.Bottom, "Change").Click(The.Bottom, "Change");
+            //Click(The.Bottom, What.Contains, "Change");
+            Goto("https://localhost:5001/manage-account/change-details");
             await AxeHelper.CheckAccessibilityAsync(this);
 
 
@@ -57,7 +58,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ClearField("Last name");
             ClearField("Job title");
 
-            Click("Continue");
+            ClickText("Confirm");
 
             await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
@@ -68,7 +69,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //    () => { Expect("The following errors were detected")}
             //);
 
-            Expect("The following errors were detected");
+            Expect("There is a problem");
             Expect("You need to enter your first name");
             Expect("You need to enter your last name");
             Expect("You need to enter your job title");
