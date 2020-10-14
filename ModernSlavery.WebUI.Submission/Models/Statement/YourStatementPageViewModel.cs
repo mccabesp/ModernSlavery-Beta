@@ -62,34 +62,24 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class YourStatementPageViewModel : BaseViewModel
     {
-        public YourStatementPageViewModel()
-        {
-            MinStartYear = VirtualDateTime.Now.AddYears(-5).Year;
-            MaxStartYear = VirtualDateTime.Now.AddYears(5).Year;
-            MinEndYear = MinStartYear;
-            MaxEndYear = MaxStartYear;
-            MinApprovedYear = MinStartYear;
-            MaxApprovedYear = MaxStartYear;
-        }
-
         [JsonIgnore]
         [IgnoreMap]
-        public readonly int MinStartYear;
+        public int MinStartYear => ReportingDeadlineYear - 2;
         [JsonIgnore]
         [IgnoreMap]
-        public readonly int MaxStartYear;
+        public int MaxStartYear => ReportingDeadlineYear;
         [JsonIgnore]
         [IgnoreMap]
-        public readonly int MinEndYear;
+        public int MinEndYear => ReportingDeadlineYear - 1;
         [JsonIgnore]
         [IgnoreMap]
-        public readonly int MaxEndYear;
+        public int MaxEndYear => ReportingDeadlineYear;
         [JsonIgnore]
         [IgnoreMap]
-        public readonly int MinApprovedYear;
+        public int MinApprovedYear => ReportingDeadlineYear - 1;
         [JsonIgnore]
         [IgnoreMap]
-        public readonly int MaxApprovedYear;
+        public int MaxApprovedYear => ReportingDeadlineYear;
 
         public override string PageTitle => "Your modern slavery statement";
 
@@ -146,7 +136,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             var validationResults = new List<ValidationResult>();
 
-            //Validate the start date parts
+            #region Start date validation
+
+            // Validate the start date parts
             var partsComplete = !Text.IsAnyNull(StatementStartDay, StatementStartMonth, StatementStartYear);
             var partsEmpty = Text.IsAllNull(StatementStartDay, StatementStartMonth, StatementStartYear);
             if (!partsComplete && !partsEmpty)
@@ -160,9 +152,22 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 if (StatementStartYear == null)
                     validationResults.AddValidationError(3103, nameof(StatementStartYear));
             }
-            
-            if (StatementStartYear!=null && (StatementStartYear.Value > MaxStartYear || StatementStartYear.Value < MinStartYear))
+
+            // Must be a real date
+            if (partsComplete && !StatementStartDate.HasValue)
+                validationResults.AddValidationError(3129);
+
+            // Cannot be later than today's date
+            if (StatementStartDate.HasValue && StatementStartDate.Value > VirtualDateTime.Now)
+                validationResults.AddValidationError(0);
+
+            // Must be within the allowed years
+            if (StatementStartYear != null && (StatementStartYear.Value > MaxStartYear || StatementStartYear.Value < MinStartYear))
                 validationResults.AddValidationError(3119, nameof(StatementStartYear), new { minYear = MinStartYear, maxYear = MaxStartYear });
+
+            #endregion
+
+            #region End date validation
 
             //Validate the end date parts
             partsComplete = !Text.IsAnyNull(StatementEndDay, StatementEndMonth, StatementEndYear);
@@ -179,8 +184,39 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                     validationResults.AddValidationError(3107, nameof(StatementEndYear));
             }
 
-            if (StatementEndYear!=null && (StatementEndYear.Value > MaxEndYear || StatementEndYear.Value < MinEndYear))
+            // Must be a real date
+            if (partsComplete && !StatementEndDate.HasValue)
+                validationResults.AddValidationError(3130);
+
+            // Cannot be later than today's date
+            if (StatementEndDate.HasValue && StatementEndDate.Value > VirtualDateTime.Now)
+                validationResults.AddValidationError(0);
+
+            // Must be within the allowed years
+            if (StatementEndYear != null && (StatementEndYear.Value > MaxEndYear || StatementEndYear.Value < MinEndYear))
                 validationResults.AddValidationError(3122, nameof(StatementEndYear), new { minYear = MinEndYear, maxYear = MaxEndYear });
+
+            #endregion
+
+            #region Start/End range validation
+
+            // Validate the range when both start and end have real dates
+            if (StatementStartDate.HasValue && StatementEndDate.HasValue)
+            {
+                // Can not start before it has finished
+                if (StatementStartDate.Value >= StatementEndDate.Value)
+                    validationResults.AddValidationError(0);
+
+                //The period between from and to dates must be a minimum of 12 months and a max of 24 months
+                var monthsDiff = ((StatementEndDate.Value.Year - StatementStartDate.Value.Year) * 12)
+                    + StatementEndDate.Value.Month - StatementStartDate.Value.Month;
+                if (monthsDiff < 12 || monthsDiff < 24)
+                    validationResults.AddValidationError(0);
+            }
+
+            #endregion
+
+            #region Approved date validation
 
             //Validate the approved date parts
             partsComplete = !Text.IsAnyNull(ApprovedDay, ApprovedMonth, ApprovedYear);
@@ -196,14 +232,30 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 if (ApprovedYear == null)
                     validationResults.AddValidationError(3111, nameof(ApprovedYear));
             }
-            
-            if (ApprovedYear!=null && (ApprovedYear.Value > MaxApprovedYear || ApprovedYear.Value < MinApprovedYear))
+
+            // Must be a real date
+            if (partsComplete && !ApprovedDate.HasValue)
+                validationResults.AddValidationError(3130);
+
+            // Cannot be later than today's date
+            if (ApprovedDate.HasValue && ApprovedDate.Value > VirtualDateTime.Now)
+                validationResults.AddValidationError(0);
+
+            // Cannot be before the statment end date
+            if (ApprovedDate.HasValue && StatementEndDate.HasValue && ApprovedDate.Value < StatementEndDate.Value)
+                validationResults.AddValidationError(0);
+
+            // Must be within the allowed years
+            if (ApprovedYear != null && (ApprovedYear.Value > MaxApprovedYear || ApprovedYear.Value < MinApprovedYear))
                 validationResults.AddValidationError(3125, nameof(ApprovedYear), new { minYear = MinApprovedYear, maxYear = MaxApprovedYear });
+
+            #endregion
+
+            #region Approver validation
 
             //Validate the approver parts
             partsComplete = !Text.IsAnyNullOrWhiteSpace(ApproverFirstName, ApproverLastName, ApproverJobTitle);
             partsEmpty = Text.IsAllNullOrWhiteSpace(ApproverFirstName, ApproverLastName, ApproverJobTitle);
-
             if (!partsComplete && !partsEmpty)
             {
                 if (string.IsNullOrWhiteSpace(ApproverFirstName))
@@ -215,6 +267,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 if (string.IsNullOrWhiteSpace(ApproverJobTitle))
                     validationResults.AddValidationError(3115, nameof(ApproverJobTitle));
             }
+
+            #endregion
 
             return validationResults;
         }
