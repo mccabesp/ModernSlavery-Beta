@@ -1,29 +1,45 @@
 ﻿using Geeks.Pangolin;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting fix for public registration in 3113, awaiting confirmation of international registration")]
+    [TestFixture]
 
     public class Registration_Public_International_Success : Registration_Public_Start_Registration
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
+
+        protected Organisation org;
+        [OneTimeSetUp]
+        public async Task SetUp()
+        {
+            org = this.Find<Organisation>(org => org.SectorType.IsAny(SectorTypes.Public) && !org.UserOrganisations.Any()); ;
+
+
+            org = this.Find<Organisation>(org => org.SectorType.IsAny(SectorTypes.Public) && org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
+        }
 
         [Test, Order(30)]
         public async Task ExpectAddressFields()
         {
 
 
-            ExpectHeader("Address of the organisation you`re reporting for");
-            await AxeHelper.CheckAccessibilityAsync(this);
+            //            ClickButton(That.Contains, "Choose");
+            ExpectHeader("Your organisation's address");
 
+            var OrgAdress = org.GetAddress(DateTime.Now);
             //fields pre-populated
-            AtField("Address 1").Expect(RegistrationTestData.Address1_Blackpool);
-            AtField("Address 2").Expect(RegistrationTestData.Address2_Blackpool);
-            AtField("Address 3").Expect(RegistrationTestData.Address3_Blackpool);
-            AtField("Postcode").Expect(RegistrationTestData.PostCode_Blackpool);
+            //todo discuss address issue - RegistrationController.Manual
+            //AtField("Address 1").Expect(OrgAdress.Address1);
+            //AtField("Address 2").Expect(OrgAdress.TownCity);
+            //AtField("Address 3").Expect(OrgAdress.County);
+            //AtField("Postcode").Expect(OrgAdress.PostCode);
             await Task.CompletedTask;
         }
         [Test, Order(31)]
@@ -31,8 +47,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Continue");
             await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
             ExpectHeader("Your contact details");
-            ExpectText("Please enter your contact details. The Government Equalities Office may contact you to confirm your registration.");
+            ExpectText("Enter your contact details.");
             await Task.CompletedTask;
         }
 
@@ -42,8 +59,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             //fields pre-populated
             AtField("First name").Expect(Create_Account.roger_first);
             AtField("Last name").Expect(Create_Account.roger_last);
-            AtField("Email address").Expect(Create_Account.roger_email);
+            AtField("Email address").Expect(UniqueEmail);
             AtField("Job title").Expect(Create_Account.roger_job_title);
+            Set("Telephone number").To("01414453344");
             await Task.CompletedTask;
 
         }
@@ -63,24 +81,24 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ExpectOrgDetailsFields()
         {
 
-            AtLabel("Organisation name").Expect(RegistrationTestData.OrgName_Blackpool);
-            AtLabel("Registered address").Expect(RegistrationTestData.RegisteredAddress_Blackpool);
-            AtLabel("Business Sectors (SIC Codes)").Expect(RegistrationTestData.SicCodes_Blackpool);
+            RightOfText("Organisation name").Expect(org.OrganisationName);
+            //RightOfText("Registered address").Expect(org.GetAddressString(DateTime.Now));
 
-            ExpectHeader("Your contact details");
-            AtLabel("Your name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last);
-            AtLabel("Email").Expect(Create_Account.roger_email);
-            AtLabel("").Expect(RegistrationTestData.OrgName_Blackpool);
+            ExpectRow("Your contact details");
+            RightOfText("Your name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last + " (" + Create_Account.roger_job_title + ")");
+            RightOfText("Email").Expect(UniqueEmail);
+            RightOfText("Telephone").Expect("01414453344");
             await Task.CompletedTask;
 
         }
         [Test, Order(36)]
         public async Task ConfirmNonUkAddress()
         {
-            ExpectHeader("Is this a UK address");
+            ExpectHeader("Is this a UK address?");
             ClickLabel("No");
             //should take you to the international workflow
-            Click("Continue");
+            Click("Confirm");
+
 
             await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
