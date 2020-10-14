@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temp ignore while setup fixed, logic fine")]
+    [TestFixture]
 
 
     public class Submission_Areas_Cancel_Unsaved_Data_Exit : Private_Registration_Success
