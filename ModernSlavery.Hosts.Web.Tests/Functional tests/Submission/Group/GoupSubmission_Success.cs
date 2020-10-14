@@ -65,7 +65,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            Click(The.Bottom, "Start Draft");
+            Click(The.Top, "Start Draft");
 
 
             ExpectHeader("Before you start");
@@ -270,11 +270,12 @@ namespace ModernSlavery.Hosts.Web.Tests
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: TestData.Organisations[1].OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            RightOfText("2019 to 2020").BelowText("Status of statement published on this service").Expect("Already included in "+ TestData.Organisations[1].OrganisationName + "’s 2019 to 2020 group submission, published on " + DateTime.Now.ToString("dd MMMM yyyy")+".");
+            //RightOfText("2019 to 2020").BelowText("Status of statement published on this service").Expect(What.Contains, "Already included in "+ org.OrganisationName + "’s 2019 to 2020 group submission, published on " + DateTime.Now.ToString("dd MMM yyyy"));
 
+            AtXPath("(//div[@class = 'gpg-manage-reports__cell gpg-manage-reports__cell--year' and contains(., '2019 to 2020')][1]//parent::div)[1]").Expect(What.Contains, "Already included in " + org.OrganisationName + "'s 2019 to 2020 group submission, published on " + DateTime.Now.ToString("dd MMM yyyy"));
 
+            AtXPath("(//div[@class = 'gpg-manage-reports__cell gpg-manage-reports__cell--year' and contains(., '2018 to 2019')][1]//parent::div)[1]").Expect(What.Contains, "Not Started");
             await Task.CompletedTask;
-
         }
 
 
