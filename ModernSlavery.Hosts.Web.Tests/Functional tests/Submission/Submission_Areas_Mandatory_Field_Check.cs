@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temporary Ignore")]
+    [TestFixture]
 
 
     public class Submission_Areas_Mandatory_Field_Check : Private_Registration_Success
@@ -14,7 +14,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(41)]
         public async Task NavigateToAreasPage()
         {
-            Submission_Helper.NavigateToAreasCovered(this, TestData.OrgName, "2019 to 2020");
+            Submission_Helper.NavigateToAreasCovered(this, org.OrganisationName, "2019 to 2020", MoreInfoRequired: true);
             await AxeHelper.CheckAccessibilityAsync(this);
 
             await Task.CompletedTask;
