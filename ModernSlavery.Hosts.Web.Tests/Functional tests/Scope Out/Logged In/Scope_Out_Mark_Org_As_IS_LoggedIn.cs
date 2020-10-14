@@ -54,6 +54,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             User CurrentUser = await ServiceScope.GetDataRepository().SingleOrDefaultAsync<User>(o => o.EmailAddress == UniqueEmail);
             await this.GetOrganisationBusinessLogic().SetAsScopeAsync(org.OrganisationReference, 2020, "Updated by test case", CurrentUser, ScopeStatuses.OutOfScope, true);
 
+
             await Task.CompletedTask;
         }
 
@@ -86,7 +87,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(32)]
         public async Task ChangeOrgStatus()
         {
-            Click(The.Bottom, "Change"); 
+            Click(The.Top, "Change"); 
             await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Confirm your organisation is required to publish a modern slavery statement");
             await Task.CompletedTask;
