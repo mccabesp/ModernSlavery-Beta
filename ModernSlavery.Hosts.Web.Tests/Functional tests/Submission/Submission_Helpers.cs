@@ -43,7 +43,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             }
             ui.ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            ui.RightOf(Year).Click(The.Bottom, "Start draft");
+            ui.RightOf(Year).Click(The.Top, "Start draft");
 
             ui.ExpectHeader("Before you start");
             ui.Click("Start now");
@@ -129,38 +129,15 @@ namespace ModernSlavery.Hosts.Web.Tests
             ui.SetXPath("(//div//label[contains(text(), 'Day')]/following-sibling::input)[" + Order + "]").To(Day);
         }
 
-        public static void NavigateToSubmission(UIContext ui, string Organistion, string YearFrom, string YearTo, bool MoreInfoRequired = false)
+        public static void NavigateToSubmission(UIContext ui, string Organistion, string YearFromTo, bool MoreInfoRequired = false)
         {
-            ui.Click("Manage Organisations");
-            ui.ExpectHeader("Select an organisation");
 
-            ui.Click("Organisation");
-            ui.AtRow(YearFrom + "/" + YearTo.Substring(YearTo.Length - 4)).Click("Draft report");
-            ui.ExpectHeader("Your modern slavery statement");
-
-            ui.Click("Save and continue");
-            ui.ExpectHeader("Six areas of modern slavery statement");
-
-            ui.Click("Save and continue");
-            ui.ExpectHeader("Your organisation");
-
-            ui.Click("Save and continue");
-            ui.ExpectHeader("Supply chain risk");
-
-            ui.Click("Save and continue");
-            ui.ExpectHeader("Policies");
-
-            ui.Click("Save and continue");
-            ui.ExpectHeader("Due diligence");
-
-            ui.Click("Save and continue");
-            ui.ExpectHeader("Training");
+            NavigateToMonitoringProgress(ui, Organistion, YearFromTo, MoreInfoRequired);
+            
+            
 
             ui.Click("Continue");
-            ui.ExpectHeader("Monitoring progress");
-
-            ui.Click("Continue");
-            ui.ExpectHeader("Review " + YearFrom + " to " + YearTo + " group report for" + Organistion);
+            ui.ExpectHeader(That.Contains, YearFromTo + " modern slavery statement for " + Organistion) ;
 
 
         }
