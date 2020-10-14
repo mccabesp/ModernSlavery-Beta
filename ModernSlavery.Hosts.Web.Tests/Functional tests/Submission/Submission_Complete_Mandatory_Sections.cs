@@ -14,14 +14,14 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     public class Submission_Complete_Mandatory_Sections : Private_Registration_Success
     {
-        protected Organisation org;
-        [OneTimeSetUp]
-        public async Task SetUp()
-        {
-            //HostHelper.ResetDbScope();
-            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
+        //protected Organisation org;
+        //[OneTimeSetUp]
+        //public async Task SetUp()
+        //{
+        //    //HostHelper.ResetDbScope();
+        //    org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
 
-        }
+        //}
 
         [Test, Order(40)]
         public async Task StartSubmission()
