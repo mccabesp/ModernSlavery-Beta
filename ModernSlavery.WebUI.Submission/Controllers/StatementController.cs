@@ -461,8 +461,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
             else
             {
-                //Get the organisation name
-                stashedModel.GroupResults.OrganisationName = viewModel.GroupResults.OrganisationName;
+                //Get the organisation name if it's there
+                if (viewModel.GroupResults.OrganisationName != null)
+                    stashedModel.GroupResults.OrganisationName = viewModel.GroupResults.OrganisationName;
+                //else get the search keywords
+                else
+                    stashedModel.GroupResults.SearchKeywords = viewModel.GroupResults.SearchKeywords;
             }
             viewModel = stashedModel;
 
@@ -555,6 +559,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     {
                         //Remove the selected organisation
                         viewModel.StatementOrganisations.RemoveAt(removeIndex);
+                        //keep search keywords empty                       
+                        viewModel.GroupResults.SearchKeywords = null;
 
                     }
                     else

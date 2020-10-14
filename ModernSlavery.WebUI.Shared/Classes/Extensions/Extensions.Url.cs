@@ -21,14 +21,16 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             string querystring = null;
             var keys = new SortedSet<string>(newRoute.AllKeys);
             foreach (var key in keys)
-            foreach (var value in newRoute.GetValues(key))
-            {
-                if (string.IsNullOrWhiteSpace(value)) continue;
+                foreach (var value in newRoute.GetValues(key))
+                {
+                    if (string.IsNullOrWhiteSpace(value)) continue;
 
-                if (!string.IsNullOrWhiteSpace(querystring)) querystring += "&";
-
-                querystring += $"{key}={value}";
-            }
+                    foreach (var KeyValue in value.Split(','))
+                    {
+                        if (!string.IsNullOrWhiteSpace(querystring)) querystring += "&";
+                        querystring += $"{key}={KeyValue}";
+                    }
+                }
 
             return helper.Action(actionName) + "?" + querystring;
         }
@@ -56,7 +58,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
         {
             return helper.Action<TDestController>(action, null);
         }
-        public static string ActionArea(this IUrlHelper helper, string actionName, string controllerName, string areaName, object routeValues=null, string protocol=null, string host=null, string fragment = null)
+        public static string ActionArea(this IUrlHelper helper, string actionName, string controllerName, string areaName, object routeValues = null, string protocol = null, string host = null, string fragment = null)
         {
             if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentNullException(nameof(actionName));
             if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullException(nameof(controllerName));
@@ -64,10 +66,10 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 
             IDictionary<string, object> routeData = routeValues?.ToDynamic() ?? new Dictionary<string, object>();
             routeData["Area"] = areaName;
-            return helper.Action(actionName, controllerName, routeData ,protocol, host, fragment);
+            return helper.Action(actionName, controllerName, routeData, protocol, host, fragment);
         }
 
-        public static string PageArea(this IUrlHelper helper, string pageName, string areaName, string handlerName=null, object routeValues = null, string protocol = null, string host = null, string fragment = null)
+        public static string PageArea(this IUrlHelper helper, string pageName, string areaName, string handlerName = null, object routeValues = null, string protocol = null, string host = null, string fragment = null)
         {
             if (string.IsNullOrWhiteSpace(pageName)) throw new ArgumentNullException(nameof(pageName));
             if (string.IsNullOrWhiteSpace(areaName)) throw new ArgumentNullException(nameof(areaName));
@@ -76,9 +78,9 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             routeData["Area"] = areaName;
             return helper.Page(pageName, handlerName, routeData, protocol, host, fragment);
         }
-        public static bool IsAction(this IUrlHelper helper, string actionName, string controllerName=null, string areaName=null)
+        public static bool IsAction(this IUrlHelper helper, string actionName, string controllerName = null, string areaName = null)
         {
-            var currentUrl= helper.ActionContext.HttpContext.Request.Path.Value;
+            var currentUrl = helper.ActionContext.HttpContext.Request.Path.Value;
             var testUrl = string.IsNullOrWhiteSpace(areaName) ? helper.Action(actionName, controllerName) : helper.ActionArea(actionName, controllerName, areaName);
             return currentUrl.EqualsI(testUrl);
         }

@@ -25,26 +25,29 @@
                                 </p>
                                 <p class="govuk-body govuk-!-margin-bottom-2">
                                     <span class="grey-text">Submitted under </span>
-                                    <span class="blue-header govuk-!-font-weight-bold">@Html.ActionLink(organisation.ParentName, "StatementSummary", "Viewing", new { organisationIdentifier, year = organisation.SubmissionDeadlineYear })</span>
+                                    <span class="blue-header govuk-!-font-weight-bold address">@Html.ActionLink(organisation.ParentName, "StatementSummary", "Viewing", new { organisationIdentifier, year = organisation.SubmissionDeadlineYear })</span>
+                                    <span class="blue-header govuk-!-font-weight-bold small"> (@(organisation.SubmissionDeadlineYear-1) to @(organisation.SubmissionDeadlineYear))</span>
                                 </p>
                             }
                             else
                             {
-                                <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold blue-header">
-                                    @Html.ActionLink(organisation.OrganisationName, "StatementSummary", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId), year = organisation.SubmissionDeadlineYear })
-                                </p>
+                        <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold blue-header">
+                            @Html.ActionLink(organisation.OrganisationName, "StatementSummary", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId), year = organisation.SubmissionDeadlineYear })
+                            <span class="small"> (@(organisation.SubmissionDeadlineYear-1) to @(organisation.SubmissionDeadlineYear))</span>
+
+                        </p>
                                 @if (organisation.GroupSubmission)
                                 {
                                     <p class="govuk-body govuk-!-margin-bottom-2 grey-text">Reported as group</p>
                                 }
                             }
-                            <p class="govuk-body govuk-!-margin-bottom-2">@organisation.Address.GetFullAddress()</p>
+                            <p class="govuk-body govuk-!-margin-bottom-2 address">@organisation.Address.GetFullAddress()</p>
                             @if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
                             {
-                                <p class="govuk-body govuk-!-margin-bottom-2">Company number: @organisation.CompanyNumber</p>
+                                <p class="govuk-body govuk-!-margin-bottom-2 company-number">Company number: @organisation.CompanyNumber</p>
                             }
                         </div>
-                        <div class="govuk-grid-column-one-third">
+                        <div class="govuk-grid-column-one-third wide">
                             <p class="govuk-body govuk-!-margin-bottom-2">@(organisation.SubmissionDeadlineYear-1) to @(organisation.SubmissionDeadlineYear)</p>
                         </div>
                     </div>

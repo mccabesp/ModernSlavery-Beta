@@ -137,7 +137,12 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         public List<short> GetLocationRiskParentIds()
         {
-            var parentIds = LocationRisks.Where(d => d.ParentId != null).OrderBy(d => d.Description).Select(d => d.ParentId.Value).Distinct().ToList();
+            var parentIds = LocationRisks
+                // if the parent is null it is the parent
+                .Select(d => d.ParentId ?? d.Id)
+                .Distinct()
+                .OrderBy(d => d)
+                .ToList();
             return parentIds;
         }
 
