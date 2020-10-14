@@ -4,11 +4,9 @@
 @inject ModernSlavery.Core.Classes.StatementTypeIndexes.DiligenceTypeIndex _diligenceTypeIndex
 @{
     //Required for variables in Sitemap taghelpers
-    var reportingPeriod = (Model.SubmissionDeadlineYear - 1) + "-" + Model.SubmissionDeadlineYear;
-
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = Model.OrganisationName + " Modern Slavery statement" + " / " + reportingPeriod;
-    ViewBag.pageDescription = $"View {reportingPeriod} Modern Slavery statement for {Model.OrganisationName}";
+    ViewBag.Title = Model.OrganisationName + " Modern Slavery statement" + " / " + Model.SubmissionDeadlineYear;
+    ViewBag.pageDescription = $"View {Model.SubmissionDeadlineYear} Modern Slavery statement for {Model.OrganisationName}";
     ViewBag.pageClass = "organisation-report-page";
 
 }
@@ -20,7 +18,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">
-            @Model.OrganisationName modern slavery statement summary @(Model.SubmissionDeadlineYear - 1) to @Model.SubmissionDeadlineYear
+            @Model.OrganisationName modern slavery statement summary @Model.SubmissionDeadlineYear
         </h1>
 
         <details class="govuk-details" data-module="govuk-details">

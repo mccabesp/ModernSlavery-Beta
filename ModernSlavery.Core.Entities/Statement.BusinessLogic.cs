@@ -68,6 +68,8 @@ namespace ModernSlavery.Core.Entities
         {
             return Organisation.GetActiveScopeStatus(SubmissionDeadline);
         }
+
+        [Obsolete("Use reporting deadline year", true)]
         public string GetReportingPeriod()
         {
             return $"{SubmissionDeadline.AddYears(-1).ToString("yyyy")}/{SubmissionDeadline.ToString("yy")}";
