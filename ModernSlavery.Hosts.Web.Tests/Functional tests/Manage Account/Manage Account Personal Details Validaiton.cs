@@ -35,8 +35,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ChangeDetailsPage_ClickChange_GoestoPersonalDetails()
         {
             
+            //todo fix this naviation
             //Click(The.Bottom, What.Contains, "Change");
-            Goto("https://localhost:5001/manage-account/change-details");
+            Goto("/manage-account/change-details");
             await AxeHelper.CheckAccessibilityAsync(this);
 
 
