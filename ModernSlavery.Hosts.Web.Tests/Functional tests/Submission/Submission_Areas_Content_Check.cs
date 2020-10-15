@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temporary Ignore")]
+    [TestFixture]
 
 
     public class Submission_Areas_Content_Check : Private_Registration_Success
@@ -16,18 +16,23 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task StartSubmission()
         {
 
+            RefreshPage();
+
             ExpectHeader("Select an organisation");
 
-            Click(TestData.OrgName);
-
+            Click(org.OrganisationName);
+            await AxeHelper.CheckAccessibilityAsync(this);
+            SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
 
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            Click("Start Draft");
+            Click(The.Bottom, "Start Draft");
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
             ExpectHeader("Before you start");
             Click("Start now");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: org.OrganisationName);
             await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Your modern slavery statement");
             await Task.CompletedTask;

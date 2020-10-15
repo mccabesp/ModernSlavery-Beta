@@ -12,7 +12,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(40)]
         public async Task NavigateToSubmissionPage()
         {
-            Submission_Helper.NavigateToSubmission(this, Submission.OrgName_Blackpool, "2020", "2021");
+            Submission_Helper.NavigateToSubmission(this, Submission.OrgName_Blackpool, "2020 to 2021", MoreInfoRequired: true);
             await AxeHelper.CheckAccessibilityAsync(this);
             await Task.CompletedTask;
         }
