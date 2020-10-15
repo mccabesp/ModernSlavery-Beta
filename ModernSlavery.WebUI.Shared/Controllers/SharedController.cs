@@ -98,21 +98,11 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         [HttpPost("send-feedback")]
         public async Task<IActionResult> SendFeedback(FeedbackViewModel viewModel)
         {
-
-            //TODO: change to 
-            //if (!ModelState.IsValid)
-            //{
-            //    this.SetModelCustomErrors(viewModel);
-            //    return View("SendFeedback", viewModel);
-            //}
-            viewModel.ParseAndValidateParameters(Request, m => m.WhyVisitMSUSite);
-            viewModel.ParseAndValidateParameters(Request, m => m.HowEasyIsThisServiceToUse);
-
-            viewModel.ParseAndValidateParameters(Request, m => m.Details);
-
-            if (viewModel.HasAnyErrors())
-                // If there are any errors, return the user back to the same page to correct the mistakes
+            if (!ModelState.IsValid)
+            {
+                this.SetModelCustomErrors(viewModel);
                 return View("SendFeedback", viewModel);
+            }
 
             WebService.CustomLogger.Information("Feedback has been received", viewModel);
 

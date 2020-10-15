@@ -10,39 +10,29 @@ namespace ModernSlavery.WebUI.Shared.Models
 {
     public class FeedbackViewModel : GovUkViewModel
     {
-        [GovUkValidateRequired(
-            ErrorMessageIfMissing = "Select what you did on this service"
-        )]
+        [Required]
         public WhyVisitSite? WhyVisitMSUSite { get; set; }
 
-        [GovUkValidateRequired(
-           ErrorMessageIfMissing = "Select how easy or difficult this service is to use"
-         )]
+        [Required]
         public HowEasyIsThisServiceToUse? HowEasyIsThisServiceToUse { get; set; }
 
-        [GovUkValidateRequired(
-           ErrorMessageIfMissing = "Tell us how we can improve the service"
-        )]
-        [GovUkValidateCharacterCount(
-            MaxCharacters = 2000
-        )]
         [Required]
         [MaxLength(2000)]
         public string Details { get; set; }
-
+        [EmailAddress]
         public string EmailAddress { get; set; }
-
+        [Phone]
         public string PhoneNumber { get; set; }
     }
     public enum WhyVisitSite : byte
     {
-        [GovUkRadioCheckboxLabelText(Text = "Submitted a statement")]
+        [Display(Description = "Submitted a statement")]
         SubmittedAStatement = 0,
 
-        [GovUkRadioCheckboxLabelText(Text = "Viewed 1 or more statements")]
+        [Display(Description = "Viewed 1 or more statements")]
         Viewed1OrMoreStatements = 1,
 
-        [GovUkRadioCheckboxLabelText(Text = "Submitted and viewed statements")]
+        [Display(Description = "Submitted and viewed statements")]
         SubmittedAndViewedStatements = 2,
 
 
@@ -50,19 +40,19 @@ namespace ModernSlavery.WebUI.Shared.Models
 
     public enum HowEasyIsThisServiceToUse : byte
     {
-        [GovUkRadioCheckboxLabelText(Text = "Very easy")]
+        [Display(Description = "Very easy")]
         VeryEasy = 0,
 
-        [GovUkRadioCheckboxLabelText(Text = "Easy")]
+        [Display(Description = "Easy")]
         Easy = 1,
 
-        [GovUkRadioCheckboxLabelText(Text = "Neither easy nor difficult")]
+        [Display(Description = "Neither easy nor difficult")]
         Neutral = 2,
 
-        [GovUkRadioCheckboxLabelText(Text = "Difficult")]
+        [Display(Description = "Difficult")]
         Difficult = 3,
 
-        [GovUkRadioCheckboxLabelText(Text = "Very difficult")]
+        [Display(Description = "Very difficult")]
         VeryDifficult = 4
     }
 }
