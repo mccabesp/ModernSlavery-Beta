@@ -12,16 +12,26 @@ namespace ModernSlavery.Hosts.Web.Tests
     [TestFixture]
 
 
-    public class Submission_Areas_Cancel_Unsaved_Data_Exit : Private_Registration_Success
+    public class Submission_Areas_Cancel_Unsaved_Data_Exit : CreateAccount
     {
-        protected Organisation org;
+        const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
+
+        protected Organisation org;
         [OneTimeSetUp]
         public async Task SetUp()
         {
             org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
-            //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
+
+
         }
+
+        public Submission_Areas_Cancel_Unsaved_Data_Exit() : base(_firstname, _lastname, _title, _email, _password)
+        {
+
+
+        }
+
         [Test, Order(40)]
         public async Task StartSubmission()
         {
