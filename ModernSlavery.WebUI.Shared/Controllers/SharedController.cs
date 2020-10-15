@@ -202,7 +202,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
             var cookieSettingsViewModel = new CookieSettingsViewModel
             {
-                GoogleAnalyticsGpg = cookieSettings.GoogleAnalyticsGpg ? "On" : "Off",
+                GoogleAnalyticsMSU = cookieSettings.GoogleAnalyticsMSU ? "On" : "Off",
                 GoogleAnalyticsGovUk = cookieSettings.GoogleAnalyticsGovUk ? "On" : "Off",
                 ApplicationInsights = cookieSettings.ApplicationInsights ? "On" : "Off",
                 RememberSettings = cookieSettings.RememberSettings ? "On" : "Off"
@@ -216,8 +216,8 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         {
             var cookieSettings = new CookieSettings
             {
-                GoogleAnalyticsGpg =
-                    cookieSettingsViewModel != null && cookieSettingsViewModel.GoogleAnalyticsGpg == "On",
+                GoogleAnalyticsMSU =
+                    cookieSettingsViewModel != null && cookieSettingsViewModel.GoogleAnalyticsMSU == "On",
                 GoogleAnalyticsGovUk = cookieSettingsViewModel != null &&
                                        cookieSettingsViewModel.GoogleAnalyticsGovUk == "On",
                 ApplicationInsights = cookieSettingsViewModel != null &&
@@ -247,7 +247,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         {
             var cookieSettings = new CookieSettings
             {
-                GoogleAnalyticsGpg = true,
+                GoogleAnalyticsMSU = true,
                 GoogleAnalyticsGovUk = true,
                 ApplicationInsights = true,
                 RememberSettings = true
@@ -260,7 +260,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         }
 
         [HttpGet("~/cookie-details")]
-        public IActionResult c()
+        public IActionResult CookieDetails()
         {
             return View("CookieDetails");
         }
