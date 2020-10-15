@@ -1,8 +1,9 @@
-﻿@inject IWebService WebService
-@{
-    var ClientName = "Submit or view a modern slavery statement";
+﻿@using ModernSlavery.Core.Models
+@inject SharedOptions sharedOptions
+@inject IWebService WebService
+@{    
     Layout = "~/Views/DfeTemplate.cshtml";
-    ViewBag.Title = $"Sign out - {ClientName} - GOV.UK";
+    ViewBag.Title = $"Sign out - {sharedOptions.ServiceName} - GOV.UK";
 }
 
 <div class="grid-row">
@@ -10,7 +11,7 @@
         <div class="govuk-box-highlight">
             <h1 class="bold-large">Signed out</h1>
         </div>
-        <p>You are now signed out of the <span>@ClientName</span>.</p>
+        <p>You are now signed out of the <span>@sharedOptions.ServiceName</span>.</p>
 
         <div>
             <div class="subsection panel-indent">

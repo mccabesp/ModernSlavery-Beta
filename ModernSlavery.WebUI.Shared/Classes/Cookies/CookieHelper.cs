@@ -26,7 +26,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Cookies
 
             return new CookieSettings
             {
-                GoogleAnalyticsGpg = false, GoogleAnalyticsGovUk = false, ApplicationInsights = false,
+                GoogleAnalyticsMSU = false, GoogleAnalyticsGovUk = false, ApplicationInsights = false,
                 RememberSettings = false
             };
         }

@@ -42,7 +42,7 @@
     @{
         var cookieSettings = CookieHelper.GetCookieSettingsCookie(Context.Request);
     }
-    @if (cookieSettings.GoogleAnalyticsGpg || cookieSettings.GoogleAnalyticsGovUk)
+    @if (cookieSettings.GoogleAnalyticsMSU || cookieSettings.GoogleAnalyticsGovUk)
     {
         <script type="text/javascript">
 

@@ -1,4 +1,6 @@
-﻿@{
+﻿@using ModernSlavery.Core.Models
+@inject SharedOptions sharedOptions
+@{
     Layout = "~/Views/DfeTemplate.cshtml";
 }
 @model ChangeEmailStatusViewModel
@@ -12,7 +14,7 @@
             </h1>
         </div>
 
-        <p>You are now signed out of the Submit a modern slavery statement service.</p>
+        <p>You are now signed out of the @sharedOptions.ServiceName.</p>
 
     </div>
 
