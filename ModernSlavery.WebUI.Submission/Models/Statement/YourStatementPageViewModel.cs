@@ -209,7 +209,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 //The period between from and to dates must be a minimum of 12 months and a max of 24 months
                 var monthsDiff = ((StatementEndDate.Value.Year - StatementStartDate.Value.Year) * 12)
                     + StatementEndDate.Value.Month - StatementStartDate.Value.Month;
-                if (monthsDiff < 12 || monthsDiff < 24)
+                if (monthsDiff < 12 || monthsDiff > 24)
                     validationResults.AddValidationError(3135, nameof(StatementStartDate));
             }
 
