@@ -1,23 +1,50 @@
 ﻿using Geeks.Pangolin;
 using Geeks.Pangolin.Helper.UIContext;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Waiting for submission merge")]
+    [TestFixture]
 
-    public class Review_And_Edit_Link_Navigation : Registration_Public_Success
+    public class Review_And_Edit_Link_Navigation : CreateAccount
     {
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
-        [Test, Order(40)]
-        public async Task NavigateToSubmissionPage()       
+
+        protected Organisation org;
+        [OneTimeSetUp]
+        public async Task SetUp()
         {
-            Submission_Helper.NavigateToSubmission(this, Submission.OrgName_Blackpool, "2020", "2021");
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
+
+
+        }
+
+        public Review_And_Edit_Link_Navigation() : base(_firstname, _lastname, _title, _email, _password)
+        {
+
+
+        }
+
+        [Test, Order(29)]
+        public async Task RegisterOrg()
+        {
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
+            RefreshPage();
+
+            await Task.CompletedTask;
+        }
+        [Test, Order(40)]
+        public async Task NavigateToReviewAndEdit()
+        {
+
+            Submission_Helper.NavigateToSubmission(this, org.OrganisationName, "2019 to 2020", MoreInfoRequired: true);
             await AxeHelper.CheckAccessibilityAsync(this);
-            ExpectHeader("Review 2019 to 2020 group report for " + Submission.OrgName_Blackpool);
             await Task.CompletedTask;
         }
 
@@ -56,20 +83,21 @@ namespace ModernSlavery.Hosts.Web.Tests
         private static void SaveAndCancelcheck(UIContext ui, string LinkText, string HeaderText, string OrgName) 
         { 
             //navigate to page
-            ui.ExpectHeader("Review 2019 to 2020 group report for " + OrgName);
+            ui.ExpectHeader("Review before submitting");
             ui.ClickLink(LinkText);
             ui.ExpectHeader(HeaderText);
 
             //test cancel/save cancel/cancel and continue all return to draft page
             ui.Click("Continue");
-            ui.ExpectHeader("Review 2019 to 2020 group report for " + OrgName);
-           
+            ui.ExpectHeader("Review before submitting");
+
+
             ui.ClickLink(LinkText);
             ui.ExpectHeader(HeaderText);
             ui.Click("Cancel");
-            ui.Expect("You have unsaved data");
-            ui.Click("Exit without saving");
-            ui.ExpectHeader("Review 2019 to 2020 group report for " + OrgName);
+            ui.Expect("You have unsaved data, what do you want to do?");
+            ui.Click("Exit and lose changes");
+            ui.ExpectHeader("Review before submitting");
 
             ui.ClickLink(LinkText);
             ui.ExpectHeader(HeaderText);
@@ -78,7 +106,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             ui.Click("Save the data");
             ui.Expect(What.Contains, "You`ve saved a draft of your Modern Slavery Statement");
             ui.Click("Continue");
-            ui.ExpectHeader("Review 2019 to 2020 group report for " + OrgName);
+            ui.ExpectHeader("Review before submitting");
+
         }
     }
 }
