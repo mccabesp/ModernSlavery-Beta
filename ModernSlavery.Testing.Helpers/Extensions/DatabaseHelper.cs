@@ -24,7 +24,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         /// Deletes all tables in the database (except _EFMigrationsHistory) and reimports all seed data
         /// </summary>
         /// <param name="host"></param>
-        public static async System.Threading.Tasks.Task ResetDatabaseAsync(this IHost host, bool force = false)
+        public static async System.Threading.Tasks.Task ResetDatabaseAsync(this IHost host, bool force = true)
         {
             var config = host.Services.GetRequiredService<IConfiguration>();
             var vaultName = config["Vault"];
