@@ -16,6 +16,7 @@
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.ReturnToReviewPage);
+            @Html.HiddenFor(m => m.SubmissionDeadline);
             @Html.HiddenFor(m => m.Submitted);
 
             <h1 class="govuk-heading-l">
@@ -43,7 +44,7 @@
                     </span>
                     <div class="app-date-range__container">
                         <div class="app-date-range__child">
-                            <div class="govuk-date-input  @Html.SetErrorClass(new[] {nameof(Model.StatementStartDay),nameof(Model.StatementStartMonth),nameof(Model.StatementStartYear)}, "govuk-form-group--error")" id="reporting-start">
+                            <div class="govuk-date-input  @Html.SetErrorClass(new[] {nameof(Model.StatementStartDate),nameof(Model.StatementStartDay),nameof(Model.StatementStartMonth),nameof(Model.StatementStartYear)}, "govuk-form-group--error")" id="reporting-start">
                                 <div class="govuk-date-input__item">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label govuk-date-input__label" asp-for="StatementStartDay">
@@ -71,6 +72,7 @@
                                 <span asp-validation-for="StatementStartDay" class="govuk-error-message"></span>
                                 <span asp-validation-for="StatementStartMonth" class="govuk-error-message"></span>
                                 <span asp-validation-for="StatementStartYear" class="govuk-error-message"></span>
+                                <span asp-validation-for="StatementStartDate" class="govuk-error-message"></span>
                             </div>
                         </div>
                         <div class="app-date-range__child">

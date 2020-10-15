@@ -35,7 +35,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.StatementStartDate, opt => { opt.MapFrom(s => s.StatementStartDate); })
                 .ForMember(d => d.StatementEndDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.StatementEndDate); })
                 .ForMember(d => d.ApprovedDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.ApprovedDate); })
-                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForSourceMember(s => s.StatementStartYear, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.StatementStartMonth, opt => opt.DoNotValidate())
                 .ForSourceMember(s => s.StatementStartDay, opt => opt.DoNotValidate())
@@ -155,11 +154,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             // Must be a real date
             if (partsComplete && !StatementStartDate.HasValue)
-                validationResults.AddValidationError(3129);
+                validationResults.AddValidationError(3129, nameof(StatementStartDate));
 
             // Cannot be later than today's date
             if (StatementStartDate.HasValue && StatementStartDate.Value > VirtualDateTime.Now)
-                validationResults.AddValidationError(0);
+                validationResults.AddValidationError(3132, nameof(StatementStartDate));
 
             // Must be within the allowed years
             if (StatementStartYear != null && (StatementStartYear.Value > MaxStartYear || StatementStartYear.Value < MinStartYear))
@@ -186,11 +185,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             // Must be a real date
             if (partsComplete && !StatementEndDate.HasValue)
-                validationResults.AddValidationError(3130);
+                validationResults.AddValidationError(3130, nameof(StatementEndDate));
 
             // Cannot be later than today's date
             if (StatementEndDate.HasValue && StatementEndDate.Value > VirtualDateTime.Now)
-                validationResults.AddValidationError(0);
+                validationResults.AddValidationError(3133, nameof(StatementEndDate));
 
             // Must be within the allowed years
             if (StatementEndYear != null && (StatementEndYear.Value > MaxEndYear || StatementEndYear.Value < MinEndYear))
@@ -205,13 +204,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             {
                 // Can not start before it has finished
                 if (StatementStartDate.Value >= StatementEndDate.Value)
-                    validationResults.AddValidationError(0);
+                    validationResults.AddValidationError(3137, nameof(StatementStartDate));
 
                 //The period between from and to dates must be a minimum of 12 months and a max of 24 months
                 var monthsDiff = ((StatementEndDate.Value.Year - StatementStartDate.Value.Year) * 12)
                     + StatementEndDate.Value.Month - StatementStartDate.Value.Month;
                 if (monthsDiff < 12 || monthsDiff < 24)
-                    validationResults.AddValidationError(0);
+                    validationResults.AddValidationError(3135, nameof(StatementStartDate));
             }
 
             #endregion
@@ -235,15 +234,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             // Must be a real date
             if (partsComplete && !ApprovedDate.HasValue)
-                validationResults.AddValidationError(3130);
+                validationResults.AddValidationError(3130, nameof(ApprovedDate));
 
             // Cannot be later than today's date
             if (ApprovedDate.HasValue && ApprovedDate.Value > VirtualDateTime.Now)
-                validationResults.AddValidationError(0);
+                validationResults.AddValidationError(3134, nameof(ApprovedDate));
 
             // Cannot be before the statment end date
             if (ApprovedDate.HasValue && StatementEndDate.HasValue && ApprovedDate.Value < StatementEndDate.Value)
-                validationResults.AddValidationError(0);
+                validationResults.AddValidationError(3136, nameof(ApprovedDate));
 
             // Must be within the allowed years
             if (ApprovedYear != null && (ApprovedYear.Value > MaxApprovedYear || ApprovedYear.Value < MinApprovedYear))
