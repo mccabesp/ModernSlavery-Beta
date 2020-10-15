@@ -31,30 +31,38 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
         private Organisation org;
+
+        [OneTimeSetUp]
+
+        public void OTSetUp()
+        {
+            //(TestRunSetup.TestWebHost.GetDbContext() as Microsoft.EntityFrameworkCore.DbContext)
+
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
+            //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)
+
+        }
+
+
         [Test, Order(20)]
         public async Task AddSecurityCode()
         {
-            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
+            DeleteCookiesAndReturnToRoot(this);
 
-            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
+            await AxeHelper.CheckAccessibilityAsync(this);
+            await this.SetSecurityCode(org, new DateTime(2021, 6, 10));
 
-            var result = this.GetSecurityCodeBusinessLogic().CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
 
-            if (result.Failed)
-            {
-                throw new Exception("Unable to set security code");
-            }
+            await Task.CompletedTask;
 
-            await this.SaveDatabaseAsync();
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);           
 
             await Task.CompletedTask;
         }
 
         [Test, Order(22)]
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
-        {
-            Click("Sign out");
-            ExpectHeader("Signed out");
+        {            
             Goto(ScopeConstants.ScopeUrl);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
             await Task.CompletedTask;
