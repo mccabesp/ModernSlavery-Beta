@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temp ignore while setup fixed, logic fine")]
+    [TestFixture]
 
 
     public class Submission_Areas_Cancel_Unsaved_Data_Save : Private_Registration_Success
