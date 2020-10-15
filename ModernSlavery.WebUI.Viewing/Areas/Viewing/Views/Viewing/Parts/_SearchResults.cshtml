@@ -33,7 +33,7 @@
                             {
                         <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold blue-header">
                             @Html.ActionLink(organisation.OrganisationName, "StatementSummary", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId), year = organisation.SubmissionDeadlineYear })
-                            <span class="small"> (@(organisation.SubmissionDeadlineYear-1) to @(organisation.SubmissionDeadlineYear))</span>
+                            <span class="small"> (@organisation.SubmissionDeadlineYear)</span>
 
                         </p>
                                 @if (organisation.GroupSubmission)

@@ -105,7 +105,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
             if (years.Count()>1)
                 SetDownloadDisposition($"StatementSummaries{years[0]}-{years[years.Length - 1].ToString().Substring(2)}");
             else if (years.Any())
-                SetDownloadDisposition($"StatementSummaries{years[0]-1}-{years[0].ToString().Substring(2)}");
+                SetDownloadDisposition($"StatementSummaries{years[0]}");
             else
                 SetDownloadDisposition($"StatementSummaries");
 
