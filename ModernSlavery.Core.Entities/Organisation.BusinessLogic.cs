@@ -35,7 +35,7 @@ namespace ModernSlavery.Core.Entities
         public string GetLatestSicSource()
         {
             return OrganisationSicCodes.Where(s =>
-                    s.Retired == null).OrderByDescending(s=>s.Created).FirstOrDefault()
+                    s.Retired == null).OrderByDescending(s => s.Created).FirstOrDefault()
                 ?.Source;
         }
         public string GetSicSource(DateTime accountingDate)
@@ -57,7 +57,7 @@ namespace ModernSlavery.Core.Entities
 
         public IEnumerable<OrganisationSicCode> GetLatestSicCodes()
         {
-            return OrganisationSicCodes.Where(s =>s.Retired == null).OrderByDescending(s=>s.Created);
+            return OrganisationSicCodes.Where(s => s.Retired == null).OrderByDescending(s => s.Created);
         }
 
         public IEnumerable<int> GetLatestSicCodeIds(string delimiter = ", ")
@@ -135,7 +135,7 @@ namespace ModernSlavery.Core.Entities
         /// <returns></returns>
         public string GetPreviousName(DateTime? reportingDeadline = null)
         {
-            if (reportingDeadline.HasValue)return OrganisationNames.Where(n => n.Created < reportingDeadline.Value).OrderByDescending(n => n.Created).Skip(1).Select(n => n.Name).FirstOrDefault();
+            if (reportingDeadline.HasValue) return OrganisationNames.Where(n => n.Created < reportingDeadline.Value).OrderByDescending(n => n.Created).Skip(1).Select(n => n.Name).FirstOrDefault();
             return OrganisationNames.OrderByDescending(n => n.Created).Skip(1).Select(n => n.Name).FirstOrDefault();
         }
 
@@ -263,7 +263,7 @@ namespace ModernSlavery.Core.Entities
         {
             if (newScope != null && newScope.Status != ScopeRowStatuses.Active) throw new ArgumentException($"Cannot set latest scope with status={newScope.Status}");
 
-             LatestScope = newScope ?? OrganisationScopes.OrderBy(a => a.SubmissionDeadline).ThenBy(s => s.ScopeStatusDate).LastOrDefault(a => a.Status == ScopeRowStatuses.Active);
+            LatestScope = newScope ?? OrganisationScopes.OrderBy(a => a.SubmissionDeadline).ThenBy(s => s.ScopeStatusDate).LastOrDefault(a => a.Status == ScopeRowStatuses.Active);
         }
 
         /// <summary>
@@ -348,11 +348,14 @@ namespace ModernSlavery.Core.Entities
                 // presumed scope from created date
                 if (shouldPresumeScope)
                 {
-                    var createdAfterDeadlineYear = Created >= reportingDeadline;
-                    if (createdAfterDeadlineYear)
-                        prevYearScope = ScopeStatuses.PresumedOutOfScope;
-                    else
+                    // the first year considered presumed in scope
+                    // is the first year with a deadline before the created date
+                    // plus all subsequent years
+                    var isPresumedIn = reportingDeadline.AddYears(1) >= Created;
+                    if (isPresumedIn)
                         prevYearScope = ScopeStatuses.PresumedInScope;
+                    else
+                        prevYearScope = ScopeStatuses.PresumedOutOfScope;
                 }
                 // otherwise presume scope from declared scope
                 else if (prevYearScope == ScopeStatuses.InScope)
@@ -404,9 +407,9 @@ namespace ModernSlavery.Core.Entities
             return Status == Entities.OrganisationStatuses.Pending;
         }
 
-        public bool GetWasDissolvedBefore(DateTime? accountingDate=null)
+        public bool GetWasDissolvedBefore(DateTime? accountingDate = null)
         {
-            return DateOfCessation != null && (accountingDate==null || DateOfCessation < accountingDate.Value);
+            return DateOfCessation != null && (accountingDate == null || DateOfCessation < accountingDate.Value);
         }
 
         public bool GetIsCurrentlyDissolved()
@@ -427,7 +430,7 @@ namespace ModernSlavery.Core.Entities
                 ByUserId = byUserId
             };
             OrganisationStatuses.Add(organisationStatus);
-                
+
             Status = status;
             StatusDate = VirtualDateTime.Now;
             StatusDetails = details;

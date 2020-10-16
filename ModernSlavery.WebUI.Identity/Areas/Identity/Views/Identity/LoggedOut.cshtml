@@ -1,11 +1,12 @@
 ﻿@model ModernSlavery.WebUI.Identity.Models.LoggedOutViewModel
+@using ModernSlavery.Core.Models
+@inject SharedOptions sharedOptions
 
 @{
     Layout = "~/Views/DfeTemplate.cshtml";
     // set this so the layout rendering sees an anonymous user
     ViewData["signed-out"] = true;
-    ViewData["PageTitle"] = "Sign out - Modern Slavery reporting service - GOV.UK";
-    var ClientName = "Submit or view a modern slavery statement";
+    ViewData["PageTitle"] = $"Sign out - {sharedOptions.ServiceName} - GOV.UK";   
 }
 @section Head {
     <script type="text/javascript">
@@ -21,7 +22,7 @@
         <div class="govuk-box-highlight">
             <h1 class="bold-large">Signed out</h1>
         </div>
-        <p>You are now signed out of the @ClientName.</p>
+        <p>You are now signed out of the @sharedOptions.ServiceName</p>
 
         @if (Model.PostLogoutRedirectUri != null)
         {

@@ -18,55 +18,66 @@
     <div class="govuk-grid-column-two-thirds">
         <form method="POST" action="@Url.Action("SendFeedback", "Shared")">
             @(Html.AntiForgeryToken())
+            @(await Html.GovUkValidationSummaryAsync())          
+
             <h1 class="govuk-heading-l">Send us feedback</h1>
             <div class="govuk-form-group">
 
-                @(Html.GovUkErrorSummary(new[]
-                {
-                    nameof(FeedbackViewModel.WhyVisitMSUSite),
-                    nameof(FeedbackViewModel.HowEasyIsThisServiceToUse),
-                    nameof(FeedbackViewModel.Details)
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.WhyVisitMSUSite, "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset govuk-!-margin-top-6">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            <h1 class="govuk-fieldset__heading">
+                                What did you do on this service?
+                            </h1>
+                        </legend>
+                        <div class="govuk-radios">
+                            @foreach (var reason in Enums.GetValues<WhyVisitSite>())
+                            {
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="WhyVisit-@(reason)" name="WhyVisitMSUSite" type="radio" value="@(reason)" checked="@(Model.WhyVisitMSUSite == reason)">
+                                    <label class="govuk-label govuk-radios__label" for="WhyVisit-@(reason)">
+                                        @(reason.GetDisplayDescription())
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </fieldset>
+                    <span asp-validation-for="WhyVisitMSUSite" class="govuk-error-message"></span>
+                </div>
 
-                }))
-                @(Html.GovUkRadiosFor(
-                    m =>m.WhyVisitMSUSite,
-                    new FieldsetViewModel
-                    {
-                        Legend = new LegendViewModel
-                        {
-                            Text = "What did you do on this service?",
-                            Classes = "govuk-fieldset__legend--m"
-                        },
-                        Classes = "govuk-!-margin-top-6"
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.HowEasyIsThisServiceToUse, "govuk-form-group--error")">
+                    <fieldset class="govuk-fieldset govuk-!-margin-top-6">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            <h1 class="govuk-fieldset__heading">
+                                How easy or difficult was it to use the service?
+                            </h1>
+                        </legend>
+                        <div class="govuk-radios">
+                            @foreach (var reason in Enums.GetValues<HowEasyIsThisServiceToUse>())
+                            {
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="HowEasy-@(reason)" name="HowEasyIsThisServiceToUse" type="radio" value="@(reason)" checked="@(Model.HowEasyIsThisServiceToUse == reason)">
+                                    <label class="govuk-label govuk-radios__label" for="HowEasy-@(reason)">
+                                        @(reason.GetDisplayDescription())
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </fieldset>
+                    <span asp-validation-for="HowEasyIsThisServiceToUse" class="govuk-error-message"></span>
+                </div>
 
-                    }
-                  ))
-                @(Html.GovUkRadiosFor(
-                    m => m.HowEasyIsThisServiceToUse,
-                    new FieldsetViewModel
-                    {
-                        Legend = new LegendViewModel
-                        {
-                            Text = "How easy or difficult was it to use the service?",
-                            Classes = "govuk-fieldset__legend--m"
-                        },
-                        Classes = "govuk-!-margin-top-6"
-                    }
-                    ))
-                @(Html.GovUkCharacterCountFor(
-                    m => m.Details,
-                    labelOptions: new LabelViewModel
-                    {
-                        Text = "How can we improve the service?",
-                        Classes = "govuk-label--m"
-                    },
-                    formGroupOptions: new FormGroupViewModel
-                    {
-                        Classes = "govuk-!-margin-top-6"
-                    }
-                    ))
+                <div class="govuk-character-count @Html.SetErrorClass(model => model.Details, "govuk-form-group--error")" data-module="govuk-character-count" data-maxlength="2000">
+                    <div class="govuk-form-group govuk-!-margin-top-6">
+                        <label class="govuk-label govuk-label--m" for="details">
+                            How can we improve the service?
+                        </label>
+                        <textarea class="govuk-textarea govuk-js-character-count" id="details" name="Details" rows="5" aria-describedby="hint-info details-info">@Model.Details</textarea>
+                    </div>
+                    <span asp-validation-for="Details" class="govuk-error-message"></span>
+                </div>
 
-                <fieldset class="govuk-fieldset">                    
+                <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-!-margin-bottom-4">
                         <label class="govuk-label govuk-label--m">
                             Further feedback
@@ -75,24 +86,18 @@
                         To find out how we'll handle your data, see our <a href="@Url.Action("PrivacyPolicy", "Shared")">Privacy policy</a>.
                     </legend>
 
-                    @(Html.GovUkTextInput(new TextInputViewModel
-                {
-                    Label = new LabelViewModel
-                    {
-                        Text = "Your email address (optional)"
-                    },
-                    Name = nameof(Model.EmailAddress),
-                    InputMode = "email",                    
-                }))
-                    @(Html.GovUkTextInput(new TextInputViewModel
-                    {
-                        Label = new LabelViewModel
-                        {
-                            Text = "Your phone number (optional)"
-                        },
-                        Name = nameof(Model.PhoneNumber),
-                        InputMode = "tel"
-                    }))
+                    <div class="govuk-form-group @Html.SetErrorClass(model => model.EmailAddress, "govuk-form-group--error")">
+                        <label asp-for="EmailAddress" class="govuk-label">Your email address (optional)</label>
+                        <input asp-for="EmailAddress" class="govuk-input govuk-input--width-20" spellcheck="false">
+                        <span asp-validation-for="EmailAddress" class="govuk-error-message"></span>
+                    </div>
+
+                    <div class="govuk-form-group @Html.SetErrorClass(model => model.PhoneNumber, "govuk-form-group--error")">
+                        <label asp-for="PhoneNumber" class="govuk-label">Your phone number(optional)</label>
+                        <input asp-for="PhoneNumber" class="govuk-input govuk-input--width-20" spellcheck="false">
+                        <span asp-validation-for="PhoneNumber" class="govuk-error-message"></span>
+                    </div>
+
                 </fieldset>
 
                 <div class="govuk-inset-text">

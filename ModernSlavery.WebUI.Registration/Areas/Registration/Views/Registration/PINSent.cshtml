@@ -1,7 +1,9 @@
-﻿@inject IWebService WebService
+﻿@using ModernSlavery.Core.Models
+@inject SharedOptions sharedOptions
+@inject IWebService WebService
 @{
     Layout = "~/Views/DfeTemplate.cshtml";
-    ViewBag.Title = "PIN confirmation - Modern Slavery reporting service";
+    ViewBag.Title = $"PIN confirmation - {sharedOptions.ServiceName}";
 }
 @model string
 <main id="content" role="main">
@@ -16,7 +18,7 @@
                     <h1 class="bold-medium">We're sending a PIN by post to the following name and address:</h1>
                 </div>
                 <div id="default-content" class="dynamic-content default-content ltd" style="display: block;">
-                    <p>@ViewBag.UserFullName (@ViewBag.UserJobTitle),<br> @ViewBag.Organisation, <br/>@Html.Raw(ViewBag.Address)</p>
+                    <p>@ViewBag.UserFullName (@ViewBag.UserJobTitle),<br> @ViewBag.Organisation, <br />@Html.Raw(ViewBag.Address)</p>
 
                 </div>
                 @if (!string.IsNullOrWhiteSpace(ViewBag.PinCode))
@@ -26,7 +28,7 @@
                 <div class="bold-small">What happens next.</div>
                 <p>Your PIN should arrive within 7 days.</p>
                 <p>
-                    When you get it, sign in to the&nbsp;<a href="@Url.Action("ActivateService", new {id = Model})">Submit a modern slavery statement service</a> and use the PIN to activate the service.
+                    When you get it, sign in to the&nbsp;<a href="@Url.Action("ActivateService", new {id = Model})">@sharedOptions.ServiceName</a> and use the PIN to activate the service.
                 </p>
                 <div class="bold-small">
                     More options

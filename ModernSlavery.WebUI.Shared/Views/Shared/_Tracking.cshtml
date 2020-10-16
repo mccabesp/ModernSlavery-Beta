@@ -59,7 +59,7 @@
         deleteCookie('_gat');
     }
 
-    @if (cookieSettings.GoogleAnalyticsGpg || cookieSettings.GoogleAnalyticsGovUk || testOptions.ForceGoogleAnalyticsTracking)
+    @if (cookieSettings.GoogleAnalyticsMSU || cookieSettings.GoogleAnalyticsGovUk || testOptions.ForceGoogleAnalyticsTracking)
     {
         @:initialiseGoogleAnalytics();
     }
@@ -67,7 +67,7 @@
     {
         @:deleteGoogleAnalyticsCookies();
     }
-    @if (cookieSettings.GoogleAnalyticsGpg || testOptions.ForceGoogleAnalyticsTracking)
+    @if (cookieSettings.GoogleAnalyticsMSU || testOptions.ForceGoogleAnalyticsTracking)
     {
         @:sendGpgPageView();
     }
