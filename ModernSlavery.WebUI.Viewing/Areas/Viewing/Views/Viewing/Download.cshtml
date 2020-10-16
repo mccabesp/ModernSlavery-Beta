@@ -37,15 +37,14 @@
         </h2>
         @foreach (var deadlineYear in ReportingDeadlineHelper.GetReportingDeadlines(SectorTypes.Public))
         {
-            var fromYear = deadlineYear.Year - 1;
             <div class="app-download--row govuk-!-margin-top-3">
                 <img class="app-download--image" src="/assets/images/download.svg" alt="Download">
                 <div class="app-download--text govuk-!-font-size-27">
                     <a class="govuk-link"
-                       href="/Api/Public/StatementSummaries@($"{fromYear}-{deadlineYear.Year}").csv"
+                       href="/Api/Public/StatementSummaries@(deadlineYear.Year).csv"
                        download="true"
                        data-name="download"
-                       target="_blank">Modern slavery statement summaries (@fromYear to @deadlineYear.Year)</a>
+                       target="_blank">Modern slavery statement summaries (@deadlineYear.Year)</a>
                     <p class="govuk-body govuk-!-font-size-14 govuk-!-margin-top-2">CSV</p> @* TODO - File size *@
                 </div>
             </div>
