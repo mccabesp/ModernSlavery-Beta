@@ -42,9 +42,9 @@
                     <span id="reporting-start-hint" class="govuk-hint">
                         For example, 31 3 1980
                     </span>
-                    <div class="app-date-range__container">
+                    <div class="app-date-range__container @Html.SetErrorClass(new[] {nameof(Model.StatementStartDate),nameof(Model.StatementStartDay),nameof(Model.StatementStartMonth),nameof(Model.StatementStartYear),nameof(Model.StatementEndDay),nameof(Model.StatementEndMonth),nameof(Model.StatementEndYear)}, "govuk-form-group--error")">
                         <div class="app-date-range__child">
-                            <div class="govuk-date-input  @Html.SetErrorClass(new[] {nameof(Model.StatementStartDate),nameof(Model.StatementStartDay),nameof(Model.StatementStartMonth),nameof(Model.StatementStartYear)}, "govuk-form-group--error")" id="reporting-start">
+                            <div class="govuk-date-input" id="reporting-start">
                                 <div class="govuk-date-input__item">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label govuk-date-input__label" asp-for="StatementStartDay">
@@ -69,17 +69,13 @@
                                         <input asp-for="StatementStartYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="number" min="@Model.MinStartYear" max="@Model.MaxStartYear" inputmode="number" placeholder="YYYY">
                                     </div>
                                 </div>
-                                <span asp-validation-for="StatementStartDay" class="govuk-error-message"></span>
-                                <span asp-validation-for="StatementStartMonth" class="govuk-error-message"></span>
-                                <span asp-validation-for="StatementStartYear" class="govuk-error-message"></span>
-                                <span asp-validation-for="StatementStartDate" class="govuk-error-message"></span>
                             </div>
                         </div>
                         <div class="app-date-range__child">
                             <p class="govuk-body">to</p>
                         </div>
                         <div class="app-date-range__child">
-                            <div class="govuk-date-input @Html.SetErrorClass(new[] {nameof(Model.StatementEndDay),nameof(Model.StatementEndMonth),nameof(Model.StatementEndYear)}, "govuk-form-group--error")" id="reporting-end">
+                            <div class="govuk-date-input" id="reporting-end">
                                 <div class="govuk-date-input__item">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label govuk-date-input__label" asp-for="StatementEndDay">
@@ -104,11 +100,16 @@
                                         <input asp-for="StatementEndYear" class="govuk-input govuk-date-input__input govuk-input--width-3" type="number" min="@Model.MinEndYear" max="@Model.MaxEndYear" inputmode="number" placeholder="YYYY">
                                     </div>
                                 </div>
-                                <span asp-validation-for="StatementEndDay" class="govuk-error-message"></span>
-                                <span asp-validation-for="StatementEndMonth" class="govuk-error-message"></span>
-                                <span asp-validation-for="StatementEndYear" class="govuk-error-message"></span>
                             </div>
                         </div>
+
+                        <span asp-validation-for="StatementStartDay" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementStartMonth" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementStartYear" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementStartDate" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementEndDay" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementEndMonth" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementEndYear" class="govuk-error-message"></span>
                     </div>
                 </fieldset>
             </div>
@@ -139,7 +140,7 @@
                 </div>
             </fieldset>
 
-            <div class="govuk-form-group @Html.SetErrorClass(new[] {nameof(Model.ApprovedDay),nameof(Model.ApprovedMonth),nameof(Model.ApprovedYear)}, "govuk-form-group--error")">
+            <div class="govuk-form-group @Html.SetErrorClass(new[] {nameof(Model.ApprovedDate), nameof(Model.ApprovedDay),nameof(Model.ApprovedMonth),nameof(Model.ApprovedYear)}, "govuk-form-group--error")">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="statement-approved-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
