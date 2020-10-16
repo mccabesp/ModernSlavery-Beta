@@ -64,7 +64,7 @@
             else
             {
                 <th scope="row" class="govuk-table__cell" rowspan="@(Model.OrganisationScopes.Count(s => s.SubmissionDeadline == scope.SubmissionDeadline))">
-                    @(ReportingPeriodHelper.FormatReportingPeriod(scope.SubmissionDeadline.Year))
+                    @scope.SubmissionDeadline.Year
                 </th>
             }
             <td class="govuk-table__cell">@(scope.ScopeStatus)</td>
@@ -81,7 +81,7 @@
                 <td class="govuk-table__cell" rowspan="@(Model.OrganisationScopes.Count(s => s.SubmissionDeadline == scope.SubmissionDeadline))">
                     <a href="@Url.Action("ChangeScopeGet", "AdminOrganisationScope", new {id = scope.OrganisationId, year = scope.SubmissionDeadline.Year})"
                        class="govuk-link">
-                        Change <span class="govuk-visually-hidden"> scope for @(ReportingPeriodHelper.FormatReportingPeriod(scope.SubmissionDeadline.Year))</span>
+                        Change <span class="govuk-visually-hidden"> scope for @scope.SubmissionDeadline.Year</span>
                     </a>
                 </td>
             }

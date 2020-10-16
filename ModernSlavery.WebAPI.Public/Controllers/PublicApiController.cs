@@ -105,7 +105,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
             if (years.Count()>1)
                 SetDownloadDisposition($"StatementSummaries{years[0]}-{years[years.Length - 1].ToString().Substring(2)}");
             else if (years.Any())
-                SetDownloadDisposition($"StatementSummaries{years[0]-1}-{years[0].ToString().Substring(2)}");
+                SetDownloadDisposition($"StatementSummaries{years[0]}");
             else
                 SetDownloadDisposition($"StatementSummaries");
 
@@ -148,8 +148,43 @@ namespace ModernSlavery.WebAPI.Public.Controllers
             }
 
             var years = Enumerable.Range(fromYear, (toYear-fromYear)+1).ToList();
-            if (fromYear==toYear-1)years.RemoveAt(0);
             var statementSummaryModels = ListStatementSummariesAsync(years.ToArray());
+
+            // build the result view model
+            await foreach (var statementSummaryModel in statementSummaryModels)
+                yield return statementSummaryModel;
+        }
+
+        /// <summary>
+        /// Returns a file containing a list of statement summaries submitted for the specified year in a specified format
+        /// </summary>
+        /// <param name="year">The reporting year</param>
+        /// <param name="extension">The file type to return (i.e., 'json', 'csv' or 'xml')</param>
+        /// <returns></returns>
+        [HttpGet("StatementSummaries{year}.{extension}")]
+        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryViewModel>))]
+        public async IAsyncEnumerable<StatementSummaryViewModel> ListStatementSummariesAsync(int year, string extension)
+        {
+            //Ensure search service is enabled
+            if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable, "Service is disabled");
+
+            //Check the parameters
+            if (year == 0) throw new HttpException(HttpStatusCode.BadRequest, $"{nameof(year)} cannot be 0");
+
+            year = year.ToFourDigitYear();
+
+            switch (extension?.ToLower())
+            {
+                case "json":
+                case "csv":
+                case "xml":
+                    Request.Headers["accept"] = $"application/{extension}";
+                    break;
+                default:
+                    throw new HttpException(HttpStatusCode.BadRequest, $"{nameof(extension)} must be 'json', 'csv' or 'xml'");
+            }
+
+            var statementSummaryModels = ListStatementSummariesAsync(new [] { year });
 
             // build the result view model
             await foreach (var statementSummaryModel in statementSummaryModels)

@@ -428,8 +428,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var result = new List<string>();
             foreach (var statement in statements)
             {
-                result.Add($"{statement.Organisation.OrganisationName}'s {statement.SubmissionDeadline.Year - 1} to {statement.SubmissionDeadline.Year} group submission, published on {statement.Modified:d MMM yyyy}");
-
+                result.Add($"{statement.Organisation.OrganisationName}'s {statement.SubmissionDeadline.Year} group submission, published on {statement.Modified:d MMM yyyy}");
             }
             return result;
         }
@@ -921,7 +920,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             {
                 var submission = await FindSubmittedStatementAsync(organisationId, reportingDeadlineYear);
                 if (submission != null)
-                    results.Add($"{reportingDeadlineYear - 1} to {reportingDeadlineYear} statement for\n{submission.Organisation.OrganisationName}\n" +
+                    results.Add($"{reportingDeadlineYear} statement for\n{submission.Organisation.OrganisationName}\n" +
                         $"(submitted to our service on {submission.Modified:d MMM yyyy})");
                 else
                 {
@@ -934,14 +933,14 @@ namespace ModernSlavery.BusinessDomain.Submission
                     {
                         var organisation = await _organisationBusinessLogic.DataRepository.GetAsync<Organisation>(organisationId);
                         if (organisation != null)
-                            results.Add($"{reportingDeadlineYear - 1} to {reportingDeadlineYear} statement for\n{organisation.OrganisationName}\n" +
+                            results.Add($"{reportingDeadlineYear} statement for\n{organisation.OrganisationName}\n" +
                                 $"(draft submission in progress on our service)");
                     }
                 }
 
                 var groupSubmissions = await FindGroupSubmissionStatementsAsync(organisationId, reportingDeadlineYear);
                 foreach (var groupSubmission in groupSubmissions)
-                    results.Add($"{reportingDeadlineYear - 1} to {reportingDeadlineYear} statement for\n{groupSubmission.Organisation.OrganisationName}\n" +
+                    results.Add($"{reportingDeadlineYear} statement for\n{groupSubmission.Organisation.OrganisationName}\n" +
                         $"(submitted to our service on {groupSubmission.Modified:d MMM yyyy})");
             }
             return results;

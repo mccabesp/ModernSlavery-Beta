@@ -1,17 +1,17 @@
 ﻿@model GroupSearchViewModel
 
-            @if (Model.ShowBanner == true)
-            {
-                <div class="govuk-inset-text floating-summary">
-                    <h3 class="govuk-heading-m">@Model.StatementOrganisations.Count  @(Model.StatementOrganisations.Count == 1 ? "organisation" : "organisations") included</h3>
-                    <p class="govuk-body"> in @Model.OrganisationName group statement (@(Model.ReportingDeadlineYear - 1) to @(Model.ReportingDeadlineYear)) </p>
-                    <a class="govuk-body" href="@Model.GroupReviewUrl">See which organisations you've selected</a>
-                </div>
-            }
-            else
-            {
-            <h2 class="govuk-heading-s">
-                @(Model.OrganisationName) <a class="govuk-link" href="@Model.GroupReviewUrl">group statement</a> (@(Model.ReportingDeadlineYear - 1) to @(Model.ReportingDeadlineYear))
-            </h2>
-            }
+@if (Model.ShowBanner == true)
+{
+    <div class="govuk-inset-text floating-summary">
+        <h3 class="govuk-heading-m">@Model.StatementOrganisations.Count  @(Model.StatementOrganisations.Count == 1 ? "organisation" : "organisations") included</h3>
+        <p class="govuk-body"> in @Model.OrganisationName group statement (@(Model.ReportingDeadlineYear)) </p>
+        <a class="govuk-body" href="@Model.GroupReviewUrl">See which organisations you've selected</a>
+    </div>
+}
+else
+{
+    <h2 class="govuk-heading-s">
+        @(Model.OrganisationName) <a class="govuk-link" href="@Model.GroupReviewUrl">group statement</a> (@(Model.ReportingDeadlineYear))
+    </h2>
+}
 
