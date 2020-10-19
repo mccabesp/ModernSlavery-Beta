@@ -16,7 +16,7 @@ using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temporary igore")]
+    [TestFixture]
 
     public class Manage_Orgnaisation_Content_Check : CreateAccount
     {
@@ -37,18 +37,26 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Expect("Use this page to access your registered organisations or to register a new organisation.");
 
-            Expect("Once you have selected an organisation you can:");
-            Expect("- state whether this organisation is required to publish an annual modern slavery statement");
-            Expect("-provide a link to the full modern slavery statement published on the organisations website");
-            Expect("-enter information about this organisations modern slavery statement");
-            Expect("-save this information as a draft, and complete it at a later date before submitting it.");
+            Expect("Once you've selected an organisation (by clicking on its name, below) you can:");
+            Expect("state whether this organisation is required to publish an annual modern slavery statement");
+            Expect("provide a link to the full modern slavery statement published on the organisation's website");
+            Expect("enter information about this organisation's modern slavery statement");
+            Expect("save this information as a draft, and complete it at a later date before submitting it");
 
-            Expect("The information that you submit will be published as a Modern slavery statement report in the `Find and view a modern slavery statement service.`");
+            Expect("The information you submit will be published on our viewing service as a summary of your modern slavery statement.");
 
-            Expect("Registar an organisation");
+            Expect("Register an organisation");
 
-            ExpectHeader("Help make the service better");
-            Expect("We want to understand what our users want so that we can create a better service. Complete our service and make your voice heard.");
+            ExpectHeader("Need to close your account?");
+            Expect(What.Contains, "If you created an account by mistake or no longer responsible");
+            Expect(What.Contains, "for reporting Modern Slavery statement you can close your account in");
+            ExpectLink(That.Contains, "manage account");
+
+
+            Expect("Help us improve this service");
+            Expect(What.Contains, "We want to understand what our users want so that we can");
+            Expect(What.Contains, "create a better service.");
+            Expect(What.Contains, "Take part in our survey and make your voice heard.");
             Expect("Complete our survey");
             await Task.CompletedTask;
         }
