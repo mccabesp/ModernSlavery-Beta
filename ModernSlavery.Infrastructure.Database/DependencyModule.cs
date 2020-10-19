@@ -76,18 +76,21 @@ namespace ModernSlavery.Infrastructure.Database
                     Task.Run(async () => { importImportPublicOrganisations = await fileRepository.PushRemoteFileAsync(Filenames.ImportPublicOrganisations, _sharedOptions.DataPath); })
                 );
 
-                //Reimport to database whenever migrations are applied or new file was imported
-                var dbContext = lifetimeScope.Resolve<IDbContext>();
-                var _dataImporter = lifetimeScope.Resolve<IDataImporter>();
-                if (dbContext.MigrationsApplied || importSicSections) _dataImporter.ImportSICSectionsAsync().Wait();
-                if (dbContext.MigrationsApplied || importSicCodes) _dataImporter.ImportSICCodesAsync().Wait();
-                if (dbContext.MigrationsApplied || importStatementDiligenceTypes) _dataImporter.ImportStatementDiligenceTypesAsync().Wait();
-                if (dbContext.MigrationsApplied || importStatementPolicyTypes) _dataImporter.ImportStatementPolicyTypesAsync().Wait();
-                if (dbContext.MigrationsApplied || importStatementRiskTypes) _dataImporter.ImportStatementRiskTypesAsync().Wait();
-                if (dbContext.MigrationsApplied || importStatementSectorTypes) _dataImporter.ImportStatementSectorTypesAsync().Wait();
-                if (dbContext.MigrationsApplied || importStatementTrainingTypes) _dataImporter.ImportStatementTrainingTypesAsync().Wait();
-                if (dbContext.MigrationsApplied || importImportPrivateOrganisations) _dataImporter.ImportPrivateOrganisationsAsync(-1).Wait();
-                if (dbContext.MigrationsApplied || importImportPublicOrganisations) _dataImporter.ImportPublicOrganisationsAsync(-1).Wait();
+                if (_databaseOptions.ImportSeedData)
+                {
+                    //Reimport to database whenever migrations are applied or new file was imported
+                    var dbContext = lifetimeScope.Resolve<IDbContext>();
+                    var _dataImporter = lifetimeScope.Resolve<IDataImporter>();
+                    if (dbContext.MigrationsApplied || importSicSections) _dataImporter.ImportSICSectionsAsync().Wait();
+                    if (dbContext.MigrationsApplied || importSicCodes) _dataImporter.ImportSICCodesAsync().Wait();
+                    if (dbContext.MigrationsApplied || importStatementDiligenceTypes) _dataImporter.ImportStatementDiligenceTypesAsync().Wait();
+                    if (dbContext.MigrationsApplied || importStatementPolicyTypes) _dataImporter.ImportStatementPolicyTypesAsync().Wait();
+                    if (dbContext.MigrationsApplied || importStatementRiskTypes) _dataImporter.ImportStatementRiskTypesAsync().Wait();
+                    if (dbContext.MigrationsApplied || importStatementSectorTypes) _dataImporter.ImportStatementSectorTypesAsync().Wait();
+                    if (dbContext.MigrationsApplied || importStatementTrainingTypes) _dataImporter.ImportStatementTrainingTypesAsync().Wait();
+                    if (dbContext.MigrationsApplied || importImportPrivateOrganisations) _dataImporter.ImportPrivateOrganisationsAsync(-1).Wait();
+                    if (dbContext.MigrationsApplied || importImportPublicOrganisations) _dataImporter.ImportPublicOrganisationsAsync(-1).Wait();
+                }
             }
         }
 
