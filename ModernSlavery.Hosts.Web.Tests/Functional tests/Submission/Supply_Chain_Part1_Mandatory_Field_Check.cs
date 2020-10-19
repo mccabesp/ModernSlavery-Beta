@@ -1,21 +1,50 @@
 ﻿using Geeks.Pangolin;
 using Geeks.Pangolin.Helper.UIContext;
+using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture, Ignore("Awaiting Submission merge")]
 
-    public class Supply_Chain_Part1_Mandatory_Field_Check : Private_Registration_Success
+    public class Supply_Chain_Part1_Mandatory_Field_Check : CreateAccount
     {
-        [Test, Order(40)]
+        const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
+
+
+        protected Organisation org;
+        [OneTimeSetUp]
+        public async Task SetUp()
+        {
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
+
+
+        }
+
+        public Supply_Chain_Part1_Mandatory_Field_Check() : base(_firstname, _lastname, _title, _email, _password)
+        {
+
+
+        }
+
+        [Test, Order(29)]
+        public async Task RegisterOrg()
+        {
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
+            RefreshPage();
+
+            await Task.CompletedTask;
+        }
+        [Test
+            , Order(40)]
         public async Task NavigateToSCRPart1()
         {
-            Submission_Helper.NavigateToSupplyChainRisks1(this, Submission.OrgName_Blackpool, "2019/2020");
+            Submission_Helper.NavigateToSupplyChainRisks1(this, org.OrganisationName, "2019 to 2020", MoreInfoRequired: true);
             await AxeHelper.CheckAccessibilityAsync(this);
-            ExpectHeader("Supply Chain Risks and due diligence");
             await Task.CompletedTask;
         }
 
@@ -23,9 +52,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task TriggerAllOtherFieldsToAppear()
         {
             //only mandatory fields are other fields
-
+            ClickText(The.Top, That.Contains, "Open all");
             //trigger all other fields by clicking all "other" options
-            string[] OtherOptions = new string[] { "Other vulnerable group", "Other type of work", "Please specify the other sector" };
+            string[] OtherOptions = new string[] { "Other vulnerable group(s)", "Other type of work", "Other sector" };
 
             foreach (var Option in OtherOptions)
             ClickLabel(Option);
@@ -45,7 +74,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task CheckValidationMessages()
         {
             Expect("There is a problem");
-            Expect("Please enter explanation");
+            Expect("Missing details");
+            Expect("Enter details");
             await Task.CompletedTask;
         }
 
@@ -53,14 +83,14 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task FillInMandatoryFields()
         {
             //all fields must be filled
-            var OtherFields = new string[] { "Please specify the other vulnerable group", "Please specify the other type of work", "Please specify the other sector" };
+            var OtherFields = new string[] { "RelevantRisks[8].Details", "RelevantRisks[13].Details", "RelevantRisks[22].Details" };
             foreach (var  Field in OtherFields)
             {
-                Set("Please specify the other vulnerable group").To("Details");
+                Set(Field).To("Details");
                 Click("Continue");
 
                 Expect("There is a problem");
-                Expect("Please enter explanation");
+                Expect("Missing details");
             }
 
             //set last field
