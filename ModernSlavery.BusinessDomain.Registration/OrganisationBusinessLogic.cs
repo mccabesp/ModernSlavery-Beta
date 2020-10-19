@@ -80,7 +80,6 @@ namespace ModernSlavery.BusinessDomain.Registration
                 var record = new OrganisationsFileModel
                 {
                     OrganisationId = o.OrganisationId,
-                    DUNSNumber = o.DUNSNumber,
                     OrganisationReference = o.OrganisationReference,
                     OrganisationName = o.OrganisationName,
                     CompanyNo = o.CompanyNumber,
@@ -98,16 +97,15 @@ namespace ModernSlavery.BusinessDomain.Registration
                     SecurityCodeCreatedDateTime = o.SecurityCodeCreatedDateTime
                 };
 
-                var latestReturn = await _submissionLogic.GetLatestStatementBySnapshotYearAsync(o.OrganisationId, year);
+                var latestStatement = await _submissionLogic.GetLatestStatementByDeadlineYearAsync(o.OrganisationId, year);
                 var reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(o.SectorType, year);
                 var latestScope = await _scopeLogic.GetScopeByReportingDeadlineOrLatestAsync(o.OrganisationId, reportingDeadline);
 
-                record.LatestReturn = latestReturn?.Modified;
+                record.LatestSubmission = latestStatement?.Modified;
                 record.ScopeStatus = latestScope?.ScopeStatus;
                 record.ScopeDate = latestScope?.ScopeStatusDate;
                 records.Add(record);
             }
-
 
             return records;
         }

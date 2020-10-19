@@ -6,7 +6,6 @@ namespace ModernSlavery.Core.Models
     public class OrganisationsFileModel
     {
         public long OrganisationId { get; set; }
-        public string DUNSNumber { get; set; }
         public string OrganisationReference { get; set; }
         public string OrganisationName { get; set; }
         public string CompanyNo { get; set; }
@@ -18,10 +17,13 @@ namespace ModernSlavery.Core.Models
         public string SicCodes { get; set; }
         public DateTime? LatestRegistrationDate { get; set; }
         public RegistrationMethods? LatestRegistrationMethod { get; set; }
-        public DateTime? LatestReturn { get; set; }
+        public DateTime? LatestSubmission { get; set; }
         public ScopeStatuses? ScopeStatus { get; set; }
         public DateTime? ScopeDate { get; set; }
         public DateTime Created { get; set; }
+
+        public bool IsGroupSubmission { get; set; }
+        public DateTime FirstSubmittedDate { get; set; }
 
         #region SecurityCode information
 
