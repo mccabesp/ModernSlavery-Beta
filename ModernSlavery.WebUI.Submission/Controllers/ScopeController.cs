@@ -362,7 +362,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(user.EmailAddress,
                             organisation.OrganisationName,
                             stateModel.EnterAnswers.FullName,
-                            $"{stateModel.DeadlineDate.Year} to {stateModel.DeadlineDate.Year + 1}",
+                            stateModel.DeadlineDate.Year.ToString(),
                             organisation.LatestAddress.GetAddressString(),
                             stateModel.EnterAnswers.FriendlyReasonOptions.ToArray());
                 }
@@ -372,7 +372,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(stateModel.EnterAnswers.EmailAddress,
                         organisation.OrganisationName,
                         stateModel.EnterAnswers.FullName,
-                        $"{stateModel.DeadlineDate.Year} to {stateModel.DeadlineDate.Year + 1}",
+                        stateModel.DeadlineDate.Year.ToString(),
                         organisation.LatestAddress.GetAddressString(),
                         stateModel.EnterAnswers.FriendlyReasonOptions.ToArray());
             }

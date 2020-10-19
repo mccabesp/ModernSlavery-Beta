@@ -200,7 +200,7 @@
                 @foreach (var scope in scopes)
                 {
                     <b>
-                        @(ReportingPeriodHelper.FormatReportingPeriod(scope.SubmissionDeadline.Year)):
+                        @scope.SubmissionDeadline.Year:
                     </b>
                     @(scope.ScopeStatus)
                     <br />
@@ -281,7 +281,7 @@
                 {
                     <span>@(statementForYear.IsLateSubmission ? "Yes" : "No") - </span>
                     <a href="@Url.Action("ChangeLateFlag", "AdminReturnLateFlag", new {id = statementForYear.StatementId})" class="govuk-link">
-                        Change <span class="govuk-visually-hidden"> late submission status for @(statementForYear.GetReportingPeriod())</span>
+                        Change <span class="govuk-visually-hidden"> late submission status for @(statementForYear.SubmissionDeadline.Year)</span>
                     </a>
                 }
             </td>

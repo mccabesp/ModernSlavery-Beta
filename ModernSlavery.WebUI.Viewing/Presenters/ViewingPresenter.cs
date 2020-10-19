@@ -172,7 +172,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
                     new OptionSelect
                     {
                         Id = reportingDeadline.Year.ToString(),
-                        Label = $"{reportingDeadline.Year - 1} to {reportingDeadline.Year}",
+                        Label = reportingDeadline.Year.ToString(),
                         Value = reportingDeadline.Year.ToString(),
                         Checked = isChecked
                         // Disabled = facetResults.Count == 0 && !isChecked
