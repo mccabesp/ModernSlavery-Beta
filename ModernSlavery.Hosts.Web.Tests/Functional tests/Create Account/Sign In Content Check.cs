@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Temporary Ignore")]
+    [TestFixture]
 
     public class SignInContentCheck : CreateAccount
     {
@@ -30,16 +30,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             Expect("Signed out");
-            Click("Continue");
+            Click(The.Top, "Sign in");
 
-            await AxeHelper.CheckAccessibilityAsync(this);
-
-            ExpectHeader("Submit a modern slavery statement");
-            Click("Start now");
-
-            await AxeHelper.CheckAccessibilityAsync(this);
-
-            ExpectHeader("Sign in or create an account");
             await Task.CompletedTask;
 
         }
@@ -49,16 +41,17 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task CheckContentOfSignInPage()
         {
             ExpectHeader("Sign in or create an account");
-            Expect("If you have an account please sign in using your email address and password");
+            Expect(What.Contains, "If you have an account, sign in using your email address and password.");
+            Expect(What.Contains, "After signing into your account you can register a new organisation or manage your existing organisations.");
             Expect("Email");
             Expect("Password");
             Expect("Sign in");
 
-            Expect("Problems with your passoword?");
-            Expect("Reset your password");
+            Expect("Problems with your password?");
+            ExpectLink("Reset your password");
 
             ExpectHeader("No account yet?");
-            Expect("If you`re new to the service you will need to create an account. This will allow you to register organisations and submit information about their modern slavery statements");
+            Expect(What.Contains, "If you're new to the service you will need to create an account. This will allow you to register organisations and submit information about their modern slavery statements.");
             Expect("Create an account");
             await Task.CompletedTask;
 
