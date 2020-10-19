@@ -161,6 +161,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click("Continue");
 
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
 
             ExpectHeader("Select an organisation");
 
