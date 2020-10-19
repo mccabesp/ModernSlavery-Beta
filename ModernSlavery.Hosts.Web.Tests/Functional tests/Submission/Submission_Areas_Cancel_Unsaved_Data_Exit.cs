@@ -32,6 +32,15 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
+        [Test, Order(29)]
+        public async Task RegisterOrg()
+        {
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
+            RefreshPage();
+
+        }
+
+
         [Test, Order(40)]
         public async Task StartSubmission()
         {
