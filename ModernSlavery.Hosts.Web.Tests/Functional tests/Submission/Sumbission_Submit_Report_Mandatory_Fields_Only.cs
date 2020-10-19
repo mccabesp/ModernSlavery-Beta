@@ -59,7 +59,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Expect("Submission complete");
             Expect(What.Contains, "You have submitted your modern slavery statement");
-            Expect(What.Contains, "for 2019 to 2020");
+            Expect(What.Contains, "for 2020");
 
             Click("Finish and Sign out");
             await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");

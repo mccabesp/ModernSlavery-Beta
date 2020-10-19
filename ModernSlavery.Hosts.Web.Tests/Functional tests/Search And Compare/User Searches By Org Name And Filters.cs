@@ -50,7 +50,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Below("Organisation name or company number").Set("Search").To("Amazon");
             Click("Search");
             Expect("Amazon statement");
-            AtRow("Amazon statement").Column("Statement year").Expect("2019 to 2020");
+            AtRow("Amazon statement").Column("Statement year").Expect("2020");
 
             await Task.CompletedTask;
         }

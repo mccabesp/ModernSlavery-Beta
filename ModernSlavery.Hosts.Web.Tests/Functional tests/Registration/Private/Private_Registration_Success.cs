@@ -78,7 +78,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task ChooseOrganisation()
         { 
-        AtRow(That.Contains, org.OrganisationName).Click(What.Contains, "Choose");
+         BelowHeader("Choose your organisation").AtRow(That.Contains, org.OrganisationName).Click(What.Contains, "Choose");
 
             await AxeHelper.CheckAccessibilityAsync(this);
 

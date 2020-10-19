@@ -65,6 +65,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public const string YourMSStatement_Date_Year = "2019";
         public const string YourMSStatement_To_Day = "31";
         public const string YourMSStatement_To_Month = "01";
+        public const string YourMSStatement_From_Year = "2019";
         public const string YourMSStatement_To_Year = "2020";
         public const string YourMSStatement_First = "Roger";
         public const string YourMSStatement_Last = "Reporter";

@@ -43,7 +43,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToReviewAndEdit()
         {
 
-            Submission_Helper.NavigateToSubmission(this, org.OrganisationName, "2019 to 2020", MoreInfoRequired: true);
+            Submission_Helper.NavigateToSubmission(this, org.OrganisationName, "2020", MoreInfoRequired: true);
             await AxeHelper.CheckAccessibilityAsync(this);
             await Task.CompletedTask;
         }

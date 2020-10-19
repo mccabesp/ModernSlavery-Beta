@@ -66,7 +66,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
             await AxeHelper.CheckAccessibilityAsync(this);
 
-            RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "Yes");
+            RightOfText("2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "Yes");
             await Task.CompletedTask;
         }
 

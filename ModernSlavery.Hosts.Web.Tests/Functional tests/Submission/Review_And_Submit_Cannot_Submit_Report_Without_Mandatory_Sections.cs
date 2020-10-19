@@ -59,7 +59,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Continue");
             await AxeHelper.CheckAccessibilityAsync(this);
-            ExpectHeader("Review 2019 to 2020 group report for " + Submission.OrgName_Blackpool);
+            ExpectHeader("Review 2020 group report for " + Submission.OrgName_Blackpool);
             await Task.CompletedTask;
         }
 
@@ -110,7 +110,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click("Continue");
             await AxeHelper.CheckAccessibilityAsync(this);
-            ExpectHeader("Review 2019 to 2020 group report for " + Submission.OrgName_Blackpool);
+            ExpectHeader("Review 2020 group report for " + Submission.OrgName_Blackpool);
 
             //both pages complete now
             

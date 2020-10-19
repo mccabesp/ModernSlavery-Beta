@@ -49,14 +49,14 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click(TestData.Organisations[0].OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "No");
+            RightOfText("2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "No");
             await Task.CompletedTask;
         }
 
         [Test, Order(36)]
         public async Task ChooseGroupSubmission()
         {
-            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, true, TestData.Organisations[0].OrganisationName, "2019 to 2020");
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, true, TestData.Organisations[0].OrganisationName, "2020");
 
             await Task.CompletedTask;
         }
@@ -194,9 +194,9 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("Review before submitting");
 
-            Expect("2019 to 2020 modern slavery statement for " + TestData.Organisations[0].OrganisationName + " (group)");
+            Expect("2020 modern slavery statement for " + TestData.Organisations[0].OrganisationName + " (group)");
 
-            Expect("2019 to 2020 modern slavery statement for " + TestData.Organisations[0].OrganisationName);
+            Expect("2020 modern slavery statement for " + TestData.Organisations[0].OrganisationName);
 
 
             Click("Submit fo publication");
@@ -207,7 +207,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task SubmitDraft()
         {
             Expect("Submit");
-            Expect("You've submitted your Modern Slavery statement for 2019 to 2020");
+            Expect("You've submitted your Modern Slavery statement for 2020");
 
 
             await Task.CompletedTask;
@@ -226,7 +226,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click(TestData.Organisations[0].OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            RightOfText("2019 to 2020").BelowText("Status of statement published on this service").Expect(What.Contains, "Submission complete");
+            RightOfText("2020").BelowText("Status of statement published on this service").Expect(What.Contains, "Submission complete");
 
 
             await Task.CompletedTask;
@@ -245,7 +245,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click(TestData.Organisations[1].OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            RightOfText("2019 to 2020").BelowText("Status of statement published on this service").Expect("Not started");
+            RightOfText("2020").BelowText("Status of statement published on this service").Expect("Not started");
 
 
             await Task.CompletedTask;

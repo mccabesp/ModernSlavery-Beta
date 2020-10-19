@@ -43,7 +43,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             , Order(40)]
         public async Task NavigateToSCRPart1()
         {
-            Submission_Helper.NavigateToSupplyChainRisks1(this, org.OrganisationName, "2019 to 2020", MoreInfoRequired: true);
+            Submission_Helper.NavigateToSupplyChainRisks1(this, org.OrganisationName, "2020", MoreInfoRequired: true);
             await AxeHelper.CheckAccessibilityAsync(this);
             await Task.CompletedTask;
         }

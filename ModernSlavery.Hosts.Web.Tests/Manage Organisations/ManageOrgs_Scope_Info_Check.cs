@@ -64,9 +64,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ExpectScopeInfoOOS()
         {
 
-            RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "No");
+            RightOfText("2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "No");
 
-            RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").ExpectLink("Change");
+            RightOfText("2020").BelowText("Required by law to publish a statement on your website?").ExpectLink("Change");
 
             await Task.CompletedTask;
         }
@@ -86,9 +86,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             RefreshPage();
             await AxeHelper.CheckAccessibilityAsync(this);
-            RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "Yes");
+            RightOfText("2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "Yes");
 
-            RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").ExpectLink("Change");
+            RightOfText("2020").BelowText("Required by law to publish a statement on your website?").ExpectLink("Change");
 
             await Task.CompletedTask;
         }

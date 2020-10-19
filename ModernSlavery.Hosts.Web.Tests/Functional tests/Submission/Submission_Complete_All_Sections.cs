@@ -73,7 +73,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Set("URL").To(Submission.YourMSStatement_URL);
 
-            Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_To_Year, "1");
+            Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_From_Year, "1");
             Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_To_Year, "2");
 
             Set("First name").To(Submission.YourMSStatement_First);

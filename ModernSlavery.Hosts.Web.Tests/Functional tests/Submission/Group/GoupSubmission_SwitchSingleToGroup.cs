@@ -83,7 +83,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Expect("a group of organisations");
             //Click("a group of organisations");
 
-                    SubmissionHelper.GroupOrSingleScreenComplete(this, true, org.OrganisationName, "2019 to 2020");
+                    SubmissionHelper.GroupOrSingleScreenComplete(this, true, org.OrganisationName, "2020");
 
             Click("Continue");
             ExpectHeader("Which organisations are included in your group statement?");

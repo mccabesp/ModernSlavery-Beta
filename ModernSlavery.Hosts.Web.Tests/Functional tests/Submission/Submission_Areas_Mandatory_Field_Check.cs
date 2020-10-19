@@ -14,7 +14,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(41)]
         public async Task NavigateToAreasPage()
         {
-            Submission_Helper.NavigateToAreasCovered(this, org.OrganisationName, "2019 to 2020", MoreInfoRequired: true);
+            Submission_Helper.NavigateToAreasCovered(this, org.OrganisationName, "2020", MoreInfoRequired: true);
             await AxeHelper.CheckAccessibilityAsync(this);
 
             await Task.CompletedTask;

@@ -57,7 +57,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            RightOfText("2019 to 2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "No");
+            RightOfText("2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "No");
             await Task.CompletedTask;
         }
         [Test, Order(35)]
@@ -77,7 +77,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(36)]
         public async Task ChooseGroupSubmission()
         {
-            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, true, org.OrganisationName, "2019 to 2020");
+            ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, true, org.OrganisationName, "2020");
 
             await Task.CompletedTask;
         }
@@ -133,7 +133,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Set("URL").To(Submission.YourMSStatement_URL);
 
-            Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_To_Year, "1");
+            Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_From_Year, "1");
             Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_To_Year, "2");
 
             Set("First name").To(Submission.YourMSStatement_First);
@@ -209,9 +209,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(48)]
         public async Task GroupReviewPage()
         {
-            //Expect("2019 to 2020 modern slavery statement for "+ org.OrganisationName + " (group)");
+            //Expect("2020 modern slavery statement for "+ org.OrganisationName + " (group)");
 
-            Expect("2019 to 2020 modern slavery statement for " + org.OrganisationName);
+            Expect("2020 modern slavery statement for " + org.OrganisationName);
 
             Expect(What.Contains, "You can ");
             ExpectLink(That.Contains, "review and edit the organisations");
@@ -226,7 +226,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Submit for publication");
             Expect(What.Contains, "You have submitted your modern slavery statement");
-            Expect(What.Contains, "for 2019 to 2020");
+            Expect(What.Contains, "for 2020");
 
 
             await Task.CompletedTask;
@@ -247,10 +247,10 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             DateTime now = DateTime.Now;
 
-            RightOfText("2019 to 2020").BelowText("Status of statement published on this service").Expect(What.Contains, "Published");
+            RightOfText("2020").BelowText("Status of statement published on this service").Expect(What.Contains, "Published");
 
 
-                RightOfText("2019 to 2020").BelowText("Status of statement published on this service").Expect(What.Contains, "on " + now.Day + " " + now.ToString("MMMM") + " " + now.Year );
+                RightOfText("2020").BelowText("Status of statement published on this service").Expect(What.Contains, "on " + now.Day + " " + now.ToString("MMMM") + " " + now.Year );
 
 
             await Task.CompletedTask;
@@ -270,11 +270,11 @@ namespace ModernSlavery.Hosts.Web.Tests
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: TestData.Organisations[1].OrganisationName);
             ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
 
-            //RightOfText("2019 to 2020").BelowText("Status of statement published on this service").Expect(What.Contains, "Already included in "+ org.OrganisationName + "’s 2019 to 2020 group submission, published on " + DateTime.Now.ToString("dd MMM yyyy"));
+            //RightOfText("2020").BelowText("Status of statement published on this service").Expect(What.Contains, "Already included in "+ org.OrganisationName + "’s 2020 group submission, published on " + DateTime.Now.ToString("dd MMM yyyy"));
 
-            AtXPath("(//div[@class = 'gpg-manage-reports__cell gpg-manage-reports__cell--year' and contains(., '2019 to 2020')][1]//parent::div)[1]").Expect(What.Contains, "Already included in " + org.OrganisationName + "'s 2019 to 2020 group submission, published on " + DateTime.Now.ToString("dd MMM yyyy"));
+            AtXPath("(//div[@class = 'gpg-manage-reports__cell gpg-manage-reports__cell--year' and contains(., '2020')][1]//parent::div)[1]").Expect(What.Contains, "Already included in " + org.OrganisationName + "'s 2020 group submission, published on " + DateTime.Now.ToString("dd MMM yyyy"));
 
-            AtXPath("(//div[@class = 'gpg-manage-reports__cell gpg-manage-reports__cell--year' and contains(., '2018 to 2019')][1]//parent::div)[1]").Expect(What.Contains, "Not Started");
+            AtXPath("(//div[@class = 'gpg-manage-reports__cell gpg-manage-reports__cell--year' and contains(., '2019')][1]//parent::div)[1]").Expect(What.Contains, "Not Started");
             await Task.CompletedTask;
         }
 
