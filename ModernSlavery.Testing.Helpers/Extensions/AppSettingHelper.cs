@@ -23,10 +23,15 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             var config = host.Services.GetRequiredService<IConfiguration>();
             config[key] = value;
         }
-           public static void SetShowEmailVerifyLink(this IHost host, bool value)
+        public static void SetShowEmailVerifyLink(this IHost host, bool value)
         {
             var sharedOptions = host.Services.GetRequiredService<SharedOptions>();
             sharedOptions.ShowEmailVerifyLink = value;
+        }
+        public static void SetSkipSpamProtection(this IHost host, bool value)
+        {
+            var sharedOptions = host.Services.GetRequiredService<SharedOptions>();
+            sharedOptions.SkipSpamProtection = value;
         }
     }
 }
