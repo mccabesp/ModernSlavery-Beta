@@ -7,8 +7,11 @@ using Microsoft.Extensions.Hosting;
 using ModernSlavery.Testing.Helpers;
 using NUnit.Framework;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ModernSlavery.Testing.Helpers.Classes
 {
@@ -60,7 +63,37 @@ namespace ModernSlavery.Testing.Helpers.Classes
             ReturntoRoot(ui);
         }
 
-        
+        public void Expect(params string[] pars)
+        {
+            var exceptions = new ConcurrentBag<Exception>();
+            Parallel.ForEach(pars, par =>
+            {
+                try
+                {
+                    Expect(par);
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            });
+            if (exceptions.Count>0)
+            {
+                if (exceptions.Count==1)throw exceptions.First();
+                throw new AggregateException(exceptions);
+
+            }
+
+            //var tasks = new List<Task>();
+            //tasks.Add(new Task(() => Expect("plplplpl")));
+            //tasks.Add(new Task(() => Expect("plplplpl")));
+            //tasks.Add(new Task(() => Expect("plplplpl")));
+            //tasks.Add(new Task(() => Expect("plplplpl")));
+            //tasks.Add(new Task(() => Expect("plplplpl")));
+            //Task.WaitAll(tasks.ToArray());
+
+        }
+
 
     }
 
