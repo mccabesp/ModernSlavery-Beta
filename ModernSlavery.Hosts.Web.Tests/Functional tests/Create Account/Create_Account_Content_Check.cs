@@ -83,7 +83,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
-        [Test, Order(3)]
+        [Test, Order(4)]
         public async Task Expect_Create_Password_Validation_Rules()
 
         {
@@ -106,7 +106,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             await Task.CompletedTask;
         }
 
-        [Test, Order(4)]
+        [Test, Order(6)]
         public async Task Expect_Create_Account_Terms_And_Conditions()
 
         {
@@ -116,7 +116,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             await Task.CompletedTask;
         }
 
-        [Test, Order(4)]
+        [Test, Order(8)]
         public async Task Expect_Continue_Creation_Button()
         {
             ExpectButton("Continue");
