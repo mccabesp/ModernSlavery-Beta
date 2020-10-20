@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ModernSlavery.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,6 +22,11 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         {
             var config = host.Services.GetRequiredService<IConfiguration>();
             config[key] = value;
+        }
+           public static void SetShowEmailVerifyLink(this IHost host, bool value)
+        {
+            var sharedOptions = host.Services.GetRequiredService<SharedOptions>();
+            sharedOptions.ShowEmailVerifyLink = value;
         }
     }
 }
