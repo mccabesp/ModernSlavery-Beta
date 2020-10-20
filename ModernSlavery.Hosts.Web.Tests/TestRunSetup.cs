@@ -49,6 +49,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Delete all the draft files
             await TestWebHost.Services.DeleteDraftsAsync();
 
+            //Clear all message queues 
+            await TestWebHost.Services.ClearQueuesAsync();
+
             //Start the Selenium client
             var baseUrl = TestWebHost.GetHostAddress();
             TestContext.Progress.WriteLine($"Test Host started on endpoint: {baseUrl}");
