@@ -19,7 +19,8 @@ namespace ModernSlavery.Infrastructure.Logging
             string fileName)
         {
             SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
-            if (string.IsNullOrWhiteSpace(applicationName)) throw new ArgumentNullException(nameof(applicationName));
+            if (string.IsNullOrWhiteSpace(applicationName)) applicationName=sharedOptions.ApplicationName;
+            if (string.IsNullOrWhiteSpace(applicationName)) applicationName= AppDomain.CurrentDomain.FriendlyName;
 
             if (string.IsNullOrWhiteSpace(fileName)) throw new ArgumentNullException(nameof(fileName));
 

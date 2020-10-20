@@ -10,6 +10,7 @@ using ModernSlavery.Testing.Helpers;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using Microsoft.Extensions.Hosting;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -49,7 +50,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //Send logs to file for later upload to DevOps as test attachments
             var loggerFactory = lifetimeScope.Resolve<ILoggerFactory>();
-            var logFilepath = Path.Combine(_configuration["Filepaths:LogFiles"], $"{AppDomain.CurrentDomain.FriendlyName}.{_configuration[HostDefaults.EnvironmentKey]}.log");
+            var logFilepath = Path.Combine(_configuration["Filepaths:LogFiles"], $"{_configuration.GetApplicationName()}.{_configuration[HostDefaults.EnvironmentKey]}.log");
             loggerFactory.AddFile(logFilepath);
         }
 

@@ -16,7 +16,7 @@ namespace ModernSlavery.Infrastructure.Logging
         public UserAuditLogger(
             SharedOptions sharedOptions,
             LogRecordQueue queue)
-            : base(sharedOptions, queue, AppDomain.CurrentDomain.FriendlyName, Filenames.UserLog)
+            : base(sharedOptions, queue, null, Filenames.UserLog)
         {
         }
 

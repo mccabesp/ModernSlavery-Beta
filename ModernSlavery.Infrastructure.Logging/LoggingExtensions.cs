@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using Autofac;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
+using Microsoft.Extensions.Configuration;
 
 namespace ModernSlavery.Infrastructure.Logging
 {
@@ -20,7 +19,6 @@ namespace ModernSlavery.Infrastructure.Logging
                 .As<IAuditLogger>()
                 .Keyed<IAuditLogger>(fileName)
                 .SingleInstance()
-                .WithParameter("applicationName", AppDomain.CurrentDomain.FriendlyName)
                 .WithParameter("fileName", fileName);
         }
 
@@ -38,8 +36,10 @@ namespace ModernSlavery.Infrastructure.Logging
             // Resolve the keyed queue from autofac
             var logEventQueue = lifetimeScope.Resolve<LogEventQueue>();
 
+            var configuration = lifetimeScope.Resolve<IConfiguration>();
+
             // Create the logging provider
-            loggerFactory.AddProvider(new EventLoggerProvider(logEventQueue, filterOptions.Value));
+            loggerFactory.AddProvider(new EventLoggerProvider(logEventQueue, filterOptions.Value, configuration.GetApplicationName()));
 
             return loggerFactory;
         }
