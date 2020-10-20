@@ -49,6 +49,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             else
                 SetupTest(TestContext.CurrentContext.Test.Name);
 
+            
+
         }
 
 
@@ -66,6 +68,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task GoToCreateAccountPage()
         {
 
+            AppSettingHelper.SetShowEmailVerifyLink(TestRunSetup.TestWebHost,true);
             DeleteCookiesAndReturnToRoot(this);
 
             await AxeHelper.CheckAccessibilityAsync(this);
