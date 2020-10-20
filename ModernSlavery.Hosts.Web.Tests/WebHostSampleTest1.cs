@@ -11,7 +11,6 @@ using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -89,16 +88,6 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test]
         public void WebTestHost_FileRepository_Exists()
         {
-            Expect("plplplpl", "plplpl", "ijijij");
-
-            var tasks = new List<Task>();
-            tasks.Add(new Task(() => Expect("plplplpl")));
-            tasks.Add(new Task(() => Expect("plplplpl")));
-            tasks.Add(new Task(() => Expect("plplplpl")));
-            tasks.Add(new Task(() => Expect("plplplpl")));
-            tasks.Add(new Task(() => Expect("plplplpl")));
-            Task.WaitAll(tasks.ToArray());
-
             //Check we got the file repository from the test web server
             Assert.IsNotNull(_fileRepository);
         }
