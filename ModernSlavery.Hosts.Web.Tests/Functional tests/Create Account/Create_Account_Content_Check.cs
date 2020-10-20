@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
+    [TestFixture, Parallelizable(ParallelScope.Children)]
+
     public class Create_Account_Content_Check : BaseUITest
     {
         public Create_Account_Content_Check() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
@@ -38,7 +40,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
-        [Test, Order(1)]
+        [Test, Order(1), NonParallelizable]
         public async Task GoToCreateAccountPage()
         {
             DeleteCookiesAndReturnToRoot(this);
@@ -64,6 +66,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             BelowHeader("Email address").Expect("Enter an email address that you can access. The service will send you an email to verify your identity.");
             ExpectField("Email address");
             ExpectField("Confirm your email address");
+
+            
 
             await Task.CompletedTask;
 
