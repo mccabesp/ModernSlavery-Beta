@@ -14,7 +14,7 @@ namespace ModernSlavery.Infrastructure.Logging
     {
         public RegistrationAuditLogger(SharedOptions sharedOptions,
             LogRecordQueue queue)
-            : base(sharedOptions, queue,null,Filenames.RegistrationLog)
+            : base(sharedOptions, queue,Filenames.RegistrationLog)
         {
         }
 
