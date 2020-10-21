@@ -10,7 +10,7 @@
                 <p class="govuk-body govuk-!-font-weight-bold"> Statement year</p>
             </div>
         </div>
-        <ul class="govuk-list">
+        <ul class="govuk-list govuk-!-margin-bottom-0">
             @foreach (var organisation in Model.Organisations.Results)
             {
                 var organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId);
