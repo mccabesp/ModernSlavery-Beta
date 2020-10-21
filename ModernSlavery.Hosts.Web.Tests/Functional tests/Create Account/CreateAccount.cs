@@ -32,7 +32,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         protected readonly OrganisationTestData TestData;
         public CreateAccount(string firstname, string lastname, string title, string email, string password) : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
         {
-            UniqueEmail = email + DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            UniqueEmail = email + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
             _firstname = firstname; _lastname = lastname; _title = title; _email = UniqueEmail; _password = password;
 
             TestData = new OrganisationTestData(this);
@@ -73,7 +73,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             await AxeHelper.CheckAccessibilityAsync(this);
 
-
+            RefreshPage();
             Click("Sign in");
 
             await AxeHelper.CheckAccessibilityAsync(this);
@@ -151,11 +151,12 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click(The.Bottom, "Sign In");
 
+            //TakeScreenshot(UniqueEmail);
             await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-
+            //TakeScreenshot(UniqueEmail + "2");
             ExpectHeader("You've confirmed your email address");
 
-            Expect("To finish creating your account, select continue.");
+           Expect("To finish creating your account, select continue.");
             Click("Continue");
             await AxeHelper.CheckAccessibilityAsync(this);
 
