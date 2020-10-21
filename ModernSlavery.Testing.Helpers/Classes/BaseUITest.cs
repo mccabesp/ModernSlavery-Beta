@@ -63,7 +63,7 @@ namespace ModernSlavery.Testing.Helpers.Classes
             ReturntoRoot(ui);
         }
 
-        public void Expect(params string[] pars)
+        public void ExpectMulti(params string[] pars)
         {
             var exceptions = new ConcurrentBag<Exception>();
             Parallel.ForEach(pars, par =>
