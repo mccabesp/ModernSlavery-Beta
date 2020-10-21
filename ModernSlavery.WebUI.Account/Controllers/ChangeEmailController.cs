@@ -95,13 +95,13 @@ namespace ModernSlavery.WebUI.Account.Controllers
             // if not logged in go straight to CompleteChangeEmailAsync
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null && checkResult is ChallengeResult)
-                return base.RedirectToAction(
-                    nameof(CompleteChangeEmailAsync),
+                return RedirectToAction(
+                    nameof(CompleteChangeEmail),
                     new {code});
 
             // force sign-out then prompt sign-in before confirming email
             var redirectUrl = Url.Action<ChangeEmailController>(
-                nameof(CompleteChangeEmailAsync),
+                nameof(CompleteChangeEmail),
                 new {code},
                 "https");
 
@@ -109,7 +109,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
         }
 
         [HttpGet("complete-change-email")]
-        public async Task<IActionResult> CompleteChangeEmailAsync(string code)
+        public async Task<IActionResult> CompleteChangeEmail(string code)
         {
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
