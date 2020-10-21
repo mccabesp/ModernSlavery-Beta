@@ -57,10 +57,18 @@ namespace ModernSlavery.Testing.Helpers.Classes
             ui.Goto("/");
         }
 
-        public void DeleteCookiesAndReturnToRoot(UIContext ui)
+        public void SignOutDeleteCookiesAndReturnToRoot(UIContext ui)
         {
+            SignOut();
             ClearCookies();
             ReturntoRoot(ui);
+        }
+
+        public void SignOut()
+        {
+            Goto("/sign-out");
+            Expect("Signed out");
+            WebDriver.Url.EndsWith("/sign-out");
         }
 
         public void ExpectMulti(params string[] pars)

@@ -64,7 +64,7 @@ private bool TestRunFailed = false;
         [Test, Order(20)]
         public async Task SetSecurityCode()
         {
-            DeleteCookiesAndReturnToRoot(this);
+            SignOutDeleteCookiesAndReturnToRoot(this);
 
 
             await this.SetSecurityCode(org, new DateTime(2021, 6, 10));

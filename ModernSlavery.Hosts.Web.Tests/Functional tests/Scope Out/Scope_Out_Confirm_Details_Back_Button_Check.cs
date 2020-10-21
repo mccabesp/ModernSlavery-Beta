@@ -33,7 +33,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task SetSecurityCode()
         {
-            DeleteCookiesAndReturnToRoot(this);
+            SignOutDeleteCookiesAndReturnToRoot(this);
 
             org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null);
 

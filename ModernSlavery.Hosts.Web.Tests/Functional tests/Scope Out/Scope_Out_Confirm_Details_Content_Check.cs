@@ -32,7 +32,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            DeleteCookiesAndReturnToRoot(this);
+            SignOutDeleteCookiesAndReturnToRoot(this);
 
             org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null);
             //&& !o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null)

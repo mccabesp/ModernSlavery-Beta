@@ -64,7 +64,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task SetSecurityCode()
         {
-            DeleteCookiesAndReturnToRoot(this);
+            SignOutDeleteCookiesAndReturnToRoot(this);
 
             await AxeHelper.CheckAccessibilityAsync(this);
             await this.SetSecurityCode(org, new DateTime(2021, 6, 10));

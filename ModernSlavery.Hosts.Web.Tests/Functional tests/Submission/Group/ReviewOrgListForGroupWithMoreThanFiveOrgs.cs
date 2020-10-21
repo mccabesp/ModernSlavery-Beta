@@ -32,7 +32,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(1)]
         public async Task CheckContentFor6PlusOrganisations()
         {
-            DeleteCookiesAndReturnToRoot(this);
+            SignOutDeleteCookiesAndReturnToRoot(this);
 
             ExpectHeader("Review the organisations in your group statement");
             ExpectText("You’ve told us your statement is for the following group of organisations. You can add more organisations to the group, or remove organisations, before confirming and continuing.");

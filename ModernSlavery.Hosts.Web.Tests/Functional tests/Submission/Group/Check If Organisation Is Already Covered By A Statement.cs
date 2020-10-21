@@ -43,7 +43,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(1)]
         public async Task CheckContentForOrganisationsStatementPage()
         {
-            DeleteCookiesAndReturnToRoot(this);
+            SignOutDeleteCookiesAndReturnToRoot(this);
 
             ExpectHeader("Modern slavery statement submissions");
             AtRow("2020-2021").Column("Status of statement published on this service").Expect("Already included in:");

@@ -34,7 +34,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(22)]
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
         {
-            DeleteCookiesAndReturnToRoot(this);
+            SignOutDeleteCookiesAndReturnToRoot(this);
 
             Goto(TestData.ScopeUrl);
             AxeHelper.CheckAccessibilityAsync(this);

@@ -50,30 +50,31 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
 
-        [Test, Order(42)]
+        [Test, Order(42), Parallelizable]
         public async Task CheckSectorPageText()
         {
             ExpectHeader("Your organisation");
 
             ExpectHeader("Which sector does your organisation operate in?");
             Expect("Select all that apply");   
-           
-        
+            System.Threading.Thread.Sleep(30000);
+
+
 
             await Task.CompletedTask;
         }
 
-        [Test, Order(44)]
+        [Test, Order(44), Parallelizable]
         public async Task CheckSectorSectors()
         {
 
             //expect all sectors in order
             Submission_Helper.ExpectSectors(this, Submission.Sectors);
-
+            System.Threading.Thread.Sleep(20000);
             await Task.CompletedTask;
         }
 
-        [Test, Order(44)]
+        [Test, Order(46), NonParallelizable]
         public async Task CheckSectorFinancialOptions()
         {
             //expect all financial options in order

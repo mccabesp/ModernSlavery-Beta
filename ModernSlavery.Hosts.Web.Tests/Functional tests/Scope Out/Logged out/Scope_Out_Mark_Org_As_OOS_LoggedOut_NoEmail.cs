@@ -36,7 +36,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task SetSecurityCode()
         {
-            DeleteCookiesAndReturnToRoot(this);
+            SignOutDeleteCookiesAndReturnToRoot(this);
 
             var result = this.GetSecurityCodeBusinessLogic().CreateSecurityCode(TestData.Organisation, new DateTime(2021, 6, 10));
 

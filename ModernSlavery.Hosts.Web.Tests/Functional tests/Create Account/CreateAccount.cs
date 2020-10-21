@@ -69,7 +69,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             AppSettingHelper.SetShowEmailVerifyLink(TestRunSetup.TestWebHost,true);
-            DeleteCookiesAndReturnToRoot(this);
+            SignOutDeleteCookiesAndReturnToRoot(this);
 
             await AxeHelper.CheckAccessibilityAsync(this);
 
@@ -151,9 +151,8 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click(The.Bottom, "Sign In");
 
-            //TakeScreenshot(UniqueEmail);
+
             await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            //TakeScreenshot(UniqueEmail + "2");
             ExpectHeader("You've confirmed your email address");
 
            Expect("To finish creating your account, select continue.");

@@ -43,7 +43,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(1), NonParallelizable]
         public async Task GoToCreateAccountPage()
         {
-            DeleteCookiesAndReturnToRoot(this);
+            SignOutDeleteCookiesAndReturnToRoot(this);
 
             Click("Sign in");
 

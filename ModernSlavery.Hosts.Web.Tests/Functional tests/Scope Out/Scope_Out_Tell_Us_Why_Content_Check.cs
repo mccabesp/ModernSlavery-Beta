@@ -62,7 +62,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task SetSecurityCode()
         {
-            DeleteCookiesAndReturnToRoot(this);
+            SignOutDeleteCookiesAndReturnToRoot(this);
 
 
             await this.SetSecurityCode(org, new DateTime(2021, 6, 10));
@@ -73,7 +73,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(22)]
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
         {
-            DeleteCookiesAndReturnToRoot(this);
+            SignOutDeleteCookiesAndReturnToRoot(this);
             await AxeHelper.CheckAccessibilityAsync(this);
             Goto(ScopeConstants.ScopeUrl);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
