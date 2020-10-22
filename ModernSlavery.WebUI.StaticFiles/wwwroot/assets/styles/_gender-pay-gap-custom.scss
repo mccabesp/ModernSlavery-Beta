@@ -39,3 +39,9 @@
 
 //this is for the custom styling of the search results list on the search page
 @import "./components/finder_frontend";
+
+//custom styling of govuk-panel
+@import "./components/_panel";
+
+//styling of service info
+@import "./components/_service-info";

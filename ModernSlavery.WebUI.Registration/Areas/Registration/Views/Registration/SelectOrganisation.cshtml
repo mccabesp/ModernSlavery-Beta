@@ -1,74 +1,69 @@
 ﻿@{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Select your organisation - Modern Slavery reporting service";
 }
 @model OrganisationViewModel
+@section BeforeMain {
+    <a href="@Url.Action("AddOrganisation")" class="govuk-back-link">Back</a>
+}
 
-<main id="content" role="main">
-    <div class="grid-row">
-        <div class="column-full">
-            <a href="@Url.Action("AddOrganisation")" class="link-back">Back</a>
-        </div>
-    </div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.RegistrationType)
 
-    @using (Html.BeginForm())
-    {
-        @Html.AntiForgeryToken()
-        @Html.HiddenFor(model => model.RegistrationType)
+            @await Html.GovUkValidationSummaryAsync();
 
-        <div class="grid-row">
-            <div class="column-two-thirds">
-                @await Html.CustomValidationSummaryAsync()
-                <h1 class="heading-large">
-                    <span>Select your organisation</span>
-                </h1>
+            <h1 class="govuk-heading-large">
+                <span>Select your organisation</span>
+            </h1>
 
-            </div>
-            <div class="column-full">
-                @if (Model.MatchedReferenceCount == 0)
-                {
-                    <p>Select the organisation you wish to report from the list below or click "Continue" to register a new organisation.</p>
-                }
-                else
-                {
+     @if (Model.MatchedReferenceCount == 0)
+     {
+                    <p class="govuk-body">Select the organisation you wish to report from the list below or click "Continue" to register a new organisation.</p>
+     }
+     else
+     {
                     <p>The following organisations match your references. Select the organisation you wish to report for from the list below.</p>
-                }
-                <table class="search search3" summary="A list organisations that match your organisation details">
-                    <caption class="visuallyhidden">Customer and Business listing</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Organisation name and registered address</th>
-                            <th scope="col">References</th>
-                            <th scope="col">&nbsp;</th>
+     }
+                <table class="govuk-table govuk-!-font-size-16" summary="A list organisations that match your organisation details">                  
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-half">Organisation name and registered address</th>
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">References</th>
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">&nbsp;</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="govuk-table__body">
                         @for (var i = 0; i < Model.ManualOrganisations.Count; i++)
                         {
-                            <tr>
-                                <td>
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell">
                                     @Model.ManualOrganisations[i].OrganisationName <span>@Model.ManualOrganisations[i].GetFullAddress()</span>
                                 </td>
-                                <td>
+                                <td class="govuk-table__cell">
                                     @{ var references = Model.GetReferences(i); }
                                     @foreach (var key in references.Keys)
                                     {
-                                        <span style="display: block; white-space: nowrap;">@key: @(references[key])</span>
+                                        <span >@key: @(references[key])</span>
                                     }
                                 </td>
-                                <td>
-                                    <button type="submit" class="link-button" name="command" value="organisation_@i">Choose&nbsp;organisation</button>
+                                <td class="govuk-table__cell">
+                                    <button type="submit" class="link-button govuk-!-font-size-16" name="command" value="organisation_@i">Choose&nbsp;organisation</button>
                                 </td>
                             </tr>
-                        }
+                                        }
                     </tbody>
                 </table>
                 @if (Model.MatchedReferenceCount == 0)
                 {
                     <br />
-                    <input class="button" type="submit" role="button" name="command" value="Continue" />
+                    <input class="govuk-button" type="submit" role="button" name="command" value="Continue" />
                 }
-            </div>
-        </div>
-    }
-</main>
+        }
+    </div>
+    </div>
+
+       

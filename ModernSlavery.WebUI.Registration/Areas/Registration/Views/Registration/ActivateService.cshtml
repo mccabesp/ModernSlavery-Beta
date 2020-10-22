@@ -1,53 +1,52 @@
 ﻿@{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Enter your PIN - Modern Slavery reporting service";
 }
 @inject IWebService WebService
 @model CompleteViewModel
-<main id="content" role="main">
+
     @await Html.PartialAsync("_ServiceInfo")
 
-    <div class="grid-row">
-        @using (Html.BeginForm())
-        {
-            @Html.AntiForgeryToken()
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
 
-            <div class="column-two-thirds">
-                @await Html.CustomValidationSummaryAsync()
-                <h1 class="heading-large">
-                   Enter your registration PIN
+                @await Html.GovUkValidationSummaryAsync()
+                <h1 class="govuk-heading-l">
+                    Enter your registration PIN
                 </h1>
-                <p>
+                <p class="govuk-body">
                     Enter the PIN we sent you by post to finish registering this organisation.
                 </p>
-                <p>
+                <p class="govuk-body">
                     You will then be able to submit information about this organisation`s modern slavery statement.
-                </p>                    
-               
-                <div class="form-group @Html.SetErrorClass(model => model.PIN, "error") ">
-                    @Html.LabelFor(model => model.PIN, "Enter PIN", new {@class = "form-label"})
-                    @Html.ValidationMessageFor(model => model.PIN, null, new {@class = "error-danger"})
-                    <div class="col-md-10">
-                        @Html.CustomEditorFor(model => model.PIN, new {@class = "form-control", style = "text-transform: uppercase;", autocomplete = "off"})
-                    </div>
-                </div>
-                <br/>
-                <details>
-                    <summary role="button" aria-controls="details-content-0" aria-expanded="true">Problems with your PIN?</summary>
-                    <div class="panel panel-border-narrow" id="details-content-0" aria-hidden="false">
-                        <p>
-                            If your PIN hasn't arrived after 7 days or has expired, <a href="@Url.Action("RequestPIN")">request a new PIN</a>.
-                        </p>
-
-                    </div>
-                </details> <br/>
-
-                <input type="submit" class="button" name="command" value="Activate and continue"/>
-                <p>
-                    <br/>
-                    <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Cancel</a>
                 </p>
-            </div>
-        }
-    </div>
-</main>
+
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.PIN, "govuk-form-group--error") ">
+                    @Html.LabelFor(model => model.PIN, "Enter PIN", new { @class = "govuk-label" })
+                    @Html.ValidationMessageFor(model => model.PIN, null, new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
+                    <div class="col-md-10">
+                        @Html.CustomEditorFor(model => model.PIN, new { @class = "govuk-input govuk-!-width-one-half", style = "text-transform: uppercase;", autocomplete = "off" })
+                    </div>
+                </div>              
+                <details class="govuk-details" data-module="govuk-details">
+                    <summary class="govuk-details__summary">                       
+                        <span class="govuk-details__summary-text">
+                            Problems with your PIN?
+                        </span>
+                    </summary>
+                    <div class="govuk-details__text">                        
+                            If your PIN hasn't arrived after 7 days or has expired, <a class="govuk-link" href="@Url.Action("RequestPIN")">request a new PIN</a>.
+                    </div>
+                </details> 
+
+                <input type="submit" class="govuk-button" name="command" value="Activate and continue" />
+                <p class="govuk-body">                    
+                    <a class="govuk-link" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Cancel</a>
+                </p>
+
+            }
+        </div>
+        </div>

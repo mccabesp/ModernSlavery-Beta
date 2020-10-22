@@ -1,7 +1,7 @@
 ﻿@model RemoveOrganisationModel
 @inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Confirm removal of organisation - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
 
@@ -9,61 +9,61 @@
     var userRemovingSelf = controller.CurrentUser.UserId == userId && controller.IsImpersonatingUser == false;
     var userNamePostFix = userRemovingSelf ? "You" : "";
 }
-<main id="content" role="main">
-    @using (Html.BeginForm())
-    {
-        @Html.AntiForgeryToken()
-        @Html.HiddenFor(m => m.EncOrganisationId)
-        @Html.HiddenFor(m => m.EncUserId)
-        @Html.HiddenFor(m => m.OrganisationName)
-        @Html.HiddenFor(m => m.UserName)
 
-        <div class="grid-row">
-            <div class="column-two-thirds">
-                <h1 class="heading-large">
-                    Confirm removal of user
-                </h1>
-                <p>Once the user has been removed, they will no longer be able to submit a modern slavery statement for this organisation.</p>
-                <dl class="govuk-check-your-answers cya-questions-short">
-                    <div>
-                        <dt class="cya-question">
-                            User name
-                        </dt>
-                        <dd id="UserNameAnswer" class="cya-answer">
-                            @Model.UserName
-                            @if (string.IsNullOrEmpty(userNamePostFix) == false)
-                            {
-                                <span>(@userNamePostFix)</span>
-                            }
-                        </dd>
-                    </div>
-                    <div>
-                        <dt class="cya-question">
-                            Organisation name
-                        </dt>
-                        <dd id="OrgNameAnswer" class="cya-answer">
-                            @Model.OrganisationName
-                        </dd>
-                    </div>
-                    <div>
-                        <dt class="cya-question">
-                            Address
-                        </dt>
-                        <dd id="OrgAddressAnswer" class="cya-answer">
-                            @Html.Raw(Model.OrganisationAddress.Replace(",", "&#44;<br/>"))
-                        </dd>
-                    </div>
-                </dl>
-                <br />
-                <div class="form-group">
-                    <p>
-                        <button type="submit" class="button button-warning" name="id">Remove user</button>
-                    </p>
-                    <p>
-                       <a href="@(Url.ActionArea("ManageOrganisation", "Submission", "Submission", new {organisationIdentifier = Model.EncOrganisationId}))">Cancel</a>
-                    </p>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.EncOrganisationId)
+            @Html.HiddenFor(m => m.EncUserId)
+            @Html.HiddenFor(m => m.OrganisationName)
+            @Html.HiddenFor(m => m.UserName)
+
+            <h1 class="govuk-heading-l">
+                Confirm removal of user
+            </h1>
+            <p class="govuk-body">Once the user has been removed, they will no longer be able to submit a modern slavery statement for this organisation.</p>
+            
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        User name
+                    </dt>
+                    <dd id="UserNameAnswer" class="govuk-summary-list__value">
+                        @Model.UserName
+                        @if (string.IsNullOrEmpty(userNamePostFix) == false)
+                        {
+                            <span>(@userNamePostFix)</span>
+                        }
+                    </dd>
                 </div>
-            </div>
-        </div>
-    }
-</main>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Organisation name
+                    </dt>
+                    <dd id="OrgNameAnswer" class="govuk-summary-list__value">
+                        @Model.OrganisationName
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
+                        Address
+                    </dt>
+                    <dd id="OrgAddressAnswer" class="govuk-summary-list__value">
+                        @Html.Raw(Model.OrganisationAddress.Replace(",", "&#44;<br/>"))
+                    </dd>
+                </div>
+            </dl>          
+           
+              
+                    <button type="submit" class="govuk-button button-warning" name="id">Remove user</button>
+              
+                <p class="govuk-body">
+                    <a class="govuk-link" href="@(Url.ActionArea("ManageOrganisation", "Submission", "Submission", new {organisationIdentifier = Model.EncOrganisationId}))">Cancel</a>
+                </p>
+           
+
+        }
+    </div>
+</div>
