@@ -15,7 +15,7 @@
                     <div class="gov-uk-c-searchbar">
                         <div class="gov-uk-l-searchbar__table">
                             <div class="gov-uk-l-searchbar__cell">
-                                @Html.TextBoxFor(m => m.GroupResults.SearchKeywords, new { value = "@(Model)", aria_expanded = "false", @class = "gov-uk-c-searchbar__input", type = "text", autocomplete = "on", spellcheck = "false", maxlength = "100" })<br />
+                                @Html.TextBoxFor(m => m.GroupResults.SearchKeywords, new { value = "@(Model)", @class = "gov-uk-c-searchbar__input",aria-label="Search" type = "text", autocomplete = "on", spellcheck = "false", maxlength = "100" })<br />
                                 <span asp-validation-for="GroupResults.SearchKeywords" class="govuk-error-message"></span>
                             </div>
                             <div class="gov-uk-l-searchbar__cell">
