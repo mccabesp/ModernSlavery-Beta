@@ -8,8 +8,12 @@
         margin: 15px 0px;
     }
 
+    .govuk-grid-row:last-child {
+        margin-bottom: 0px;
+    }
+
     .govuk-grid-column-one-third, .govuk-grid-column-two-thirds {
-        padding: 0px;       
+        padding: 0px;
     }
 
     .blue-header a, .blue-header {
@@ -22,11 +26,16 @@
     }
 
     .grey-text {
-      color:  $govuk-border-colour;
+        color: $govuk-border-colour;
     }
 
-    .small{
-        display:none;
+    .small {
+        display: none;
+    }
+
+    .govuk-list > li:last-child
+    {
+        margin-bottom:0px;
     }
 }
 

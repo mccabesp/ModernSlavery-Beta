@@ -550,7 +550,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 "ChangeEmail/ChangeEmailPending",
                 "ChangeEmail/VerifyChangeEmail",
                 "ChangeEmail/ChangeEmailFailed",
-                "ChangeEmail/CompleteChangeEmailAsync",
+                "ChangeEmail/CompleteChangeEmail",
                 "ChangeDetails/ChangeDetails",
                 "ChangePassword/ChangePassword",
                 "CloseAccount/CloseAccount"))
