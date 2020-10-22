@@ -50,7 +50,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
 
-        [Test, Order(42), Parallelizable]
+        [Test, Order(42)]
         public async Task CheckSectorPageText()
         {
             ExpectHeader("Your organisation");
@@ -64,7 +64,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             await Task.CompletedTask;
         }
 
-        [Test, Order(44), Parallelizable]
+        [Test, Order(44)]
         public async Task CheckSectorSectors()
         {
 
@@ -74,7 +74,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             await Task.CompletedTask;
         }
 
-        [Test, Order(46), NonParallelizable]
+        [Test, Order(46)]
         public async Task CheckSectorFinancialOptions()
         {
             //expect all financial options in order
