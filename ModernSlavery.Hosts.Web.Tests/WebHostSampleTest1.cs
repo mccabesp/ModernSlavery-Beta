@@ -141,7 +141,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Check for the landing page header
             Expect(What.Contains,_sharedOptions.ServiceName);
 
-            Expect("It may take up to a week to register your organisation");
+//            Expect("It may take up to a week to register your organisation");
         }
     }
 }
