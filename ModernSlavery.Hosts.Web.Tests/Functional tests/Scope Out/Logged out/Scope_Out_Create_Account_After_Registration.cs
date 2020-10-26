@@ -17,7 +17,7 @@ using ModernSlavery.Testing.Helpers.Extensions;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture]
+    [TestFixture, Ignore("Need to review verif link visibility")]
 
     public class Scope_Out_Create_Account_After_Registration : Scope_Out_Mark_Org_As_OOS_LoggedOut
     {

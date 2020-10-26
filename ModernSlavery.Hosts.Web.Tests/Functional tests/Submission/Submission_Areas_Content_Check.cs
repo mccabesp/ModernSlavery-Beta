@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Need to revie text boxes")]
 
 
     public class Submission_Areas_Content_Check : Private_Registration_Success
