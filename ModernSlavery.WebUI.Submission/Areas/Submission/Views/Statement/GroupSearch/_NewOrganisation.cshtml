@@ -7,7 +7,7 @@
 <div class="govuk-grid-row govuk-!-margin-bottom-6 govuk-!-margin-top-4">
     <div class="govuk-grid-column-two-thirds">
 
-        @Html.LabelFor(m => m.GroupResults.OrganisationName, "Tell us the name of the organisation", new { @class = "govuk-label" })
+        @Html.LabelFor(m => m.GroupResults.OrganisationName, "Or type in the name of the organisation", new { @class = "govuk-label" })
         @if (Model.StatementOrganisations.Any(x => x.OrganisationId == null && x.ManuallyAdded != false))
         {
             <table class="govuk-table organisation-list">
