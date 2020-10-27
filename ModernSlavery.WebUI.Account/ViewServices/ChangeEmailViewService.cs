@@ -74,7 +74,7 @@ namespace ModernSlavery.WebUI.Account.ViewServices
             {
                 errorState.AddModelError(
                     nameof(CompleteChangeEmailAsync),
-                    "Cannot complete the change email process because your verify url has expired.");
+                    "We cannot complete your request to change your email address because the link we sent you to verify the new email address has expired. You can still sign into your account using your old email address then change the email address again.");
                 return errorState;
             }
 
@@ -95,7 +95,7 @@ namespace ModernSlavery.WebUI.Account.ViewServices
             {
                 errorState.AddModelError(
                     nameof(CompleteChangeEmailAsync),
-                    "Cannot complete the change email process because the new email address has been registered since this change was requested.");
+                    "We cannot change your email address to the one you specified because this address has been registered on our system since you made your request. You can still sign into your account using your old email address then change the email address again.");
                 return errorState;
             }
 
