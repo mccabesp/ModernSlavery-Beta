@@ -29,13 +29,7 @@
 }
 
 button.link-button{
-    border: none;
-    background: none;
-    text-decoration: underline;
-    cursor: pointer;
-    color: $govuk-brand-colour;
-    font-size: 19px;    
-
+    
     &.find-organisation {
         padding:0px;
         margin-bottom:20px;

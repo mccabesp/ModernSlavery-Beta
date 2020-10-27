@@ -7,7 +7,7 @@
     <a href="@Url.Action("AddOrganisation")" class="govuk-back-link">Back</a>
 }
 
-<div class="govuk-grid-row">
+<div class="govuk-grid-row select-organisation">
     <div class="govuk-grid-column-full">
         @using (Html.BeginForm())
         {
@@ -28,12 +28,12 @@
      {
                     <p>The following organisations match your references. Select the organisation you wish to report for from the list below.</p>
      }
-                <table class="govuk-table govuk-!-font-size-16" summary="A list organisations that match your organisation details">                  
+                <table class="search govuk-table govuk-!-font-size-16" summary="A list organisations that match your organisation details">                  
                     <thead class="govuk-table__head">
                         <tr class="govuk-table__row">
-                            <th scope="col" class="govuk-table__header govuk-!-width-one-half">Organisation name and registered address</th>
-                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">References</th>
-                            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">&nbsp;</th>
+                            <th scope="col" class="govuk-table__header">Organisation name and registered address</th>
+                            <th scope="col" class="govuk-table__header">References</th>
+                            <th scope="col" class="govuk-table__header">&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody class="govuk-table__body">
@@ -41,7 +41,8 @@
                         {
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell">
-                                    @Model.ManualOrganisations[i].OrganisationName <span>@Model.ManualOrganisations[i].GetFullAddress()</span>
+                                    @Model.ManualOrganisations[i].OrganisationName 
+                                    <span class="govuk-!-font-size-14">@Model.ManualOrganisations[i].GetFullAddress()</span>
                                 </td>
                                 <td class="govuk-table__cell">
                                     @{ var references = Model.GetReferences(i); }
@@ -51,7 +52,7 @@
                                     }
                                 </td>
                                 <td class="govuk-table__cell">
-                                    <button type="submit" class="link-button govuk-!-font-size-16" name="command" value="organisation_@i">Choose&nbsp;organisation</button>
+                                    <button type="submit" class="link-button govuk-link govuk-!-font-size-16" name="command" value="organisation_@i">Choose&nbsp;organisation</button>
                                 </td>
                             </tr>
                                         }
