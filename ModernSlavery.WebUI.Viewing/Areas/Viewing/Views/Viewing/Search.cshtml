@@ -43,36 +43,38 @@
                         <partial name="Parts/_SearchKeywords" model="Model" />
                     </div>
                 </div>
-                <details class="govuk-details advanced-search-details" data-module="govuk-details">
-                    <summary data-open="Fewer search options" data-close="Advanced search" class="govuk-details__summary">
+                <div class="govuk-form-group">
+                    <details class="govuk-details advanced-search-details" data-module="govuk-details">
+                        <summary data-open="Fewer search options" data-close="Advanced search" class="govuk-details__summary">
 
-                    </summary>
-                    <div class="govuk-details__text">
-                        @foreach (var filter in filters)
-                        {
-                            <div id="checkboxes-@(filter.Id)" class="advanced-search-checkboxes govuk-form-group govuk-checkboxes--small" data-module="govuk-checkboxes">
-                                <fieldset class="govuk-fieldset">
-                                    <h4 class="govuk-heading-s">
-                                        @filter.Label
-                                    </h4>
-                                    <ul class="govuk-checkboxes advanced-search-checkboxes__list @(filter.Id == "SectorFilter"? "two-columns": "")">
-                                        @foreach (var item in filter.Metadata)
-                                        {
-                                            <li class="govuk-checkboxes__item">
-                                                <input type="checkbox" name="@(filter.Group)" id="@(item.Id)" value="@(item.Value)" checked="@(item.Checked)" class="govuk-checkboxes__input" />
-                                                <label for="@(item.Id)" class="govuk-label govuk-checkboxes__label">@item.Label</label>
-                                            </li>
-                                        }
-                                    </ul>
-                                </fieldset>
-                            </div>
-                        }
-                    </div>
-                    <button class="govuk-button" data-module="govuk-button" name="search" type="submit">Search</button>
+                        </summary>
+                        <div class="govuk-details__text">
+                            @foreach (var filter in filters)
+                            {
+                                <div id="checkboxes-@(filter.Id)" class="advanced-search-checkboxes govuk-form-group govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                    <fieldset class="govuk-fieldset">
+                                        <h4 class="govuk-heading-s">
+                                            @filter.Label
+                                        </h4>
+                                        <ul class="govuk-checkboxes advanced-search-checkboxes__list @(filter.Id == "SectorFilter"? "two-columns": "")">
+                                            @foreach (var item in filter.Metadata)
+                                            {
+                                                <li class="govuk-checkboxes__item">
+                                                    <input type="checkbox" name="@(filter.Group)" id="@(item.Id)" value="@(item.Value)" checked="@(item.Checked)" class="govuk-checkboxes__input" />
+                                                    <label for="@(item.Id)" class="govuk-label govuk-checkboxes__label">@item.Label</label>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </fieldset>
+                                </div>
+                            }
+                            <button class="govuk-button govuk-!-margin-top-3" data-module="govuk-button" name="search" type="submit">Search</button>
 
-                </details>
-                <a class="govuk-button govuk-button--secondary" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">See all statements</a>
-            }
+                        </div>                       
+                    </details>
+                    <a class="govuk-button govuk-button--secondary" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">See all statements</a>
+                </div>
+                    }
         </div>
     </div>
 
