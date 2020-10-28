@@ -17,13 +17,14 @@ namespace ModernSlavery.Core.Models
         public string SicCodes { get; set; }
         public DateTime? LatestRegistrationDate { get; set; }
         public RegistrationMethods? LatestRegistrationMethod { get; set; }
-        public DateTime? LatestSubmission { get; set; }
         public ScopeStatuses? ScopeStatus { get; set; }
         public DateTime? ScopeDate { get; set; }
         public DateTime Created { get; set; }
 
-        public bool IsGroupSubmission { get; set; }
-        public DateTime FirstSubmittedDate { get; set; }
+        public bool? IsGroupStatement { get; set; }
+        public DateTime? LatestSubmission { get; set; }
+        public DateTime? FirstSubmittedDate { get; set; }
+        public int NumberOfStatements { get; set; }
 
         #region SecurityCode information
 

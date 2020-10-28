@@ -75,39 +75,98 @@ namespace ModernSlavery.BusinessDomain.Registration
 #endif
             var records = new List<OrganisationsFileModel>();
 
-            foreach (var o in orgs)
+            foreach (var org in orgs)
             {
-                var record = new OrganisationsFileModel
-                {
-                    OrganisationId = o.OrganisationId,
-                    OrganisationReference = o.OrganisationReference,
-                    OrganisationName = o.OrganisationName,
-                    CompanyNo = o.CompanyNumber,
-                    Sector = o.SectorType,
-                    Status = o.Status,
-                    StatusDate = o.StatusDate,
-                    StatusDetails = o.StatusDetails,
-                    Address = o.LatestAddress?.GetAddressString(),
-                    SicCodes = GetOrganisationSicCodeIdsString(o),
-                    LatestRegistrationDate = o.LatestRegistration?.PINConfirmedDate,
-                    LatestRegistrationMethod = o.LatestRegistration?.Method,
-                    Created = o.Created,
-                    SecurityCode = o.SecurityCode,
-                    SecurityCodeExpiryDateTime = o.SecurityCodeExpiryDateTime,
-                    SecurityCodeCreatedDateTime = o.SecurityCodeCreatedDateTime
-                };
-
-                var latestStatement = await _submissionLogic.GetLatestStatementByDeadlineYearAsync(o.OrganisationId, year);
-                var reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(o.SectorType, year);
-                var latestScope = await _scopeLogic.GetScopeByReportingDeadlineOrLatestAsync(o.OrganisationId, reportingDeadline);
-
-                record.LatestSubmission = latestStatement?.Modified;
-                record.ScopeStatus = latestScope?.ScopeStatus;
-                record.ScopeDate = latestScope?.ScopeStatusDate;
+                var record = await MapToOrgFileModel(org, year);
                 records.Add(record);
             }
 
             return records;
+        }
+
+        private async Task<OrganisationsFileModel> MapToOrgFileModel(Organisation org, int year)
+        {
+            var reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(org.SectorType, year);
+            var statement = await GetPrimaryStatementForYear(org, year);
+            var latestScope = await _scopeLogic.GetScopeByReportingDeadlineOrLatestAsync(org.OrganisationId, reportingDeadline);
+
+            var record = new OrganisationsFileModel
+            {
+                OrganisationId = org.OrganisationId,
+                OrganisationReference = org.OrganisationReference,
+                OrganisationName = org.OrganisationName,
+                CompanyNo = org.CompanyNumber,
+                Sector = org.SectorType,
+                Status = org.Status,
+                StatusDate = org.StatusDate,
+                StatusDetails = org.StatusDetails,
+                Address = org.LatestAddress?.GetAddressString(),
+                SicCodes = GetOrganisationSicCodeIdsString(org),
+                LatestRegistrationDate = org.LatestRegistration?.PINConfirmedDate,
+                LatestRegistrationMethod = org.LatestRegistration?.Method,
+                Created = org.Created,
+                SecurityCode = org.SecurityCode,
+                SecurityCodeExpiryDateTime = org.SecurityCodeExpiryDateTime,
+                SecurityCodeCreatedDateTime = org.SecurityCodeCreatedDateTime,
+
+                ScopeStatus = latestScope?.ScopeStatus,
+                ScopeDate = latestScope?.ScopeStatusDate,
+
+                IsGroupStatement = statement?.StatementOrganisations.Any(),
+                FirstSubmittedDate = statement?.Created,
+                LatestSubmission = statement?.Modified,
+                NumberOfStatements = await CountStatementsIncludedForYear(org, year)
+            };
+
+            return record;
+        }
+
+        public async Task<int> CountStatementsIncludedForYear(Organisation organisation, int year)
+        {
+            var selfSubmittedReport = await DataRepository.FirstOrDefaultAsync<Statement>(s =>
+                s.OrganisationId == organisation.OrganisationId
+                && s.SubmissionDeadline.Year == year
+                && s.Status == StatementStatuses.Submitted);
+
+            var count = (selfSubmittedReport != null ? 1 : 0);
+
+            var submittedGroup = DataRepository.GetAll<StatementOrganisation>()
+                .Where(so =>
+                    so.OrganisationId == organisation.OrganisationId
+                    && so.Included
+                    && so.Statement.SubmissionDeadline.Year == year
+                    && so.Statement.Status == StatementStatuses.Submitted)
+                .OrderBy(so => so.Statement.StatusDate)
+                .Count();
+
+            count += submittedGroup;
+
+            return count;
+        }
+
+        public async Task<Statement> GetPrimaryStatementForYear(Organisation organisation, int year)
+        {
+            // if they reported for themselves, that takes primacy
+            var submittedStatement = await DataRepository.FirstOrDefaultAsync<Statement>(s =>
+                s.OrganisationId == organisation.OrganisationId
+                && s.SubmissionDeadline.Year == year
+                && s.Status == StatementStatuses.Submitted);
+
+            if (submittedStatement != null)
+                return submittedStatement;
+
+            // if they are in a group, the earlist submitted report has primacy
+            var earliestSubmittedGroup = DataRepository.GetAll<StatementOrganisation>()
+                .Where(so =>
+                    so.OrganisationId == organisation.OrganisationId
+                    && so.Included
+                    && so.Statement.SubmissionDeadline.Year == year
+                    && so.Statement.Status == StatementStatuses.Submitted)
+                .OrderBy(so => so.Statement.StatusDate)
+                .FirstOrDefault()
+                ?.Statement;
+
+            return earliestSubmittedGroup;
         }
 
         public virtual async Task SetUniqueOrganisationReferencesAsync()
