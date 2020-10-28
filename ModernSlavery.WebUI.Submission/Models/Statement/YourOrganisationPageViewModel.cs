@@ -9,6 +9,7 @@ using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Binding;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Entities;
+using static ModernSlavery.Core.Entities.Statement;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -56,7 +57,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public string OtherSector { get; set; }
 
         [Display(Name = "What was your turnover or budget during the last financial accounting year?")]
-        public StatementTurnovers? Turnover { get; set; }
+        public StatementTurnoverRanges? Turnover { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -76,7 +77,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             return Sectors.Any()
                 && !Sectors.Any(t => t == other.Id && string.IsNullOrWhiteSpace(OtherSector))
-                && Turnover != StatementTurnovers.NotProvided;
+                && Turnover != StatementTurnoverRanges.NotProvided;
         }
     }
 }

@@ -7,9 +7,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
+using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
+using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1.StatementRisk;
 
 namespace ModernSlavery.WebAPI.Public.Classes
 {
@@ -94,14 +95,24 @@ namespace ModernSlavery.WebAPI.Public.Classes
                     return addressModel.GetFullAddress(Environment.NewLine);
                 case SectorTypeIndex.SectorType sectorType:
                     return sectorType.Description;
-                case PolicyTypeIndex.PolicyType policyType:
-                    return policyType.Description;
-                case RiskTypeIndex.RiskType riskType:
-                    return riskType.Description;
-                case DiligenceTypeIndex.DiligenceType diligenceType:
-                    return diligenceType.Description;
-                case TrainingTypeIndex.TrainingType trainingType:
-                    return trainingType.Description;
+                case PolicyTypes type:
+                    return type.GetEnumDescription();
+                case TrainingTargetTypes type:
+                    return type.GetEnumDescription();
+                case PartnerTypes type:
+                    return type.GetEnumDescription();
+                case SocialAuditTypes type:
+                    return type.GetEnumDescription();
+                case GrievanceMechanismTypes type:
+                    return type.GetEnumDescription();
+                case RiskSourceTypes type:
+                    return type.GetEnumDescription();
+                case RiskTargetTypes type:
+                    return type.GetEnumDescription();
+                case IndicatorTypes type:
+                    return type.GetEnumDescription();
+                case RemediationTypes type:
+                    return type.GetEnumDescription();
                 default:
                     return value.ToString();
             }

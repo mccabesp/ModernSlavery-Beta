@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Net;
+using static ModernSlavery.Core.Entities.Statement;
 
 namespace ModernSlavery.WebAPI.Models
 {
@@ -62,7 +63,7 @@ namespace ModernSlavery.WebAPI.Models
 
             foreach (var turnover in Turnovers)
                 // ensure we have a valid org turnover
-                if (!Enum.IsDefined(typeof(StatementTurnovers), turnover))
+                if (!Enum.IsDefined(typeof(StatementTurnoverRanges), turnover))
                     return false;
 
             return true;
@@ -76,6 +77,14 @@ namespace ModernSlavery.WebAPI.Models
 
             if (!IsOrganisationTurnoverValid())
                 result = new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"Invalid Turnovers {Turnovers.ToDelimitedString()}");
+
+            //TODO: Check validity of sectors
+
+            //TODO: Check validity of years
+
+            //TODO: Check validity of page number
+
+            //TODO: Check validity of page size
 
             return result == null;
         }

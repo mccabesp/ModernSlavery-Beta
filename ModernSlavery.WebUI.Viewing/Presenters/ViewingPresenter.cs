@@ -21,6 +21,7 @@ using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Viewing.Models;
 using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
+using static ModernSlavery.Core.Entities.Statement;
 
 namespace ModernSlavery.WebUI.Viewing.Presenters
 {
@@ -122,15 +123,15 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         #region Filter methods
         public List<OptionSelect> GetTurnoverOptions(IEnumerable<byte> filterTurnoverRanges)
         {
-            var allRanges = Enums.GetValues<StatementTurnovers>();
+            var allRanges = Enums.GetValues<StatementTurnoverRanges>();
 
             // setup the filters
             var results = new List<OptionSelect>();
             foreach (var range in allRanges)
             {
-                if (range == StatementTurnovers.NotProvided) continue;
+                if (range == StatementTurnoverRanges.NotProvided) continue;
                 var id = (byte)range;
-                var label = range.GetDisplayDescription();
+                var label = range.GetEnumDescription();
                 var isChecked = filterTurnoverRanges != null && filterTurnoverRanges.Contains(id);
                 results.Add(
                     new OptionSelect

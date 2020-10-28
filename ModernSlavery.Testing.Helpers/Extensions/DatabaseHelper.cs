@@ -18,7 +18,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
     public static class DatabaseHelper
     {
         private const string LastFullDatabaseResetKey = "LastFullDatabaseReset";
-        private static readonly int? CommandTimeout=500;
+        private static readonly int? CommandTimeout = 500;
 
         /// <summary>
         /// Deletes all tables in the database (except _EFMigrationsHistory) and reimports all seed data
@@ -34,13 +34,13 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             if (!force)
             {
                 var lastFullDatabaseReset = string.IsNullOrWhiteSpace(vaultName) ? RegistryHelper.GetRegistryKey(LastFullDatabaseResetKey).ToDateTime() : host.GetKeyVaultSecret(vaultName, LastFullDatabaseResetKey).ToDateTime();
-                if (lastFullDatabaseReset > DateTime.MinValue && lastFullDatabaseReset.Date==DateTime.Now.Date)
+                if (lastFullDatabaseReset > DateTime.MinValue && lastFullDatabaseReset.Date == DateTime.Now.Date)
                 {
                     dataRepository.ResetDatabase(lastFullDatabaseReset);
                     return;
                 }
             }
-            
+
             dataRepository.SetCommandTimeout(CommandTimeout);//Give the batch command 5 mins to timout - required on Basic SQL tier
             dataRepository.GetAll<AuditLog>().BatchDelete();
             dataRepository.GetAll<Feedback>().BatchDelete();
@@ -53,19 +53,13 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             dataRepository.GetAll<PublicSectorType>().BatchDelete();
             dataRepository.GetAll<SicCode>().BatchDelete();
             dataRepository.GetAll<SicSection>().BatchDelete();
-            dataRepository.GetAll<StatementDiligenceType>().BatchDelete();
-            dataRepository.GetAll<StatementPolicyType>().BatchDelete();
-            dataRepository.GetAll<StatementRiskType>().BatchDelete();
-            dataRepository.GetAll<StatementTrainingType>().BatchDelete();
+
+
 
             var dataImporter = host.Services.GetService<IDataImporter>();
             dataImporter.ImportSICSectionsAsync().Wait();
             dataImporter.ImportSICCodesAsync().Wait();
-            dataImporter.ImportStatementDiligenceTypesAsync().Wait();
-            dataImporter.ImportStatementPolicyTypesAsync().Wait();
-            dataImporter.ImportStatementRiskTypesAsync().Wait();
             dataImporter.ImportStatementSectorTypesAsync().Wait();
-            dataImporter.ImportStatementTrainingTypesAsync().Wait();
             dataImporter.ImportPrivateOrganisationsAsync(-1, 100).Wait();
             dataImporter.ImportPublicOrganisationsAsync(-1, 100).Wait();
 
@@ -107,10 +101,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             dataRepository.GetAll<PublicSectorType>().Where(r => r.Created >= createdDate).BatchDelete();
             dataRepository.GetAll<SicCode>().Where(r => r.Created >= createdDate).BatchDelete();
             dataRepository.GetAll<SicSection>().Where(r => r.Created >= createdDate).BatchDelete();
-            dataRepository.GetAll<StatementDiligenceType>().Where(r => r.Created >= createdDate).BatchDelete();
-            dataRepository.GetAll<StatementPolicyType>().Where(r => r.Created >= createdDate).BatchDelete();
-            dataRepository.GetAll<StatementRiskType>().Where(r => r.Created >= createdDate).BatchDelete();
-            dataRepository.GetAll<StatementTrainingType>().Where(r => r.Created >= createdDate).BatchDelete();
+
         }
 
         /// <summary>

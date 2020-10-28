@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
+using static ModernSlavery.Core.Entities.Statement;
 
 namespace ModernSlavery.WebUI.Viewing.Models
 {
@@ -60,7 +61,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
 
             foreach (var turnover in Turnovers)
                 // ensure we have a valid org turnover
-                if (!Enum.IsDefined(typeof(StatementTurnovers), turnover))
+                if (!Enum.IsDefined(typeof(StatementTurnoverRanges), turnover))
                     return false;
 
             return true;

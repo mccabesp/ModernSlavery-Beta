@@ -20,6 +20,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         public DateTime SubmissionDeadline { get; set; }
         public DateTime ModifiedDate { get; set; }
         public string StatementUrl { get; set; }
+        public string StatementEmail { get; set; }
         public string ApprovingPerson { get; set; }
         public string Turnover { get; set; }
         public string Modifications { get; set; }

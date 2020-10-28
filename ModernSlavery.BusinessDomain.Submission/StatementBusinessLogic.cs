@@ -197,126 +197,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                     statement.Sectors.Add(sector);
                 }
             });
-
-            //Map the Policies
-            statement.Policies.Where(s => !statementModel.Policies.Contains(s.StatementPolicyTypeId)).ForEach(s => { statement.Policies.Remove(s); _organisationBusinessLogic.DataRepository.Delete(s); });
-            statementModel.Policies.ForEach(id =>
-            {
-                var policy = statement.Policies.FirstOrDefault(s => s.StatementPolicyTypeId == id);
-                if (policy == null)
-                {
-                    policy = new StatementPolicy()
-                    {
-                        StatementPolicyTypeId = id,
-                        StatementPolicyType = _organisationBusinessLogic.DataRepository.Get<StatementPolicyType>(id),
-                        StatementId = statement.StatementId
-                    };
-
-                    statement.Policies.Add(policy);
-                }
-            });
-
-            //Map the Relevant Risks
-            statement.RelevantRisks.Where(s => !statementModel.RelevantRisks.Any(model => model.Id == s.StatementRiskTypeId)).ForEach(s => { statement.RelevantRisks.Remove(s); _organisationBusinessLogic.DataRepository.Delete(s); });
-            statementModel.RelevantRisks.ForEach(model =>
-            {
-                var relevantRisk = statement.RelevantRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
-                if (relevantRisk == null)
-                {
-                    relevantRisk = new StatementRelevantRisk()
-                    {
-                        StatementRiskTypeId = model.Id,
-                        StatementRiskType = _organisationBusinessLogic.DataRepository.Get<StatementRiskType>(model.Id),
-                        Details = model.Details,
-                        StatementId = statement.StatementId
-                    };
-
-                    statement.RelevantRisks.Add(relevantRisk);
-                }
-                else
-                    relevantRisk.Details = model.Details;
-            });
-
-            //Map the High Risks
-            statement.HighRisks.Where(s => !statementModel.HighRisks.Any(model => model.Id == s.StatementRiskTypeId)).ForEach(s => { statement.HighRisks.Remove(s); _organisationBusinessLogic.DataRepository.Delete(s); });
-            statementModel.HighRisks.ForEach(model =>
-            {
-                var highRisk = statement.HighRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
-                if (highRisk == null)
-                {
-                    highRisk = new StatementHighRisk()
-                    {
-                        StatementRiskTypeId = model.Id,
-                        StatementRiskType = _organisationBusinessLogic.DataRepository.Get<StatementRiskType>(model.Id),
-                        Details = model.Details,
-                        StatementId = statement.StatementId
-                    };
-
-                    statement.HighRisks.Add(highRisk);
-                }
-                else
-                    highRisk.Details = model.Details;
-            });
-
-            //Map the Location Risks
-            statement.LocationRisks.Where(s => !statementModel.LocationRisks.Any(model => model.Id == s.StatementRiskTypeId)).ForEach(s => { statement.LocationRisks.Remove(s); _organisationBusinessLogic.DataRepository.Delete(s); });
-            statementModel.LocationRisks.ForEach(model =>
-            {
-                var locationRisk = statement.LocationRisks.FirstOrDefault(s => s.StatementRiskTypeId == model.Id);
-                if (locationRisk == null)
-                {
-                    locationRisk = new StatementLocationRisk()
-                    {
-                        StatementRiskTypeId = model.Id,
-                        StatementRiskType = _organisationBusinessLogic.DataRepository.Get<StatementRiskType>(model.Id),
-                        Details = model.Details,
-                        StatementId = statement.StatementId
-                    };
-
-                    statement.LocationRisks.Add(locationRisk);
-                }
-                else
-                    locationRisk.Details = model.Details;
-            });
-
-            //Map the Due Diligences
-            statement.Diligences.Where(s => !statementModel.DueDiligences.Any(model => model.Id == s.StatementDiligenceTypeId)).ForEach(s => { statement.Diligences.Remove(s); _organisationBusinessLogic.DataRepository.Delete(s); });
-            statementModel.DueDiligences.ForEach(model =>
-            {
-                var diligence = statement.Diligences.FirstOrDefault(s => s.StatementDiligenceTypeId == model.Id);
-                if (diligence == null)
-                {
-                    diligence = new StatementDiligence()
-                    {
-                        StatementDiligenceTypeId = model.Id,
-                        StatementDiligenceType = _organisationBusinessLogic.DataRepository.Get<StatementDiligenceType>(model.Id),
-                        Details = model.Details,
-                        StatementId = statement.StatementId
-                    };
-
-                    statement.Diligences.Add(diligence);
-                }
-                else
-                    diligence.Details = model.Details;
-            });
-
-            //Map the Training
-            statement.Training.Where(s => !statementModel.Training.Contains(s.StatementTrainingTypeId)).ForEach(s => { statement.Training.Remove(s); _organisationBusinessLogic.DataRepository.Delete(s); });
-            statementModel.Training.ForEach(id =>
-            {
-                var training = statement.Training.FirstOrDefault(s => s.StatementTrainingTypeId == id);
-                if (training == null)
-                {
-                    training = new StatementTraining()
-                    {
-                        StatementTrainingTypeId = id,
-                        StatementTrainingType = _organisationBusinessLogic.DataRepository.Get<StatementTrainingType>(id),
-                        StatementId = statement.StatementId
-                    };
-
-                    statement.Training.Add(training);
-                }
-            });
         }
 
         private async Task<Outcome<StatementErrors, (Organisation Organisation, DateTime ReportingDeadline)>> GetOrganisationAndDeadlineAsync(long organisationId, int reportingDeadlineYear)
@@ -389,7 +269,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (newModel == null) throw new ArgumentNullException(nameof(newModel));
 
             //Compare the two statementModels
-            var membersToIgnore = new[] { nameof(StatementModel.ReturnToReviewPage), nameof(StatementModel.DraftBackupDate), nameof(StatementModel.EditorUserId), nameof(StatementModel.EditTimestamp), nameof(StatementModel.StatementId), nameof(StatementModel.OrganisationName), nameof(StatementModel.Status), nameof(StatementModel.StatusDate), nameof(StatementModel.SubmissionDeadline), nameof(StatementModel.OrganisationId), nameof(StatementModel.ReturnToReviewPage), nameof(StatementModel.Modifications), nameof(StatementModel.EHRCResponse), nameof(StatementModel.LateReason), nameof(StatementModel.IncludedOrganisationCount), nameof(StatementModel.ExcludedOrganisationCount), nameof(StatementModel.Modified), nameof(StatementModel.Created) };
+            var membersToIgnore = new[] { nameof(StatementModel.ReturnToReviewPage), nameof(StatementModel.DraftBackupDate), nameof(StatementModel.EditorUserId), nameof(StatementModel.EditTimestamp), nameof(StatementModel.StatementId), nameof(StatementModel.OrganisationName), nameof(StatementModel.Status), nameof(StatementModel.StatusDate), nameof(StatementModel.SubmissionDeadline), nameof(StatementModel.OrganisationId), nameof(StatementModel.ReturnToReviewPage), nameof(StatementModel.Modifications), nameof(StatementModel.LateReason), nameof(StatementModel.Modified), nameof(StatementModel.Created) };
             var differences = oldModel.GetDifferences(newModel, membersToIgnore).ToList();
             return differences;
         }

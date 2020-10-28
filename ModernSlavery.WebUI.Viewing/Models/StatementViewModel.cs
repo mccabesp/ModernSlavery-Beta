@@ -6,7 +6,9 @@ using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Entities.StatementSummary;
 using ModernSlavery.Core.Extensions;
+using static ModernSlavery.Core.Entities.Statement;
 
 namespace ModernSlavery.WebUI.Viewing.Models
 {
@@ -14,9 +16,6 @@ namespace ModernSlavery.WebUI.Viewing.Models
     {
         public StatementViewModelMapperProfile()
         {
-            CreateMap<StatementModel.RisksModel, StatementViewModel.RiskViewModel>();
-            CreateMap<StatementModel.DiligenceModel, StatementViewModel.DueDiligenceViewModel>();
-
             CreateMap<StatementModel, StatementViewModel>();
         }
     }
@@ -26,22 +25,10 @@ namespace ModernSlavery.WebUI.Viewing.Models
     {
         [IgnoreMap]
         public SectorTypeIndex SectorTypes { get; }
-        [IgnoreMap]
-        public PolicyTypeIndex PolicyTypes { get; }
-        [IgnoreMap]
-        public RiskTypeIndex RiskTypes { get; }
-        [IgnoreMap]
-        public DiligenceTypeIndex DiligenceTypes { get; }
-        [IgnoreMap]
-        public TrainingTypeIndex TrainingTypes { get; }
 
-        public StatementViewModel(SectorTypeIndex sectorTypes, PolicyTypeIndex policyTypes, RiskTypeIndex riskTypes, DiligenceTypeIndex diligenceTypes, TrainingTypeIndex trainingTypes)
+        public StatementViewModel(SectorTypeIndex sectorTypes)
         {
             SectorTypes = sectorTypes;
-            PolicyTypes = policyTypes;
-            RiskTypes = riskTypes;
-            DiligenceTypes = diligenceTypes;
-            TrainingTypes = trainingTypes;
         }
 
         public StatementViewModel()
@@ -49,55 +36,44 @@ namespace ModernSlavery.WebUI.Viewing.Models
 
         }
 
-        #region Types
-        public class RiskViewModel
-        {
-            public short Id { get; set; }
-            public string Details { get; set; }
-        }
-        public class DueDiligenceViewModel
-        {
-            public short Id { get; set; }
-            public string Details { get; set; }
-        }
-
-        #endregion
-
-        #region General Properties
+        #region Statement Key Fields
         public long StatementId { get; set; }
-        public DateTime SubmissionDeadline { get; set; }
         public long OrganisationId { get; set; }
         public string OrganisationName { get; set; }
-        [IgnoreMap]
-        public string OrganisationAddress { get; set; }
-        [IgnoreMap]
-        public string EncryptedOrganisationId { get; set; }
-        [IgnoreMap]
-        public SectorTypes SectorType { get; set; }
-        public DateTime Modified { get; set; }
-        [IgnoreMap]
-        public string ReturnUrl { get; set; }
-        [IgnoreMap]
-        public bool IsVoluntarySubmission { get; set; }
-        [IgnoreMap]
-        public bool IsLateSubmission { get; set; }
-        [IgnoreMap]
-        public bool ShouldProvideLateReason { get; set; }
-        [IgnoreMap]
-        public bool IsInScopeForThisReportingYear { get; set; }
+        public DateTime SubmissionDeadline { get; set; }
         #endregion
 
-        #region Your Statement
+        #region Organisation Fields
+        [IgnoreMap]public string OrganisationAddress { get; set; }
+        [IgnoreMap]public string EncryptedOrganisationId { get; set; }
+        [IgnoreMap]public SectorTypes SectorType { get; set; }
+        #endregion
+
+        #region Statement Status Fields
+        #endregion
+
+        #region Statement Control Fields
+        public DateTime Modified { get; set; }
+        #endregion
+
+        #region Url & Email Fields
         public string StatementUrl { get; set; }
+        public string StatementEmail { get; set; }
+        #endregion
+
+        #region Statement Period Fields
         public DateTime StatementStartDate { get; set; }
         public DateTime StatementEndDate { get; set; }
+        #endregion
+
+        #region Approver & Date Fields
         public string ApproverFirstName { get; set; }
         public string ApproverLastName { get; set; }
         public string ApproverJobTitle { get; set; }
         public DateTime ApprovedDate { get; set; }
         #endregion
 
-        #region Compliance
+        #region Compliance Fields
         public bool IncludesStructure { get; set; }
         public string StructureDetails { get; set; }
 
@@ -115,100 +91,40 @@ namespace ModernSlavery.WebUI.Viewing.Models
 
         public bool IncludesGoals { get; set; }
         public string GoalsDetails { get; set; }
+
         #endregion
 
-        #region Your Organisation
+        #region Sectors Fields
         public List<short> Sectors { get; set; } = new List<short>();
-
-        public string OtherSector { get; set; }
-
-        public StatementTurnovers? Turnover { get; set; }
+        public string OtherSectors { get; set; }
         #endregion
 
-        #region Policies
-        public List<short> Policies { get; set; } = new List<short>();
-
-        public string OtherPolicies { get; set; }
-
+        #region Turnover Fields
+        public StatementTurnoverRanges? Turnover;
         #endregion
 
-        #region Supply Chain Risks
-        public List<RiskViewModel> RelevantRisks { get; set; } = new List<RiskViewModel>();
-        public string OtherRelevantRisks;
-        public List<RiskViewModel> HighRisks { get; set; } = new List<RiskViewModel>();
-        public string OtherHighRisks;
-        public List<RiskViewModel> LocationRisks { get; set; } = new List<RiskViewModel>();
+        #region Statement Years Fields
+        public StatementYearRanges? StatementYears { get; set; }
         #endregion
 
-        #region Due Diligence
-        public List<DueDiligenceViewModel> DueDiligences { get; set; } = new List<DueDiligenceViewModel>();
-        public bool? HasForceLabour { get; set; }
-        public string ForcedLabourDetails { get; set; }
-        public bool? HasSlaveryInstance { get; set; }
-        public bool? HasRemediation { get; set; }
-        public string SlaveryInstanceDetails { get; set; }
+        #region Statement Summary Fields
+        public StatementSummary1 Summary { get; set; }
+        #endregion
 
+        #region Navigation Properties
         [IgnoreMap]
-        public string[] RemediationTypes = new[]
-        {
-            "repayment of recruitment fees",
-            "change in policy",
-            "referring victims to government services",
-            "supporting victims via NGOs",
-            "supporting criminal justice against perpetrator",
-            "other"
-        };
-
-        [IgnoreMap]
-        public List<string> SelectedRemediationTypes { get; set; } = new List<string>();
-
-        [IgnoreMap]
-        public string OtherRemediation { get; set; }
-
-        public string SlaveryInstanceRemediation
-        {
-            get
-            {
-                var selectedRemediationTypes = new List<string>(SelectedRemediationTypes.Where(s => !string.IsNullOrWhiteSpace(s)));
-
-                if (selectedRemediationTypes.Contains("other"))
-                {
-                    selectedRemediationTypes.Remove("other");
-                    selectedRemediationTypes.Add(OtherRemediation);
-                }
-                return selectedRemediationTypes.ToDelimitedString(Environment.NewLine);
-            }
-            set
-            {
-                var selectedRemediationTypes = new List<string>(value.SplitI(Environment.NewLine).Where(s => !string.IsNullOrWhiteSpace(s)));
-
-                //Set the selected types
-                SelectedRemediationTypes.Clear();
-                for (int i = selectedRemediationTypes.Count - 1; i >= 0; i--)
-                {
-                    if (RemediationTypes.ContainsI(selectedRemediationTypes[i]))
-                    {
-                        SelectedRemediationTypes.Add(selectedRemediationTypes[i]);
-                        selectedRemediationTypes.RemoveAt(i);
-                    }
-                }
-                OtherRemediation = selectedRemediationTypes.ToDelimitedString(Environment.NewLine);
-                if (!string.IsNullOrWhiteSpace(OtherRemediation)) SelectedRemediationTypes.Add("other");
-            }
-        }
-
+        public string ReturnUrl { get; set; }
         #endregion
 
-        #region Training
-        public List<short> Training { get; set; } = new List<short>();
-        public string OtherTraining { get; set; }
-        #endregion
-
-        #region Monitoring progress
-        public bool? IncludesMeasuringProgress { get; set; }
-        public string ProgressMeasures { get; set; }
-        public string KeyAchievements { get; set; }
-        public StatementYears? StatementYears { get; set; }
+        #region Calculated Properties
+        [IgnoreMap]
+        public bool IsVoluntarySubmission { get; set; }
+        [IgnoreMap]
+        public bool IsLateSubmission { get; set; }
+        [IgnoreMap]
+        public bool ShouldProvideLateReason { get; set; }
+        [IgnoreMap]
+        public bool IsInScopeForThisReportingYear { get; set; }
         #endregion
     }
 }

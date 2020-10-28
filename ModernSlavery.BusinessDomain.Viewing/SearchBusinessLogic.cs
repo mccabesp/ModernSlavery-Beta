@@ -233,6 +233,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
                 GroupSubmission = submittedStatement == null ? false : submittedStatement.StatementOrganisations.Any(),
 
                 StatementUrl = submittedStatement?.StatementUrl,
+                StatementEmail = submittedStatement?.StatementEmail,
                 StatementStartDate = submittedStatement?.StatementStartDate,
                 StatementEndDate = submittedStatement?.StatementEndDate,
                 ApprovingPerson = submittedStatement?.ApprovingPerson,
@@ -252,24 +253,12 @@ namespace ModernSlavery.BusinessDomain.Viewing
                 GoalsDetails = submittedStatement?.GoalsDetails,
 
                 Sectors = submittedStatement?.Sectors.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementSectorTypeId, Name = s.StatementSectorType.Description }).ToList(),
-                OtherSector = submittedStatement?.OtherSector,
+                OtherSectors = submittedStatement?.OtherSectors,
 
-                Policies = submittedStatement?.Policies.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementPolicyTypeId, Name = s.StatementPolicyType.Description }).ToList(),
-                OtherPolicies = submittedStatement?.OtherPolicies,
+                Turnover = submittedStatement==null ? null : _autoMapper.Map<OrganisationSearchModel.KeyName>(submittedStatement.Turnover),
+                StatementYears = submittedStatement==null ? null : _autoMapper.Map<OrganisationSearchModel.KeyName>(submittedStatement.StatementYears),
 
-                RelevantRisks = submittedStatement?.RelevantRisks.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementRiskTypeId, Name = string.IsNullOrWhiteSpace(s.Details) ? s.StatementRiskType.Description : s.Details }).ToList(),
-                OtherRelevantRisks = submittedStatement?.OtherRelevantRisks,
-                HighRisks = submittedStatement?.HighRisks.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementRiskTypeId, Name = string.IsNullOrWhiteSpace(s.Details) ? s.StatementRiskType.Description : s.Details }).ToList(),
-                OtherHighRisks = submittedStatement?.OtherHighRisks,
-                LocationRisks = submittedStatement?.LocationRisks.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementRiskTypeId, Name = string.IsNullOrWhiteSpace(s.Details) ? s.StatementRiskType.Description : s.Details }).ToList(),
-
-                DueDiligences = submittedStatement?.Diligences.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementDiligenceTypeId, Name = string.IsNullOrWhiteSpace(s.Details) ? s.StatementDiligenceType.Description : s.Details }).ToList(),
-                ForcedLabourDetails = submittedStatement?.ForcedLabourDetails,
-                SlaveryInstanceDetails = submittedStatement?.SlaveryInstanceDetails,
-                RemediationTypes = submittedStatement?.SlaveryInstanceRemediation.SplitI(Environment.NewLine, 0, StringSplitOptions.RemoveEmptyEntries).ToList(),
-
-                Training = submittedStatement?.Training.Select(s => new OrganisationSearchModel.KeyName { Key = s.StatementTrainingTypeId, Name = string.IsNullOrWhiteSpace(s.Details) ? s.StatementTrainingType.Description : s.Details }).ToList(),
-                OtherTraining = submittedStatement?.OtherTraining,
+                Summary = submittedStatement == null ? null : _autoMapper.Map<OrganisationSearchModel.SummarySearchModel>(submittedStatement.Summary),
 
                 StatementId = submittedStatement?.StatementId,
                 ParentOrganisationId = organisation.OrganisationId,
@@ -279,22 +268,11 @@ namespace ModernSlavery.BusinessDomain.Viewing
                 SectorType = new OrganisationSearchModel.KeyName { Key = (int)organisation.SectorType, Name = organisation.SectorType.ToString() },
                 Address = AddressModel.Create(organisation.LatestAddress),
 
-                IncludesMeasuringProgress = submittedStatement?.IncludesMeasuringProgress,
-                ProgressMeasures = submittedStatement?.ProgressMeasures,
-                KeyAchievements = submittedStatement?.KeyAchievements,
                 Modified = submittedStatement == null ? organisation.Modified : submittedStatement.Modified,
                 Abbreviations = CreateOrganisationNameAbbreviations(organisation.OrganisationName),
                 PartialNameForCompleteTokenSearches = organisation.OrganisationName,
                 PartialNameForSuffixSearches = organisation.OrganisationName
             };
-
-            if (submittedStatement != null)
-            {
-                var turnover = submittedStatement.GetStatementTurnover();
-                parentStatementModel.Turnover = new OrganisationSearchModel.KeyName { Key = (int)turnover, Name = turnover.ToString() };
-                var statementYears = submittedStatement.GetStatementYears();
-                parentStatementModel.StatementYears = new OrganisationSearchModel.KeyName { Key = (int)statementYears, Name = statementYears.ToString() };
-            }
 
             yield return parentStatementModel.SetSearchDocumentKey();
 

@@ -49,7 +49,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         #endregion
 
-
         #region Initialisation
 
         /// <summary>
@@ -660,58 +659,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             model.Uploads.Add(upload);
             #endregion
 
-            #region Show StatementDiligenceTypes Upload
-            upload = new UploadViewModel.Upload
-            {
-                Type = Filenames.StatementDiligenceTypes,
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementDiligenceTypes),
-                Title = "Statement Due Diligence Types",
-                Description = "Due-diligence types used for Modern Slavery Statements. Import performs Add/Update/Delete.",
-                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementDiligenceType>().CountAsync()
-            };
-            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
-            {
-                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
-                upload.FileExists = true;
-            }
-            model.Uploads.Add(upload);
-            
-            #endregion
-
-            #region Show StatementPolicyTypes Upload
-            upload = new UploadViewModel.Upload
-            {
-                Type = Filenames.StatementPolicyTypes,
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementPolicyTypes),
-                Title = "Statement Policy Types",
-                Description = "Policy types used for Modern Slavery Statements. Import performs Add/Update/Delete.",
-                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementPolicyType>().CountAsync()
-            };
-            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
-            {
-                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
-                upload.FileExists = true;
-            }
-            model.Uploads.Add(upload);
-            #endregion
-
-            #region Show StatementRiskTypes Upload
-            upload = new UploadViewModel.Upload
-            {
-                Type = Filenames.StatementRiskTypes,
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementRiskTypes),
-                Title = "Statement Risk Types",
-                Description = "Risk types used for Modern Slavery Statements. Import performs Add/Update/Delete.",
-                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementRiskType>().CountAsync()
-            };
-            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
-            {
-                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
-                upload.FileExists = true;
-            }
-            model.Uploads.Add(upload);
-            #endregion
-
             #region Show StatementSectorTypes Upload
             upload = new UploadViewModel.Upload
             {
@@ -726,24 +673,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
                 upload.FileExists = true;
             }
-            model.Uploads.Add(upload);
-            #endregion
-
-            #region Show StatementTrainingTypes Upload
-            upload = new UploadViewModel.Upload
-            {
-                Type = Filenames.StatementTrainingTypes,
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementTrainingTypes),
-                Title = "Statement Due Training Types",
-                Description = "Due-Training types used for Modern Slavery Statements. Import performs Add/Update/Delete.",
-                DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementTrainingType>().CountAsync()
-            };
-            if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
-            {
-                upload.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(upload.Filepath);
-                upload.FileExists = true;
-            }
-            
             model.Uploads.Add(upload);
             #endregion
 
@@ -915,20 +844,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             case var f when f.EqualsI(Filenames.ShortCodes):
                                 records = csvReader.GetRecords<ShortCodeModel>().Cast<object>().ToList();
                                 break;
-                            case var f when f.EqualsI(Filenames.StatementDiligenceTypes):
-                                records = csvReader.GetRecords<StatementDiligenceType>().Cast<object>().ToList();
-                                break;
-                            case var f when f.EqualsI(Filenames.StatementPolicyTypes):
-                                records = csvReader.GetRecords<StatementPolicyType>().Cast<object>().ToList();
-                                break;
-                            case var f when f.EqualsI(Filenames.StatementRiskTypes):
-                                records = csvReader.GetRecords<StatementRiskType>().Cast<object>().ToList();
-                                break;
                             case var f when f.EqualsI(Filenames.StatementSectorTypes):
                                 records = csvReader.GetRecords<StatementSectorType>().Cast<object>().ToList();
-                                break;
-                            case var f when f.EqualsI(Filenames.StatementTrainingTypes):
-                                records = csvReader.GetRecords<StatementTrainingType>().Cast<object>().ToList();
                                 break;
                             default:
                                 throw new Exception($"Invalid upload '{fileName}'");
@@ -961,20 +878,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             case var f when f.EqualsI(Filenames.ShortCodes):
                                 await WebService.ShortCodesRepository.ClearAllShortCodesAsync();
                                 break;
-                            case var f when f.EqualsI(Filenames.StatementDiligenceTypes):
-                                await _adminService.DataImporter.ImportStatementDiligenceTypesAsync(true);
-                                break;
-                            case var f when f.EqualsI(Filenames.StatementPolicyTypes):
-                                await _adminService.DataImporter.ImportStatementPolicyTypesAsync(true);
-                                break;
-                            case var f when f.EqualsI(Filenames.StatementRiskTypes):
-                                await _adminService.DataImporter.ImportStatementRiskTypesAsync(true);
-                                break;
                             case var f when f.EqualsI(Filenames.StatementSectorTypes):
                                 await _adminService.DataImporter.ImportStatementSectorTypesAsync(true);
-                                break;
-                            case var f when f.EqualsI(Filenames.StatementTrainingTypes):
-                                await _adminService.DataImporter.ImportStatementTrainingTypesAsync(true);
                                 break;
                         }
                     }

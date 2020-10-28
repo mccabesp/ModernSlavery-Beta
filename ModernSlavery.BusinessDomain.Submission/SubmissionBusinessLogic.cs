@@ -105,10 +105,10 @@ namespace ModernSlavery.BusinessDomain.Submission
                         SubmissionDeadline = j.r.SubmissionDeadline,
                         ModifiedDate = j.r.Modified,
                         StatementUrl = j.r.StatementUrl,
+                        StatementEmail = j.r.StatementEmail,
                         ApprovingPerson = j.r.ApprovingPerson,
-                        Turnover = j.r.GetStatementTurnover().ToString(),
-                        Modifications = j.r.Modifications,
-                        EHRCResponse = j.r.EHRCResponse
+                        Turnover = j.r.Turnover.GetEnumDescription(),
+                        Modifications = j.r.Modifications
                     });
 
             return records;
@@ -154,8 +154,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                         r.Created,
                         r.Modified,
                         r.Modifications,
-                        r.ApprovingPerson,
-                        r.EHRCResponse
+                        r.ApprovingPerson
                     }).ToList();
 
             // create scope table query
@@ -198,8 +197,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                         ReportPersonResonsible =
                             j.r.SectorType == SectorTypes.Public
                                 ? "Not required"
-                                : j.r.ApprovingPerson,
-                        ReportEHRCResponse = j.r.EHRCResponse
+                                : j.r.ApprovingPerson
                     });
         }
 

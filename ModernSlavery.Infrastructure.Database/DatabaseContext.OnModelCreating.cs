@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Infrastructure.Database.Classes;
 
 namespace ModernSlavery.Infrastructure.Database
 {
@@ -23,19 +24,10 @@ namespace ModernSlavery.Infrastructure.Database
             modelBuilder.Entity<SicCode>().ToTable("SicCodes");
             modelBuilder.Entity<SicSection>().ToTable("SicSections");
             modelBuilder.Entity<Statement>().ToTable("Statements");
-            modelBuilder.Entity<StatementDiligence>().ToTable("StatementDiligences");
-            modelBuilder.Entity<StatementDiligenceType>().ToTable("StatementDiligenceTypes");
-            modelBuilder.Entity<StatementPolicy>().ToTable("StatementPolicies");
-            modelBuilder.Entity<StatementPolicyType>().ToTable("StatementPolicyTypes");
-            modelBuilder.Entity<StatementRelevantRisk>().ToTable("StatementRelevantRisks");
-            modelBuilder.Entity<StatementRiskType>().ToTable("StatementRiskTypes");
-            modelBuilder.Entity<StatementHighRisk>().ToTable("StatementHighRisks");
-            modelBuilder.Entity<StatementLocationRisk>().ToTable("StatementLocationRisks");
             modelBuilder.Entity<StatementOrganisation>().ToTable("StatementOrganisations");
             modelBuilder.Entity<StatementSector>().ToTable("StatementSectors");
             modelBuilder.Entity<StatementSectorType>().ToTable("StatementSectorTypes");
             modelBuilder.Entity<StatementStatus>().ToTable("StatementStatuses");
-            modelBuilder.Entity<StatementTrainingType>().ToTable("StatementTrainingTypes");
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<UserOrganisation>().ToTable("UserOrganisations");
             modelBuilder.Entity<UserStatus>().ToTable("UserStatuses");
@@ -496,9 +488,9 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.HasIndex(e => e.IncludesTraining);
 
-                    entity.HasIndex(e => e.MaxTurnover);
+                    entity.HasIndex(e => e.Turnover);
 
-                    entity.HasIndex(e => e.MinTurnover);
+                    entity.HasIndex(e => e.StatementYears);
 
                     entity.HasIndex(e => e.OrganisationId);
 
@@ -542,215 +534,18 @@ namespace ModernSlavery.Infrastructure.Database
                     entity.Property(e => e.Status)
                         .HasColumnName("StatusId");
 
-                    entity.Property(e => e.EHRCResponse)
-                        .HasDefaultValue(0);
+                    entity.Property(e => e.Turnover)
+                        .HasColumnName("TurnoverId");
+
+                    entity.Property(e => e.StatementYears)
+                        .HasColumnName("StatementYearsId");
 
                     entity.HasOne(d => d.Organisation)
                         .WithMany(p => p.Statements)
                         .HasForeignKey(d => d.OrganisationId);
 
-                    entity.Property(e => e.IncludedOrganisationCount)
-                        .HasDefaultValue(0);
-
-                    entity.Property(e => e.ExcludedOrganisationCount)
-                        .HasDefaultValue(0);
-                });
-
-            #endregion
-
-            #region StatementTrainingType
-
-            modelBuilder.Entity<StatementTrainingType>(
-                entity =>
-                {
-                    entity.HasKey(e => e.StatementTrainingTypeId);
-                    entity.Property(e => e.StatementTrainingTypeId).ValueGeneratedNever();
-
-                    entity.Property(e => e.Description)
-                        .IsRequired()
-                        .HasMaxLength(255);
-                });
-
-            #endregion
-
-            #region StatementTraining
-
-            modelBuilder.Entity<StatementTraining>(
-                entity =>
-                {
-                    entity.HasKey(e => new { e.StatementTrainingTypeId, e.StatementId });
-
-                    entity.HasIndex(e => e.StatementId);
-
-                    entity.HasOne(e => e.StatementTrainingType)
-                        .WithMany(e => e.StatementTraining)
-                        .HasForeignKey(e => e.StatementTrainingTypeId);
-
-                    entity.HasOne(e => e.Statement)
-                        .WithMany(e => e.Training)
-                        .HasForeignKey(e => e.StatementId);
-                });
-
-            #endregion
-
-            #region StatementDiligence
-
-            modelBuilder.Entity<StatementDiligence>(
-                entity =>
-                {
-                    entity.HasKey(e => new { e.StatementDiligenceTypeId, e.StatementId });
-
-                    entity.HasIndex(e => e.StatementId);
-
-                    entity.HasOne(e => e.StatementDiligenceType)
-                        .WithMany()
-                        .HasForeignKey(e => e.StatementDiligenceTypeId);
-
-                    entity.HasOne(e => e.Statement)
-                        .WithMany(e => e.Diligences)
-                        .HasForeignKey(e => e.StatementId);
-
-                    entity.HasOne(e => e.StatementDiligenceType)
-                        .WithMany(e => e.StatementDiligences)
-                        .HasForeignKey(e => e.StatementDiligenceTypeId);
-                });
-
-            #endregion
-
-            #region StatementDiligenceType
-
-            modelBuilder.Entity<StatementDiligenceType>(
-                entity =>
-                {
-                    entity.HasKey(e => e.StatementDiligenceTypeId);
-                    entity.Property(e => e.StatementDiligenceTypeId).ValueGeneratedNever();
-
-                    entity.HasIndex(e => e.ParentDiligenceTypeId);
-
-                    entity.Property(e => e.Description)
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    entity.HasOne(d => d.ParentDiligenceType)
-                    .WithMany(p => p.ChildDiligenceTypes)
-                    .HasForeignKey(d => d.ParentDiligenceTypeId);
-                });
-
-            #endregion
-
-            #region StatementPolicyType
-
-            modelBuilder.Entity<StatementPolicyType>(
-                entity =>
-                {
-                    entity.HasKey(e => e.StatementPolicyTypeId);
-                    entity.Property(e => e.StatementPolicyTypeId).ValueGeneratedNever();
-
-                    entity.Property(e => e.Description)
-                        .IsRequired()
-                        .HasMaxLength(255);
-                });
-
-            #endregion
-
-            #region StatementPolicy
-
-            modelBuilder.Entity<StatementPolicy>(
-                entity =>
-                {
-                    entity.HasKey(e => new { e.StatementPolicyTypeId, e.StatementId });
-
-                    entity.HasIndex(e => e.StatementId);
-
-                    entity.HasOne(e => e.StatementPolicyType)
-                        .WithMany(e => e.StatementPolicies)
-                        .HasForeignKey(e => e.StatementPolicyTypeId);
-
-                    entity.HasOne(e => e.Statement)
-                        .WithMany(e => e.Policies)
-                        .HasForeignKey(e => e.StatementId);
-                });
-
-            #endregion
-
-            #region StatementRelevantRisk
-
-            modelBuilder.Entity<StatementRelevantRisk>(
-                entity =>
-                {
-                    entity.HasKey(e => new { e.StatementRiskTypeId, e.StatementId });
-
-                    entity.HasIndex(e => e.StatementId);
-
-                    entity.HasOne(e => e.StatementRiskType)
-                        .WithMany(e => e.StatementRelevantRisks)
-                        .HasForeignKey(e => e.StatementRiskTypeId);
-
-                    entity.HasOne(e => e.Statement)
-                        .WithMany(e => e.RelevantRisks)
-                        .HasForeignKey(e => e.StatementId);
-                });
-
-            #endregion
-
-            #region StatementHighRisk
-
-            modelBuilder.Entity<StatementHighRisk>(
-                entity =>
-                {
-                    entity.HasKey(e => new { e.StatementRiskTypeId, e.StatementId });
-
-                    entity.HasIndex(e => e.StatementId);
-
-                    entity.HasOne(e => e.StatementRiskType)
-                        .WithMany(e => e.StatementHighRisks)
-                        .HasForeignKey(e => e.StatementRiskTypeId);
-
-                    entity.HasOne(e => e.Statement)
-                        .WithMany(e => e.HighRisks)
-                        .HasForeignKey(e => e.StatementId);
-                });
-
-            #endregion
-
-            #region StatementRiskType
-
-            modelBuilder.Entity<StatementRiskType>(
-                entity =>
-                {
-
-                    entity.Property(e => e.Category).HasColumnName("RiskCategoryId");
-
-                    entity.HasKey(e => e.StatementRiskTypeId);
-                    entity.Property(e => e.StatementRiskTypeId).ValueGeneratedNever();
-
-                    entity.HasIndex(e => e.ParentRiskTypeId);
-
-                    entity.Property(e => e.Description).HasMaxLength(255);
-
-                    entity.HasOne(d => d.ParentRiskType)
-                   .WithMany(p => p.ChildRiskType)
-                   .HasForeignKey(d => d.ParentRiskTypeId);
-                });
-
-            #endregion
-
-            #region StatementLocationRisk
-
-            modelBuilder.Entity<StatementLocationRisk>(
-                entity =>
-                {
-                    entity.HasKey(e => new { e.StatementRiskTypeId, e.StatementId });
-
-                    entity.HasIndex(e => e.StatementId);
-
-                    entity.HasOne(e => e.StatementRiskType)
-                        .WithMany(e => e.StatementLocationRisks)
-                        .HasForeignKey(e => e.StatementRiskTypeId);
-
-                    entity.HasOne(e => e.Statement)
-                        .WithMany(e => e.LocationRisks)
-                        .HasForeignKey(e => e.StatementId);
+                    entity.Property(e => e.Summary)
+                        .HasJsonValueConversion();
                 });
 
             #endregion
@@ -843,6 +638,9 @@ namespace ModernSlavery.Infrastructure.Database
 
                 });
 
+            #endregion
+
+            #region StatementSummary
             #endregion
 
             #region UserOrganisation

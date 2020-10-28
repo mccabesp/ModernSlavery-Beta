@@ -1,22 +1,23 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Entities.StatementSummary;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using static ModernSlavery.Core.Entities.Statement;
+using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 
 namespace ModernSlavery.WebUI.Shared.Models
 {
     [Serializable()]
     [XmlType("StatementSummary")]
-    public class StatementSummaryViewModel
+    public class StatementSummaryViewModel: IStatementSummary1
     {
         #region Automapper
         public class AutoMapperProfile : Profile
@@ -26,6 +27,23 @@ namespace ModernSlavery.WebUI.Shared.Models
                 CreateMap<OrganisationSearchModel, StatementSummaryViewModel>()
                     .ForMember(d => d.StatementSummaryUrl, opt => opt.Ignore())
                     .ForMember(d => d.BackUrl, opt => opt.Ignore())
+                    .ForMember(d => d.Policies, opt => opt.MapFrom(s=>s.Summary.Policies))
+                    .ForMember(d => d.OtherPolicies, opt => opt.MapFrom(s=>s.Summary.OtherPolicies))
+                    .ForMember(d => d.TrainingTargets, opt => opt.MapFrom(s=>s.Summary.TrainingTargets))
+                    .ForMember(d => d.OtherTrainingTargets, opt => opt.MapFrom(s=>s.Summary.OtherTrainingTargets))
+                    .ForMember(d => d.Partners, opt => opt.MapFrom(s=>s.Summary.Partners))
+                    .ForMember(d => d.OtherPartners, opt => opt.MapFrom(s=>s.Summary.OtherPartners))
+                    .ForMember(d => d.SocialAudits, opt => opt.MapFrom(s=>s.Summary.SocialAudits))
+                    .ForMember(d => d.OtherSocialAudits, opt => opt.MapFrom(s=>s.Summary.OtherSocialAudits))
+                    .ForMember(d => d.GrievanceMechanisms, opt => opt.MapFrom(s=>s.Summary.GrievanceMechanisms))
+                    .ForMember(d => d.OtherGrievanceMechanisms, opt => opt.MapFrom(s=>s.Summary.OtherGrievanceMechanisms))
+                    .ForMember(d => d.OtherWorkConditionsMonitoring, opt => opt.MapFrom(s=>s.Summary.OtherWorkConditionsMonitoring))
+                    .ForMember(d => d.Risks, opt => opt.MapFrom(s=>s.Summary.Risks))
+                    .ForMember(d => d.Indicators, opt => opt.MapFrom(s=>s.Summary.Indicators))
+                    .ForMember(d => d.OtherIndicators, opt => opt.MapFrom(s=>s.Summary.OtherIndicators))
+                    .ForMember(d => d.Remediations, opt => opt.MapFrom(s=>s.Summary.Remediations))
+                    .ForMember(d => d.OtherRemedations, opt => opt.MapFrom(s=>s.Summary.OtherRemedations))
+                    .ForMember(d => d.ProgressMeasures, opt => opt.MapFrom(s=>s.Summary.ProgressMeasures))
                     .AfterMap<ObfuscateAction>();
             }
 
@@ -49,36 +67,44 @@ namespace ModernSlavery.WebUI.Shared.Models
         }
         #endregion
 
-        #region General Properties
-        public string StatementSummaryUrl { get; set; }
+        #region Statement Key Fields
         public string ParentOrganisationId { get; set; }
         public int? SubmissionDeadlineYear { get; set; }
-        public string OrganisationName { get; set; }
-        public SectorTypes? SectorType { get; set; }
-
-        public AddressModel Address { get; set; }
-
-        public string CompanyNumber { get; set; }
-        public DateTime Modified { get; set; } = VirtualDateTime.Now;
-        public string BackUrl { get; set; }
-
         #endregion
 
-        #region Group Submission
+        #region Organisation Fields
+        public string OrganisationName { get; set; }
+        public string CompanyNumber { get; set; }
+        public SectorTypes? SectorType { get; set; }
+        public AddressModel Address { get; set; }
+        #endregion
+
+        #region Statement Control Fields
+        public DateTime Modified { get; set; } = VirtualDateTime.Now;
+        #endregion
+
+        #region Group Organisation Fields
         public bool GroupSubmission { get; set; }
         public string ParentName { get; set; }
         public string ChildOrganisationId { get; set; }
         #endregion
 
-        #region Your Statement
+        #region Url & Email Fields
         public string StatementUrl { get; set; }
+        public string StatementEmail { get; set; }
+        #endregion
+
+        #region Statement Period Fields
         public DateTime? StatementStartDate { get; set; }
         public DateTime? StatementEndDate { get; set; }
+        #endregion
+
+        #region Approver & Date Fields
         public string ApprovingPerson { get; set; }
         public DateTime? ApprovedDate { get; set; }
         #endregion
 
-        #region Compliance
+        #region Compliance Fields
         public bool? IncludesStructure { get; set; }
         public string StructureDetails { get; set; }
 
@@ -98,81 +124,92 @@ namespace ModernSlavery.WebUI.Shared.Models
         public string GoalsDetails { get; set; }
         #endregion
 
-        #region Your Organisation
+        #region Sectors Fields
         public List<SectorTypeIndex.SectorType> Sectors { get; set; } = new List<SectorTypeIndex.SectorType>();
-        public string OtherSector { get; set; }
-
-        public virtual StatementTurnovers? Turnover { get; set; }
+        public string OtherSectors { get; set; }
         #endregion
 
-        #region Policies
-
-        public List<PolicyTypeIndex.PolicyType> Policies { get; set; } = new List<PolicyTypeIndex.PolicyType>();
-
-        public string OtherPolicies { get; set; }
-
+        #region Turnover Fields
+        public virtual StatementTurnoverRanges? Turnover { get; set; }
         #endregion
 
-        #region Supply Chain Risks
-        public List<RiskTypeIndex.RiskType> RelevantRisks { get; set; } = new List<RiskTypeIndex.RiskType>();
+        #region Statement Years Fields
+        public StatementYearRanges? StatementYears { get; set; }
+        #endregion
 
-        public List<short> GetRelevantRiskParentIds()
-        {
-            var parentIds = RelevantRisks.Where(d => d.ParentId != null).OrderBy(d => d.Description).Select(d => d.ParentId.Value).Distinct().ToList();
-            return parentIds;
-        }
+        #region Navigation Properties
+        public string StatementSummaryUrl { get; set; }
 
-        public string OtherRelevantRisks { get; set; }
-        public List<RiskTypeIndex.RiskType> HighRisks { get; set; } = new List<RiskTypeIndex.RiskType>();
-        public List<short> GetHighRiskParentIds()
-        {
-            var parentIds = HighRisks.Where(d => d.ParentId != null).OrderBy(d => d.Description).Select(d => d.ParentId.Value).Distinct().ToList();
-            return parentIds;
-        }
-
-
-        public string OtherHighRisks { get; set; }
-
-        public List<RiskTypeIndex.RiskType> LocationRisks { get; set; } = new List<RiskTypeIndex.RiskType>();
-
-        public List<short> GetLocationRiskParentIds()
-        {
-            var parentIds = LocationRisks
-                // if the parent is null it is the parent
-                .Select(d => d.ParentId ?? d.Id)
-                .Distinct()
-                .OrderBy(d => d)
-                .ToList();
-            return parentIds;
-        }
+        public string BackUrl { get; set; }
 
         #endregion
 
-        #region Due Diligence
-        public List<DiligenceTypeIndex.DiligenceType> DueDiligences { get; set; } = new List<DiligenceTypeIndex.DiligenceType>();
-        public List<short> GetDiligenceParentIds()
-        {
-            var parentIds = DueDiligences.Where(d => d.ParentId != null).OrderBy(d => d.Description).Select(d => d.ParentId.Value).Distinct().ToList();
-            return parentIds;
-        }
+        #region Statement Summary Fields
+            #region Policies Fields
 
-        public string ForcedLabourDetails { get; set; }
-        public string SlaveryInstanceDetails { get; set; }
-        public List<string> RemediationTypes { get; set; } = new List<string>();
+            public SortedSet<PolicyTypes> Policies { get; set; } = new SortedSet<PolicyTypes>();
+
+            public string OtherPolicies { get; set; }
+            #endregion
+
+            #region Training Fields
+            public SortedSet<TrainingTargetTypes> TrainingTargets { get; set; } = new SortedSet<TrainingTargetTypes>();
+
+            public string OtherTrainingTargets { get; set; }
+
+            #endregion
+
+            #region Partner Fields
+
+            public SortedSet<PartnerTypes> Partners { get; set; } = new SortedSet<PartnerTypes>();
+
+            public string OtherPartners { get; set; }
+            #endregion
+
+            #region Social Audit Fields
+
+            public SortedSet<SocialAuditTypes> SocialAudits { get; set; } = new SortedSet<SocialAuditTypes>();
+
+            public string OtherSocialAudits { get; set; }
+            #endregion
+
+            #region Grievance Mechanism Fields
+
+            public SortedSet<GrievanceMechanismTypes> GrievanceMechanisms { get; set; } = new SortedSet<GrievanceMechanismTypes>();
+
+            public string OtherGrievanceMechanisms { get; set; }
+            #endregion
+
+            #region Other Work Conditions Monitoring Fields
+            public string OtherWorkConditionsMonitoring { get; set; }
+            #endregion
+
+            #region Risks
+
+            public SortedSet<StatementRisk> Risks { get; set; } = new SortedSet<StatementRisk>();
+
+            #endregion
+
+            #region Forced Labour Fields
+
+            public SortedSet<IndicatorTypes> Indicators { get; set; } = new SortedSet<IndicatorTypes>();
+
+            public string OtherIndicators { get; set; }
+            #endregion
+
+            #region Remediation Fields
+            public SortedSet<RemediationTypes> Remediations { get; set; } = new SortedSet<RemediationTypes>();
+
+            public string OtherRemedations { get; set; }
+            #endregion
+
+            #region Progress Measuring Fields
+            public string ProgressMeasures { get; set; }
+            #endregion
+
         #endregion
 
-        #region Training
-        public List<TrainingTypeIndex.TrainingType> Training { get; set; } = new List<TrainingTypeIndex.TrainingType>();
-        public string OtherTraining { get; set; }
-        #endregion
-
-        #region Monitoring progress
-        public bool? IncludesMeasuringProgress { get; set; }
-        public string ProgressMeasures { get; set; }
-        public string KeyAchievements { get; set; }
-        public StatementYears? StatementYears { get; set; }
-        #endregion
-
+        #region Methods
         public bool HasAnyAreaCovered()
         {
             return IncludesStructure.HasValue
@@ -202,5 +239,6 @@ namespace ModernSlavery.WebUI.Shared.Models
                 && IncludesTraining.HasValue && !IncludesTraining.Value
                 && IncludesGoals.HasValue && !IncludesGoals.Value;
         }
+        #endregion
     }
 }

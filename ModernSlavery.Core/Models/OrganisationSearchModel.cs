@@ -6,6 +6,9 @@ using AutoMapper;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using static ModernSlavery.Core.Entities.Statement;
+using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
+using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1.StatementRisk;
 
 namespace ModernSlavery.Core.Models
 {
@@ -23,6 +26,108 @@ namespace ModernSlavery.Core.Models
         #endregion
 
         [Serializable]
+        public class SummarySearchModel
+        {
+            #region Policies Fields
+            public List<KeyName> Policies { get; set; } = new List<KeyName>();
+
+            public string OtherPolicies { get; set; }
+            #endregion
+
+            #region Training Fields
+            public List<KeyName> TrainingTargets { get; set; } = new List<KeyName>();
+
+            public string OtherTrainingTargets { get; set; }
+
+            #endregion
+
+            #region Partner Fields
+
+            public List<KeyName> Partners { get; set; } = new List<KeyName>();
+
+            public string OtherPartners { get; set; }
+            #endregion
+
+            #region Social Audit Fields
+            public List<KeyName> SocialAudits { get; set; } = new List<KeyName>();
+
+            public string OtherSocialAudits { get; set; }
+            #endregion
+
+            #region Grievance Mechanism Fields
+            public List<KeyName> GrievanceMechanisms { get; set; } = new List<KeyName>();
+
+            public string OtherGrievanceMechanisms { get; set; }
+            #endregion
+
+            #region Other Work Conditions Monitoring Fields
+            public string OtherWorkConditionsMonitoring { get; set; }
+            #endregion
+
+            #region Risks
+            [Serializable]
+            public class StatementRisk
+            {
+                public byte Index { get; set; }
+                public string Details { get; set; }
+
+                #region Risk Source Fields
+                public KeyName LikelySource { get; set; }
+
+                public string OtherLikelySource { get; set; }
+                #endregion
+
+                #region Risk Target Fields
+
+                public List<KeyName> Targets { get; set; } = new List<KeyName>();
+
+                public string OtherTargets { get; set; }
+                #endregion
+
+                #region Risk Location Fields
+
+                public List<KeyName> Countries { get; set; } = new List<KeyName>();
+                #endregion
+
+                #region Overrides
+                public override bool Equals(object obj)
+                {
+                    // Check for null values and compare run-time types.
+                    var target = obj as StatementRisk;
+                    if (target == null) return false;
+
+                    return Index == target.Index;
+                }
+
+                public override int GetHashCode()
+                {
+                    return Index.GetHashCode();
+                }
+                #endregion
+            }
+
+            public List<KeyName> Risks { get; set; } = new List<KeyName>();
+
+            #endregion
+
+            #region Forced Labour Fields
+            public List<KeyName> Indicators { get; set; } = new List<KeyName>();
+
+            public string OtherIndicators { get; set; }
+            #endregion
+
+            #region Remediation Fields
+            public List<KeyName> Remediations { get; set; } = new List<KeyName>();
+
+            public string OtherRemedations { get; set; }
+            #endregion
+
+            #region Progress Measuring Fields
+            public string ProgressMeasures { get; set; }
+            #endregion
+        }
+
+        [Serializable]
         public class KeyName
         {
             #region Automapper
@@ -30,18 +135,40 @@ namespace ModernSlavery.Core.Models
             {
                 public AutoMapperProfile() : base()
                 {
-                    CreateMap<OrganisationSearchModel.KeyName, SectorTypes?>().ConstructUsing(s => s == null ? (SectorTypes?)null : (SectorTypes)s.Key);
-                    CreateMap<OrganisationSearchModel.KeyName, StatementTurnovers?>().ConstructUsing(s => s == null ? (StatementTurnovers?)null : (StatementTurnovers)s.Key);
-                    CreateMap<OrganisationSearchModel.KeyName, StatementYears?>().ConstructUsing(s => s == null ? (StatementYears?)null : (StatementYears)s.Key);
+                    CreateMap<KeyName, SectorTypes?>().ConstructUsing(s => s == null ? (SectorTypes?)null : (SectorTypes)s.Key);
+                    CreateMap<KeyName, StatementTurnoverRanges?>().ConstructUsing(s => s == null ? (StatementTurnoverRanges?)null : (StatementTurnoverRanges)s.Key);
+                    CreateMap<KeyName, StatementYearRanges?>().ConstructUsing(s => s == null ? (StatementYearRanges?)null : (StatementYearRanges)s.Key);
+                    CreateMap<KeyName, SectorTypeIndex.SectorType>().ConvertUsing<SectorConverter>();
 
-                    CreateMap<OrganisationSearchModel.KeyName, SectorTypeIndex.SectorType>().ConvertUsing<SectorConverter>();
-                    CreateMap<OrganisationSearchModel.KeyName, PolicyTypeIndex.PolicyType>().ConvertUsing<PolicyConverter>();
-                    CreateMap<OrganisationSearchModel.KeyName, RiskTypeIndex.RiskType>().ConvertUsing<RiskConverter>();
-                    CreateMap<OrganisationSearchModel.KeyName, DiligenceTypeIndex.DiligenceType>().ConvertUsing<DiligenceConverter>();
-                    CreateMap<OrganisationSearchModel.KeyName, TrainingTypeIndex.TrainingType>().ConvertUsing<TrainingConverter>();
+                    CreateMap<KeyName, PolicyTypes?>().ConstructUsing(s => s == null ? (PolicyTypes?)null : (PolicyTypes)s.Key);
+                    CreateMap<KeyName, TrainingTargetTypes?>().ConstructUsing(s => s == null ? (TrainingTargetTypes?)null : (TrainingTargetTypes)s.Key);
+                    CreateMap<KeyName, PartnerTypes?>().ConstructUsing(s => s == null ? (PartnerTypes?)null : (PartnerTypes)s.Key);
+                    CreateMap<KeyName, SocialAuditTypes?>().ConstructUsing(s => s == null ? (SocialAuditTypes?)null : (SocialAuditTypes)s.Key);
+                    CreateMap<KeyName, GrievanceMechanismTypes?>().ConstructUsing(s => s == null ? (GrievanceMechanismTypes?)null : (GrievanceMechanismTypes)s.Key);
+                    CreateMap<KeyName, RiskSourceTypes?>().ConstructUsing(s => s == null ? (RiskSourceTypes?)null : (RiskSourceTypes)s.Key);
+                    CreateMap<KeyName, RiskTargetTypes?>().ConstructUsing(s => s == null ? (RiskTargetTypes?)null : (RiskTargetTypes)s.Key);
+                    CreateMap<KeyName, CountryTypes?>().ConstructUsing(s => s == null ? (CountryTypes?)null : (CountryTypes)s.Key);
+                    CreateMap<KeyName, IndicatorTypes?>().ConstructUsing(s => s == null ? (IndicatorTypes?)null : (IndicatorTypes)s.Key);
+                    CreateMap<KeyName, RemediationTypes?>().ConstructUsing(s => s == null ? (RemediationTypes?)null : (RemediationTypes)s.Key);
+
+                    CreateMap<SectorTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<StatementTurnoverRanges,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<StatementYearRanges, KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<SectorTypeIndex.SectorType,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s.Id, Name = s.Description }); 
+
+                    CreateMap<PolicyTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<TrainingTargetTypes, KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<PartnerTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<SocialAuditTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<GrievanceMechanismTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<RiskSourceTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<RiskTargetTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<CountryTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<IndicatorTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<RemediationTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                 }
 
-                public class SectorConverter : ITypeConverter<OrganisationSearchModel.KeyName, SectorTypeIndex.SectorType>
+                public class SectorConverter : ITypeConverter<KeyName, SectorTypeIndex.SectorType>
                 {
                     private readonly SectorTypeIndex _sectorTypeIndex;
 
@@ -50,75 +177,9 @@ namespace ModernSlavery.Core.Models
                         _sectorTypeIndex = sectorTypeIndex;
                     }
 
-                    public SectorTypeIndex.SectorType Convert(OrganisationSearchModel.KeyName source, SectorTypeIndex.SectorType destination, ResolutionContext context)
+                    public SectorTypeIndex.SectorType Convert(KeyName source, SectorTypeIndex.SectorType destination, ResolutionContext context)
                     {
                         return _sectorTypeIndex.FirstOrDefault(sectorType => sectorType.Id == source.Key);
-                    }
-                }
-
-                public class PolicyConverter : ITypeConverter<OrganisationSearchModel.KeyName, PolicyTypeIndex.PolicyType>
-                {
-                    private readonly PolicyTypeIndex _policyTypeIndex;
-
-                    public PolicyConverter(PolicyTypeIndex policyTypeIndex)
-                    {
-                        _policyTypeIndex = policyTypeIndex;
-                    }
-
-                    public PolicyTypeIndex.PolicyType Convert(OrganisationSearchModel.KeyName source, PolicyTypeIndex.PolicyType destination, ResolutionContext context)
-                    {
-                        return _policyTypeIndex.FirstOrDefault(policyType => policyType.Id == source.Key);
-                    }
-                }
-
-                public class RiskConverter : ITypeConverter<OrganisationSearchModel.KeyName, RiskTypeIndex.RiskType>
-                {
-                    private readonly RiskTypeIndex _riskTypeIndex;
-
-                    public RiskConverter(RiskTypeIndex riskTypeIndex)
-                    {
-                        _riskTypeIndex = riskTypeIndex;
-                    }
-
-                    public RiskTypeIndex.RiskType Convert(OrganisationSearchModel.KeyName source, RiskTypeIndex.RiskType destination, ResolutionContext context)
-                    {
-                        var type = _riskTypeIndex.FirstOrDefault(riskType => riskType.Id == source.Key)?.Clone();
-                        type.Description = source.Name;
-                        return type;
-                    }
-                }
-
-                public class DiligenceConverter : ITypeConverter<OrganisationSearchModel.KeyName, DiligenceTypeIndex.DiligenceType>
-                {
-                    private readonly DiligenceTypeIndex _diligenceTypeIndex;
-
-                    public DiligenceConverter(DiligenceTypeIndex diligenceTypeIndex)
-                    {
-                        _diligenceTypeIndex = diligenceTypeIndex;
-                    }
-
-                    public DiligenceTypeIndex.DiligenceType Convert(OrganisationSearchModel.KeyName source, DiligenceTypeIndex.DiligenceType destination, ResolutionContext context)
-                    {
-                        var type = _diligenceTypeIndex.FirstOrDefault(diligenceType => diligenceType.Id == source.Key)?.Clone();
-                        type.Description = source.Name;
-                        return type;
-                    }
-                }
-
-                public class TrainingConverter : ITypeConverter<OrganisationSearchModel.KeyName, TrainingTypeIndex.TrainingType>
-                {
-                    private readonly TrainingTypeIndex _trainingTypeIndex;
-
-                    public TrainingConverter(TrainingTypeIndex trainingTypeIndex)
-                    {
-                        _trainingTypeIndex = trainingTypeIndex;
-                    }
-
-                    public TrainingTypeIndex.TrainingType Convert(OrganisationSearchModel.KeyName source, TrainingTypeIndex.TrainingType destination, ResolutionContext context)
-                    {
-                        var type = _trainingTypeIndex.FirstOrDefault(trainingType => trainingType.Id == source.Key)?.Clone();
-                        type.Description = source.Name;
-                        return type;
                     }
                 }
             }
@@ -126,6 +187,17 @@ namespace ModernSlavery.Core.Models
 
             public int Key { get; set; }
             public string Name { get; set; }
+
+            public override bool Equals(object obj)
+            {
+                var target = obj as KeyName;
+                return target != null && target.Key == Key;
+            }
+
+            public override int GetHashCode()
+            {
+                return Key.GetHashCode();
+            }
         }
 
         public override bool Equals(object obj)
@@ -148,37 +220,46 @@ namespace ModernSlavery.Core.Models
 
         #endregion
 
-        #region General Properties
+        #region Statement Key Fields
         public long? StatementId { get; set; }
         public long ParentOrganisationId { get; set; }
         public int? SubmissionDeadlineYear { get; set; }
-        public string OrganisationName { get; set; }
-
-        public KeyName SectorType { get; set; }
-
-        public AddressModel Address { get; set; }
-
-        public string CompanyNumber { get; set; }
-        public DateTime Modified { get; set; } = VirtualDateTime.Now;
-
         #endregion
 
-        #region Group Submission
-        public bool GroupSubmission { get; set; }
+        #region Organisation Fields
+        public string OrganisationName { get; set; }
+        public string CompanyNumber { get; set; }
+        public KeyName SectorType { get; set; }
+        public AddressModel Address { get; set; }
+        #endregion
+
+        #region Statement Control Fields
+        public DateTime Modified { get; set; } = VirtualDateTime.Now;
+        #endregion
+
+        #region Group Organisation Fields
+        public bool? GroupSubmission { get; set; }
         public string ParentName { get; set; }
         public long? ChildOrganisationId { get; set; }
         public long? ChildStatementOrganisationId { get; set; }
         #endregion
 
-        #region Your Statement
+        #region Url & Email Fields
         public string StatementUrl { get; set; }
+        public string StatementEmail { get; set; }
+        #endregion
+
+        #region Statement Period Fields
         public DateTime? StatementStartDate { get; set; }
         public DateTime? StatementEndDate { get; set; }
+        #endregion
+
+        #region Approver & Date Fields
         public string ApprovingPerson { get; set; }
         public DateTime? ApprovedDate { get; set; }
         #endregion
 
-        #region Compliance
+        #region Compliance Fields
         public bool? IncludesStructure { get; set; }
         public string StructureDetails { get; set; }
 
@@ -198,47 +279,24 @@ namespace ModernSlavery.Core.Models
         public string GoalsDetails { get; set; }
         #endregion
 
-        #region Your Organisation
+        #region Sectors Fields
         public List<KeyName> Sectors { get; set; } = new List<KeyName>();
-        public string OtherSector { get; set; }
+        public string OtherSectors { get; set; }
+        #endregion
 
+        #region Turnover Fields
         public KeyName Turnover { get; set; }
         #endregion
 
-        #region Policies
-        public List<KeyName> Policies { get; set; } = new List<KeyName>();
-        public string OtherPolicies { get; set; }
-
-        #endregion
-
-        #region Supply Chain Risks
-        public List<KeyName> RelevantRisks { get; set; } = new List<KeyName>();
-        public string OtherRelevantRisks { get; set; }
-        public List<KeyName> HighRisks { get; set; } = new List<KeyName>();
-        public string OtherHighRisks { get; set; }
-
-        public List<KeyName> LocationRisks { get; set; } = new List<KeyName>();
-        #endregion
-
-        #region Due Diligence
-        public List<KeyName> DueDiligences { get; set; } = new List<KeyName>();
-        public string ForcedLabourDetails { get; set; }
-        public string SlaveryInstanceDetails { get; set; }
-        public List<string> RemediationTypes { get; set; } = new List<string>();
-        #endregion
-
-        #region Training
-        public List<KeyName> Training { get; set; } = new List<KeyName>();
-        public string OtherTraining { get; set; }
-        #endregion
-
-        #region Monitoring progress
-        public bool? IncludesMeasuringProgress { get; set; }
-        public string ProgressMeasures { get; set; }
-        public string KeyAchievements { get; set; }
+        #region Statement Years Fields
         public KeyName StatementYears { get; set; }
         #endregion
 
+        #region Statement Summary Fields
+        public SummarySearchModel Summary { get; set; }
+        #endregion
+
+        #region Methods
         public OrganisationSearchModel SetSearchDocumentKey()
         {
             var key = ParentOrganisationId.ToString();
@@ -253,5 +311,6 @@ namespace ModernSlavery.Core.Models
             SearchDocumentKey = key;
             return this;
         }
+        #endregion
     }
 }

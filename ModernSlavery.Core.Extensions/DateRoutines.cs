@@ -8,6 +8,11 @@ namespace ModernSlavery.Core.Extensions
     /// </summary>
     public static class DateTimeRoutines
     {
+        public static DateTime? ToNullable(this DateTime dateTime)
+        {
+            return dateTime == DateTime.MinValue ? (DateTime?)null : dateTime;
+        }
+
         public static string ToFriendlyDate(this DateTime date)
         {
             if (date == DateTime.MinValue) return null;

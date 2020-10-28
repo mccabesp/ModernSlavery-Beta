@@ -8,7 +8,7 @@ using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Infrastructure.Database.Classes
 {
-    public static class Extensions
+    public static partial class Extensions
     {
         internal static List<T> SqlQuery<T>(this IDbConnection connection, string query, ILogger logger = null)
         {

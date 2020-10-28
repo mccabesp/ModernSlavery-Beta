@@ -25,7 +25,6 @@ namespace ModernSlavery.Core.Entities
         }
         #endregion
 
-        public const int MinComplienceTurnover = 30000000;
         [NotMapped]
         public string ApprovingPerson
         {
@@ -54,16 +53,6 @@ namespace ModernSlavery.Core.Entities
             StatusDetails = details;
         }
 
-        public StatementYears GetStatementYears()
-        {
-            return Enums.GetEnumFromRange<StatementYears>(MinStatementYears, MaxStatementYears == null ? 0 : MaxStatementYears.Value);
-        }
-
-        public StatementTurnovers GetStatementTurnover()
-        {
-            return Enums.GetEnumFromRange<StatementTurnovers>(MinTurnover, MaxTurnover == null ? 0 : MaxTurnover.Value);
-        }
-
         public ScopeStatuses GetScopeStatus()
         {
             return Organisation.GetActiveScopeStatus(SubmissionDeadline);
@@ -72,14 +61,14 @@ namespace ModernSlavery.Core.Entities
         public bool GetIsLateSubmission()
         {
             return Modified > SubmissionDeadline
-                   && this.MinTurnover >= MinComplienceTurnover
+                   && this.Turnover > StatementTurnoverRanges.Under36Million
                    && GetScopeStatus().IsAny(ScopeStatuses.InScope, ScopeStatuses.PresumedInScope);
         }
 
         public bool IsVoluntarySubmission()
         {
             return StatementId > 0
-                   && this.MinTurnover >= MinComplienceTurnover
+                   && this.Turnover > StatementTurnoverRanges.Under36Million
                    && GetScopeStatus().IsAny(ScopeStatuses.OutOfScope, ScopeStatuses.PresumedOutOfScope);
         }
 

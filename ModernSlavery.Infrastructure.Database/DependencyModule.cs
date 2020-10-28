@@ -53,11 +53,7 @@ namespace ModernSlavery.Infrastructure.Database
             {
                 bool importSicSections = false;
                 bool importSicCodes = false;
-                bool importStatementDiligenceTypes = false;
-                bool importStatementPolicyTypes = false;
-                bool importStatementRiskTypes = false;
                 bool importStatementSectorTypes = false;
-                bool importStatementTrainingTypes = false;
                 bool importImportPrivateOrganisations = false;
                 bool importImportPublicOrganisations = false;
 
@@ -67,11 +63,7 @@ namespace ModernSlavery.Infrastructure.Database
                     fileRepository.PushRemoteFileAsync(Filenames.ShortCodes, _sharedOptions.DataPath),
                     Task.Run(async () => { importSicSections = await fileRepository.PushRemoteFileAsync(Filenames.SicSections, _sharedOptions.DataPath); }),
                     Task.Run(async () => { importSicCodes = await fileRepository.PushRemoteFileAsync(Filenames.SicCodes, _sharedOptions.DataPath); }),
-                    Task.Run(async () => { importStatementDiligenceTypes = await fileRepository.PushRemoteFileAsync(Filenames.StatementDiligenceTypes, _sharedOptions.DataPath); }),
-                    Task.Run(async () => { importStatementPolicyTypes = await fileRepository.PushRemoteFileAsync(Filenames.StatementPolicyTypes, _sharedOptions.DataPath); }),
-                    Task.Run(async () => { importStatementRiskTypes = await fileRepository.PushRemoteFileAsync(Filenames.StatementRiskTypes, _sharedOptions.DataPath); }),
                     Task.Run(async () => { importStatementSectorTypes = await fileRepository.PushRemoteFileAsync(Filenames.StatementSectorTypes, _sharedOptions.DataPath); }),
-                    Task.Run(async () => { importStatementTrainingTypes = await fileRepository.PushRemoteFileAsync(Filenames.StatementTrainingTypes, _sharedOptions.DataPath); }),
                     Task.Run(async () => { importImportPrivateOrganisations = await fileRepository.PushRemoteFileAsync(Filenames.ImportPrivateOrganisations, _sharedOptions.DataPath); }),
                     Task.Run(async () => { importImportPublicOrganisations = await fileRepository.PushRemoteFileAsync(Filenames.ImportPublicOrganisations, _sharedOptions.DataPath); })
                 );
@@ -83,11 +75,7 @@ namespace ModernSlavery.Infrastructure.Database
                     var _dataImporter = lifetimeScope.Resolve<IDataImporter>();
                     if (dbContext.MigrationsApplied || importSicSections) _dataImporter.ImportSICSectionsAsync().Wait();
                     if (dbContext.MigrationsApplied || importSicCodes) _dataImporter.ImportSICCodesAsync().Wait();
-                    if (dbContext.MigrationsApplied || importStatementDiligenceTypes) _dataImporter.ImportStatementDiligenceTypesAsync().Wait();
-                    if (dbContext.MigrationsApplied || importStatementPolicyTypes) _dataImporter.ImportStatementPolicyTypesAsync().Wait();
-                    if (dbContext.MigrationsApplied || importStatementRiskTypes) _dataImporter.ImportStatementRiskTypesAsync().Wait();
                     if (dbContext.MigrationsApplied || importStatementSectorTypes) _dataImporter.ImportStatementSectorTypesAsync().Wait();
-                    if (dbContext.MigrationsApplied || importStatementTrainingTypes) _dataImporter.ImportStatementTrainingTypesAsync().Wait();
                     if (dbContext.MigrationsApplied || importImportPrivateOrganisations) _dataImporter.ImportPrivateOrganisationsAsync(-1).Wait();
                     if (dbContext.MigrationsApplied || importImportPublicOrganisations) _dataImporter.ImportPublicOrganisationsAsync(-1).Wait();
                 }

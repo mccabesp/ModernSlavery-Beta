@@ -35,10 +35,6 @@ namespace ModernSlavery.WebUI.Shared
 
             //Register service dependencies here
             services.AddSingleton<SectorTypeIndex>();
-            services.AddSingleton<PolicyTypeIndex>();
-            services.AddSingleton<RiskTypeIndex>();
-            services.AddSingleton<DiligenceTypeIndex>();
-            services.AddSingleton<TrainingTypeIndex>();
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

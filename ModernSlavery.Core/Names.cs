@@ -39,11 +39,7 @@ namespace ModernSlavery.Core
         public const string SicSections = "MSU-SicSections.csv";
         public const string SicSectorSynonyms = "MSU-SicSectorSynonyms.csv";
 
-        public const string StatementDiligenceTypes = "MSU-StatementDiligenceTypes.csv";
-        public const string StatementPolicyTypes = "MSU-StatementPolicyTypes.csv";
-        public const string StatementRiskTypes = "MSU-StatementRiskTypes.csv";
         public const string StatementSectorTypes = "MSU-StatementSectorTypes.csv";
-        public const string StatementTrainingTypes = "MSU-StatementTrainingTypes.csv";
 
         // Record logs
         public const string BadSicLog = "MSU-BadSicLog.csv";
