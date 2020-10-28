@@ -13,7 +13,13 @@ namespace ModernSlavery.Core.Models
         public OrganisationStatuses Status { get; set; }
         public DateTime StatusDate { get; set; }
         public string StatusDetails { get; set; }
-        public string Address { get; set; }
+        public string AddressLine1 { get; set; }
+        public string AddressLine2 { get; set; }
+        public string AddressLine3 { get; set; }
+        public string AddressTownCity { get; set; }
+        public string AddressCounty { get; set; }
+        public string AddressCountry { get; set; }
+        public string AddressPostCode { get; set; }
         public string SicCodes { get; set; }
         public DateTime? LatestRegistrationDate { get; set; }
         public RegistrationMethods? LatestRegistrationMethod { get; set; }

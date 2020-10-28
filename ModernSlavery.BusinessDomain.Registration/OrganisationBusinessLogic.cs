@@ -89,6 +89,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             var reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(org.SectorType, year);
             var statement = await GetPrimaryStatementForYear(org, year);
             var latestScope = await _scopeLogic.GetScopeByReportingDeadlineOrLatestAsync(org.OrganisationId, reportingDeadline);
+            var address = org.LatestAddress;
 
             var record = new OrganisationsFileModel
             {
@@ -100,7 +101,13 @@ namespace ModernSlavery.BusinessDomain.Registration
                 Status = org.Status,
                 StatusDate = org.StatusDate,
                 StatusDetails = org.StatusDetails,
-                Address = org.LatestAddress?.GetAddressString(),
+                AddressLine1 = address.Address1,
+                AddressLine2 = address.Address2,
+                AddressLine3 = address.Address3,
+                AddressTownCity = address.TownCity,
+                AddressCounty = address.County,
+                AddressCountry = address.Country,
+                AddressPostCode = address.PostCode,
                 SicCodes = GetOrganisationSicCodeIdsString(org),
                 LatestRegistrationDate = org.LatestRegistration?.PINConfirmedDate,
                 LatestRegistrationMethod = org.LatestRegistration?.Method,
