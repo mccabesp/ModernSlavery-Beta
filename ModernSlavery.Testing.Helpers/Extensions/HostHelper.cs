@@ -1,20 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.WebUI.Shared.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
+using Microsoft.Extensions.Configuration;
+using System;
+using Microsoft.AspNetCore.Http;
 
 namespace ModernSlavery.Testing.Helpers
 {
@@ -41,29 +34,46 @@ namespace ModernSlavery.Testing.Helpers
             return testWebHostBuilder.Build();
         }
 
+        private static IServiceScopeFactory GetServiceScopeFactory(this IHost host)
+        {
+            return host.Services.GetRequiredService<IServiceScopeFactory>();
+        }
+
+        public static IServiceScope CreateServiceScope(this IHost host)
+        {
+            var serviceScopeFactory = host.GetServiceScopeFactory();
+            return serviceScopeFactory.CreateScope();
+        }
+
         public static T GetDependency<T>(this IHost host)
         {
+            if (host == null) throw new ArgumentNullException(nameof(host));
             return host.Services.GetRequiredService<T>();
         }
-
-        public static IDataRepository GetDataRepository(this IHost host)
+        public static T GetDependency<T>(this IServiceScope serviceScope)
         {
-            return host.Services.GetRequiredService<IDataRepository>();
+            if (serviceScope == null) throw new ArgumentNullException(nameof(serviceScope));
+            return serviceScope.ServiceProvider.GetRequiredService<T>();
         }
 
-        public static DatabaseContext GetDatabaseContext(this IHost host)
+        public static IConfiguration GetConfiguration(this IServiceProvider serviceProvider)
         {
-            return host.Services.GetRequiredService<DatabaseContext>();
+            return serviceProvider.GetRequiredService<IConfiguration>();
         }
 
-        public static IFileRepository GetFileRepository(this IHost host)
+        public static IDataRepository GetDataRepository(this IServiceScope serviceScope)
         {
-            return host.Services.GetRequiredService<IFileRepository>();
+            return serviceScope.GetDependency<IDataRepository>();
         }
 
-        public static IHttpSession GetHttpSession(this IHost host)
+        public static IDbContext GetDbContext(this IServiceScope serviceScope)
         {
-            return host.Services.GetRequiredService<IHttpSession>();
+            return serviceScope.GetDependency<IDbContext>();
+        }
+
+        public static IFileRepository GetFileRepository(this IServiceProvider serviceProvider)
+        {
+            return serviceProvider.GetRequiredService<IFileRepository>();
         }
     }
 }

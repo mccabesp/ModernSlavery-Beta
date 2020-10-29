@@ -10,6 +10,7 @@ using ModernSlavery.Testing.Helpers;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using Microsoft.Extensions.Hosting;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
@@ -43,15 +44,13 @@ namespace ModernSlavery.Hosts.Web.Tests
             //GovNotify uses AppSetting Test key Email:Providers:GovNotify:ApiKey and AllowTestKeyOnly to simulate sending of emails and letters 
 
             //Create and In-memory database
-            var databaseContext = DependencyFactory.CreateInMemoryDatabaseContext();
-            builder.RegisterInstance(databaseContext).As<IDbContext>().SingleInstance();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
         {
             //Send logs to file for later upload to DevOps as test attachments
             var loggerFactory = lifetimeScope.Resolve<ILoggerFactory>();
-            var logFilepath = Path.Combine(_configuration["Filepaths:LogFiles"], $"{AppDomain.CurrentDomain.FriendlyName}.{_configuration[HostDefaults.EnvironmentKey]}.log");
+            var logFilepath = Path.Combine(_configuration["Filepaths:LogFiles"], $"{_configuration.GetApplicationName()}.{_configuration[HostDefaults.EnvironmentKey]}.log");
             loggerFactory.AddFile(logFilepath);
         }
 

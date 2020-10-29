@@ -15,11 +15,11 @@ namespace ModernSlavery.Infrastructure.Logging
         private readonly IQueue queue;
         protected readonly SharedOptions SharedOptions;
 
-        public AuditLogger(SharedOptions sharedOptions, LogRecordQueue queue, string applicationName,
-            string fileName)
+        public AuditLogger(SharedOptions sharedOptions, LogRecordQueue queue, string fileName, string applicationName=null)
         {
             SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
-            if (string.IsNullOrWhiteSpace(applicationName)) throw new ArgumentNullException(nameof(applicationName));
+            if (string.IsNullOrWhiteSpace(applicationName)) applicationName=sharedOptions.ApplicationName;
+            if (string.IsNullOrWhiteSpace(applicationName)) applicationName= AppDomain.CurrentDomain.FriendlyName;
 
             if (string.IsNullOrWhiteSpace(fileName)) throw new ArgumentNullException(nameof(fileName));
 
