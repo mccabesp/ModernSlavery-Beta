@@ -1,28 +1,28 @@
 ﻿@inject IWebService WebService
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Service activated - Modern Slavery reporting service";
 }
-<div class="grid-row">
-    <div class="column-two-thirds">
-        <div class="govuk-box-highlight">
-            <h1 class="bold-large">You can now submit a modern slavery statement for this organisation.</h1>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-panel govuk-panel--confirmation">
+            <h1 class="govuk-panel__title govuk-!-font-size-36">You can now submit a modern slavery statement for this organisation.</h1>
         </div>
-        <div class="subsection">
-            <dl class="govuk-check-your-answers cya-questions-short">
-                <div>
-                    <dt class="cya-question">
+        <div class="govuk-form-group">
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">
                         Organisation name
                     </dt>
-                    <dd class="cya-answer">
+                    <dd class="govuk-summary-list__value">
                         @ViewBag.OrganisationName
                     </dd>
                 </div>
             </dl>
         </div>       
         <br/>
-        <p>
-            <a class="button" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Continue</a>
+        <p class="govuk-body">
+            <a class="govuk-button" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Continue</a>
         </p>
     </div>
 </div>

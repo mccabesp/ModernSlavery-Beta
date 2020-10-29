@@ -2,38 +2,38 @@
 @inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
 @model RemoveOrganisationModel
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Remove organisation reason - Modern Slavery reporting service";
     var controller = ViewData["Controller"] as BaseController;
     var userId = Obfuscator.DeObfuscate(Model.EncUserId).ToInt64();
 }
-<div class="grid-row">
-    <div class="column-two-thirds">
-        <div class="govuk-box-highlight">
-            <h1 class="heading-xlarge">
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-panel govuk-panel--confirmation ">
+            <h1 class="govuk-panel__title">
                 Removal complete
             </h1>
         </div>
 
         @if (controller.CurrentUser.UserId == userId && controller.IsImpersonatingUser == false)
         {
-            <p>
+            <p class="govuk-body">
                 You can no longer submit a modern slavery statement for @Model.OrganisationName. You will receive an email notification shortly.
             </p>
         }
         else
         {
-            <p>
+            <p class="govuk-body">
                 @Model.UserName can no longer submit a modern slavery statement for @Model.OrganisationName. They will receive an email notification shortly.
             </p>
         }
 
-        <div class="form-group">
-            <div class="bold-small">
+        <div class="govuk-form-group">
+            <span class="govuk-!-font-weight-bold">
                 More options
-            </div>
-            <p>
-                <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" )">Manage organisations</a>
+            </span>
+            <p class="govuk-body">
+                <a class="govuk-link" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" )">Manage organisations</a>
             </p>
         </div>
     </div>

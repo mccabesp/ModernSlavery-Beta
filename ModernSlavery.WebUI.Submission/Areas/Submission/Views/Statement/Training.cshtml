@@ -42,10 +42,10 @@
                             {
                                 <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTraining, "govuk-form-group--error")" id="training-conditional-@(trainingType.Id)">
                                     <div class="govuk-form-group">
-                                        <label class="govuk-label" for="other">
+                                        <label class="govuk-label" asp-for="OtherTraining">
                                             Please specify
                                         </label>
-                                        <input asp-for="OtherTraining" class="govuk-input" id="contact-by-email" name="OtherTraining" spellcheck="false" maxlength="256">
+                                        <input asp-for="OtherTraining" class="govuk-input" spellcheck="false" maxlength="256">
                                         <span asp-validation-for="OtherTraining" class="govuk-error-message"></span>
                                     </div>
                                 </div>

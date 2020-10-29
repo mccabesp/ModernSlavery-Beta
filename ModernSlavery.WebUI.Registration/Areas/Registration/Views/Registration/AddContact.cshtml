@@ -1,112 +1,103 @@
 ﻿@{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Add your organisation's address - Modern Slavery reporting service";
 }
 @model OrganisationViewModel
+@section BeforeMain {
+    <a href="@Url.Action("AddAddress")" class="govuk-back-link">Back</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.SelectedOrganisationIndex)
+            @Html.HiddenFor(model => model.CompanyNumber)
+            @Html.HiddenFor(model => model.CharityNumber)
+            @Html.HiddenFor(model => model.MutualNumber)
+            @Html.HiddenFor(model => model.OtherName)
+            @Html.HiddenFor(model => model.OtherValue)
+            @Html.HiddenFor(model => model.BackAction)
+            @Html.HiddenFor(model => model.AddressReturnAction)
+            @Html.HiddenFor(model => model.ConfirmReturnAction)
+            @Html.HiddenFor(model => model.SearchText)
+            @Html.HiddenFor(model => model.SectorType)
+            @Html.HiddenFor(model => model.RegistrationType)
+            @Html.HiddenFor(model => model.OrganisationName)
+            @Html.HiddenFor(model => model.NameSource)
+            @Html.HiddenFor(model => model.AddressSource)
+            @Html.HiddenFor(model => model.SicSource)
 
-<div id="add-contact-content">
-    <div class="grid-row">
-        <div class="column-full">
-            <a href="@Url.Action("AddAddress")" class="link-back">Back</a>
-        </div>
-    </div>
-    @using (Html.BeginForm())
-    {
-        @Html.AntiForgeryToken()
-        @Html.HiddenFor(model => model.SelectedOrganisationIndex)
-        @Html.HiddenFor(model => model.CompanyNumber)
-        @Html.HiddenFor(model => model.CharityNumber)
-        @Html.HiddenFor(model => model.MutualNumber)
-        @Html.HiddenFor(model => model.OtherName)
-        @Html.HiddenFor(model => model.OtherValue)
-        @Html.HiddenFor(model => model.BackAction)
-        @Html.HiddenFor(model => model.AddressReturnAction)
-        @Html.HiddenFor(model => model.ConfirmReturnAction)
-        @Html.HiddenFor(model => model.SearchText)
-        @Html.HiddenFor(model => model.SectorType)
-        @Html.HiddenFor(model => model.RegistrationType)
-        @Html.HiddenFor(model => model.OrganisationName)
-        @Html.HiddenFor(model => model.NameSource)
-        @Html.HiddenFor(model => model.AddressSource)
-        @Html.HiddenFor(model => model.SicSource)
+            @Html.HiddenFor(model => model.NoReference)
+            @Html.HiddenFor(model => model.Address1)
+            @Html.HiddenFor(model => model.Address2)
+            @Html.HiddenFor(model => model.Address3)
+            @Html.HiddenFor(model => model.City)
+            @Html.HiddenFor(model => model.County)
+            @Html.HiddenFor(model => model.Country)
+            @Html.HiddenFor(model => model.Postcode)
+            @Html.HiddenFor(model => model.PoBox)
 
-        @Html.HiddenFor(model => model.NoReference)
-        @Html.HiddenFor(model => model.Address1)
-        @Html.HiddenFor(model => model.Address2)
-        @Html.HiddenFor(model => model.Address3)
-        @Html.HiddenFor(model => model.City)
-        @Html.HiddenFor(model => model.County)
-        @Html.HiddenFor(model => model.Country)
-        @Html.HiddenFor(model => model.Postcode)
-        @Html.HiddenFor(model => model.PoBox)
+            @Html.HiddenFor(model => model.ManualAddress)
+            @Html.HiddenFor(model => model.ManualOrganisationIndex)
+            @Html.HiddenFor(model => model.MatchedReferenceCount)
 
-        @Html.HiddenFor(model => model.ManualAddress)
-        @Html.HiddenFor(model => model.ManualOrganisationIndex)
-        @Html.HiddenFor(model => model.MatchedReferenceCount)
+            @Html.HiddenFor(model => model.ManualRegistration)
+            @Html.HiddenFor(model => model.WrongAddress)
 
-        @Html.HiddenFor(model => model.ManualRegistration)
-        @Html.HiddenFor(model => model.WrongAddress)
+            @Html.HiddenFor(model => model.ManualAuthorised)
+            @Html.HiddenFor(model => model.SelectedAuthorised)
 
-        @Html.HiddenFor(model => model.ManualAuthorised)
-        @Html.HiddenFor(model => model.SelectedAuthorised)
 
-        <div class="grid-row">
-            <div class="column-two-thirds">
-                @await Html.CustomValidationSummaryAsync()
+            @await Html.GovUkValidationSummaryAsync()
 
-                <h1 class="heading-large">
-                    Your contact details
-                </h1>
+            <h1 class="govuk-heading-l">
+                Your contact details
+            </h1>
 
-                <div class="dynamic-content default-content">
-                    <p>Enter your contact details.</p>
+            <div class="govuk-form-group">
+                <p class="govuk-body">Enter your contact details.</p>
 
-                    <div class="form-group @Html.SetErrorClass(model => model.ContactFirstName, " error")">
-                        @Html.LabelFor(model => model.ContactFirstName, "First name", new { @class = "form-label col-md-2" })
-                        @Html.ValidationMessageFor(model => model.ContactFirstName, "", new { @class = "error-danger" })
-                        <div class="col-md-10">
-                            @Html.CustomEditorFor(model => model.ContactFirstName, new { @class = "form-control" })
-                        </div>
-                    </div>
-
-                    <div class="form-group @Html.SetErrorClass(model => model.ContactLastName, " error")">
-                        @Html.LabelFor(model => model.ContactLastName, "Last name", new { @class = "form-label col-md-2" })
-                        @Html.ValidationMessageFor(model => model.ContactLastName, "", new { @class = "error-danger" })
-                        <div class="col-md-10">
-                            @Html.CustomEditorFor(model => model.ContactLastName, new { @class = "form-control" })
-                        </div>
-                    </div>
-
-                    <div class="form-group @Html.SetErrorClass(model => model.ContactJobTitle, " error")">
-                        @Html.LabelFor(model => model.ContactJobTitle, "Job title", new { @class = "form-label col-md-2" })
-                        @Html.ValidationMessageFor(model => model.ContactJobTitle, "", new { @class = "error-danger" })
-                        <div class="col-md-10">
-                            @Html.CustomEditorFor(model => model.ContactJobTitle, new { @class = "form-control" })
-                        </div>
-                    </div>
-
-                    <div class="form-group @Html.SetErrorClass(model => model.ContactEmailAddress, " error") form-group-compound">
-                        @Html.LabelFor(model => model.ContactEmailAddress, "Email address", new { @class = "form-label col-md-2" })
-                        @Html.ValidationMessageFor(model => model.ContactEmailAddress, "", new { @class = "error-danger" })
-                        <div class="col-md-10">
-                            @Html.CustomEditorFor(model => model.ContactEmailAddress, new { @class = "form-control" })
-                        </div>
-                    </div>
-
-                    <div class="form-group @Html.SetErrorClass(model => model.ContactPhoneNumber, " error") form-group-compound">
-                        @Html.LabelFor(model => model.ContactPhoneNumber, "Telephone number", new { @class = "form-label col-md-2" })
-                        @Html.ValidationMessageFor(model => model.ContactPhoneNumber, "", new { @class = "error-danger" })
-                        <div class="col-md-10">
-                            @Html.CustomEditorFor(model => model.ContactPhoneNumber, new { @class = "form-control" })
-                        </div>
-                    </div>
-
-                    <br><br>
-
-                    <input class="button" type="submit" role="button" name="command" value="Continue" aria-label="Continue" />
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.ContactFirstName, "govuk-form-group--error")">
+                    @Html.LabelFor(model => model.ContactFirstName, "First name", new { @class = "govuk-label" })
+                    @Html.ValidationMessageFor(model => model.ContactFirstName, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
+                    @Html.CustomEditorFor(model => model.ContactFirstName, new { @class = "govuk-input govuk-!-width-one-half" })
 
                 </div>
+
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.ContactLastName, "govuk-form-group--error")">
+                    @Html.LabelFor(model => model.ContactLastName, "Last name", new { @class = "govuk-label" })
+                    @Html.ValidationMessageFor(model => model.ContactLastName, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
+                    @Html.CustomEditorFor(model => model.ContactLastName, new { @class = "govuk-input govuk-!-width-one-half" })
+
+                </div>
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.ContactJobTitle, "govuk-form-group--error")">
+                    @Html.LabelFor(model => model.ContactJobTitle, "Job title", new { @class = "govuk-label" })
+                    @Html.ValidationMessageFor(model => model.ContactJobTitle, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
+                    @Html.CustomEditorFor(model => model.ContactJobTitle, new { @class = "govuk-input govuk-!-width-one-half" })
+
+                </div>
+
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.ContactEmailAddress, "govuk-form-group--error")">
+                    @Html.LabelFor(model => model.ContactEmailAddress, "Email address", new { @class = "govuk-label" })
+                    @Html.ValidationMessageFor(model => model.ContactEmailAddress, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
+                    @Html.CustomEditorFor(model => model.ContactEmailAddress, new { @class = "govuk-input govuk-!-width-one-half" })
+
+                </div>
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.ContactPhoneNumber, "govuk-form-group--error")">
+                    @Html.LabelFor(model => model.ContactPhoneNumber, "Telephone number", new { @class = "govuk-label" })
+                    @Html.ValidationMessageFor(model => model.ContactPhoneNumber, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
+                    @Html.CustomEditorFor(model => model.ContactPhoneNumber, new { @class = "govuk-input govuk-!-width-one-half" })
+
+                </div>
+
+                <br><br>
+
+                <input class="govuk-button" type="submit" role="button" name="command" value="Continue" aria-label="Continue" />
+
             </div>
+        }
         </div>
-    }
-</div>
+    </div>
+
+       

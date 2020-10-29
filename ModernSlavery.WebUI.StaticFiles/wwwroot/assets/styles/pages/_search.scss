@@ -44,5 +44,12 @@ details.advanced-search-details .govuk-details__text {
     margin-bottom:15px;
 }
 
+@media (max-width: 40.0525em) 
+{
+    .two-columns{
+        columns:1;
+    }
+}
+
 
 
