@@ -1,16 +1,14 @@
 ﻿@{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "~/Views/GdSLayout.cshtml";
     ViewBag.Title = "Feedback sent - Modern Slavery reporting service";
 }
-<main id="content" role="main">
-    <div class="grid-row">
-        <div class="column-two-thirds">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
 
-            <h1 class="heading-large">Thank you</h1>
+            <h1 class="govuk-heading-l">Thank you</h1>
 
-            <h2 class="font-medium">Thank you for giving us your feedback about this service. We regularly update the service and pay careful attention to all the comments we receive.</h2><br>
+            <p>Thank you for giving us your feedback about this service. We regularly update the service and pay careful attention to all the comments we receive.</p><br>
 
-            <a class="button" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" role="button">Return to manage organisations</a>
+            <a class="govuk-button" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" role="button">Return to manage organisations</a>
         </div>
     </div>
-</main>
