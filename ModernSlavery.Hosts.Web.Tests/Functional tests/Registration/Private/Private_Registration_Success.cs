@@ -99,7 +99,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(23)]
 
         public async Task ExtractPin() {
-            Pin = WebDriver.FindElement(By.XPath("//b")).Text;
+            Pin = WebDriver.FindElement(By.XPath("(//b)[2]")).Text;
             await Task.CompletedTask;
         }
 

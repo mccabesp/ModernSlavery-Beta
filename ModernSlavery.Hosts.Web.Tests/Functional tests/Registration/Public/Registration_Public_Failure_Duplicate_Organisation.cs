@@ -40,7 +40,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //org already registered
             //error should appear
 
-            Expect("The following errors were detected");
+            Expect("There is a problem");
             Expect("You have already started registering for this organisation");
 
             await Task.CompletedTask;
