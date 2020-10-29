@@ -10,7 +10,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
     {
         public static string LogsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
         public static string ScreenshotsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots");
-        public static string AxeResultsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AxeResults");
+        public static string AxeResultsFilepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"AxeResults/{DateTime.Now:yy-MM-dd (hh꞉mm꞉ss)}");
 
         static LoggingHelper()
         {
