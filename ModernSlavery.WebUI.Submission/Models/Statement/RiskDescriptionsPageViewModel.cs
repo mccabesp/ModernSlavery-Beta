@@ -23,7 +23,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                     foreach (var pars in new[] { (s.HighRisk1, 0), (s.HighRisk2, 1), (s.HighRisk3, 2) })
                         SetRiskDetails(pars.Item1, pars.Item2);
 
-                    void SetRiskDetails(string details, int index)
+                    void SetRiskDetails(string description, int index)
                     {
                         //Ensure there is a risk for every item
                         var risk = d.Risks.Count <= index ? null : d.Risks[index];
@@ -34,10 +34,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                         }
 
                         //When clearing descriptions ensure no other properties are set
-                        if (string.IsNullOrWhiteSpace(details) && risk.IsEmpty(true)) throw new Exception($"Attempt to clear Risk {index} description when details are not empty");
+                        if (string.IsNullOrWhiteSpace(description) && risk.IsEmpty(true)) throw new Exception($"Attempt to clear Risk {index} description when details are not empty");
 
                         //Set the new description
-                        risk.Description = details;
+                        risk.Description = description;
                     }
 
                     //Remove empty risks
