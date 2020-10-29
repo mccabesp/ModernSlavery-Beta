@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
-using ModernSlavery.BusinessDomain.Shared.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
-using ModernSlavery.WebUI.Shared.Classes.Binding;
-using ModernSlavery.Core.Classes.StatementTypeIndexes;
+using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
+using ModernSlavery.Core.Entities.StatementSummary;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -14,51 +13,29 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public TrainingPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, TrainingPageViewModel>();
+            CreateMap<StatementSummary1, TrainingPageViewModel>();
 
-            CreateMap<TrainingPageViewModel, StatementModel>(MemberList.Source)
-                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
-                .ForMember(s => s.OrganisationId, opt => opt.Ignore())
-                .ForSourceMember(s => s.TrainingTypes, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
+            CreateMap<TrainingPageViewModel, StatementSummary1>(MemberList.Source)
+                .ForMember(d => d.TrainingTargets, opt => opt.MapFrom(s=>s.TrainingTargets))
+                .ForMember(d => d.OtherTrainingTargets, opt => opt.MapFrom(s=>s.OtherTraining))
+                .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    [DependencyModelBinder]
     public class TrainingPageViewModel : BaseViewModel
     {
+        public override string PageTitle => "During the period of the statement, did you provide training on modern slavery, or any other activities to raise awareness?";
 
-        [IgnoreMap]
-        [Newtonsoft.Json.JsonIgnore]//This needs to be Newtonsoft.Json.JsonIgnore namespace not System.Text.Json.Serialization.JsonIgnore
-        public TrainingTypeIndex TrainingTypes { get; }
-        public TrainingPageViewModel(TrainingTypeIndex trainingTypes)
-        {
-            TrainingTypes = trainingTypes;
-        }
+        public List<TrainingTargetTypes> TrainingTargets { get; set; } = new List<TrainingTargetTypes>();
 
-        public TrainingPageViewModel()
-        {
-
-        }
-        public override string PageTitle => "Training";
-
-        public List<short> Training { get; set; } = new List<short>();
-
-        [MaxLength(256)]//We need at least one validation annotation otherwise Validate wont execute
+        [MaxLength(256)]
         public string OtherTraining { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
 
-            var otherId = TrainingTypes.Single(x => x.Description.Equals("Other")).Id;
-
-            if (Training.Contains(otherId) && string.IsNullOrWhiteSpace(OtherTraining))
+            if (TrainingTargets.Contains(TrainingTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTraining))
                 validationResults.AddValidationError(3700, nameof(OtherTraining));
 
             return validationResults;
@@ -66,10 +43,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            var other = TrainingTypes.Single(x => x.Description.Equals("Other"));
-
-            return Training.Any()
-                && !Training.Any(t => t == other.Id && string.IsNullOrWhiteSpace(OtherTraining));
+            return TrainingTargets.Any()
+                && (!TrainingTargets.Contains(TrainingTargetTypes.Other) || !string.IsNullOrWhiteSpace(OtherTraining));
         }
     }
 }

@@ -42,7 +42,7 @@ namespace ModernSlavery.WebUI.Shared.Models
                     .ForMember(d => d.Indicators, opt => opt.MapFrom(s=>s.Summary.Indicators))
                     .ForMember(d => d.OtherIndicators, opt => opt.MapFrom(s=>s.Summary.OtherIndicators))
                     .ForMember(d => d.Remediations, opt => opt.MapFrom(s=>s.Summary.Remediations))
-                    .ForMember(d => d.OtherRemedations, opt => opt.MapFrom(s=>s.Summary.OtherRemedations))
+                    .ForMember(d => d.OtherRemediations, opt => opt.MapFrom(s=>s.Summary.OtherRemedations))
                     .ForMember(d => d.ProgressMeasures, opt => opt.MapFrom(s=>s.Summary.ProgressMeasures))
                     .AfterMap<ObfuscateAction>();
             }
@@ -186,7 +186,7 @@ namespace ModernSlavery.WebUI.Shared.Models
 
             #region Risks
 
-            public SortedSet<StatementRisk> Risks { get; set; } = new SortedSet<StatementRisk>();
+            public List<StatementRisk> Risks { get; set; } = new List<StatementRisk>();
 
             #endregion
 
@@ -200,7 +200,7 @@ namespace ModernSlavery.WebUI.Shared.Models
             #region Remediation Fields
             public SortedSet<RemediationTypes> Remediations { get; set; } = new SortedSet<RemediationTypes>();
 
-            public string OtherRemedations { get; set; }
+            public string OtherRemediations { get; set; }
             #endregion
 
             #region Progress Measuring Fields

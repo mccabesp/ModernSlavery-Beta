@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
@@ -8,56 +7,45 @@ using System.Linq;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Binding;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
-using ModernSlavery.Core.Entities;
 using static ModernSlavery.Core.Entities.Statement;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class OrganisationPageViewModelMapperProfile : Profile
+    public class SectorPageViewModelMapperProfile : Profile
     {
-        public OrganisationPageViewModelMapperProfile()
+        public SectorPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, YourOrganisationPageViewModel>();
+            CreateMap<StatementModel, SectorPageViewModel>();
 
-            CreateMap<YourOrganisationPageViewModel, StatementModel>(MemberList.Source)
-                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
-                .ForMember(s => s.OrganisationId, opt => opt.Ignore())
-                .ForMember(d => d.GroupSubmission, opt => opt.Ignore())
-                .ForSourceMember(s => s.SectorTypes, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
+            CreateMap<SectorPageViewModel, StatementModel>(MemberList.Source)
+                .ForMember(d => d.Sectors, opt => opt.MapFrom(s => s.Sectors))
+                .ForMember(d => d.OtherSectors, opt => opt.MapFrom(s => s.OtherSector))
+                .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
     [DependencyModelBinder]
-    public class YourOrganisationPageViewModel : BaseViewModel
+    public class SectorPageViewModel : BaseViewModel
     {
         [IgnoreMap]
         [Newtonsoft.Json.JsonIgnore]//This needs to be Newtonsoft.Json.JsonIgnore namespace not System.Text.Json.Serialization.JsonIgnore
         public SectorTypeIndex SectorTypes { get; }
-        public YourOrganisationPageViewModel(SectorTypeIndex sectorTypes)
+        public SectorPageViewModel(SectorTypeIndex sectorTypes)
         {
             SectorTypes = sectorTypes;
         }
 
-        public YourOrganisationPageViewModel()
+        public SectorPageViewModel()
         {
 
         }
 
-        public override string PageTitle => "Your organisation";
+        public override string PageTitle => "Which sector(s) does your organisation operate in?";
 
         public List<short> Sectors { get; set; } = new List<short>();
 
         [MaxLength(128)]//We need at least one validation annotation otherwise Validate wont execute
         public string OtherSector { get; set; }
-
-        [Display(Name = "What was your turnover or budget during the last financial accounting year?")]
-        public StatementTurnoverRanges? Turnover { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -76,8 +64,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             var other = SectorTypes.Single(x => x.Description.Equals("Other"));
 
             return Sectors.Any()
-                && !Sectors.Any(t => t == other.Id && string.IsNullOrWhiteSpace(OtherSector))
-                && Turnover != StatementTurnoverRanges.NotProvided;
+                && (!Sectors.Any(t => t == other.Id || !string.IsNullOrWhiteSpace(OtherSector)));
         }
     }
 }

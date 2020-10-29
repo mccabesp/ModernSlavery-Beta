@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -17,17 +15,24 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<StatementModel, ReviewAndEditPageViewModel>()
                 .ForMember(s => s.GroupOrganisations, opt => opt.MapFrom(s => s))
-                .ForMember(s => s.YourStatement, opt => opt.MapFrom(s => s))
-                .ForMember(s => s.Compliance, opt => opt.MapFrom(s => s))
-                .ForMember(s => s.Organisation, opt => opt.MapFrom(s => s))
-                .ForMember(s => s.Policies, opt => opt.MapFrom(s => s))
-                .ForMember(s => s.Risks, opt => opt.MapFrom(s => s))
-                .ForMember(s => s.DueDiligence, opt => opt.MapFrom(s => s))
-                .ForMember(s => s.Training, opt => opt.MapFrom(s => s))
-                .ForMember(s => s.Progress, opt => opt.MapFrom(s => s))
-                .ForMember(s => s.BackUrl, opt => opt.Ignore())
-                .ForMember(s => s.CancelUrl, opt => opt.Ignore())
-                .ForMember(s => s.ContinueUrl, opt => opt.Ignore());
+                .ForMember(s => s.UrlPageViewModel, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.StatementPeriodPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.ApprovalPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.CompliancePage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.SectorsPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.StatementYearsPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.PoliciesPage, opt => opt.MapFrom(s => s.Summary))
+                .ForMember(s => s.TrainingPage, opt => opt.MapFrom(s => s.Summary))
+                .ForMember(s => s.PartnersPage, opt => opt.MapFrom(s => s.Summary))
+                .ForMember(s => s.SocialAuditsPage, opt => opt.MapFrom(s => s.Summary))
+                .ForMember(s => s.GrievancesPage, opt => opt.MapFrom(s => s.Summary))
+                .ForMember(s => s.OtherWorkConditionsPage, opt => opt.MapFrom(s => s.Summary))
+                .ForMember(s => s.RiskDescriptionsPage, opt => opt.MapFrom(s => s.Summary))
+                .ForMember(s => s.RiskDetailsPages, opt => opt.MapFrom(s => s.Summary.Risks))
+                .ForMember(s => s.IndicatorsPage, opt => opt.MapFrom(s => s.Summary))
+                .ForMember(s => s.RemediationPage, opt => opt.MapFrom(s => s.Summary))
+                .ForMember(s => s.MonitoringProgressPage, opt => opt.MapFrom(s => s.Summary))
+                .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
@@ -38,7 +43,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         private string GetSubtitle()
         {
-            var complete = YourStatement.IsComplete() && Compliance.IsComplete();
+            var complete = IsComplete();
 
             var result = $"Submission {(complete ? "" : "in")}complete.";
 
@@ -50,78 +55,135 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return result;
         }
 
+        #region Individual Page ViewModels
         public GroupOrganisationsViewModel GroupOrganisations { get; set; }
-        public YourStatementPageViewModel YourStatement { get; set; }
-        public CompliancePageViewModel Compliance { get; set; }
-        public YourOrganisationPageViewModel Organisation { get; set; }
-        public PoliciesPageViewModel Policies { get; set; }
-        public SupplyChainRisksPageViewModel Risks { get; set; }
-        public DueDiligencePageViewModel DueDiligence { get; set; }
-        public TrainingPageViewModel Training { get; set; }
-        public MonitoringProgressPageViewModel Progress { get; set; }
-        
+        public UrlPageViewModel UrlPageViewModel { get; set; }
+        public StatementPeriodPageViewModel StatementPeriodPage { get; set; }
+        public ApprovalPageViewModel ApprovalPage { get; set; }
+        public CompliancePageViewModel CompliancePage { get; set; }
+        public SectorPageViewModel SectorsPage { get; set; }
+        public StatementYearsPageViewModel StatementYearsPage { get; set; }
+        public PoliciesPageViewModel PoliciesPage { get; set; }
+        public TrainingPageViewModel TrainingPage { get; set; }
+        public PartnersPageViewModel PartnersPage { get; set; }
+        public SocialAuditsPageViewModel SocialAuditsPage { get; set; }
+        public GrievancesPageViewModel GrievancesPage { get; set; }
+        public MonitoringOtherWorkConditionsPageViewModel OtherWorkConditionsPage { get; set; }
+        public RiskDescriptionsPageViewModel RiskDescriptionsPage { get; set; }
+        public List<RiskDetailsPageViewModel> RiskDetailsPages { get; set; } = new List<RiskDetailsPageViewModel>();
+        public IndicatorsPageViewModel IndicatorsPage { get; set; }
+        public RemediationPageViewModel RemediationPage { get; set; }
+        public MonitoringProgressPageViewModel MonitoringProgressPage { get; set; }
+        #endregion
+
         [IgnoreMap]
         public IList<AutoMap.Diff> DraftModifications { get; set; }
 
         [IgnoreMap]
         public IList<AutoMap.Diff> SubmittedModifications { get; set; }
 
+        #region Navigation Url
         [IgnoreMap]
         [BindNever]
-        public string GroupStatusUrl { get; set; }
+        public string GroupReportingUrl { get; set; }
+
         [IgnoreMap]
         [BindNever]
-        public string GroupReviewUrl { get; set; }
-        [IgnoreMap]
-        [BindNever]
-        public string YourStatementUrl { get; set; }
+        public string UrlApprovalUrl { get; set; }
+
         [IgnoreMap]
         [BindNever]
         public string ComplianceUrl { get; set; }
+
         [IgnoreMap]
         [BindNever]
-        public string OrganisationUrl { get; set; }
+        public string SectorTurnoverUrl { get; set; }
+
+        [IgnoreMap]
+        [BindNever]
+        public string StatementYearsUrl { get; set; }
+
         [IgnoreMap]
         [BindNever]
         public string PoliciesUrl { get; set; }
-        [IgnoreMap]
-        [BindNever]
-        public string RisksUrl { get; set; }
-        [IgnoreMap]
-        [BindNever]
-        public string DueDiligenceUrl { get; set; }
+
         [IgnoreMap]
         [BindNever]
         public string TrainingUrl { get; set; }
+
         [IgnoreMap]
         [BindNever]
-        public string ProgressUrl { get; set; }
+        public string WorkingConditionsUrl { get; set; }
+
+        [IgnoreMap]
+        [BindNever]
+        public string RisksUrl { get; set; }
+
+        [IgnoreMap]
+        [BindNever]
+        public string IndicatorsUrl { get; set; }
+
+        [IgnoreMap]
+        [BindNever]
+        public string MonitoringProgressUrl { get; set; }
+        #endregion
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (YourStatement.Validate(validationContext).Any())
-                yield return new ValidationResult($"Section '{YourStatement.PageTitle}' is invalid");
+            if (GroupOrganisations.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{GroupOrganisations.PageTitle}' is invalid");
 
-            if (Compliance.Validate(validationContext).Any())
-                yield return new ValidationResult($"Section '{Compliance.PageTitle}' is invalid");
+            if (UrlPageViewModel.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{UrlPageViewModel.PageTitle}' is invalid");
 
-            if (Organisation.Validate(validationContext).Any())
-                yield return new ValidationResult($"Section '{Organisation.PageTitle}' is invalid");
+            if (StatementPeriodPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{StatementPeriodPage.PageTitle}' is invalid");
 
-            if (Policies.Validate(validationContext).Any())
-                yield return new ValidationResult($"Section '{Policies.PageTitle}' is invalid");
+            if (ApprovalPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{ApprovalPage.PageTitle}' is invalid");
 
-            if (Risks.Validate(validationContext).Any())
-                yield return new ValidationResult($"Section '{Risks.PageTitle}{(string.IsNullOrWhiteSpace(Risks.PageTitle) ? "" : $" ({Risks.SubTitle})")}' is invalid");
+            if (CompliancePage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{CompliancePage.PageTitle}' is invalid");
 
-            if (DueDiligence.Validate(validationContext).Any())
-                yield return new ValidationResult($"Section '{DueDiligence.PageTitle}{(string.IsNullOrWhiteSpace(DueDiligence.PageTitle) ? "" : $" ({DueDiligence.SubTitle})")}' is invalid");
+            if (SectorsPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{SectorsPage.PageTitle}' is invalid");
 
-            if (Training.Validate(validationContext).Any())
-                yield return new ValidationResult($"Section '{Training.PageTitle}' is invalid");
+            if (StatementYearsPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{StatementYearsPage.PageTitle}' is invalid");
 
-            if (Progress.Validate(validationContext).Any())
-                yield return new ValidationResult($"Section '{Progress.PageTitle}' is invalid");
+            if (PoliciesPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{PoliciesPage.PageTitle}' is invalid");
+
+            if (TrainingPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{TrainingPage.PageTitle}' is invalid");
+
+            if (PartnersPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{PartnersPage.PageTitle}' is invalid");
+
+            if (SocialAuditsPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{SocialAuditsPage.PageTitle}' is invalid");
+
+            if (GrievancesPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{GrievancesPage.PageTitle}' is invalid");
+
+            if (OtherWorkConditionsPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{OtherWorkConditionsPage.PageTitle}' is invalid");
+
+            if (RiskDescriptionsPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{RiskDescriptionsPage.PageTitle}' is invalid");
+
+            for (var pageIndex=0; pageIndex<RiskDetailsPages.Count; pageIndex++)
+                if (RiskDetailsPages[pageIndex].Validate(validationContext).Any())
+                    yield return new ValidationResult($"Section '{RiskDetailsPages[pageIndex].PageTitle} {pageIndex+1}' is invalid");
+
+            if (IndicatorsPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{IndicatorsPage.PageTitle}' is invalid");
+
+            if (RemediationPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{RemediationPage.PageTitle}' is invalid");
+
+            if (MonitoringProgressPage.Validate(validationContext).Any())
+                yield return new ValidationResult($"Section '{MonitoringProgressPage.PageTitle}' is invalid");
 
             if (!IsComplete())
                 yield return new ValidationResult("You must first complete all sections before you can submit");
@@ -130,10 +192,38 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 yield return new ValidationResult("You must edit the statement before you can submit");
         }
 
+        public const int SectionCount = 11;
+        public int CompleteCount()
+        {
+            int count = 0;
+            //1
+            if (GroupOrganisations.IsComplete()) count++;
+            //2
+            if (UrlPageViewModel.IsComplete() && StatementPeriodPage.IsComplete() && ApprovalPage.IsComplete()) count++;
+            //3
+            if (CompliancePage.IsComplete()) count++;
+            //4
+            if (SectorsPage.IsComplete() && StatementYearsPage.IsComplete()) count++;
+            //5
+            if (StatementYearsPage.IsComplete()) count++;
+            //6
+            if (PoliciesPage.IsComplete()) count++;
+            //7
+            if (TrainingPage.IsComplete()) count++;
+            //8
+            if (PartnersPage.IsComplete() && SocialAuditsPage.IsComplete() && GrievancesPage.IsComplete() && OtherWorkConditionsPage.IsComplete()) count++;
+            //9
+            if (RiskDescriptionsPage.IsComplete() && RiskDetailsPages.All(v => v.IsComplete())) count++;
+            //10
+            if (IndicatorsPage.IsComplete() && RemediationPage.IsComplete()) count++;
+            //11
+            if (MonitoringProgressPage.IsComplete())count++;
+            return count;
+        }
+
         public override bool IsComplete()
         {
-            return GroupOrganisations.IsComplete() && YourStatement.IsComplete() 
-                && Compliance.IsComplete();
+            return CompleteCount()==SectionCount;
         }
 
         public bool CanSubmit()

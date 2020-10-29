@@ -88,7 +88,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         public enum GrievanceMechanismTypes : byte
         {
             Unknown = 0,
-            //[Description("Other grievance mechanism")] Other = 1,
+            [Description("Other grievance mechanism")] Other = 1,
             [Description("Whistleblowing services")] WhistleblowingServices = 2,
             [Description("Worker voice platforms")] WorkerVoicePlatforms = 3
         }
@@ -105,8 +105,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         #region Risks
         public class StatementRisk
         {
-            public byte Index { get; set; }
-            public string Details { get; set; }
+            public string Description { get; set; }
 
             #region Risk Source Fields
             public enum RiskSourceTypes : byte
@@ -399,26 +398,10 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             public SortedSet<CountryTypes> Countries { get; set; } = new SortedSet<CountryTypes>();
             #endregion
 
-            #region Overrides
-            public override bool Equals(object obj)
-            {
-                // Check for null values and compare run-time types.
-                var target = obj as StatementRisk;
-                if (target == null) return false;
-
-                return Index == target.Index;
-            }
-
-            public override int GetHashCode()
-            {
-                return Index.GetHashCode();
-            }
-            #endregion
-
             #region Methods
-            public bool IsEmpty()
+            public bool IsEmpty(bool ignoreDescription=false)
             {
-                return string.IsNullOrWhiteSpace(Details)
+                return (ignoreDescription || string.IsNullOrWhiteSpace(Description))
                     && LikelySource == RiskSourceTypes.Unknown && string.IsNullOrWhiteSpace(OtherLikelySource)
                     && (Targets == null || Targets.Count == 0) && string.IsNullOrWhiteSpace(OtherTargets)
                     && (Countries == null || Countries.Count == 0);
@@ -426,7 +409,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             #endregion
         }
 
-        SortedSet<StatementRisk> Risks { get; set; }
+        List<StatementRisk> Risks { get; set; }
 
         #endregion
 
@@ -468,7 +451,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
 
         SortedSet<RemediationTypes> Remediations { get; set; }
 
-        string OtherRemedations { get; set; }
+        string OtherRemediations { get; set; }
         #endregion
 
         #region Progress Measuring Fields

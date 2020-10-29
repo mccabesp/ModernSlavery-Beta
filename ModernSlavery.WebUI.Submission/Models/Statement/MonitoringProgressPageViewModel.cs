@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
-using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
+using ModernSlavery.Core.Entities.StatementSummary;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
@@ -11,47 +10,20 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public ProgressPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, MonitoringProgressPageViewModel>();
+            CreateMap<StatementSummary1, MonitoringProgressPageViewModel>();
 
-            CreateMap<MonitoringProgressPageViewModel, StatementModel>(MemberList.Source)
-                .ForMember(s => s.OrganisationId, opt => opt.Ignore())
-                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
-                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
+            CreateMap<MonitoringProgressPageViewModel, StatementSummary1>(MemberList.Source)
+                .ForMember(d => d.ProgressMeasures, opt => opt.MapFrom(s=>s.ProgressMeasures))
+                .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
     public class MonitoringProgressPageViewModel : BaseViewModel
     {
-        #region Types
-        public enum YearRanges : byte
-        {
-            NotProvided = 0,
+        public override string PageTitle => "How does your statement demonstrate your progress over time in addressing modern slavery risks?";
 
-            [GovUkRadioCheckboxLabelText(Text = "This is the first time")]
-            Year1 = 1,
-
-            [GovUkRadioCheckboxLabelText(Text = "1 to 5 years")]
-            Years1To5 = 2,
-
-            [GovUkRadioCheckboxLabelText(Text = "More than 5 years")]
-            Over5Years = 3,
-        }
-        #endregion
-
-        public override string PageTitle => "Monitoring progress";
-
-        public bool? IncludesMeasuringProgress { get; set; }
         [MaxLength(1024)]
         public string ProgressMeasures { get; set; }
-        [MaxLength(1024)]
-        public string KeyAchievements { get; set; }
-
-        public YearRanges? StatementYears { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -62,10 +34,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            return IncludesMeasuringProgress != null
-                && !string.IsNullOrWhiteSpace(ProgressMeasures)
-                && !string.IsNullOrWhiteSpace(KeyAchievements)
-                && StatementYears != YearRanges.NotProvided;
+            return !string.IsNullOrWhiteSpace(ProgressMeasures);
         }
     }
 }

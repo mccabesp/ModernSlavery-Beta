@@ -6,7 +6,8 @@ using System.Linq;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Binding;
-using ModernSlavery.Core.Classes.StatementTypeIndexes;
+using ModernSlavery.Core.Entities.StatementSummary;
+using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -14,40 +15,20 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public PoliciesPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, PoliciesPageViewModel>();
+            CreateMap<StatementSummary1, PoliciesPageViewModel>();
 
-            CreateMap<PoliciesPageViewModel, StatementModel>(MemberList.Source)
-                .ForMember(s => s.OrganisationId, opt => opt.Ignore())
-                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
-                .ForSourceMember(s => s.PolicyTypes, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
+            CreateMap<PoliciesPageViewModel, StatementSummary1>(MemberList.Source)
+                .ForMember(d => d.Policies, opt => opt.MapFrom(s=>s.Policies))
+                .ForMember(d => d.OtherPolicies, opt => opt.MapFrom(s=>s.OtherPolicies))
+                .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    [DependencyModelBinder]
     public class PoliciesPageViewModel : BaseViewModel
     {
-        [IgnoreMap]
-        [Newtonsoft.Json.JsonIgnore]//This needs to be Newtonsoft.Json.JsonIgnore namespace not System.Text.Json.Serialization.JsonIgnore
-        public PolicyTypeIndex PolicyTypes { get; }
-        public PoliciesPageViewModel(PolicyTypeIndex policyTypes)
-        {
-            PolicyTypes = policyTypes;
-        }
+        public override string PageTitle => "Do your organisation’s policies and codes include any of the following provisions in relation to modern slavery?";
 
-        public PoliciesPageViewModel()
-        {
-
-        }
-
-        public override string PageTitle => "Policies";
-
-        public List<short> Policies { get; set; } = new List<short>();
+        public List<PolicyTypes> Policies { get; set; } = new List<PolicyTypes>();
 
         [MaxLength(256)]//We need at least one validation annotation otherwise Validate wont execute
         public string OtherPolicies { get; set; }
@@ -56,10 +37,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             var validationResults = new List<ValidationResult>();
 
-            //better way to identify this checkbox
-            var otherId = PolicyTypes.Single(x => x.Description.Equals("Other")).Id;
-
-            if (Policies.Contains(otherId) && string.IsNullOrWhiteSpace(OtherPolicies))
+            if (Policies.Contains(PolicyTypes.Other) && string.IsNullOrWhiteSpace(OtherPolicies))
                 validationResults.AddValidationError(3400, nameof(OtherPolicies));
 
             return validationResults;
@@ -67,10 +45,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override bool IsComplete()
         {
-            var other = PolicyTypes.Single(x => x.Description.Equals("Other"));
-
             return Policies.Any()
-                && !Policies.Any(p => p == other.Id && string.IsNullOrWhiteSpace(OtherPolicies));
+                && (!Policies.Contains(PolicyTypes.Other) || !string.IsNullOrWhiteSpace(OtherPolicies));
         }
     }
 }

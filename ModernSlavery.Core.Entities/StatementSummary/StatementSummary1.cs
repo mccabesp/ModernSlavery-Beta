@@ -49,7 +49,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
 
         #region Risks
 
-        public SortedSet<StatementRisk> Risks { get; set; } = new SortedSet<StatementRisk>();
+        public List<StatementRisk> Risks { get; set; } = new List<StatementRisk>();
 
         #endregion
 
@@ -63,7 +63,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         #region Remediation Fields
         public SortedSet<RemediationTypes> Remediations { get; set; } = new SortedSet<RemediationTypes>();
 
-        public string OtherRemedations { get; set; }
+        public string OtherRemediations { get; set; }
         #endregion
 
         #region Progress Measuring Fields
@@ -81,7 +81,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
                 && string.IsNullOrWhiteSpace(OtherWorkConditionsMonitoring)
                 && (Risks.Count == 0 || Risks.All(r => r.IsEmpty()))
                 && Indicators.Count == 0 && string.IsNullOrWhiteSpace(OtherIndicators)
-                && Remediations.Count == 0 && string.IsNullOrWhiteSpace(OtherRemedations)
+                && Remediations.Count == 0 && string.IsNullOrWhiteSpace(OtherRemediations)
                 && string.IsNullOrWhiteSpace(ProgressMeasures);
         }
         #endregion

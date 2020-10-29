@@ -599,6 +599,175 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             return View(viewModel);
         }
 
+        [HttpGet("{organisationIdentifier}/{year}/group-add")]
+        public async Task<IActionResult> GroupAdd(string organisationIdentifier, int year)
+        {
+            return await GetAsync<GroupSearchViewModel>(organisationIdentifier, year);
+        }
+
+        [HttpPost("{organisationIdentifier}/{year}/group-add")]
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GroupAdd(GroupSearchViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, int addIndex = -1, int removeIndex = -1)
+        {
+            //Get the saved viewmodel information from session
+            var stashedModel = UnstashModel<GroupSearchViewModel>();
+
+            //Continue or cancel normally
+            if (command.IsAny(BaseViewModel.CommandType.Continue, BaseViewModel.CommandType.Cancel))
+            {
+                viewModel = stashedModel;
+                //Must clear otherwise hidden for doesnt work
+                ModelState.Clear();
+                return await PostAsync(viewModel, organisationIdentifier, year, command);
+            };
+
+            //Rebuild the search model from the postback
+            if (stashedModel.GroupResults.ShowResults)
+            {
+                //Get the search keywords
+                stashedModel.GroupResults.SearchKeywords = viewModel.GroupResults.SearchKeywords;
+            }
+            else
+            {
+                //Get the organisation name if it's there
+                if (viewModel.GroupResults.OrganisationName != null)
+                    stashedModel.GroupResults.OrganisationName = viewModel.GroupResults.OrganisationName;
+                //else get the search keywords
+                else
+                    stashedModel.GroupResults.SearchKeywords = viewModel.GroupResults.SearchKeywords;
+            }
+            viewModel = stashedModel;
+
+            ModelState.Exclude(nameof(viewModel.ReturnToReviewPage), nameof(viewModel.Submitted));
+
+            if (command.IsAny(BaseViewModel.CommandType.Search, BaseViewModel.CommandType.SearchNext, BaseViewModel.CommandType.SearchPrevious))
+            {
+                //Dont validate the organisation name
+                ModelState.Exclude($"{nameof(viewModel.GroupResults)}.{nameof(viewModel.GroupResults.OrganisationName)}");
+
+                //Check the search string
+                if (!ModelState.IsValid)
+                {
+                    this.SetModelCustomErrors(viewModel);
+                    return View(viewModel);
+                }
+
+                if (command == BaseViewModel.CommandType.Search)
+                    viewModel.GroupResults.ResultsPage.CurrentPage = 1;
+                else if (command == BaseViewModel.CommandType.SearchNext)
+                    viewModel.GroupResults.ResultsPage.CurrentPage++;
+                else if (command == BaseViewModel.CommandType.SearchPrevious)
+                    viewModel.GroupResults.ResultsPage.CurrentPage--;
+
+
+                var outcome = await SubmissionPresenter.SearchGroupOrganisationsAsync(viewModel, VirtualUser);
+                if (!outcome.Success) HandleStatementErrors(outcome.Errors, viewModel);
+
+                //Show the search results
+                viewModel.GroupResults.ShowResults = true;
+            }
+            else if (command == BaseViewModel.CommandType.ToggleResults)
+            {
+                //Toggle the view
+                viewModel.GroupResults.ShowResults = !viewModel.GroupResults.ShowResults;
+
+                //Copy the search text to the organisation name
+                if (!viewModel.GroupResults.ShowResults && !string.IsNullOrWhiteSpace(viewModel.GroupResults.SearchKeywords))
+                {
+                    viewModel.GroupResults.OrganisationName = viewModel.GroupResults.SearchKeywords;
+
+                    //Add the group search model to session before removing SearchKeywords
+                    StashModel(viewModel);
+
+                    // remove text from searchbox
+                    viewModel.GroupResults.SearchKeywords = null;
+
+                    //Must clear otherwise hidden for doesnt work
+                    ModelState.Clear();
+
+                    //Return the page
+                    return View(viewModel);
+                }
+
+            }
+            else if (addIndex > -1 || removeIndex > -1)
+            {
+                if (addIndex > -1)
+                {
+                    if (!viewModel.GroupResults.ShowResults)
+                    {
+                        //Dont validate the search string
+                        ModelState.Exclude($"{nameof(viewModel.GroupResults)}.{nameof(viewModel.GroupResults.SearchKeywords)}");
+
+                        //Check the search string
+                        if (!ModelState.IsValid)
+                        {
+                            this.SetModelCustomErrors(viewModel);
+                            return View(viewModel);
+                        }
+                    }
+
+                    //Add the organisation to the view model
+                    var outcome = await SubmissionPresenter.IncludeGroupOrganisationAsync(viewModel, addIndex);
+
+                    //Handle any errors
+                    if (!outcome.Success) HandleStatementErrors(outcome.Errors);
+
+                    //Clear the input name 
+                    viewModel.GroupResults.OrganisationName = null;
+                    //Clear searchkeywords if manually added an org
+                    if (!viewModel.GroupResults.ShowResults)
+                        viewModel.GroupResults.SearchKeywords = null;
+
+                }
+                else
+                {
+                    //removing from manual orgs table
+                    if (!viewModel.GroupResults.ShowResults)
+                    {
+                        //Remove the selected organisation
+                        viewModel.StatementOrganisations.RemoveAt(removeIndex);
+                        //keep search keywords empty                       
+                        viewModel.GroupResults.SearchKeywords = null;
+
+                    }
+                    else
+                    {
+                        //Add the organisation to the view model
+                        var removeOrg = viewModel.GroupResults.ResultsPage.Results[removeIndex];
+                        var index = viewModel.FindGroupOrganisation(removeOrg);
+                        viewModel.StatementOrganisations.RemoveAt(index);
+                    }
+                }
+
+                //showBanner when including/removing organisation
+                viewModel.ShowBanner = true;
+
+                //Populate the extra submission info
+                await SubmissionPresenter.GetOtherSubmissionsInformationAsync(viewModel, GetReportingDeadlineYear());
+
+                //Copy changes to the search review model
+                var reviewViewModel = UnstashModel<GroupReviewViewModel>();
+                if (reviewViewModel != null)
+                {
+                    reviewViewModel.StatementOrganisations = viewModel.StatementOrganisations;
+                    StashModel(reviewViewModel);
+                }
+            }
+            else
+                throw new NotImplementedException();
+
+            //Add the group search model to session
+            StashModel(viewModel);
+
+            //Must clear otherwise hidden for doesnt work
+            ModelState.Clear();
+
+            //Return the page
+            return View(viewModel);
+        }
+
         [HttpGet("{organisationIdentifier}/{year}/group-review")]
         public async Task<IActionResult> GroupReview(string organisationIdentifier, int year)
         {

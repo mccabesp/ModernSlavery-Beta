@@ -9,7 +9,7 @@
     }
 }
 
-@using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+@using (Html.BeginForm())
 {
     @await Html.GovUkValidationSummaryAsync();
     @Html.AntiForgeryToken();
@@ -25,16 +25,11 @@
         </div>
     </div>
 
-    <partial name="GroupSearch/_SearchKeywords" model="Model" />
-
-    if (Model.GroupResults?.ResultsPage != null && !string.IsNullOrWhiteSpace(Model.GroupResults.SearchKeywords))
-    {
-        <partial name="GroupSearch/_SearchResults" model="Model" />
-    }
+    <partial name="GroupSearch/_NewOrganisation" model="Model" />
 
     @if (Model.ShowBanner == true)
     {
-        <a class="govuk-button" href="@Model.GroupReviewUrl">View your group</a>
+        <a class="govuk-button" href="@Model.GroupReviewUrl">View your group</a>    
     }
     else
     {
@@ -42,10 +37,10 @@
             Continue
         </button>
     }
-    <div>
-        <button class="link-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
-            Cancel
-        </button>
-    </div>
+<div>
+    <button class="link-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+        Cancel
+    </button>
+</div>
 }
 
