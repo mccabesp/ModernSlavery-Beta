@@ -185,7 +185,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                         var searchRecords = await _searchBusinessLogic.ListSearchDocumentsAsync(org);
 
-                        await _dataRepository.BeginTransactionAsync(
+                        await _dataRepository.ExecuteTransactionAsync(
                             async () =>
                             {
                                 try

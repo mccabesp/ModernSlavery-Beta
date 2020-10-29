@@ -1610,7 +1610,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             #region Save the changes to the database
 
             var saved = false;
-            await _registrationService.OrganisationBusinessLogic.DataRepository.BeginTransactionAsync(
+            await SharedBusinessLogic.DataRepository.ExecuteTransactionAsync(
                 async () =>
                 {
                     try

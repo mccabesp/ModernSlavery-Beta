@@ -251,9 +251,14 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
         #region IDataTransaction
 
-        public async Task BeginTransactionAsync(Func<Task> delegateAction)
+        public async Task ExecuteTransactionAsync(Func<Task> delegateAction)
         {
-            await DataRepository.BeginTransactionAsync(delegateAction);
+            await DataRepository.ExecuteTransactionAsync(delegateAction);
+        }
+
+        public void BeginTransaction()
+        {
+            DataRepository.BeginTransaction();
         }
 
         public void CommitTransaction()

@@ -20,6 +20,7 @@ namespace ModernSlavery.Infrastructure.Database
         public string MigrationAppName { get; set; }
         public bool UseMigrations { get; set; }
         public bool EncryptEmails { get; set; } = true;
+        public bool ImportSeedData { get; set; } = true;
 
         /// <summary>
         /// Returns true if the current application os marked to perform migrations

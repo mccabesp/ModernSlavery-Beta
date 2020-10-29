@@ -1,22 +1,21 @@
 ﻿using CommandLine;
-using Microsoft.Azure.Management.AppService.Fluent.Models;
 using Microsoft.Azure.Management.Fluent;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Infrastructure.DevOps.Cloud.AzureManagerOptions;
-using ModernSlavery.Infrastructure.DevOps.Cloud.AzureManagerOptions.Interfaces;
-using ModernSlavery.Infrastructure.DevOps.Cloud.AzureResourceManagers;
+using ModernSlavery.Infrastructure.Azure.AppService;
+using ModernSlavery.Infrastructure.Azure.DevOps;
+using ModernSlavery.Infrastructure.Azure.KeyVault;
+using ModernSlavery.Infrastructure.Azure.SqlServer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace ModernSlavery.Infrastructure.DevOps.Cloud
+namespace ModernSlavery.Infrastructure.Azure
 {
     public class CommandLineParser
     {
-        private static AuthenticationManager AuthenticationManager = new AuthenticationManager();
-        private static IAzure _azure=null;
-        private static IAzureOptions _azureOptions;
+        private static AzureManager AzureManager = new AzureManager();
+        private static AzureOptions _azureOptions;
 
         private static Type[] LoadCommandLineVerbTypes()
         {
@@ -42,29 +41,68 @@ namespace ModernSlavery.Infrastructure.DevOps.Cloud
 
         private static void ExecuteVerbs(object verbType)
         {
-            Authenticate(verbType as IAzureOptions);
-
+            IAzure _Azure = null;
             switch (verbType)
             {
-                case IKeyVaultOptions keyVaultOptions:
-                    var keyVaultManager = new KeyVaultManager(_azure, keyVaultOptions.VaultName);
+                case KeyVaultOptions keyVaultOptions:
+                    Authenticate(verbType as AzureOptions);
 
-                        switch (verbType)
-                        {
-                            case KeyVaultSetOptions options:
-                                keyVaultManager.SetValue(options.key, options.value);
-                                break;
-                            case KeyVaultImportOptions options:
-                                keyVaultManager.ImportValues(options.filepath, options.section);
-                                break;
-                            case KeyVaultListOptions options:
-                                keyVaultManager.GetValues(options.section).ForEach(kv=>Console.WriteLine($"[{kv.Key}]={kv.Value}"));
-                                break;
-                            case KeyVaultExportOptions options:
-                                keyVaultManager.ExportValues(options.VaultName, options.filepath, options.section);
-                                break;
-                        }
-                        break;
+                    var keyVaultManager = new KeyVaultManager(_Azure, keyVaultOptions.VaultName);
+
+                    switch (verbType)
+                    {
+                        case KeyVaultSetOptions options:
+                            keyVaultManager.SetValue(options.key, options.value);
+                            break;
+                        case KeyVaultImportOptions options:
+                            keyVaultManager.ImportValues(options.filepath, options.section);
+                            break;
+                        case KeyVaultListOptions options:
+                            keyVaultManager.GetValues(options.section).ForEach(kv => Console.WriteLine($"[{kv.Key}]={kv.Value}"));
+                            break;
+                        case KeyVaultExportOptions options:
+                            keyVaultManager.ExportValues(options.VaultName, options.filepath, options.section);
+                            break;
+                    }
+                    break;
+                case AppServiceOptions appServiceOptions:
+                    Authenticate(verbType as AzureOptions);
+                    var appServiceManager = new AppServiceManager(_Azure);
+
+                    switch (verbType)
+                    {
+                        case AppServiceSetPricingTierOptions options:
+                            appServiceManager.SetAppServicePricingTier(options.AppService, options.PricingTier);
+                            break;
+                    }
+                    break;
+                case SqlServerOptions sqlServerOptions:
+                case SqlDatabaseOptions sqlDatabaseOptions:
+                    Authenticate(verbType as AzureOptions);
+                    var sqlManager = new SqlManager(_Azure);
+
+                    switch (verbType)
+                    {
+                        case SqlDatabasetSetEditionOptions options:
+                            sqlManager.SetDatabaseEdition(options.Database, options.DatabaseEdition);
+                            break;
+                        case SqlServerOpenFirewallOptions options:
+                            sqlManager.OpenFirewall(options.Server, options.RuleName,options.StartIP, options.EndIP);
+                            break;
+                        case SqlServerDeleteFirewallOptions options:
+                            sqlManager.DeleteFirewall(options.Server, options.RuleName);
+                            break;
+                    }
+                    break;
+                case DevOpsOptions devOpsOptions:
+                    var devOpsManager = new DevOpsManager(devOpsOptions.Organisation, devOpsOptions.PersonalAccessToken);
+
+                    switch (verbType)
+                    {
+                        default:
+                            break;
+                    }
+                    break;
             }
         }
 
@@ -72,11 +110,10 @@ namespace ModernSlavery.Infrastructure.DevOps.Cloud
         /// Sign in to the azure tenant
         /// </summary>
         /// <param name="azureOptions"></param>
-        private static void Authenticate(IAzureOptions azureOptions)
+        private static void Authenticate(AzureOptions azureOptions)
         {
             if (azureOptions == null) throw new ArgumentNullException(nameof(azureOptions));
-            if (_azure != null && _azureOptions.ClientId == azureOptions.ClientId && _azureOptions.ClientSecret == azureOptions.ClientSecret && _azureOptions.TenantId == azureOptions.TenantId && _azureOptions.SubscriptionId == azureOptions.SubscriptionId) return;
-            _azure=AuthenticationManager.Authenticate(azureOptions);
+            AzureManager.Authenticate(azureOptions);
             _azureOptions = azureOptions;
         }
     }

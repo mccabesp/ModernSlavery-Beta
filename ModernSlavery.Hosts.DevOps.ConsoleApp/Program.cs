@@ -1,4 +1,4 @@
-﻿using ModernSlavery.Infrastructure.DevOps.Cloud;
+﻿using ModernSlavery.Infrastructure.Azure;
 using System;
 using System.IO;
 using System.Reflection;

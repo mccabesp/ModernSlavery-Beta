@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using ModernSlavery.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,27 +10,28 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 {
     public static class AppSettingHelper
     {
-        //Returns a value from session
-        public static void GetAppSetting(this IHost host, string sessionId, string key)
+        //Returns a value from configuration
+        public static string GetAppSetting(this IHost host, string key)
         {
-            throw new NotImplementedException();
+            var config = host.Services.GetRequiredService<IConfiguration>();
+            return config[key];
         }
 
-        //Sets a value to session
-        public static void SetAppSetting(this IHost host, string sessionId, string key, string value)
+        //Sets a value to configuration
+        public static void SetAppSetting(this IHost host, string key, string value)
         {
-            throw new NotImplementedException();
+            var config = host.Services.GetRequiredService<IConfiguration>();
+            config[key] = value;
         }
-
-        //Clears a value from session
-        public static void ClearAppSetting(this IHost host, string key)
+        public static void SetShowEmailVerifyLink(this IHost host, bool value)
         {
-            throw new NotImplementedException();
+            var sharedOptions = host.Services.GetRequiredService<SharedOptions>();
+            sharedOptions.ShowEmailVerifyLink = value;
         }
-
-        public static void SetSessionTimeOut(this IHost host, int seconds)
+        public static void SetSkipSpamProtection(this IHost host, bool value)
         {
-            throw new NotImplementedException();
+            var sharedOptions = host.Services.GetRequiredService<SharedOptions>();
+            sharedOptions.SkipSpamProtection = value;
         }
     }
 }

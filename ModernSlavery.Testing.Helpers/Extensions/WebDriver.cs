@@ -2,6 +2,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Io;
+using Geeks.Pangolin;
 using ModernSlavery.Core.Extensions;
 using Newtonsoft.Json;
 using OpenQA.Selenium;
