@@ -39,3 +39,16 @@
     white-space: pre-line;
     margin: 0;
 }
+
+.app-statement-summary_url {
+    .app-statement-summary_url-link-pending {
+    }
+
+    .app-statement-summary_url-link-broken {
+        display: none;
+    }
+
+    .app-statement-summary_url-link-working {
+        display: none;
+    }
+}

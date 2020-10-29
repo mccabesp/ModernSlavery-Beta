@@ -80,35 +80,118 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @{ var workingUrl = !string.IsNullOrWhiteSpace(Model.StatementUrl); }
-        <div class="app-statement-summary_url" data-statement-url="@Model.StatementUrl">
-            <div class="govuk-panel @(workingUrl ? "govuk-panel--blue" : "govuk-panel--grey")">
-                <div class="govuk-panel__body govuk-!-font-size-16">
-                    <strong class="govuk-!-font-size-24">Link to full statement</strong>
-                    <br>
-                    @if (workingUrl)
-                    {
+
+        <div class="app-statement-summary_url" data-statement-url="https://geeks.g.e">
+            <div class="app-statement-summary_url-link-pending">
+            </div>
+
+            <div class="app-statement-summary_url-link-broken">
+                <div class="govuk-panel govuk-panel--grey">
+                    <div class="govuk-panel__body govuk-!-font-size-16">
+                        <strong class="govuk-!-font-size-24">Link to full statement</strong>
+                        <br>
+                        <span>The URL linking to the statement on the organisation’s website is not working.</span>
+                    </div>
+                </div>
+                <div class="app-statement-summary_hint">
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                What to do if the URL is not working
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            If the URL linking to the statement isn’t working, try again later – or go to the homepage of the organisation’s website and search for the statement from there.
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <div class="app-statement-summary_url-link-working">
+                <div class="govuk-panel govuk-panel--blue">
+                    <div class="govuk-panel__body govuk-!-font-size-16">
+                        <strong class="govuk-!-font-size-24">Link to full statement</strong>
+                        <br>
                         <a class="govuk-link govuk-!-font-size-16" href="@Model.StatementUrl" rel="noreferrer noopener">Go to full modern slavery statement on organisation’s website</a>
-                    }
-                    else
-                    {
-                        <text>The URL linking to the statement on the organisation’s website is not working.</text>
-                    }
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="app-statement-summary_url" data-statement-url="https://geeks.g.e/">
-            @*@if (!workingUrl)*@
-                <details class="govuk-details" data-module="govuk-details">
-                    <summary class="govuk-details__summary">
-                        <span class="govuk-details__summary-text">
-                            What to do if the URL is not working
-                        </span>
-                    </summary>
-                    <div class="govuk-details__text">
-                        If the URL linking to the statement isn’t working, try again later – or go to the homepage of the organisation’s website and search for the statement from there.
+
+
+        <div class="app-statement-summary_url" data-statement-url="https://www.google.com">
+            <div class="app-statement-summary_url-link-pending">
+            </div>
+
+            <div class="app-statement-summary_url-link-broken">
+                <div class="govuk-panel govuk-panel--grey">
+                    <div class="govuk-panel__body govuk-!-font-size-16">
+                        <strong class="govuk-!-font-size-24">Link to full statement</strong>
+                        <br>
+                        <span>The URL linking to the statement on the organisation’s website is not working.</span>
                     </div>
-                </details>
+                </div>
+                <div class="app-statement-summary_hint">
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                What to do if the URL is not working
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            If the URL linking to the statement isn’t working, try again later – or go to the homepage of the organisation’s website and search for the statement from there.
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <div class="app-statement-summary_url-link-working">
+                <div class="govuk-panel govuk-panel--blue">
+                    <div class="govuk-panel__body govuk-!-font-size-16">
+                        <strong class="govuk-!-font-size-24">Link to full statement</strong>
+                        <br>
+                        <a class="govuk-link govuk-!-font-size-16" href="@Model.StatementUrl" rel="noreferrer noopener">Go to full modern slavery statement on organisation’s website</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="app-statement-summary_url" data-statement-url="https://www.google.com/sadsadsad">
+            <div class="app-statement-summary_url-link-pending">
+            </div>
+
+            <div class="app-statement-summary_url-link-broken">
+                <div class="govuk-panel govuk-panel--grey">
+                    <div class="govuk-panel__body govuk-!-font-size-16">
+                        <strong class="govuk-!-font-size-24">Link to full statement</strong>
+                        <br>
+                        <span>The URL linking to the statement on the organisation’s website is not working.</span>
+                    </div>
+                </div>
+                <div class="app-statement-summary_hint">
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                What to do if the URL is not working
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            If the URL linking to the statement isn’t working, try again later – or go to the homepage of the organisation’s website and search for the statement from there.
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <div class="app-statement-summary_url-link-working">
+                <div class="govuk-panel govuk-panel--blue">
+                    <div class="govuk-panel__body govuk-!-font-size-16">
+                        <strong class="govuk-!-font-size-24">Link to full statement</strong>
+                        <br>
+                        <a class="govuk-link govuk-!-font-size-16" href="@Model.StatementUrl" rel="noreferrer noopener">Go to full modern slavery statement on organisation’s website</a>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="contents govuk-!-margin-top-8">
@@ -675,4 +758,4 @@
         </div>
 
     </div>
-    </div>
+</div>

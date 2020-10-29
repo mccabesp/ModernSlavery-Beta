@@ -10,18 +10,6 @@
     function initialiseUrlCheck($element) {
         var url = $element.data('statement-url');
         console.log(url);
-        //var myheaders = new Headers();
-        //var myrequest = new Request(url, {
-        //    method: 'get',
-        //    mode: 'cors',
-        //    credentials: 'omit'
-        //});
-        //fetch(myrequest)
-        //    .then(response => {
-        //        debugger;
-        //        console.log(url);
-        //        console.log(response);
-        //    });
 
         $.ajax({
             url: url,
@@ -29,33 +17,35 @@
             mode: 'cors',
             statusCode: {
                 0: function () {
-                    console.log($element.data('statement-url') + ": status code 0 returned");
+                    console.log(url + ': 0');
+                    urlFailed($element);
                 },
                 200: function () {
-                    console.log($element.data('statement-url') + ": status code 200 returned");
+                    console.log(url + ': 200');
+                    urlSuccess($element);
                 },
                 404: function () {
-                    console.log($element.data('statement-url') + ": status code 404 returned");
+                    console.log(url + ': 404');
+                    urlFailed($element);
                 }
             },
-            success: function (data, textStatus, jqXHR) {
-                console.log($element.data('statement-url') + ": Success");
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.log($element.data('statement-url') + ": Error");
-            },
-            complete: function () {
-                console.log($element.data('statement-url') + ": Complete");
+            timeout: 20000,
+            crossDomain: true,
+            processData: false,
+            complete: function (jqXHR, textStatus, errorThrown) {
+                console.log(url + ': complete');
             }
         });
     };
 
-    function urlSuccess(data, textStatus, jqXHR) {
-        debugger;
+    function urlSuccess($element) {
+        $('.app-statement-summary_url-link-working', $element)
+            .show();
     };
 
-    function urlFailed(jqXHR, textStatus, errorThrown) {
-        debugger;
+    function urlFailed($element) {
+        $('.app-statement-summary_url-link-broken', $element)
+            .show();
     };
 
 })(jQuery);
