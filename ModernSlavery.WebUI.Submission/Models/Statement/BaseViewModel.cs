@@ -10,7 +10,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
     public abstract class BaseViewModel: GovUkViewModel, IValidatableObject
     {
-
         public enum CommandType
         {
             Unknown=0,
@@ -26,6 +25,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             IncludeOrganisation = 10,
             RemoveOrganisation = 11,
             ToggleResults=12
+        }
+
+        public enum Status
+        {
+            Incomplete,
+            InProgress,
+            Complete
         }
 
         [BindRequired]
@@ -62,8 +68,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public long OrganisationId { get; set; }
         public string OrganisationName { get; set; }
 
-        public abstract IEnumerable<ValidationResult> Validate(ValidationContext validationContext);
+        public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var validationResults = new List<ValidationResult>();
+            return validationResults;
+        }
 
-        public virtual bool IsComplete() => false;
+        public virtual Status GetStatus() =>  Status.Incomplete;
     }
 }

@@ -9,20 +9,20 @@ using ModernSlavery.Core.Entities.StatementSummary;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class RemediationPageViewModelMapperProfile : Profile
+    public class RemediationsViewModelMapperProfile : Profile
     {
-        public RemediationPageViewModelMapperProfile()
+        public RemediationsViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, RemediationPageViewModel>();
+            CreateMap<StatementSummary1, RemediationsViewModel>();
 
-            CreateMap<RemediationPageViewModel, StatementSummary1>(MemberList.Source)
+            CreateMap<RemediationsViewModel, StatementSummary1>(MemberList.Source)
                 .ForMember(d => d.Remediations, opt => opt.MapFrom(s=>s.Remediations))
                 .ForMember(d => d.OtherRemediations, opt => opt.MapFrom(s=>s.OtherRemediations))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class RemediationPageViewModel : BaseViewModel
+    public class RemediationsViewModel : BaseViewModel
     {
         public override string PageTitle => "What action did you take in response?";
 
@@ -41,10 +41,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return Remediations.Any()
-                && (!Remediations.Contains(RemediationTypes.Other) || !string.IsNullOrWhiteSpace(OtherRemediations));
+            if (Remediations.Any())
+            {
+                if (Remediations.Contains(RemediationTypes.Other) && string.IsNullOrWhiteSpace(OtherRemediations)) return Status.InProgress;
+                return Status.Complete;
+            }
+
+            return Status.Incomplete;
         }
     }
 }

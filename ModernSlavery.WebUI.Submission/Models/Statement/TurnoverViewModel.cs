@@ -7,25 +7,20 @@ using static ModernSlavery.Core.Entities.Statement;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class TurnoverPageViewModelMapperProfile : Profile
+    public class TurnoverViewModelMapperProfile : Profile
     {
-        public TurnoverPageViewModelMapperProfile()
+        public TurnoverViewModelMapperProfile()
         {
-            CreateMap<StatementModel, YourTurnoverPageViewModel>();
+            CreateMap<StatementModel, TurnoverViewModel>();
 
-            CreateMap<YourTurnoverPageViewModel, StatementModel>(MemberList.Source)
+            CreateMap<TurnoverViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s=>s.Turnover))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class YourTurnoverPageViewModel : BaseViewModel
+    public class TurnoverViewModel : BaseViewModel
     {
-        public YourTurnoverPageViewModel()
-        {
-
-        }
-
         public override string PageTitle => "What was your turnover or budget during the financial year the statement relates to?";
 
         public StatementTurnoverRanges? Turnover { get; set; }

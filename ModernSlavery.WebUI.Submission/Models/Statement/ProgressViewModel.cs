@@ -6,19 +6,19 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class ProgressPageViewModelMapperProfile : Profile
+    public class ProgressViewModelMapperProfile : Profile
     {
-        public ProgressPageViewModelMapperProfile()
+        public ProgressViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, MonitoringProgressPageViewModel>();
+            CreateMap<StatementSummary1, ProgressViewModel>();
 
-            CreateMap<MonitoringProgressPageViewModel, StatementSummary1>(MemberList.Source)
+            CreateMap<ProgressViewModel, StatementSummary1>(MemberList.Source)
                 .ForMember(d => d.ProgressMeasures, opt => opt.MapFrom(s=>s.ProgressMeasures))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class MonitoringProgressPageViewModel : BaseViewModel
+    public class ProgressViewModel : BaseViewModel
     {
         public override string PageTitle => "How does your statement demonstrate your progress over time in addressing modern slavery risks?";
 

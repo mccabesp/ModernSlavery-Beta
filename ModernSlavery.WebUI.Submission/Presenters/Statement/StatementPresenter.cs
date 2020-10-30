@@ -9,6 +9,7 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
+using ModernSlavery.Core.Entities.StatementSummary;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -19,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 
 namespace ModernSlavery.WebUI.Submission.Presenters
 {
@@ -31,8 +33,9 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// </summary>
         /// <typeparam name="TViewModel">The type of the desination ViewModel</typeparam>
         /// <param name="statementModel">The instance of the source StatementModel</param>
+        /// <param name="Arguments">Any additional arguments required to populate the ViewModel</param>
         /// <returns>A new instance of the populated ViewModel</returns>
-        TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel) where TViewModel : BaseViewModel;
+        TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel, params object[] arguments) where TViewModel : BaseViewModel;
 
         /// <summary>
         /// Copies all relevant data from a ViewModel into the specified StatementModel 
@@ -40,8 +43,9 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <typeparam name="TViewModel">The type of the source ViewModel</typeparam>
         /// <param name="viewModel">The instance of the source ViewModel</param>
         /// <param name="statementModel">The instance of the destination StatementModel</param>
+        /// <param name="Arguments">Any additional arguments required to update the StatementModel</param>
         /// <returns>A new instance of the populated StatementModel</returns>
-        StatementModel SetViewModelToStatementModel<TViewModel>(TViewModel viewModel, StatementModel statementModel);
+        StatementModel SetViewModelToStatementModel<TViewModel>(TViewModel viewModel, StatementModel statementModel, params object[] arguments);
 
         /// <summary>
         /// Returns list of modifications between the specified statementModel and the draft backup)
@@ -65,8 +69,9 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="organisationIdentifier">The unique obfuscated identifier of the organisation who owns the statement data</param>
         /// <param name="reportingDeadlineYear">The year of the reporting deadlien to which the statement data relates</param>
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
+        /// <param name="Arguments">Any additional arguments required to populate the ViewModel</param>
         /// <returns>Outcome.Success with the populated ViewModel or Outcome.Fail with a list of StatementErrors</returns>
-        Task<Outcome<StatementErrors, TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId) where TViewModel : BaseViewModel;
+        Task<Outcome<StatementErrors, TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseViewModel;
 
         /// <summary>
         /// Updates a StatementModel from a ViewModel and saves a draft copy of the StatementModel for the specified oreganisation, reporting Deadline, and user
@@ -77,8 +82,9 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="organisationIdentifier">The unique obfuscated identifier of the organisation who owns the statement data</param>
         /// <param name="reportingDeadlineYear">The year of the reporting deadlien to which the statement data relates</param>
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
+        /// <param name="Arguments">Any additional arguments required to update the StatementModel</param>
         /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
-        Task<Outcome<StatementErrors, TViewModel>> SaveViewModelAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int reportingDeadlineYear, long userId) where TViewModel : BaseViewModel;
+        Task<Outcome<StatementErrors, TViewModel>> SaveViewModelAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseViewModel;
 
         /// <summary>
         /// Returns a StatementModel populated for the specified oreganisation, reporting Deadline, and user.
@@ -193,18 +199,76 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         }
         private int LastOrganisationSearchRemoteTotal => _session["LastOrganisationSearchRemoteTotal"].ToInt32();
 
-        public TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel) where TViewModel : BaseViewModel
+        public TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel, params object[] arguments) where TViewModel : BaseViewModel
         {
             //Instantiate the ViewModel
             var viewModel = ActivatorUtilities.CreateInstance<TViewModel>(_serviceProvider);
 
-            //Copy the StatementModel data to the viewModel
-            return _mapper.Map(statementModel, viewModel);
+            switch (viewModel)
+            {
+                case PoliciesViewModel _:
+                case TrainingViewModel _:
+                case PartnersViewModel _:
+                case SocialAuditsViewModel _:
+                case GrievancesViewModel _:
+                case MonitoringViewModel _:
+                case HighestRisksViewModel _:
+                case IndicatorsViewModel _:
+                case RemediationsViewModel _:
+                case ProgressViewModel _:
+                    //Copy the StatementSummaryModel data to the viewModel
+                    var summary = statementModel.Summary ?? new StatementSummary1();
+                    return _mapper.Map(summary, viewModel);
+                case Type type when type == typeof(HighRiskViewModel):
+                    //Copy the StatementRisk data to the viewModel
+                    var index = (int)arguments[0];
+                    var risk = statementModel.Summary.Risks.Count > index ? statementModel.Summary.Risks[index] : new IStatementSummary1.StatementRisk();
+                    return _mapper.Map(risk, viewModel);
+                default:
+                    //Copy the StatementModel data to the viewModel
+                    return _mapper.Map(statementModel, viewModel);
+            }
         }
 
-        public StatementModel SetViewModelToStatementModel<TViewModel>(TViewModel viewModel, StatementModel statementModel)
+        public StatementModel SetViewModelToStatementModel<TViewModel>(TViewModel viewModel, StatementModel statementModel, params object[] arguments)
         {
-            return _mapper.Map(viewModel, statementModel);
+            switch (viewModel)
+            {
+                case PoliciesViewModel _:
+                case TrainingViewModel _:
+                case PartnersViewModel _:
+                case SocialAuditsViewModel _:
+                case GrievancesViewModel _:
+                case MonitoringViewModel _:
+                case HighestRisksViewModel _:
+                case IndicatorsViewModel _:
+                case RemediationsViewModel _:
+                case ProgressViewModel _:
+                    //Copy the ViewModel data to the StatementSummaryModel
+                    if (statementModel.Summary==null) statementModel.Summary=new StatementSummary1();
+                    _mapper.Map(viewModel, statementModel.Summary);
+                    return statementModel;
+                case Type type when type == typeof(HighRiskViewModel):
+                    //Copy the ViewModel data to the HighRiskViewModel
+                    var index = (int)arguments[0];
+                    if (statementModel.Summary == null) statementModel.Summary = new StatementSummary1();
+                    if (statementModel.Summary.Risks==null) statementModel.Summary.Risks=new List<StatementRisk>();
+                    StatementRisk risk = null;
+                    if (statementModel.Summary.Risks.Count <= index) 
+                    {
+                        risk = new StatementRisk();
+                        statementModel.Summary.Risks.Add(risk);
+                    }
+                    else
+                    {
+                        risk = statementModel.Summary.Risks[index];
+                    }
+                    _mapper.Map(viewModel,risk);
+                    return statementModel;
+                default:
+                    //Copy the ViewModel data to the StatementModel
+                    return _mapper.Map(viewModel,statementModel);
+            }
         }
 
         public async Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
@@ -239,23 +303,23 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await _statementBusinessLogic.SubmitDraftStatementModelAsync(organisationId, reportingDeadlineYear, userId);
         }
 
-        public async Task<Outcome<StatementErrors, TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId) where TViewModel : BaseViewModel
+        public async Task<Outcome<StatementErrors, TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseViewModel
         {
             var openOutcome = await OpenDraftStatementModelAsync(organisationIdentifier, reportingDeadlineYear, userId);
             if (openOutcome.Fail) return new Outcome<StatementErrors, TViewModel>(openOutcome.Errors);
 
             var statementModel = openOutcome.Result;
-            var viewModel = GetViewModelFromStatementModel<TViewModel>(statementModel);
+            var viewModel = GetViewModelFromStatementModel<TViewModel>(statementModel,arguments);
             return new Outcome<StatementErrors, TViewModel>(viewModel);
         }
 
-        public async Task<Outcome<StatementErrors, TViewModel>> SaveViewModelAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int reportingDeadlineYear, long userId) where TViewModel : BaseViewModel
+        public async Task<Outcome<StatementErrors, TViewModel>> SaveViewModelAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseViewModel
         {
             var openOutcome = await OpenDraftStatementModelAsync(organisationIdentifier, reportingDeadlineYear, userId);
             if (openOutcome.Fail) return new Outcome<StatementErrors, TViewModel>(openOutcome.Errors);
 
             var statementModel = openOutcome.Result;
-            statementModel = SetViewModelToStatementModel(viewModel, statementModel);
+            statementModel = SetViewModelToStatementModel(viewModel, statementModel,arguments);
 
             //Remove any child organisations when single submission
             if (statementModel.GroupSubmission != true) statementModel.StatementOrganisations.Clear();

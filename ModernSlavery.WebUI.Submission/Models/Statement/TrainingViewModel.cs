@@ -9,20 +9,20 @@ using ModernSlavery.Core.Entities.StatementSummary;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class TrainingPageViewModelMapperProfile : Profile
+    public class TrainingViewModelMapperProfile : Profile
     {
-        public TrainingPageViewModelMapperProfile()
+        public TrainingViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, TrainingPageViewModel>();
+            CreateMap<StatementSummary1, TrainingViewModel>();
 
-            CreateMap<TrainingPageViewModel, StatementSummary1>(MemberList.Source)
+            CreateMap<TrainingViewModel, StatementSummary1>(MemberList.Source)
                 .ForMember(d => d.TrainingTargets, opt => opt.MapFrom(s=>s.TrainingTargets))
                 .ForMember(d => d.OtherTrainingTargets, opt => opt.MapFrom(s=>s.OtherTraining))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class TrainingPageViewModel : BaseViewModel
+    public class TrainingViewModel : BaseViewModel
     {
         public override string PageTitle => "During the period of the statement, did you provide training on modern slavery, or any other activities to raise awareness?";
 
@@ -41,10 +41,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return TrainingTargets.Any()
-                && (!TrainingTargets.Contains(TrainingTargetTypes.Other) || !string.IsNullOrWhiteSpace(OtherTraining));
+            if (TrainingTargets.Any())
+            {
+                if (TrainingTargets.Contains(TrainingTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTraining)) return Status.InProgress;
+                return Status.Complete;
+            }
+
+            return Status.Incomplete;
         }
     }
 }

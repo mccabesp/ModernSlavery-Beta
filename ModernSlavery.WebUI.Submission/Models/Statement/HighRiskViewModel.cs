@@ -5,19 +5,20 @@ using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1.StatementRisk;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class RiskDetailsPageViewModelMapperProfile : Profile
+    public class HighRiskViewModelMapperProfile : Profile
     {
-        public RiskDetailsPageViewModelMapperProfile()
+        public HighRiskViewModelMapperProfile()
         {
-            CreateMap<StatementRisk, RiskDetailsPageViewModel>();
+            CreateMap<StatementRisk, HighRiskViewModel>();
 
-            CreateMap<RiskDetailsPageViewModel, StatementRisk>(MemberList.Source)
+            CreateMap<HighRiskViewModel, StatementRisk>(MemberList.Source)
                 .ForMember(d=>d.LikelySource,opt=>opt.MapFrom(s=>s.LikelySource))
                 .ForMember(d=>d.OtherLikelySource,opt=>opt.MapFrom(s=>s.OtherLikelySource))
                 .ForMember(d=>d.Targets,opt=>opt.MapFrom(s=>s.Targets))
@@ -27,7 +28,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class RiskDetailsPageViewModel : BaseViewModel
+    public class HighRiskViewModel : BaseViewModel
     {
         public override string PageTitle => "About this risk";
 
@@ -56,10 +57,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return (LikelySource == null || (LikelySource== RiskSourceTypes.Other && !string.IsNullOrWhiteSpace(OtherTargets)))
-                && (Targets == null || Targets.Count == 0 || (Targets.Contains(RiskTargetTypes.Other) && !string.IsNullOrWhiteSpace(OtherTargets)));
+            if (LikelySource == RiskSourceTypes.Other && string.IsNullOrWhiteSpace(OtherLikelySource)) return Status.InProgress;
+            if (Targets.Contains(RiskTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTargets)) return Status.InProgress;
+            if (LikelySource != RiskSourceTypes.Unknown && Targets.Any()) return Status.Complete;
+
+            return Status.Incomplete;
         }
     }
 }

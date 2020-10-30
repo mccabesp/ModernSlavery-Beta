@@ -1,0 +1,42 @@
+﻿@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model TransparencyViewModel
+
+@section BeforeMain {
+    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">
+            @Model.PageTitle
+        </h1>
+        <p class="govuk-body">
+            We encourage you to answer all questions as fully as possible, to help tackle modern slavery.
+        </p>
+
+        <p class="govuk-body">
+            We acknowledge that identifying and addressing modern slavery risks is a long-term challenge.
+        </p>
+
+        <p class="govuk-body">
+            Our aim is to encourage organisations to:
+            <ul class="govuk-list govuk-list--bullet">
+                <li>
+                    be open and transparent about modern slavery risks in their business and supply chains
+                </li>
+                <li>
+                    target their actions and prioritise risks in order to have the most impact
+                </li>
+                <li>
+                    make progress over time to address those risks and improve outcomes for workers
+                </li>
+            </ul>
+        </p>
+
+        <a href="@Model.ContinueUrl" class="govuk-button govuk-button--start">
+            Continue
+        </a>
+
+    </div>
+</div>

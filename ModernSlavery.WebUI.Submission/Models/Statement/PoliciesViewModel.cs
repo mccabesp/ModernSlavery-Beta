@@ -11,20 +11,20 @@ using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class PoliciesPageViewModelMapperProfile : Profile
+    public class PoliciesViewModelMapperProfile : Profile
     {
-        public PoliciesPageViewModelMapperProfile()
+        public PoliciesViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, PoliciesPageViewModel>();
+            CreateMap<StatementSummary1, PoliciesViewModel>();
 
-            CreateMap<PoliciesPageViewModel, StatementSummary1>(MemberList.Source)
+            CreateMap<PoliciesViewModel, StatementSummary1>(MemberList.Source)
                 .ForMember(d => d.Policies, opt => opt.MapFrom(s=>s.Policies))
                 .ForMember(d => d.OtherPolicies, opt => opt.MapFrom(s=>s.OtherPolicies))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class PoliciesPageViewModel : BaseViewModel
+    public class PoliciesViewModel : BaseViewModel
     {
         public override string PageTitle => "Do your organisation’s policies and codes include any of the following provisions in relation to modern slavery?";
 
@@ -43,10 +43,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return Policies.Any()
-                && (!Policies.Contains(PolicyTypes.Other) || !string.IsNullOrWhiteSpace(OtherPolicies));
+            if (Policies.Any())
+            {
+                if (Policies.Contains(PolicyTypes.Other) && string.IsNullOrWhiteSpace(OtherPolicies)) return Status.InProgress;
+                return Status.Complete;
+            }
+
+            return Status.Incomplete;
         }
     }
 }

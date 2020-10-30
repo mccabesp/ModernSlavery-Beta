@@ -6,19 +6,19 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class OtherWorkConditionsPageViewModelMapperProfile : Profile
+    public class MonitoringViewModelMapperProfile : Profile
     {
-        public OtherWorkConditionsPageViewModelMapperProfile()
+        public MonitoringViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, MonitoringOtherWorkConditionsPageViewModel>();
+            CreateMap<StatementSummary1, MonitoringViewModel>();
 
-            CreateMap<MonitoringOtherWorkConditionsPageViewModel, StatementSummary1>(MemberList.Source)
+            CreateMap<MonitoringViewModel, StatementSummary1>(MemberList.Source)
                 .ForMember(d => d.OtherWorkConditionsMonitoring, opt => opt.MapFrom(s=>s.OtherWorkConditionsMonitoring))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class MonitoringOtherWorkConditionsPageViewModel : BaseViewModel
+    public class MonitoringViewModel : BaseViewModel
     {
         public override string PageTitle => "Do you want to tell us about any other ways you monitored working conditions across your organisation and supply chain?";
 

@@ -7,21 +7,22 @@ namespace ModernSlavery.Core.Entities.StatementSummary
     public interface IStatementSummary1
     {
         #region Policies Fields
-        public enum PolicyTypes : byte
+        public enum PolicyTypes
         {
             Unknown = 0,
-            [Description("Other")] Other = 1,
-            [Description("Adherence to local and national laws")] Laws = 2,
-            [Description("Freedom of workers to terminate employment")] FreedomToTerminate = 3,
-            [Description("Freedom of movement")] FreedomOfMovement = 4,
-            [Description("Freedom of association")] FreedomOfAssociation = 5,
-            [Description("Prohibits any threat of violence, harassment and intimidation")] ViolenceHarassmentIntimidation = 6,
-            [Description("Prohibits the use of worker-paid recruitment fees")] RecruitmentFees = 7,
-            [Description("Prohibits compulsory overtime")] CompulsoryOvertime = 8,
-            [Description("Prohibits child labour")] ChildLabour = 9,
-            [Description("Prohibits discrimination")] Discrimination = 10,
-            [Description("Prohibits confiscation of workers original identification documents")] DocumentRetention = 11,
-            [Description("Provides access to remedy, compensation and justice for victims of modern slavery")] RemedyAccess = 12
+            [Description("Your organisation does not have any policies and codes in relation to modern slavery")] None,
+            [Description("Other")] Other,
+            [Description("Adherence to local and national laws")] Laws,
+            [Description("Freedom of workers to terminate employment")] FreedomToTerminate,
+            [Description("Freedom of movement")] FreedomOfMovement,
+            [Description("Freedom of association")] FreedomOfAssociation,
+            [Description("Prohibits any threat of violence, harassment and intimidation")] ViolenceHarassmentIntimidation,
+            [Description("Prohibits the use of worker-paid recruitment fees")] RecruitmentFees,
+            [Description("Prohibits compulsory overtime")] CompulsoryOvertime,
+            [Description("Prohibits child labour")] ChildLabour,
+            [Description("Prohibits discrimination")] Discrimination,
+            [Description("Prohibits confiscation of workers original identification documents")] DocumentRetention,
+            [Description("Provides access to remedy, compensation and justice for victims of modern slavery")] RemedyAccess
         }
 
         SortedSet<PolicyTypes> Policies { get; set; }
@@ -30,17 +31,18 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         #endregion
 
         #region Training Fields
-        public enum TrainingTargetTypes : byte
+        public enum TrainingTargetTypes
         {
-            Unknown = 0,
-            [Description("Other")] Other = 1,
-            [Description("Your whole organisation")] OwnOrganisation = 2,
-            [Description("Your front line staff")] OwnStaff = 3,
-            [Description("Human resources")] OwnHumanResources = 4,
-            [Description("Executive-level staff")] OwnExecutives = 5,
-            [Description("Procurement staff")] OwnProcurers = 6,
-            [Description("Your suppliers")] Suppliers = 7,
-            [Description("The wider community")] WiderCommunity = 8
+            Unknown,
+            [Description("Your organisation did not provide training on modern slavery, or any other activities to raise awareness during the period of the statement")] None,
+            [Description("Other")] Other,
+            [Description("Your whole organisation")] OwnOrganisation,
+            [Description("Your front line staff")] OwnStaff,
+            [Description("Human resources")] OwnHumanResources,
+            [Description("Executive-level staff")] OwnExecutives,
+            [Description("Procurement staff")] OwnProcurers,
+            [Description("Your suppliers")] Suppliers,
+            [Description("The wider community")] WiderCommunity
         }
 
         SortedSet<TrainingTargetTypes> TrainingTargets { get; set; }
@@ -50,17 +52,18 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         #endregion
 
         #region Partner Fields
-        public enum PartnerTypes : byte
+        public enum PartnerTypes
         {
-            Unknown = 0,
-            [Description("Other businesses")] Other = 1,
-            [Description("Your suppliers")] OwnSuppliers = 2,
-            [Description("Trade unions or worker representative groups")] TradeUnions = 3,
-            [Description("Civil society organisations")] CivilSocietyOrganisations = 4,
-            [Description("Workers within your organisation")] OwnWorkers = 5,
-            [Description("Workers within your supply chain")] SupplierWorkers = 6,
-            [Description("Central or local government")] Government = 7,
-            [Description("Law enforcement, such as police, GLAA and other local labour market inspectorates")] LawEnforcement = 8
+            Unknown,
+            [Description("Your organisation did not engage with others to help monitor working conditions across your organisation and supply chain")] None,
+            [Description("Other businesses")] Other,
+            [Description("Your suppliers")] OwnSuppliers,
+            [Description("Trade unions or worker representative groups")] TradeUnions,
+            [Description("Civil society organisations")] CivilSocietyOrganisations,
+            [Description("Workers within your organisation")] OwnWorkers,
+            [Description("Workers within your supply chain")] SupplierWorkers,
+            [Description("Central or local government")] Government,
+            [Description("Law enforcement, such as police, GLAA and other local labour market inspectorates")] LawEnforcement
         }
 
         SortedSet<PartnerTypes> Partners { get; set; }
@@ -69,14 +72,15 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         #endregion
 
         #region Social Audit Fields
-        public enum SocialAuditTypes : byte
+        public enum SocialAuditTypes
         {
             Unknown = 0,
-            [Description("Other type of social audit")] Other = 1,
-            [Description("By your own staff")] OwnWorkers = 2,
-            [Description("By a third party")] ThirdParty = 3,
-            [Description("Announced social audits")] Announced = 4,
-            [Description("Unannounced social audits")] Unannounced = 5
+            [Description("Your organisation did not carry out any social audits")] None,
+            [Description("Other type of social audit")] Other,
+            [Description("By your own staff")] OwnWorkers,
+            [Description("By a third party")] ThirdParty,
+            [Description("Announced social audits")] Announced,
+            [Description("Unannounced social audits")] Unannounced
         }
 
         SortedSet<SocialAuditTypes> SocialAudits { get; set; }
@@ -85,12 +89,13 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         #endregion
 
         #region Grievance Mechanism Fields
-        public enum GrievanceMechanismTypes : byte
+        public enum GrievanceMechanismTypes
         {
-            Unknown = 0,
-            [Description("Other grievance mechanism")] Other = 1,
-            [Description("Whistleblowing services")] WhistleblowingServices = 2,
-            [Description("Worker voice platforms")] WorkerVoicePlatforms = 3
+            Unknown,
+            [Description("Your organisation does not have any anonymous grievance mechanisms in place")] None,
+            [Description("Other grievance mechanism")] Other,
+            [Description("Whistleblowing services")] WhistleblowingServices,
+            [Description("Worker voice platforms")] WorkerVoicePlatforms
         }
 
         SortedSet<GrievanceMechanismTypes> GrievanceMechanisms { get; set; }
@@ -108,12 +113,12 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             public string Description { get; set; }
 
             #region Risk Source Fields
-            public enum RiskSourceTypes : byte
+            public enum RiskSourceTypes
             {
-                Unknown = 0,
-                [Description("Other")] Other = 1,
-                [Description("Within your own operations")] OwnOperations = 2,
-                [Description("Within your supply chains")] SupplyChains = 3
+                Unknown,
+                [Description("Other")] Other,
+                [Description("Within your own operations")] OwnOperations,
+                [Description("Within your supply chains")] SupplyChains
             }
 
             public RiskSourceTypes LikelySource { get; set; }
@@ -122,14 +127,14 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             #endregion
 
             #region Risk Target Fields
-            public enum RiskTargetTypes : byte
+            public enum RiskTargetTypes
             {
-                Unknown = 0,
-                [Description("Other vulnerable group(s)")] Other = 1,
-                [Description("Women")] Women = 2,
-                [Description("Migrants")] Migrants = 3,
-                [Description("Refugees")] Refugees = 4,
-                [Description("Children")] Children = 5
+                Unknown,
+                [Description("Other vulnerable group(s)")] Other,
+                [Description("Women")] Women,
+                [Description("Migrants")] Migrants,
+                [Description("Refugees")] Refugees,
+                [Description("Children")] Children
             }
 
             public SortedSet<RiskSourceTypes> Targets { get; set; } = new SortedSet<RiskSourceTypes>();
@@ -141,7 +146,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             /// <summary>
             /// ISO 3166-1 Alpha 2 Country Codes (source: https://gist.github.com/jplwood/4f77b55cfedf2820dce0dfcd3ee0c3ea)
             /// </summary>
-            public enum CountryTypes : byte
+            public enum CountryTypes
             {
                 Unknown = 0,
                 [Description("Afghanistan")] AF = 1,
@@ -414,21 +419,22 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         #endregion
 
         #region Forced Labour Fields
-        public enum IndicatorTypes : byte
+        public enum IndicatorTypes
         {
-            Unknown = 0,
-            [Description("Other")] Other = 1,
-            [Description("Abuse of vulnerability")] VulnerabilityAbuse = 2,
-            [Description("Deception")] Deception = 3,
-            [Description("Restriction of Movement")] MovementRestriction = 4,
-            [Description("Isolation")] Isolation = 4,
-            [Description("Physical and sexual violence")] Violence = 5,
-            [Description("Intimidation and threats")] ThreatIntimidation = 6,
-            [Description("Retention of identity documents")] DocumentRetention = 7,
-            [Description("Withholding of wages")] WageWithholding = 8,
-            [Description("Debt bondage")] DebtBondage = 9,
-            [Description("Abusive working and living conditions")] WorkLiveConditions = 10,
-            [Description("Excessive overtime")] ExcessiveOvertime = 11
+            Unknown,
+            [Description("My statement does not refer to any indicators of forced labour")] None,
+            [Description("Other")] Other,
+            [Description("Abuse of vulnerability")] VulnerabilityAbuse,
+            [Description("Deception")] Deception,
+            [Description("Restriction of Movement")] MovementRestriction,
+            [Description("Isolation")] Isolation,
+            [Description("Physical and sexual violence")] Violence,
+            [Description("Intimidation and threats")] ThreatIntimidation,
+            [Description("Retention of identity documents")] DocumentRetention,
+            [Description("Withholding of wages")] WageWithholding,
+            [Description("Debt bondage")] DebtBondage,
+            [Description("Abusive working and living conditions")] WorkLiveConditions,
+            [Description("Excessive overtime")] ExcessiveOvertime
         }
 
         SortedSet<IndicatorTypes> Indicators { get; set; }
@@ -437,16 +443,17 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         #endregion
 
         #region Remediation Fields
-        public enum RemediationTypes : byte
+        public enum RemediationTypes
         {
-            Unknown = 0,
-            [Description("Other")] Other = 1,
-            [Description("Repayment of recruitment fees")] FeeRepayment = 2,
-            [Description("Change in policy")] PolicyChange = 3,
-            [Description("Change in training")] TrainingChange = 4,
-            [Description("Referring victims to government service")] VictimReferral = 5,
-            [Description("Supporting victims via NGO")] NGOSupport = 6,
-            [Description("Supporting criminal justice against perpetrator")] CRiminalJustice = 7,
+            Unknown,
+            [Description("My statement does not refer to actions taken in response to finding indicators of forced labour")] None,
+            [Description("Other")] Other,
+            [Description("Repayment of recruitment fees")] FeeRepayment,
+            [Description("Change in policy")] PolicyChange,
+            [Description("Change in training")] TrainingChange,
+            [Description("Referring victims to government service")] VictimReferral,
+            [Description("Supporting victims via NGO")] NGOSupport,
+            [Description("Supporting criminal justice against perpetrator")] CRiminalJustice,
         }
 
         SortedSet<RemediationTypes> Remediations { get; set; }

@@ -10,16 +10,16 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class ApprovalPageViewModelMapperProfile : Profile
+    public class SignOffViewModelMapperProfile : Profile
     {
-        public ApprovalPageViewModelMapperProfile()
+        public SignOffViewModelMapperProfile()
         {
-            CreateMap<StatementModel, ApprovalPageViewModel>()
+            CreateMap<StatementModel, SignOffViewModel>()
                 .ForMember(d => d.ApprovedDay, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Day))
                 .ForMember(d => d.ApprovedMonth, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Month))
                 .ForMember(d => d.ApprovedYear, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Year));
 
-            CreateMap<ApprovalPageViewModel, StatementModel>(MemberList.Source)
+            CreateMap<SignOffViewModel, StatementModel>(MemberList.Source)
                 .ForMember(s => s.OrganisationId, opt => opt.Ignore())
                 .ForMember(s => s.GroupSubmission, opt => opt.Ignore())
                 .ForMember(d => d.ApprovedDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.ApprovedDate); })
@@ -37,7 +37,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class ApprovalPageViewModel : BaseViewModel
+    public class SignOffViewModel : BaseViewModel
     {
         public override string PageTitle => "What is the name of the director (or equivalent) who signed off your statement?";
 
@@ -128,14 +128,16 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return !string.IsNullOrWhiteSpace(ApproverFirstName)
+            if (!string.IsNullOrWhiteSpace(ApproverFirstName)
                 && !string.IsNullOrWhiteSpace(ApproverLastName)
                 && !string.IsNullOrWhiteSpace(ApproverJobTitle)
                 && ApprovedDay.HasValue
                 && ApprovedMonth.HasValue
-                && ApprovedYear.HasValue;
+                && ApprovedYear.HasValue) return Status.Complete;
+
+            return Status.Incomplete;
         }
     }
 }

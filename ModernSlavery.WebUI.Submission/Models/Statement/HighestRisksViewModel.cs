@@ -7,17 +7,18 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class RiskDescriptionsPageViewModelMapperProfile : Profile
+    public class HighestRisksViewModelMapperProfile : Profile
     {
-        public RiskDescriptionsPageViewModelMapperProfile()
+        public HighestRisksViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, RiskDescriptionsPageViewModel>()
+            CreateMap<StatementSummary1, HighestRisksViewModel>()
                 .ForMember(d => d.HighRisk1, opt => opt.MapFrom(s => s.Risks.Count < 1 ? null : s.Risks[0].Description))
                 .ForMember(d => d.HighRisk1, opt => opt.MapFrom(s => s.Risks.Count < 2 ? null : s.Risks[1].Description))
                 .ForMember(d => d.HighRisk1, opt => opt.MapFrom(s => s.Risks.Count < 3 ? null : s.Risks[2].Description));
 
-            CreateMap<RiskDescriptionsPageViewModel, StatementSummary1>(MemberList.Source)
-                .AfterMap((s, d) => {
+            CreateMap<HighestRisksViewModel, StatementSummary1>(MemberList.Source)
+                .AfterMap((s, d) =>
+                {
 
                     //Create or clear each risk description
                     foreach (var pars in new[] { (s.HighRisk1, 0), (s.HighRisk2, 1), (s.HighRisk3, 2) })
@@ -33,8 +34,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                             d.Risks.Add(risk);
                         }
 
-                        //When clearing descriptions ensure no other properties are set
-                        if (string.IsNullOrWhiteSpace(description) && risk.IsEmpty(true)) throw new Exception($"Attempt to clear Risk {index} description when details are not empty");
+                        //Clearing the associated details when the description is cleared
+                        if (string.IsNullOrWhiteSpace(description))
+                        {
+                            risk.LikelySource = IStatementSummary1.StatementRisk.RiskSourceTypes.Unknown;
+                            risk.OtherLikelySource = null;
+                            risk.Targets.Clear();
+                            risk.OtherTargets = null;
+                            risk.Countries.Clear();
+                        }
 
                         //Set the new description
                         risk.Description = description;
@@ -50,12 +58,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     }
 
-    public class RiskDescriptionsPageViewModel : BaseViewModel
+    public class HighestRisksViewModel : BaseViewModel
     {
         public override string PageTitle => "Tell us about your highest risks";
 
         [MaxLength(200)]
         public string HighRisk1 { get; set; }
+
 
         [MaxLength(200)]
         public string HighRisk2 { get; set; }
@@ -72,9 +81,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return None || (!string.IsNullOrWhiteSpace(HighRisk1) && !string.IsNullOrWhiteSpace(HighRisk2) && !string.IsNullOrWhiteSpace(HighRisk3));
+            if (!string.IsNullOrWhiteSpace(HighRisk1) || !string.IsNullOrWhiteSpace(HighRisk2) || !string.IsNullOrWhiteSpace(HighRisk3))
+            {
+                if (!string.IsNullOrWhiteSpace(HighRisk1) && !string.IsNullOrWhiteSpace(HighRisk2) && !string.IsNullOrWhiteSpace(HighRisk3)) return Status.Complete;
+                    return Status.InProgress;
+            }
+
+            return Status.Incomplete;
         }
     }
 }

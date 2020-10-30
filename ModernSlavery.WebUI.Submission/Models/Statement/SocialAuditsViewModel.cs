@@ -9,20 +9,20 @@ using ModernSlavery.Core.Entities.StatementSummary;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class SocialAuditsPageViewModelMapperProfile : Profile
+    public class SocialAuditsViewModelMapperProfile : Profile
     {
-        public SocialAuditsPageViewModelMapperProfile()
+        public SocialAuditsViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, SocialAuditsPageViewModel>();
+            CreateMap<StatementSummary1, SocialAuditsViewModel>();
 
-            CreateMap<SocialAuditsPageViewModel, StatementSummary1>(MemberList.Source)
+            CreateMap<SocialAuditsViewModel, StatementSummary1>(MemberList.Source)
                 .ForMember(d => d.SocialAudits, opt => opt.MapFrom(s=>s.SocialAudits))
                 .ForMember(d => d.OtherSocialAudits, opt => opt.MapFrom(s=>s.OtherSocialAudits))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class SocialAuditsPageViewModel : BaseViewModel
+    public class SocialAuditsViewModel : BaseViewModel
     {
         public override string PageTitle => "What type of social audits did you carry out?";
 
@@ -41,10 +41,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return SocialAudits.Any()
-                && (!SocialAudits.Contains(SocialAuditTypes.Other) || !string.IsNullOrWhiteSpace(OtherSocialAudits));
+            if (SocialAudits.Any())
+            {
+                if (SocialAudits.Contains(SocialAuditTypes.Other) && string.IsNullOrWhiteSpace(OtherSocialAudits)) return Status.InProgress;
+                return Status.Complete;
+            }
+
+            return Status.Incomplete;
         }
     }
 }

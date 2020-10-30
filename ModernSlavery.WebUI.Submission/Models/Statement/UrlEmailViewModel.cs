@@ -7,20 +7,20 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class UrlPageViewModelMapperProfile : Profile
+    public class UrlEmailViewModelMapperProfile : Profile
     {
-        public UrlPageViewModelMapperProfile()
+        public UrlEmailViewModelMapperProfile()
         {
-            CreateMap<StatementModel, UrlPageViewModel>();
+            CreateMap<StatementModel, UrlEmailViewModel>();
 
-            CreateMap<UrlPageViewModel, StatementModel>(MemberList.Source)
+            CreateMap<UrlEmailViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.StatementUrl, opt => opt.MapFrom(s=>s.StatementUrl))
                 .ForMember(d => d.StatementEmail, opt => opt.MapFrom(s=>s.StatementEmail))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class UrlPageViewModel : BaseViewModel
+    public class UrlEmailViewModel : BaseViewModel
     {
         public override string PageTitle => "Provide a link to the modern slavery statement on your organisation's website";
 
@@ -41,9 +41,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return !string.IsNullOrWhiteSpace(StatementUrl) || !string.IsNullOrWhiteSpace(StatementUrl);
+            if (!string.IsNullOrWhiteSpace(StatementUrl) || !string.IsNullOrWhiteSpace(StatementUrl)) return Status.Complete;
+            return Status.Incomplete;
         }
+
     }
 }

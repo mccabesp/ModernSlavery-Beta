@@ -7,17 +7,16 @@ using System.Linq;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Binding;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
-using static ModernSlavery.Core.Entities.Statement;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class SectorPageViewModelMapperProfile : Profile
+    public class SectorsViewModelMapperProfile : Profile
     {
-        public SectorPageViewModelMapperProfile()
+        public SectorsViewModelMapperProfile()
         {
-            CreateMap<StatementModel, SectorPageViewModel>();
+            CreateMap<StatementModel, SectorsViewModel>();
 
-            CreateMap<SectorPageViewModel, StatementModel>(MemberList.Source)
+            CreateMap<SectorsViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.Sectors, opt => opt.MapFrom(s => s.Sectors))
                 .ForMember(d => d.OtherSectors, opt => opt.MapFrom(s => s.OtherSector))
                 .ForAllOtherMembers(opt => opt.Ignore());
@@ -25,17 +24,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     }
 
     [DependencyModelBinder]
-    public class SectorPageViewModel : BaseViewModel
+    public class SectorsViewModel : BaseViewModel
     {
         [IgnoreMap]
         [Newtonsoft.Json.JsonIgnore]//This needs to be Newtonsoft.Json.JsonIgnore namespace not System.Text.Json.Serialization.JsonIgnore
         public SectorTypeIndex SectorTypes { get; }
-        public SectorPageViewModel(SectorTypeIndex sectorTypes)
+        public SectorsViewModel(SectorTypeIndex sectorTypes)
         {
             SectorTypes = sectorTypes;
         }
 
-        public SectorPageViewModel()
+        public SectorsViewModel()
         {
 
         }
@@ -59,12 +58,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            var other = SectorTypes.Single(x => x.Description.Equals("Other"));
+            if (Sectors.Any())
+            {
+                var other = SectorTypes.Single(x => x.Description.Equals("Other"));
+                if (!Sectors.Any(t => t == other.Id || !string.IsNullOrWhiteSpace(OtherSector)))) return Status.Complete;
+            }
 
-            return Sectors.Any()
-                && (!Sectors.Any(t => t == other.Id || !string.IsNullOrWhiteSpace(OtherSector)));
+            return Status.Incomplete;
         }
     }
 }

@@ -13,16 +13,16 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public GrievancesPageViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, GrievancesPageViewModel>();
+            CreateMap<StatementSummary1, GrievancesViewModel>();
 
-            CreateMap<GrievancesPageViewModel, StatementSummary1>(MemberList.Source)
+            CreateMap<GrievancesViewModel, StatementSummary1>(MemberList.Source)
                 .ForMember(d => d.GrievanceMechanisms, opt => opt.MapFrom(s=>s.GrievanceMechanisms))
                 .ForMember(d => d.OtherGrievanceMechanisms, opt => opt.MapFrom(s=>s.OtherGrievances))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class GrievancesPageViewModel : BaseViewModel
+    public class GrievancesViewModel : BaseViewModel
     {
         public override string PageTitle => "What types of anonymous grievance mechanisms do you have in place?";
 
@@ -41,10 +41,16 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return GrievanceMechanisms.Any()
-                && (!GrievanceMechanisms.Contains(GrievanceMechanismTypes.Other) || !string.IsNullOrWhiteSpace(OtherGrievances));
+            if (GrievanceMechanisms.Any())
+            {
+                if (GrievanceMechanisms.Contains(GrievanceMechanismTypes.Other) && string.IsNullOrWhiteSpace(OtherGrievances)) return Status.InProgress;
+                return Status.Complete;
+            }
+
+            return Status.Incomplete;
         }
+
     }
 }

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
@@ -11,11 +10,11 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class StatementPeriodPageViewModelMapperProfile : Profile
+    public class PeriodCoveredPageViewModelMapperProfile : Profile
     {
-        public StatementPeriodPageViewModelMapperProfile()
+        public PeriodCoveredPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, StatementPeriodPageViewModel>()
+            CreateMap<StatementModel, PeriodCoveredViewModel>()
                 .ForMember(d => d.StatementStartDay, opt => opt.MapFrom(s => s.StatementStartDate == null ? (int?)null : s.StatementStartDate.Value.Day))
                 .ForMember(d => d.StatementStartMonth, opt => opt.MapFrom(s => s.StatementStartDate == null ? (int?)null : s.StatementStartDate.Value.Month))
                 .ForMember(d => d.StatementStartYear, opt => opt.MapFrom(s => s.StatementStartDate == null ? (int?)null : s.StatementStartDate.Value.Year))
@@ -23,14 +22,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.StatementEndMonth, opt => opt.MapFrom(s => s.StatementEndDate == null ? (int?)null : s.StatementEndDate.Value.Month))
                 .ForMember(d => d.StatementEndYear, opt => opt.MapFrom(s => s.StatementEndDate == null ? (int?)null : s.StatementEndDate.Value.Year));
 
-            CreateMap<StatementPeriodPageViewModel, StatementModel>(MemberList.Source)
+            CreateMap<PeriodCoveredViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.StatementStartDate, opt => { opt.MapFrom(s => s.StatementStartDate); })
                 .ForMember(d => d.StatementEndDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.StatementEndDate); })
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class StatementPeriodPageViewModel : BaseViewModel
+    public class PeriodCoveredViewModel : BaseViewModel
     {
         public override string PageTitle => "What period does this statement cover?";
 
@@ -224,14 +223,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return StatementStartDay.HasValue
+            if (StatementStartDay.HasValue
                 && StatementStartMonth.HasValue
                 && StatementStartYear.HasValue
                 && StatementEndDay.HasValue
                 && StatementEndMonth.HasValue
-                && StatementEndYear.HasValue;
+                && StatementEndYear.HasValue) return Status.Complete;
+
+            return Status.Incomplete;
         }
+
+
     }
 }

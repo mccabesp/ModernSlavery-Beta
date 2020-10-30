@@ -7,13 +7,13 @@ using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class CompliancePageViewModelMapperProfile : Profile
+    public class ComplianceViewModelMapperProfile : Profile
     {
-        public CompliancePageViewModelMapperProfile()
+        public ComplianceViewModelMapperProfile()
         {
-            CreateMap<StatementModel, CompliancePageViewModel>();
+            CreateMap<StatementModel, ComplianceViewModel>();
 
-            CreateMap<CompliancePageViewModel, StatementModel>(MemberList.Source)                
+            CreateMap<ComplianceViewModel, StatementModel>(MemberList.Source)                
                 .ForMember(d => d.StructureDetails, opt => opt.MapFrom(s=>s.StructureDetails))
                 .ForMember(d => d.IncludesPolicies, opt => opt.MapFrom(s=>s.IncludesPolicies))
                 .ForMember(d => d.PolicyDetails, opt => opt.MapFrom(s=>s.PolicyDetails))
@@ -28,7 +28,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
-    public class CompliancePageViewModel : BaseViewModel
+    public class ComplianceViewModel : BaseViewModel
     {
         public override string PageTitle => "Areas covered by your modern slavery statement";
 
@@ -81,9 +81,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return IncludesStructure.HasValue
+            if (IncludesStructure.HasValue
                 && ((IncludesStructure == true) || !string.IsNullOrWhiteSpace(StructureDetails))
                 && IncludesPolicies.HasValue
                 && ((IncludesPolicies == true) || !string.IsNullOrWhiteSpace(PolicyDetails))
@@ -94,9 +94,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 && IncludesTraining.HasValue
                 && ((IncludesTraining == true) || !string.IsNullOrWhiteSpace(TrainingDetails))
                 && IncludesGoals.HasValue
-                && ((IncludesGoals == true) || !string.IsNullOrWhiteSpace(GoalsDetails));
+                && ((IncludesGoals == true) || !string.IsNullOrWhiteSpace(GoalsDetails))) return Status.Complete;
 
-
+            return Status.Incomplete;
         }
     }
 }

@@ -68,9 +68,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return GroupSubmission.HasValue && (GroupSubmission == false || StatementOrganisations.Any());
+            if (GroupSubmission.HasValue && (GroupSubmission == false || StatementOrganisations.Any())) return Status.Complete;
+            return Status.Incomplete;
         }
     }
 }

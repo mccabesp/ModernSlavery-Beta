@@ -9,20 +9,20 @@ using ModernSlavery.Core.Entities.StatementSummary;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class IndicatorPageViewModelMapperProfile : Profile
+    public class IndicatorViewModelMapperProfile : Profile
     {
-        public IndicatorPageViewModelMapperProfile()
+        public IndicatorViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, IndicatorsPageViewModel>();
+            CreateMap<StatementSummary1, IndicatorsViewModel>();
 
-            CreateMap<IndicatorsPageViewModel, StatementSummary1>(MemberList.Source)
+            CreateMap<IndicatorsViewModel, StatementSummary1>(MemberList.Source)
                 .ForMember(d => d.Indicators, opt => opt.MapFrom(s=>s.Indicators))
                 .ForMember(d => d.OtherIndicators, opt => opt.MapFrom(s=>s.OtherIndicators))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class IndicatorsPageViewModel : BaseViewModel
+    public class IndicatorsViewModel : BaseViewModel
     {
         public override string PageTitle => "Does your statement refer to finding any ILO indicators of forced labour?";
 
@@ -41,10 +41,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return Indicators.Any()
-                && (!Indicators.Contains(IndicatorTypes.Other) || !string.IsNullOrWhiteSpace(OtherIndicators));
+            if (Indicators.Any())
+            {
+                if (Indicators.Contains(IndicatorTypes.Other) && string.IsNullOrWhiteSpace(OtherIndicators)) return Status.InProgress;
+                return Status.Complete;
+            }
+
+            return Status.Incomplete;
         }
     }
 }

@@ -47,7 +47,7 @@ namespace ModernSlavery.WebUI.Submission.Models
             get
             {
                 if (!SubmissionAvailable && !DraftAvailable) return _urlHelper.Action("BeforeYouStart", "Statement", new { organisationIdentifier = OrganisationIdentifier, year = StatementInfo.ReportingDeadline.Year });
-                return _urlHelper.Action("ReviewAndEdit", "Statement", new { organisationIdentifier = OrganisationIdentifier, year = StatementInfo.ReportingDeadline.Year });
+                return _urlHelper.Action("Review", "Statement", new { organisationIdentifier = OrganisationIdentifier, year = StatementInfo.ReportingDeadline.Year });
             }
         }
     }

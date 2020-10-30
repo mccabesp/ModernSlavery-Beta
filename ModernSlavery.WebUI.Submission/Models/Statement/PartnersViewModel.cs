@@ -9,20 +9,20 @@ using ModernSlavery.Core.Entities.StatementSummary;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class PartnersPageViewModelMapperProfile : Profile
+    public class PartnersViewModelMapperProfile : Profile
     {
-        public PartnersPageViewModelMapperProfile()
+        public PartnersViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, PartnersPageViewModel>();
+            CreateMap<StatementSummary1, PartnersViewModel>();
 
-            CreateMap<PartnersPageViewModel, StatementSummary1>(MemberList.Source)
+            CreateMap<PartnersViewModel, StatementSummary1>(MemberList.Source)
                 .ForMember(d => d.Partners, opt => opt.MapFrom(s=>s.Partners))
                 .ForMember(d => d.OtherPartners, opt => opt.MapFrom(s=>s.OtherPartners))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class PartnersPageViewModel : BaseViewModel
+    public class PartnersViewModel : BaseViewModel
     {
         public override string PageTitle => "During the period of the statement, who did you engage with to help you monitor working conditions across your organisation and supply chain?";
 
@@ -41,10 +41,16 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return Partners.Any()
-                && (!Partners.Contains(PartnerTypes.Other) || !string.IsNullOrWhiteSpace(OtherPartners));
+            if (Partners.Any())
+            {
+                if (Partners.Contains(PartnerTypes.Other) && string.IsNullOrWhiteSpace(OtherPartners)) return Status.InProgress;
+                return Status.Complete;
+            }
+
+            return Status.Incomplete;
         }
+
     }
 }

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using static ModernSlavery.Core.Entities.Statement;
@@ -8,19 +7,19 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class StatementYearsPageViewModelMapperProfile : Profile
+    public class YearsPageViewModelMapperProfile : Profile
     {
-        public StatementYearsPageViewModelMapperProfile()
+        public YearsPageViewModelMapperProfile()
         {
-            CreateMap<StatementModel, StatementYearsPageViewModel>();
+            CreateMap<StatementModel, YearsViewModel>();
 
-            CreateMap<StatementYearsPageViewModel, StatementModel>(MemberList.Source)
+            CreateMap<YearsViewModel, StatementModel>(MemberList.Source)
                 .ForMember(d => d.StatementYears, opt => opt.MapFrom(s=>s.StatementYears))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
-    public class StatementYearsPageViewModel : BaseViewModel
+    public class YearsViewModel : BaseViewModel
     {
         public override string PageTitle => "How many years has your organisation been producing modern slavery statements?";
 
@@ -33,9 +32,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return StatementYears!=null && StatementYears != StatementYearRanges.NotProvided;
+            if (StatementYears != null && StatementYears != StatementYearRanges.NotProvided) return Status.Complete;
+
+            return Status.Incomplete;
         }
     }
 }
