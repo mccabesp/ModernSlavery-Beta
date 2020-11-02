@@ -80,22 +80,22 @@
                     </legend>
                     <div id="FirstNameGroup" class="govuk-form-group @(Html.SetErrorClass(nameof(EnterAnswersViewModel.FirstName), "govuk-form-group--error")) ">
                         <label asp-for="FirstName" class="govuk-label">First name</label>
-                        <input name="@nameof(EnterAnswersViewModel.FirstName)" class="govuk-input govuk-input--width-20" value="@(Model.FirstName)" />
+                        <input asp-for="FirstName" class="govuk-input govuk-input--width-20" value="@(Model.FirstName)" />
                         <span asp-validation-for="FirstName" class="govuk-error-message"></span>
                     </div>
                     <div id="LastNameGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.LastName), "govuk-form-group--error") ">
                         <label asp-for="LastName" class="govuk-label">Last name</label>
-                        <input name="@nameof(EnterAnswersViewModel.LastName)" class="govuk-input govuk-input--width-20" value="@(Model.LastName)" />
+                        <input asp-for="LastName" class="govuk-input govuk-input--width-20" value="@(Model.LastName)" />
                         <span asp-validation-for="LastName" class="govuk-error-message"></span>
                     </div>
                     <div id="TitleGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.JobTitle), "govuk-form-group--error") ">
                         <label asp-for="JobTitle" class="govuk-label">Job title</label>
-                        <input name="@nameof(EnterAnswersViewModel.JobTitle)" class="govuk-input govuk-input--width-20" value="@(Model.JobTitle)" />
+                        <input asp-for="JobTitle" class="govuk-input govuk-input--width-20" value="@(Model.JobTitle)" />
                         <span asp-validation-for="JobTitle" class="govuk-error-message"></span>
                     </div>
                     <div id="EmailAddressGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterAnswersViewModel.EmailAddress), "govuk-form-group--error") ">
                         <label asp-for="EmailAddress" class="govuk-label">Email address</label>
-                        <input name="@nameof(EnterAnswersViewModel.EmailAddress)" class="govuk-input govuk-input--width-20" value="@(Model.EmailAddress)" type="email" />
+                        <input asp-for="EmailAddress" class="govuk-input govuk-input--width-20" value="@(Model.EmailAddress)" type="email" />
                         <span asp-validation-for="EmailAddress" class="govuk-error-message"></span>
                     </div>
                 </fieldset>

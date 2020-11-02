@@ -3,7 +3,7 @@
     Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Search modern slavery statements";
     ViewBag.SubTitle = "Organisation name or company number";
-    
+
     var sectors = new FilterGroup
     {
         Id = "SectorFilter",
@@ -47,16 +47,16 @@
                     <details class="govuk-details advanced-search-details" data-module="govuk-details">
                         <summary data-open="Fewer search options" data-close="Advanced search" class="govuk-details__summary">
 
-                        </summary>
+                </summary>
                         <div class="govuk-details__text">
                             @foreach (var filter in filters)
                             {
                                 <div id="checkboxes-@(filter.Id)" class="advanced-search-checkboxes govuk-form-group govuk-checkboxes--small" data-module="govuk-checkboxes">
                                     <fieldset class="govuk-fieldset">
-                                        <h4 class="govuk-heading-s">
+                                        <span class="govuk-heading-s">
                                             @filter.Label
-                                        </h4>
-                                        <ul class="govuk-checkboxes advanced-search-checkboxes__list @(filter.Id == "SectorFilter"? "two-columns": "")">
+                                        </span>
+                                        <ul class="govuk-checkboxes advanced-search-checkboxes__list @(filter.Id == "SectorFilter" ? "two-columns" : "")">
                                             @foreach (var item in filter.Metadata)
                                             {
                                                 <li class="govuk-checkboxes__item">
@@ -68,14 +68,16 @@
                                     </fieldset>
                                 </div>
                             }
-                            <button class="govuk-button govuk-!-margin-top-3" data-module="govuk-button" name="search" type="submit">Search</button>
+                            <button class="govuk-button" data-module="govuk-button" name="search" type="submit">Search</button>
 
-                        </div>                       
-                    </details>
-                    <a class="govuk-button govuk-button--secondary" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">See all statements</a>
-                </div>
-                    }
-        </div>
+                        </div>
+                
+            </details>
+            <a class="govuk-button govuk-button--secondary" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">See all statements</a>
+        
     </div>
+            }
+</div>
+        </div>
 
 

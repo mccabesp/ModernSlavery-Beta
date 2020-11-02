@@ -30,7 +30,7 @@
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                         <div class="govuk-radios__item">
                             <input asp-for="IncludesMeasuringProgress" value="true" id="IncludeGoals_True" checked="@(Model.IncludesMeasuringProgress==true)" class="govuk-radios__input" type="radio">
-                            <label class="govuk-label govuk-radios__label" asp-for="IncludesMeasuringProgress">
+                            <label class="govuk-label govuk-radios__label" for="IncludeGoals_True">
                                 Yes
                             </label>
                         </div>
@@ -46,20 +46,20 @@
 
             <div class="govuk-form-group">
                 <h1 class="govuk-label-wrapper">
-                    <label asp-for="ProgressMeasures" class="govuk-label govuk-label--s" for="include-goals-detail">
+                    <label asp-for="ProgressMeasures" class="govuk-label govuk-label--s">
                         How is your organisation measuring progress towards these goals?
                     </label>
                 </h1>
-                <textarea asp-for="ProgressMeasures" id="include-goals-detail" class="govuk-textarea " rows="5" type="text" maxlength="1024">@Model.ProgressMeasures</textarea>
+                <textarea asp-for="ProgressMeasures" class="govuk-textarea " rows="5" type="text" maxlength="1024">@Model.ProgressMeasures</textarea>
             </div>
 
             <div class="govuk-form-group">
                 <h1 class="govuk-label-wrapper">
-                    <label asp-for="KeyAchievements" class="govuk-label govuk-label--s" for="key-achievements">
+                    <label asp-for="KeyAchievements" class="govuk-label govuk-label--s">
                         What were your key achievements in relation to reducing modern slavery during the period covered by this statement?
                     </label>
                 </h1>
-                <textarea asp-for="KeyAchievements" class="govuk-textarea" id="more-detail" rows="5" maxlength="1024">@Model.KeyAchievements</textarea>
+                <textarea asp-for="KeyAchievements" class="govuk-textarea" rows="5" maxlength="1024">@Model.KeyAchievements</textarea>
             </div>
 
             <fieldset class="govuk-fieldset govuk-!-margin-top-6" describedby="GovUk_StatementYears-hint">

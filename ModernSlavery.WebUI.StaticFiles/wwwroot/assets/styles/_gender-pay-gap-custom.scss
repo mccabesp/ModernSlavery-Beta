@@ -5,6 +5,8 @@
 @import "./pages/download";
 @import "./pages/landing";
 
+//styling of organisation results list in registration journey
+@import "./pages/choose-organisation";
 
 @import "./components/_admin-search-box";
 @import "./components/_cookie-banner";
@@ -41,3 +43,9 @@
 
 //this is for the custom styling of the search results list on the search page
 @import "./components/finder_frontend";
+
+//custom stying of button to look like govuk-link
+@import "./components/button-link";
+
+//styling of service info
+@import "./components/service-info";

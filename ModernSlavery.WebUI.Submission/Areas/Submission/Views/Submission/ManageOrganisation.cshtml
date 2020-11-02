@@ -7,6 +7,7 @@
 @using ModernSlavery.BusinessDomain.Shared.Models
 @model ManageOrganisationModel
 @{
+    //TODO: this page needs to be changed to GDSLayout but waiting as the page is being redesigned 
     Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Manage " + Model.OrganisationName + " organisation - Modern Slavery reporting service";
 }
@@ -27,7 +28,7 @@
                     </dt>
                 </div>
                 <div>
-                    <dt style="color: gray; font-size: 0.8em; font-weight: lighter;">
+                    <dt style="color: #505a5f;        font-size: 0.8em;        font-weight: lighter;">
                         @Html.Raw(Model.LatestAddress.Replace(Environment.NewLine, "&#44;<br/>"))
                     </dt>
                 </div>

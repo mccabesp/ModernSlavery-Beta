@@ -1,49 +1,51 @@
 ﻿@model FastTrackViewModel
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Find your organisation - Modern Slavery reporting service";
 }
+@section BeforeMain {
+    <a class="govuk-back-link"href="@Url.Action("OrganisationType")">Back</a>
+}
 
-<a id="BackLink" class="link-back" href="@Url.Action("OrganisationType")">Back <span class="visuallyhidden"> to the previous question</span></a>
-<div id="grid-row">
-    <div class="column-full">
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
         @using (Html.BeginForm())
         {
             @Html.AntiForgeryToken()
+            @(await Html.GovUkValidationSummaryAsync())
 
-            @if (ViewContext.ModelState.ErrorCount > 0)
-            {
-                @await Html.PartialAsync("Patterns/ErrorSummary", ViewContext.ModelState)
-            }
-
-            <h1 class="heading-large">
+   
+            <h1 class="govuk-heading-l">
                 Fast track registration
             </h1>
 
-            <div class="dynamic-content default-content">
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-font-weight-regular">
+                        Enter the organisation reference and security code provided in the letter we sent you.
+                    </legend>
 
-                <p>
-                    Enter the organisation reference and security code provided in the letter we sent you.
-                </p>
+                    <div class="govuk-form-group @Html.SetErrorClass(model => model.OrganisationReference, "govuk-form-group--error")">
+                        @Html.LabelFor(model => model.OrganisationReference, new { @class = "govuk-label" })
+                        @Html.ValidationMessageFor(model => model.OrganisationReference, "", new { @class = "govuk-error-message" })
+                        @Html.CustomEditorFor(model => model.OrganisationReference, new { @class = "govuk-input govuk-!-width-one-half" })
+                    </div>
 
-                <div class="form-group @Html.SetErrorClass(model => model.OrganisationReference, "error")">
-                    @Html.LabelFor(model => model.OrganisationReference, new { @class = "form-label" })
-                    @Html.ValidationMessageFor(model => model.OrganisationReference, "", new { @class = "error-message" })
-                    @Html.CustomEditorFor(model => model.OrganisationReference, new { @class = "form-control" })
-                </div>
+                    <div class="govuk-form-group @Html.SetErrorClass(model => model.SecurityCode, "govuk-form-group--error")">
+                        @Html.LabelFor(model => model.SecurityCode, new { @class = "govuk-label" })
+                        @Html.ValidationMessageFor(model => model.SecurityCode, "", new { @class = "govuk-error-message" })
+                        @Html.CustomEditorFor(model => model.SecurityCode, new { @class = "govuk-input govuk-!-width-one-half" })
+                    </div>
 
-                <div class="form-group @Html.SetErrorClass(model => model.SecurityCode, "error")">
-                    @Html.LabelFor(model => model.SecurityCode, new { @class = "form-label" })
-                    @Html.ValidationMessageFor(model => model.SecurityCode, "", new { @class = "error-message" })
-                    @Html.CustomEditorFor(model => model.SecurityCode, new { @class = "form-control" })
-                </div>
+                </fieldset>
             </div>
 
-            <input type="submit" class="button" value="Continue" />
 
-            <div>
-                <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" style="display: inline-block; margin-top: 1em;">Cancel</a>
-            </div>
+            <input type="submit" class="govuk-button" value="Continue" />
+
+            <p class="govuk-body">
+                <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" class="govuk-link">Cancel</a>
+            </p>
         }
     </div>
 </div>
