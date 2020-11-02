@@ -58,7 +58,7 @@
     "StorageHealthCheck": { "Action": "Disable" },
     "TakeSnapshotAsync": { "Action": "Disable" },
     "UpdateDownloadFiles": {
-      "Action": "Disable",
+      "Action": "Enable",
       "Trigger": "00:01:00:00"
     },
     "UpdateFromCompaniesHouseAsync": {
