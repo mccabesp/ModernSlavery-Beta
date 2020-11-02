@@ -18,7 +18,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="organisationId"></param>
         /// <param name="snapshotYear"></param>
         /// <returns></returns>
-        Task<Statement> GetLatestStatementBySnapshotYearAsync(long organisationId, int snapshotYear);
+        Task<Statement> GetLatestStatementByDeadlineYearAsync(long organisationId, int snapshotYear);
 
         IEnumerable<Statement> GetAllStatementsByOrganisationIdAndReportingDeadlineYear(long organisationId,
             int snapshotYear);

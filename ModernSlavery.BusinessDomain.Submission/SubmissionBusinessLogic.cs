@@ -43,7 +43,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         /// <param name="organisationId"></param>
         /// <param name="deadlineYear"></param>
         /// <returns></returns>
-        public virtual async Task<Statement> GetLatestStatementBySnapshotYearAsync(long organisationId, int deadlineYear)
+        public virtual async Task<Statement> GetLatestStatementByDeadlineYearAsync(long organisationId, int deadlineYear)
         {
             var orgSubmission = await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Statement>(
                 s => s.SubmissionDeadline.Year == deadlineYear
