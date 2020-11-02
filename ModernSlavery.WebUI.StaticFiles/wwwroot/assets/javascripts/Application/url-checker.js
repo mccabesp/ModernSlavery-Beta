@@ -1,5 +1,5 @@
 ﻿// ping statement url to check it works
-(function ($) {
+(function ($, window) {
     "use strict";
 
     $('.app-statement-summary_url')
@@ -9,43 +9,37 @@
 
     function initialiseUrlCheck($element) {
         var url = $element.data('statement-url');
-        console.log(url);
 
         $.ajax({
             url: url,
             dataType: 'jsonp',
-            mode: 'cors',
+            timeout: 10000,
             statusCode: {
                 0: function () {
-                    console.log(url + ': 0');
+                    // timed out and did not give 200
                     urlFailed($element);
                 },
                 200: function () {
-                    console.log(url + ': 200');
                     urlSuccess($element);
-                },
-                404: function () {
-                    console.log(url + ': 404');
-                    urlFailed($element);
                 }
             },
-            timeout: 20000,
             crossDomain: true,
             processData: false,
-            complete: function (jqXHR, textStatus, errorThrown) {
-                console.log(url + ': complete');
-            }
         });
     };
 
     function urlSuccess($element) {
+        $('.app-statement-summary_url-link-broken', $element)
+            .hide();
         $('.app-statement-summary_url-link-working', $element)
             .show();
     };
 
     function urlFailed($element) {
+        $('.app-statement-summary_url-link-working', $element)
+            .hide();
         $('.app-statement-summary_url-link-broken', $element)
             .show();
     };
 
-})(jQuery);
+})(jQuery, window);
