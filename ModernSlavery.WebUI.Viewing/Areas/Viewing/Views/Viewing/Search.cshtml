@@ -31,20 +31,21 @@
     };
     var filters = new List<FilterGroup> { sectors, turnover, years };
 }
-<div class="govuk-grid-row search-landing">
-    <div class="right">
-        <a class="govuk-link download govuk-body govuk-!-font-size-19" href="@(Url.ActionArea("Download", "Viewing", "Viewing"))"><span>Download all statement summary data</span></a>
-    </div>
-    <div class="govuk-grid-column-full">
-        @using (Html.BeginForm("SearchResults", "Viewing", FormMethod.Get, new { id = "SearchForm", @class = "search-form" }))
-        {
-            <div class="govuk-grid-row finder">
-                <div class="govuk-grid-column-two-thirds">
-                    <partial name="Parts/_SearchKeywords" model="Model" />
-                </div>
+    <div class="govuk-grid-row search-landing">        
+        <div class="govuk-grid-column-full">
+            <div class="right">
+                <a class="govuk-link download govuk-body govuk-!-font-size-19" href="@(Url.ActionArea("Download", "Viewing", "Viewing"))"><span>Download all statement summary data</span></a>
             </div>
-            <details class="govuk-details advanced-search-details" data-module="govuk-details">
-                <summary data-open="Fewer search options" data-close="Advanced search" class="govuk-details__summary">
+            @using (Html.BeginForm("SearchResults", "Viewing", FormMethod.Get, new { id = "SearchForm", @class = "search-form" }))
+            {
+                <div class="govuk-grid-row finder">
+                    <div class="govuk-grid-column-two-thirds">
+                        <partial name="Parts/_SearchKeywords" model="Model" />
+                    </div>
+                </div>
+                <div class="govuk-form-group">
+                    <details class="govuk-details advanced-search-details" data-module="govuk-details">
+                        <summary data-open="Fewer search options" data-close="Advanced search" class="govuk-details__summary">
 
                 </summary>
                 <div class="govuk-details__text">

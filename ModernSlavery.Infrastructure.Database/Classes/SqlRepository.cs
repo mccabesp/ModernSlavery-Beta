@@ -127,40 +127,46 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         {
             if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
 
-            await DbContext.BulkInsertAsync(entities,setOutputIdentity, batchSize,timeout);
+            await DbContext.BulkInsertAsync(entities,setOutputIdentity,batchSize,timeout);
+        }
+
+        public async Task BulkDeleteAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class
+        {
+            if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
+
+            await DbContext.BulkDeleteAsync(entities, batchSize, timeout);
         }
 
         public async Task BulkUpdateAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class
         {
             if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
 
-            await DbContext.BulkUpdateAsync(entities, batchSize, timeout);
+            await DbContext.BulkUpdateAsync(entities, batchSize,timeout);
         }
 
-        public async Task BulkDeleteAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class
-        {
-            if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
-            await DbContext.BulkDeleteAsync(entities, batchSize, timeout);
-        }
-
-        public async Task BeginTransactionAsync(Func<Task> delegateAction)
+        public async Task ExecuteTransactionAsync(Func<Task> delegateAction)
         {
             if (Transaction != null) throw new Exception("Another transaction has already been started");
 
             var database = DbContext.GetDatabase();
             var strategy = database.CreateExecutionStrategy();
 
-            TransactionStarted = true;
             try
             {
-                await strategy.Execute(delegateAction);
-                if (Transaction != null)
-                    throw new TransactionException("An SQL transaction has started which you must commit or rollback");
+                TransactionStarted = true;
+                await strategy.ExecuteAsync(delegateAction);
+                if (Transaction != null)throw new TransactionException("An SQL transaction has started which you must commit or rollback");
             }
             finally
             {
                 TransactionStarted = false;
             }
+        }
+
+        public void BeginTransaction()
+        {
+            if (Transaction != null) throw new Exception("Another transaction has already been started");
+            Transaction = DbContext.GetDatabase().BeginTransaction();
         }
 
         public void CommitTransaction()
@@ -189,6 +195,16 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         public DbSet<TEntity> GetEntities<TEntity>() where TEntity : class
         {
             return DbContext.Set<TEntity>();
+        }
+
+        public int? GetCommandTimeout()
+        {
+            return DbContext.GetDatabase().GetCommandTimeout();
+        }
+
+        public void SetCommandTimeout(int? timeout)
+        {
+            DbContext.GetDatabase().SetCommandTimeout(timeout);
         }
     }
 }

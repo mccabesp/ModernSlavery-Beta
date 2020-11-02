@@ -1,10 +1,13 @@
 using Geeks.Pangolin;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Testing.Helpers;
+using ModernSlavery.Testing.Helpers.Classes;
+using ModernSlavery.Testing.Helpers.Extensions;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using System;
@@ -17,15 +20,14 @@ namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture]
     [Parallelizable]
-    public class WebHostSampleTest1: UITest
+    public class WebHostSampleTest1: BaseUITest
     {
-        public WebHostSampleTest1():base(TestRunSetup.WebDriverService)
+        public WebHostSampleTest1():base(TestRunSetup.TestWebHost,TestRunSetup.WebDriverService)
         {
             
         }
 
         private string _webAuthority;
-        private IDataRepository _dataRepository;
         private IFileRepository _fileRepository;
         private SharedOptions _sharedOptions;
 
@@ -33,14 +35,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         public void RunBeforeAnyTests()
         {
             //Get the url from the test web host
-            _webAuthority = TestRunSetup.TestWebHost.GetHostAddress();
+            _webAuthority = _testWebHost.GetHostAddress();
             TestContext.Progress.WriteLine($"Kestrel authority: {_webAuthority}");
 
-            //Get the data repository from the test web host
-            _dataRepository = TestRunSetup.TestWebHost.GetDataRepository();
-
             //Get the file repository from the test web host
-            _fileRepository = TestRunSetup.TestWebHost.GetFileRepository();
+            _fileRepository = _testWebHost.GetDependency<IFileRepository>();
             TestContext.Progress.WriteLine($"FileRepository root: {_fileRepository.GetFullPath("\\")}");
 
             //Get the shared options
@@ -77,8 +76,13 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test]
         public void WebTestHost_DataRepository_Exists()
         {
+            var datarepo = _testWebHost.Services.GetFileRepository();
+            datarepo = ServiceScope.ServiceProvider.GetFileRepository();
+
             //Check we got the data repository from the test web server
-            Assert.IsNotNull(_dataRepository);
+            var dataRepository = ServiceScope.GetDataRepository();
+
+            Assert.IsNotNull(dataRepository);
         }
 
         [Test]
@@ -116,13 +120,28 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test]
         public async Task WebTestHost_SeleniumHelper_TestMethods_OK()
         {
+            //Check the accessibility of the current page saving results to {UrlPath}_GET.html
+            await this.CheckAccessibilityAsync();
+
+            //Check the accessibility of the current page saving results to {UrlPath}_POST.html
+            await this.CheckAccessibilityAsync(httpMethod:"POST");
+
+            //This one should not write analyse page as it is were still on the same page
+            await this.CheckAccessibilityAsync();
+
             //Go to the landing page
-            Goto(_webAuthority);
+            Goto("/manage-organisations");
+
+            //Check the accessibility of the current page saving results to manage-organisations.html
+            await this.CheckAccessibilityAsync("manage-organisations");
+
+            //Check the accessibility of the current page saving results to /statement/group-report/WebTestHost_SeleniumHelper_TestMethods_OK.html
+            await this.CheckAccessibilityAsync($"/statement/group-report/{TestContext.CurrentContext.Test.Name}");
 
             //Check for the landing page header
             Expect(What.Contains,_sharedOptions.ServiceName);
 
-            Expect("It may take up to a week to register your organisation");
+//            Expect("It may take up to a week to register your organisation");
         }
     }
 }

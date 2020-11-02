@@ -1,28 +1,46 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
+using ModernSlavery.Infrastructure.Storage;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ModernSlavery.Testing.Helpers.Extensions
 {
     public static class QueueHelper
     {
-        //Returns a value from message queue
-        public static void Peek<T>(this IHost host, string sessionId, string queueName, string key)
+        public static async Task ClearQueuesAsync(this IServiceProvider serviceProvider)
         {
-            throw new NotImplementedException();
+            var storageOptions = serviceProvider.GetRequiredService<StorageOptions>();
+
+            var queues = ListQueuesAsync(storageOptions.AzureConnectionString);
+            await foreach (var queue in queues)
+                await queue.ClearAsync();
         }
 
-        //Sets a value to message queue
-        public static void Enqueue<T>(this IHost host, string sessionId, string queueName, T value)
-        {
-            throw new NotImplementedException();
-        }
 
-        //Clears a value from message queue
-        public static T Dequeue<T>(this IHost host, string sessionId, string queueName)
+        public static async IAsyncEnumerable<CloudQueue> ListQueuesAsync(string connectionString)
         {
-            throw new NotImplementedException();
+            // Parse the connection string and return a reference to the storage account.
+            var storageAccount = CloudStorageAccount.Parse(connectionString);
+
+            // Create a CloudFileClient object for credentialed access to File storage.
+            var queueClient = storageAccount.CreateCloudQueueClient();
+
+            // Initialize a new token
+            var continuationToken = new QueueContinuationToken();
+
+            do
+            {
+                var segment = await queueClient.ListQueuesSegmentedAsync(continuationToken);
+                continuationToken = segment.ContinuationToken;
+
+                foreach (var queue in segment.Results)
+                    yield return queue;
+            }
+            while (continuationToken != null);
         }
     }
 }

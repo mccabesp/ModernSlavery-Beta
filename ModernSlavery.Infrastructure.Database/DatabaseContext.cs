@@ -100,39 +100,40 @@ namespace ModernSlavery.Infrastructure.Database
 
         public async Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity=false, int batchSize = 2000, int? timeout = null) where TEntity : class
         {
-            int? previousTimout = null;
+            int? previousTimeout = null;
             if (timeout != null)
             {
-                previousTimout = Database.GetCommandTimeout();
+                previousTimeout = Database.GetCommandTimeout();
                 Database.SetCommandTimeout(timeout);
             }
             await DbContextBulkExtensions.BulkInsertAsync(this,entities.ToList(), b=> { b.SetOutputIdentity = setOutputIdentity; b.PreserveInsertOrder = setOutputIdentity; b.BatchSize = batchSize; });
-            if (timeout != null) Database.SetCommandTimeout(previousTimout);
-        }
-        public async Task BulkUpdateAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class
-        {
-            int? previousTimout=null;
-            if (timeout != null)
-            {
-                previousTimout = Database.GetCommandTimeout();
-                Database.SetCommandTimeout(timeout);
-            }
-            await DbContextBulkExtensions.BulkUpdateAsync(this, entities.ToList(), b => { b.BatchSize=batchSize; });
-            if (timeout!=null)Database.SetCommandTimeout(previousTimout);
+            if (timeout != null) Database.SetCommandTimeout(previousTimeout);
         }
 
         public async Task BulkDeleteAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class
         {
-            int? previousTimout = null;
+            int? previousTimeout = null;
             if (timeout != null)
             {
-                previousTimout = Database.GetCommandTimeout();
+                previousTimeout = Database.GetCommandTimeout();
                 Database.SetCommandTimeout(timeout);
             }
             await DbContextBulkExtensions.BulkDeleteAsync(this, entities.ToList(), b => { b.BatchSize = batchSize; });
-            if (timeout != null) Database.SetCommandTimeout(previousTimout);
+            if (timeout != null) Database.SetCommandTimeout(previousTimeout);
         }
 
+        public async Task BulkUpdateAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class
+        {
+            int? previousTimeout = null;
+            if (timeout != null)
+            {
+                previousTimeout = Database.GetCommandTimeout();
+                Database.SetCommandTimeout(timeout);
+            }
+            await DbContextBulkExtensions.BulkUpdateAsync(this, entities.ToList(), b => { b.BatchSize = batchSize; });
+            if (timeout != null) Database.SetCommandTimeout(previousTimeout);
+        }
+        
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

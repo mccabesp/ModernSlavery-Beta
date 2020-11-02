@@ -7,7 +7,7 @@ using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 namespace ModernSlavery.Core.Extensions
 {
-    public static class Extensions
+    public static partial class Extensions
     {
         public static void DisableResponseCache(this HttpContext context)
         {

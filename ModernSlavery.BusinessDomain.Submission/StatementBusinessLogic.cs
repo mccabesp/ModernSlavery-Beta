@@ -807,7 +807,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var newStatement = new Statement { Organisation = organisation };
             newStatement.SetStatus(StatementStatuses.Submitted, userId);
 
-            await _organisationBusinessLogic.DataRepository.BeginTransactionAsync(
+            await _organisationBusinessLogic.DataRepository.ExecuteTransactionAsync(
                 async () =>
                 {
                     try
