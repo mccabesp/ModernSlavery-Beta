@@ -13,7 +13,7 @@
         $.ajax({
             url: url,
             dataType: 'jsonp',
-            timeout: 10000,
+            timeout: 20000,
             statusCode: {
                 0: function () {
                     // timed out and did not give 200
