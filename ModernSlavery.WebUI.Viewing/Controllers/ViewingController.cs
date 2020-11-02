@@ -76,7 +76,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
             await TrackPageViewAsync();
 
-            return RedirectToAction("Search");
+            return RedirectToPage("/landing");
         }
 
         #endregion
@@ -272,5 +272,6 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
         }
 
         #endregion
+
     }
 }
