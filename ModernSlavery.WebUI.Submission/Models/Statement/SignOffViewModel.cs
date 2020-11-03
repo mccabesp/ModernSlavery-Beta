@@ -17,23 +17,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<StatementModel, SignOffViewModel>()
                 .ForMember(d => d.ApprovedDay, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Day))
                 .ForMember(d => d.ApprovedMonth, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Month))
-                .ForMember(d => d.ApprovedYear, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Year));
+                .ForMember(d => d.ApprovedYear, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Year))
+                .ForAllOtherMembers(opt => opt.Ignore());
 
             CreateMap<SignOffViewModel, StatementModel>(MemberList.Source)
-                .ForMember(s => s.OrganisationId, opt => opt.Ignore())
-                .ForMember(s => s.GroupSubmission, opt => opt.Ignore())
                 .ForMember(d => d.ApprovedDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.ApprovedDate); })
-                .ForSourceMember(s => s.ApprovedYear, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ApprovedMonth, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ApprovedDay, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.MinApprovedYear, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.MaxApprovedYear, opt => opt.DoNotValidate());
+                .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 

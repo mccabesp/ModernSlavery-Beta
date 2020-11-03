@@ -10,9 +10,9 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class PeriodCoveredPageViewModelMapperProfile : Profile
+    public class PeriodCoveredViewModelMapperProfile : Profile
     {
-        public PeriodCoveredPageViewModelMapperProfile()
+        public PeriodCoveredViewModelMapperProfile()
         {
             CreateMap<StatementModel, PeriodCoveredViewModel>()
                 .ForMember(d => d.StatementStartDay, opt => opt.MapFrom(s => s.StatementStartDate == null ? (int?)null : s.StatementStartDate.Value.Day))

@@ -63,7 +63,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (Sectors.Any())
             {
                 var other = SectorTypes.Single(x => x.Description.Equals("Other"));
-                if (!Sectors.Any(t => t == other.Id || !string.IsNullOrWhiteSpace(OtherSector)))) return Status.Complete;
+                if (!Sectors.Any(t => t == other.Id || !string.IsNullOrWhiteSpace(OtherSector))) return Status.Complete;
             }
 
             return Status.Incomplete;

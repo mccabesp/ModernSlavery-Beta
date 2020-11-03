@@ -33,6 +33,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override string PageTitle => "About this risk";
 
         [BindNever]
+        public int Index { get; set; }
+        [BindNever]
+        public int TotalRisks { get; set; }
+
+        [BindNever]
         public string Description { get; set; }
 
         public RiskSourceTypes? LikelySource { get; set; }

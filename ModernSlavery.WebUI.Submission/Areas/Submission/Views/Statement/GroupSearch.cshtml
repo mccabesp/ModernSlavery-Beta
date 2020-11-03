@@ -20,32 +20,19 @@
                 @Model.PageTitle
             </h1>
 
-            <partial name="GroupSearch/_SearchHeader" model="Model" />
+            <partial name="GroupSearch/_SearchHeader" model="Model.SearchKeywords" />
 
         </div>
     </div>
 
     <partial name="GroupSearch/_SearchKeywords" model="Model" />
 
-    if (Model.GroupResults?.ResultsPage != null && !string.IsNullOrWhiteSpace(Model.GroupResults.SearchKeywords))
+    if (Model?.ResultsPage != null && !string.IsNullOrWhiteSpace(Model.SearchKeywords))
     {
         <partial name="GroupSearch/_SearchResults" model="Model" />
     }
 
-    @if (Model.ShowBanner == true)
-    {
-        <a class="govuk-button" href="@Model.GroupReviewUrl">View your group</a>
-    }
-    else
-    {
-        <button class="govuk-button govuk-!-margin-right-1 govuk-!-margin-bottom-5" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
-            Continue
-        </button>
-    }
-    <div>
-        <button class="link-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
-            Cancel
-        </button>
-    </div>
+    <a class="govuk-button" href="@(Model.StatementOrganisations.Count > 0 ? Model.ContinueUrl : Model.SkipUrl)">Save and continue</a>
+
 }
 

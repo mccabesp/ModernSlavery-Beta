@@ -20,27 +20,57 @@
                 @Model.PageTitle
             </h1>
 
-            <partial name="GroupSearch/_SearchHeader" model="Model" />
-
+            <partial name="GroupSearch/_SearchHeader" model="Model.SearchKeywords" />
         </div>
     </div>
 
-    <partial name="GroupSearch/_NewOrganisation" model="Model" />
+    <a href="@Model.BackUrl">
+        Return to previous search results
+    </a>
 
-    @if (Model.ShowBanner == true)
-    {
-        <a class="govuk-button" href="@Model.GroupReviewUrl">View your group</a>    
-    }
-    else
-    {
-        <button class="govuk-button govuk-!-margin-right-1 govuk-!-margin-bottom-5" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
-            Continue
-        </button>
-    }
-<div>
-    <button class="link-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
-        Cancel
-    </button>
-</div>
+    <div class="govuk-grid-row govuk-!-margin-bottom-6 govuk-!-margin-top-4">
+        <div class="govuk-grid-column-two-thirds">
+
+            @Html.LabelFor(m => m.OrganisationName, "Tell us the name of the organisation", new { @class = "govuk-label" })
+            <div class="organisation-input-table">
+                <div class="organisation-input-cell textbox">
+                    @Html.TextBoxFor(m => m.OrganisationName, new { @class = "govuk-input" })<br />
+                </div>
+                <div class="organisation-input-cell">
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="addIndex" value="0">
+                        Include
+                    </button>
+                </div>
+                <span asp-validation-for="OrganisationName" class="govuk-error-message"></span>
+            </div>
+
+            @if (Model.StatementOrganisations.Any(x => x.ManuallyAdded))
+            {
+                <table class="govuk-table organisation-list">
+                    <tbody class="govuk-table__body">
+                        @for (var organisationIndex = 0; organisationIndex < Model.StatementOrganisations.Count; organisationIndex++)
+                        {
+                            @if (!Model.StatementOrganisations[organisationIndex].ManuallyAdded) continue;
+
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell">
+                                    <div>
+                                        <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold"> @(Model.StatementOrganisations[organisationIndex].OrganisationName)</p>
+                                    </div>
+
+                                </td>
+                                <td class="govuk-table__cell buttons">
+                                    <button type="submit" class="link-button" name="removeIndex" value="@organisationIndex">Remove</button>
+                                </td>
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <a class="govuk-button" href="@(Model.StatementOrganisations.Count > 0 ? Model.ContinueUrl : Model.SkipUrl)">Continue</a>
 }
 

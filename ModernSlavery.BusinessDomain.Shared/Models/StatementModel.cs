@@ -29,7 +29,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
                 .ForMember(dest => dest.EditorUserId, opt => opt.Ignore())
                 .ForMember(dest => dest.EditTimestamp, opt => opt.Ignore())
                 .ForMember(dest => dest.DraftBackupDate, opt => opt.Ignore())
-                .ForMember(dest => dest.ReturnToReviewPage, opt => opt.MapFrom(st => st.StatementId > 0))
                 .ForMember(dest => dest.IncludesStructure, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesStructure))
                 .ForMember(dest => dest.IncludesPolicies, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesPolicies))
                 .ForMember(dest => dest.IncludesRisks, opt => opt.MapFrom(st => st.StatementId == 0 ? null : (bool?)st.IncludesRisks))
@@ -57,7 +56,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
     {
         #region Draft Key Fields
         public bool Submitted { get; set; }
-        public bool ReturnToReviewPage { get; set; }
         public DateTime? DraftBackupDate { get; set; }
 
         public long EditorUserId { get; set; }

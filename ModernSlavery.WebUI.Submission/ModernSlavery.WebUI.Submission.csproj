@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Areas\Submission\Views\Statement\Old\DueDiligence.cshtml" />
+    <Content Remove="Areas\Submission\Views\Statement\Old\SupplyChainRisks.cshtml" />
+    <Content Remove="Areas\Submission\Views\Statement\Old\YourOrganisation.cshtml" />
+    <Content Remove="Areas\Submission\Views\Statement\Old\YourStatement.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
@@ -25,6 +32,10 @@
     <ProjectReference Include="..\ModernSlavery.BusinessDomain.Shared\ModernSlavery.BusinessDomain.Shared.csproj" />
     <ProjectReference Include="..\ModernSlavery.BusinessDomain.Submission\ModernSlavery.BusinessDomain.Submission.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Submission\Views\Statement\Old\" />
   </ItemGroup>
 
 </Project>

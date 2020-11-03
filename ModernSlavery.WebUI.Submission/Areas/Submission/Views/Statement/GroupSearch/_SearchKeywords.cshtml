@@ -1,31 +1,30 @@
-﻿@model GroupSearchViewModel
+﻿@model string
 
-    <div class="govuk-grid-row finder">
-        <div class="govuk-grid-column-two-thirds">           
-                <p class="govuk-body govuk-!-margin-bottom-2">                 
-                        Search for and select organisation(s)                   
-                </p>
-                <span class="govuk-hint">                   
-                        Enter an organisation name or company number. You can search multiple times.                   
-                </span>          
-            @*  *@
+<div class="govuk-grid-row finder">
+    <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body govuk-!-margin-bottom-2">
+            Search for and select organisation(s)
+        </p>
+        <span class="govuk-hint">
+            Enter an organisation name or company number. You can search multiple times.
+        </span>
+        @*  *@
 
-            <div id="SearchByKeywordsGroup">
-                <fieldset class="govuk-fieldset">
-                    <div class="gov-uk-c-searchbar">
-                        <div class="gov-uk-l-searchbar__table">
-                            <div class="gov-uk-l-searchbar__cell">
-                                @Html.TextBoxFor(m => m.GroupResults.SearchKeywords, new { value = "@(Model)", @class = "gov-uk-c-searchbar__input", aria_label="Search",  type = "text", autocomplete = "on", spellcheck = "false", maxlength = "100" })<br />
-                                <span asp-validation-for="GroupResults.SearchKeywords" class="govuk-error-message"></span>
-                            </div>
-                            <div class="gov-uk-l-searchbar__cell">
-                                <button class="gov-uk-c-searchbar__submit gov-uk-c-searchbar__submit--blue" id="NextStep" type="submit" name="command" value="@BaseViewModel.CommandType.Search">Search</button>
-                            </div>
+        <div id="SearchByKeywordsGroup">
+            <fieldset class="govuk-fieldset">
+                <div class="gov-uk-c-searchbar">
+                    <div class="gov-uk-l-searchbar__table">
+                        <div class="gov-uk-l-searchbar__cell">
+                            <input name="SearchKeywords" id="SearchKeywords" value="@(Model)" class="gov-uk-c-searchbar__input" type="text" autocomplete="on" spellcheck="false" maxlength="100">
+                            @Html.ValidationMessage($"SearchKeywords", null, new { @class = "govuk-error-message" })
+                        </div>
+                        <div class="gov-uk-l-searchbar__cell">
+                            <button class="gov-uk-c-searchbar__submit gov-uk-c-searchbar__submit--blue" id="NextStep" type="submit" name="command" value="@BaseViewModel.CommandType.Search" formaction="@Url.Action(nameof(StatementController.GroupSearch))">Search</button>
                         </div>
                     </div>
-                </fieldset>
-            </div>
-
-            </div>
+                </div>
+            </fieldset>
         </div>
+    </div>
+</div>
 

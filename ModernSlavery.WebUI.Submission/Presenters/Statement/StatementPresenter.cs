@@ -139,12 +139,19 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         Task<Outcome<StatementErrors>> SearchGroupOrganisationsAsync(GroupSearchViewModel groupSearchViewModel, User user);
 
         /// <summary>
-        /// Include a manual or selected group organisation 
+        /// Include selected group organisation 
         /// </summary>
-        /// <param name="groupResults"></param>
+        /// <param name="groupSearchViewModel"></param>
         /// <param name="addIndex"></param>
         /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
         Task<Outcome<StatementErrors>> IncludeGroupOrganisationAsync(GroupSearchViewModel groupSearchViewModel, int addIndex = 0);
+
+        /// <summary>
+        /// Add a manually entered group organisation 
+        /// </summary>
+        /// <param name="groupAddViewModel"></param>
+        /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
+        Task<Outcome<StatementErrors>> AddGroupOrganisationAsync(GroupAddViewModel groupAddViewModel);
 
         /// <summary>
         /// Get all the information on group organisation submissions
@@ -219,11 +226,14 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                     //Copy the StatementSummaryModel data to the viewModel
                     var summary = statementModel.Summary ?? new StatementSummary1();
                     return _mapper.Map(summary, viewModel);
-                case Type type when type == typeof(HighRiskViewModel):
+                case HighRiskViewModel highRiskViewModel:
                     //Copy the StatementRisk data to the viewModel
                     var index = (int)arguments[0];
                     var risk = statementModel.Summary.Risks.Count > index ? statementModel.Summary.Risks[index] : new IStatementSummary1.StatementRisk();
-                    return _mapper.Map(risk, viewModel);
+                    _mapper.Map(risk, viewModel);
+                    highRiskViewModel.Index = index;
+                    highRiskViewModel.TotalRisks = statementModel.Summary.Risks.Count;
+                    return highRiskViewModel as TViewModel;
                 default:
                     //Copy the StatementModel data to the viewModel
                     return _mapper.Map(statementModel, viewModel);
@@ -349,13 +359,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public async Task<Outcome<StatementErrors>> SearchGroupOrganisationsAsync(GroupSearchViewModel groupSearchViewModel, User user)
         {
             if (groupSearchViewModel == null) throw new ArgumentNullException(nameof(GroupSearchViewModel));
-            if (groupSearchViewModel.GroupResults == null) throw new ArgumentNullException(nameof(groupSearchViewModel.GroupResults));
+            if (string.IsNullOrWhiteSpace(groupSearchViewModel.SearchKeywords)) throw new ArgumentNullException(nameof(groupSearchViewModel.SearchKeywords));
 
             try
             {
-                groupSearchViewModel.GroupResults.ResultsPage = await _organisationRepository.SearchAsync(
-                    groupSearchViewModel.GroupResults.SearchKeywords,
-                    groupSearchViewModel.GroupResults.ResultsPage.CurrentPage,
+                groupSearchViewModel.ResultsPage = await _organisationRepository.SearchAsync(
+                    groupSearchViewModel.SearchKeywords,
+                    groupSearchViewModel.ResultsPage.CurrentPage,
                     _sharedBusinessLogic.SharedOptions.OrganisationPageSize,
                     user.EmailAddress.StartsWithI(_sharedBusinessLogic.SharedOptions.TestPrefix));
             }
@@ -366,13 +376,13 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                 CompaniesHouseFailures++;
                 if (CompaniesHouseFailures < 3)
                 {
-                    groupSearchViewModel.GroupResults.ResultsPage?.Results?.Clear();
+                    groupSearchViewModel.ResultsPage?.Results?.Clear();
                     return new Outcome<StatementErrors>(StatementErrors.CoHoTransientError);
                 }
 
                 await _sharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
                     "GPG - COMPANIES HOUSE ERROR",
-                    $"Cant search using Companies House API for query '{groupSearchViewModel.GroupResults.SearchKeywords}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
+                    $"Cant search using Companies House API for query '{groupSearchViewModel.SearchKeywords}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
                     user.EmailAddress.StartsWithI(_sharedBusinessLogic.SharedOptions.TestPrefix));
 
                 return new Outcome<StatementErrors>(StatementErrors.CoHoPermanentError);
@@ -394,29 +404,17 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public async Task<Outcome<StatementErrors>> IncludeGroupOrganisationAsync(GroupSearchViewModel groupSearchViewModel, int addIndex = 0)
         {
             if (groupSearchViewModel == null) throw new ArgumentNullException(nameof(GroupSearchViewModel));
-            if (groupSearchViewModel.GroupResults == null) throw new ArgumentNullException(nameof(groupSearchViewModel.GroupResults));
+            if (groupSearchViewModel.ResultsPage == null) throw new ArgumentNullException(nameof(groupSearchViewModel.ResultsPage));
+            if (addIndex < 0 || addIndex > groupSearchViewModel.ResultsPage.Results.Count - 1) throw new ArgumentOutOfRangeException(nameof(addIndex), $"Index is outside bounds of search results");
 
             var newStatementOrganisationViewModel = new GroupOrganisationsViewModel.StatementOrganisationViewModel() { Included = true };
 
-            if (groupSearchViewModel.GroupResults.ShowResults)
-            {
-                if (groupSearchViewModel.GroupResults.ResultsPage == null) throw new ArgumentNullException(nameof(groupSearchViewModel.GroupResults.ResultsPage));
-                if (addIndex < 0 || addIndex > groupSearchViewModel.GroupResults.ResultsPage.Results.Count - 1) throw new ArgumentOutOfRangeException(nameof(addIndex), $"Index is outside bounds of search results");
-                var groupOrganisation = groupSearchViewModel.GroupResults.ResultsPage.Results[addIndex];
-                newStatementOrganisationViewModel.Address = groupOrganisation.ToAddressModel();
-                newStatementOrganisationViewModel.OrganisationId = groupOrganisation.OrganisationId > 0 ? (int?)groupOrganisation.OrganisationId : default;
-                newStatementOrganisationViewModel.OrganisationName = groupOrganisation.OrganisationName;
-                newStatementOrganisationViewModel.CompanyNumber = groupOrganisation.CompanyNumber;
-                newStatementOrganisationViewModel.DateOfCessation = groupOrganisation.DateOfCessation;
-                newStatementOrganisationViewModel.ManuallyAdded = false;
-            }
-            else
-            {
-                //Add the new organisation manually
-                if (addIndex != 0) throw new ArgumentOutOfRangeException(nameof(addIndex), $"Index must be 0 when manually adding a group organisation");
-                newStatementOrganisationViewModel.OrganisationName = groupSearchViewModel.GroupResults.OrganisationName;
-                newStatementOrganisationViewModel.ManuallyAdded = true;
-            }
+            var groupOrganisation = groupSearchViewModel.ResultsPage.Results[addIndex];
+            newStatementOrganisationViewModel.Address = groupOrganisation.ToAddressModel();
+            newStatementOrganisationViewModel.OrganisationId = groupOrganisation.OrganisationId > 0 ? (int?)groupOrganisation.OrganisationId : default;
+            newStatementOrganisationViewModel.OrganisationName = groupOrganisation.OrganisationName;
+            newStatementOrganisationViewModel.CompanyNumber = groupOrganisation.CompanyNumber;
+            newStatementOrganisationViewModel.DateOfCessation = groupOrganisation.DateOfCessation;
 
             //Check the organisation is not already included
             if (groupSearchViewModel.StatementOrganisations.Any(o => o.OrganisationName.EqualsI(newStatementOrganisationViewModel.OrganisationName)))
@@ -424,6 +422,27 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
             //Include the new organisation
             groupSearchViewModel.StatementOrganisations.Add(newStatementOrganisationViewModel);
+            return new Outcome<StatementErrors>();
+        }
+
+        public async Task<Outcome<StatementErrors>> AddGroupOrganisationAsync(GroupAddViewModel groupAddViewModel)
+        {
+            if (groupAddViewModel == null) throw new ArgumentNullException(nameof(GroupAddViewModel));
+            if (string.IsNullOrWhiteSpace(groupAddViewModel.OrganisationName)) throw new ArgumentNullException(nameof(groupAddViewModel.OrganisationName));
+
+            //Check the organisation is not already included
+            if (groupAddViewModel.StatementOrganisations.Any(o => o.OrganisationName.EqualsI(groupAddViewModel.OrganisationName)))
+                return new Outcome<StatementErrors>(StatementErrors.DuplicateName, groupAddViewModel.OrganisationName);
+
+            //Add the new organisation manually
+            var newStatementOrganisationViewModel = new GroupOrganisationsViewModel.StatementOrganisationViewModel()
+            {
+                Included = true,
+                OrganisationName = groupAddViewModel.OrganisationName
+            };
+
+            //Include the new organisation
+            groupAddViewModel.StatementOrganisations.Add(newStatementOrganisationViewModel);
             return new Outcome<StatementErrors>();
         }
 

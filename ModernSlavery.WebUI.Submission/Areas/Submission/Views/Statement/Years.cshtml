@@ -1,0 +1,55 @@
+﻿@using ModernSlavery.WebUI.GDSDesignSystem.Attributes
+@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model YearsViewModel
+
+@section BeforeMain {
+    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm())
+        {
+            @await Html.GovUkValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.Submitted);
+
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
+
+            <fieldset class="govuk-fieldset govuk-!-margin-top-6" describedby="GovUk_StatementYears-hint">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                    <h2 class="govuk-fieldset__heading">How many years has your organisation been producing modern slavery statements?</h2>
+                </legend>
+                <div class="govuk-form-group ">
+                    <span class="govuk-hint" id="GovUk_StatementYears-hint">
+                        If your statement is for a group of organisations, please select the answer that applies to the organisation with the longest history of producing statements.
+                    </span>
+                    <div class="govuk-radios">
+                        @foreach (Statement.StatementYearRanges item in (Enums.GetValues<Statement.StatementYearRanges>()).Where(x => x != Statement.StatementYearRanges.NotProvided))
+                        {
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="StatementYears-@(item)" name="StatementYears" checked="@(Model.StatementYears==item)" type="radio" value="@(item)">
+                                <label class="govuk-label govuk-radios__label" for="StatementYears-@(item)">
+                                    @(item.GetAttribute<GovUkRadioCheckboxLabelTextAttribute>()?.Text)
+                                </label>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+            </fieldset>
+
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                Continue
+            </button>
+
+            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
+            {
+                <a class="govuk-button" href="@(Model.SkipUrl)">Skip</a>
+            }
+        }
+    </div>
+</div>

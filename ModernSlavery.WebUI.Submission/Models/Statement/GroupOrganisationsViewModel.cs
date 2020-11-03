@@ -21,16 +21,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             CreateMap<GroupOrganisationsViewModel.StatementOrganisationViewModel, StatementModel.StatementOrganisationModel>();
 
-            CreateMap<GroupOrganisationsViewModel, StatementModel>(MemberList.Source)
-                .ForMember(s => s.OrganisationId, opt => opt.Ignore())
-                .ForSourceMember(s => s.PageTitle, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.SubTitle, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ReportingDeadlineYear, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.BackUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.CancelUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(s => s.ContinueUrl, opt => opt.DoNotValidate());
+            CreateMap<StatementModel, GroupOrganisationsViewModel>()
+                .ForMember(s => s.GroupSubmission, opt => opt.MapFrom(d => d.GroupSubmission))
+                .ForMember(s => s.StatementOrganisations, opt => opt.MapFrom(d => d.StatementOrganisations))
+                .ForAllOtherMembers(opt => opt.Ignore());
 
-            CreateMap<StatementModel, GroupOrganisationsViewModel>();
+            CreateMap<GroupOrganisationsViewModel, StatementModel>(MemberList.Source)
+                .ForMember(s => s.GroupSubmission, opt => opt.MapFrom(d => d.GroupSubmission))
+                .ForMember(s => s.StatementOrganisations, opt => opt.MapFrom(d => d.StatementOrganisations))
+                .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
@@ -53,9 +52,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             [NotMapped]
             [BindNever]
             public List<string> OtherSubmissionsInformation { get; set; }
+
             [NotMapped]
             [BindNever]
-            public bool? ManuallyAdded { get; set; }
+            public bool ManuallyAdded => OrganisationId == null && string.IsNullOrWhiteSpace(CompanyNumber);
         }
         #endregion
 

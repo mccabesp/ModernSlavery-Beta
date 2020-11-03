@@ -1,17 +1,14 @@
 ﻿@model GroupSearchViewModel
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <button class="link-button find-organisation" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.ToggleResults">
-            Can't find the organisation you're looking for?
-        </button>
-
+        <a href="@Url.Action(nameof(StatementController.GroupAdd))">Can't find the organisation you're looking for?</a>
     </div>
 </div>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full" js-live-search-results-block" aria-live="assertive">
 
-        @if (Model.GroupResults.ResultsPage.Results.Count < 1)
+        @if (Model.ResultsPage.Results.Count < 1)
         {
             <div class="govuk-form-group govuk-!-margin-top-5 zero-results">
                 <h2 class="govuk-heading-m">0 organisations found that match your search</h2>
@@ -42,36 +39,36 @@
 
 
 
-                @for (var addIndex = 0; addIndex < Model.GroupResults.ResultsPage.Results.Count; addIndex++)
+                @for (var addIndex = 0; addIndex < Model.ResultsPage.Results.Count; addIndex++)
                 {
 
                     <div class="govuk-summary-list__row">
                         <dd class="govuk-summary-list__value">
 
-                            <p class="govuk-!-font-weight-bold"> @(Model.GroupResults.ResultsPage.Results[addIndex].OrganisationName)</p>
+                            <p class="govuk-!-font-weight-bold"> @(Model.ResultsPage.Results[addIndex].OrganisationName)</p>
 
                         </dd>
                         <dd class="govuk-summary-list__value wide">
 
-                            <p> @(Model.GroupResults.ResultsPage.Results[addIndex].CompanyNumber)</p>
+                            <p> @(Model.ResultsPage.Results[addIndex].CompanyNumber)</p>
 
                         </dd>
                         <dd class="govuk-summary-list__value">
-                            <p class="">@(Model.GroupResults.ResultsPage.Results[addIndex].GetFullAddress())</p>
+                            <p class="">@(Model.ResultsPage.Results[addIndex].GetFullAddress())</p>
 
                         </dd>
                         <dd class="govuk-summary-list__value small">
 
-                            <p>Company number: @(Model.GroupResults.ResultsPage.Results[addIndex].CompanyNumber)</p>
+                            <p>Company number: @(Model.ResultsPage.Results[addIndex].CompanyNumber)</p>
 
                         </dd>
 
                         <dd class="govuk-summary-list__actions">
-                            @if (Model.ContainsGroupOrganisation(Model.GroupResults.ResultsPage.Results[addIndex]))
+                            @if (Model.ContainsGroupOrganisation(Model.ResultsPage.Results[addIndex]))
                             {
                                 <button type="submit" class="link-button" data-module="govuk-button" name="removeIndex" value="@(addIndex)">Remove</button>
                             }
-                            else if (Model.OrganisationId != Model.GroupResults.ResultsPage.Results[addIndex].OrganisationId && Model.GroupResults.ResultsPage.Results[addIndex].GetFullAddress() != null)
+                            else if (Model.OrganisationId != Model.ResultsPage.Results[addIndex].OrganisationId && Model.ResultsPage.Results[addIndex].GetFullAddress() != null)
                             {
                                 <button class="govuk-button govuk-button--secondary govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="addIndex" value="@(addIndex)">
                                     Include
@@ -87,7 +84,7 @@
 
     </div>
 </div>
-<partial name="_SearchPagination.cshtml" model="Model.GroupResults.ResultsPage" />
+<partial name="_SearchPagination.cshtml" model="Model.ResultsPage" />
 
 @section Scripts {
     <script>

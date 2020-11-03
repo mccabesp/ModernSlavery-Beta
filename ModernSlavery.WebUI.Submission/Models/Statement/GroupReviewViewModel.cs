@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,23 +12,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<GroupReviewViewModel, StatementModel>(MemberList.Source)
                 .IncludeBase<GroupOrganisationsViewModel, StatementModel>()
-                .ForSourceMember(d => d.GroupSearchUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(d => d.GroupStatusUrl, opt => opt.DoNotValidate());
+                .ForAllOtherMembers(opt => opt.Ignore());
 
             CreateMap<StatementModel, GroupReviewViewModel>()
-                .IncludeBase<StatementModel, GroupOrganisationsViewModel>();
+                .IncludeBase<StatementModel, GroupOrganisationsViewModel>()
+                .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
     public class GroupReviewViewModel: GroupOrganisationsViewModel
     {
         public override string PageTitle => "Review the organisations in your group statement";
-        [IgnoreMap]
-        [BindNever]
-        public string GroupStatusUrl { get; set; }
-        [IgnoreMap]
-        [BindNever]
-        public string GroupSearchUrl { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

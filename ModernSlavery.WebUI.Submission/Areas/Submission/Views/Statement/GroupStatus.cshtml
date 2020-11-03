@@ -14,7 +14,6 @@
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ReturnToReviewPage);
             @Html.HiddenFor(m => m.Submitted);
             @Html.HiddenFor(m => m.OrganisationName);
             @Html.HiddenFor(m => m.SubmissionDeadline);
@@ -69,10 +68,6 @@
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Continue
-            </button>
-
-            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
-                Cancel
             </button>
         }
     </div>

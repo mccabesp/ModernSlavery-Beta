@@ -269,7 +269,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             if (newModel == null) throw new ArgumentNullException(nameof(newModel));
 
             //Compare the two statementModels
-            var membersToIgnore = new[] { nameof(StatementModel.ReturnToReviewPage), nameof(StatementModel.DraftBackupDate), nameof(StatementModel.EditorUserId), nameof(StatementModel.EditTimestamp), nameof(StatementModel.StatementId), nameof(StatementModel.OrganisationName), nameof(StatementModel.Status), nameof(StatementModel.StatusDate), nameof(StatementModel.SubmissionDeadline), nameof(StatementModel.OrganisationId), nameof(StatementModel.ReturnToReviewPage), nameof(StatementModel.Modifications), nameof(StatementModel.LateReason), nameof(StatementModel.Modified), nameof(StatementModel.Created) };
+            var membersToIgnore = new[] { nameof(StatementModel.DraftBackupDate), nameof(StatementModel.EditorUserId), nameof(StatementModel.EditTimestamp), nameof(StatementModel.StatementId), nameof(StatementModel.OrganisationName), nameof(StatementModel.Status), nameof(StatementModel.StatusDate), nameof(StatementModel.SubmissionDeadline), nameof(StatementModel.OrganisationId), nameof(StatementModel.Modifications), nameof(StatementModel.LateReason), nameof(StatementModel.Modified), nameof(StatementModel.Created) };
             var differences = oldModel.GetDifferences(newModel, membersToIgnore).ToList();
             return differences;
         }

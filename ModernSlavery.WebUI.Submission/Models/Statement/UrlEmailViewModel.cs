@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using static ModernSlavery.WebUI.Submission.Models.Statement.GroupOrganisationsViewModel;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -31,6 +33,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [EmailAddress]
         [MaxLength(256)]
         public string StatementEmail { get; set; }
+
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

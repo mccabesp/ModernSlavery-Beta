@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 using System.Collections.Generic;
@@ -15,27 +16,58 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<GroupSearchViewModel, StatementModel>(MemberList.Source)
                 .IncludeBase<GroupOrganisationsViewModel, StatementModel>()
-                .ForSourceMember(d => d.GroupResults, opt => opt.DoNotValidate())
-                .ForSourceMember(d => d.GroupReviewUrl, opt => opt.DoNotValidate())
-                .ForSourceMember(d => d.ShowBanner, opt => opt.DoNotValidate());
+                .ForAllOtherMembers(opt => opt.Ignore());
 
             CreateMap<StatementModel, GroupSearchViewModel>()
-                .IncludeBase<StatementModel, GroupOrganisationsViewModel>();
+                .IncludeBase<StatementModel, GroupOrganisationsViewModel>()
+                .ForAllOtherMembers(opt => opt.Ignore());
         }
     }
 
     public class GroupSearchViewModel : GroupOrganisationsViewModel
     {  
         public override string PageTitle => "Which organisations are included in your group statement?";
-        [IgnoreMap]
-        [BindNever]
-        public string GroupReviewUrl { get; set; }
 
-        [IgnoreMap]
-        public GroupResultsViewModel GroupResults { get; set; } = new GroupResultsViewModel();
-        [IgnoreMap]
-        [BindNever]
-        public bool? ShowBanner { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        [StringLength(100, ErrorMessage = "You must enter an organisations name or company number between 3 and 100 characters in length", MinimumLength = 3)]
+        public string SearchKeywords { get; set; }
+
+        public PagedResult<OrganisationRecord> ResultsPage { get; set; } = new PagedResult<OrganisationRecord>();
+
+        public int ResultsStartIndex
+        {
+            get
+            {
+                if (ResultsPage == null || ResultsPage.Results == null || ResultsPage.Results.Count < 1) return 1;
+
+                return ResultsPage.CurrentPage * ResultsPage.PageSize - ResultsPage.PageSize + 1;
+            }
+        }
+
+        public int ResultsEndIndex
+        {
+            get
+            {
+                if (ResultsPage == null || ResultsPage.Results == null || ResultsPage.Results.Count < 1) return 1;
+
+                return ResultsStartIndex + ResultsPage.Results.Count - 1;
+            }
+        }
+
+        public int PagerStartIndex
+        {
+            get
+            {
+                if (ResultsPage == null || ResultsPage.PageCount <= 5) return 1;
+
+                if (ResultsPage.CurrentPage < 4) return 1;
+
+                if (ResultsPage.CurrentPage + 2 > ResultsPage.PageCount) return ResultsPage.PageCount - 4;
+
+                return ResultsPage.CurrentPage - 2;
+            }
+        }
+
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

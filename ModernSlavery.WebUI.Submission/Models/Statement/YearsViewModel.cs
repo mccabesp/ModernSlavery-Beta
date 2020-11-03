@@ -7,9 +7,9 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class YearsPageViewModelMapperProfile : Profile
+    public class YearsViewModelMapperProfile : Profile
     {
-        public YearsPageViewModelMapperProfile()
+        public YearsViewModelMapperProfile()
         {
             CreateMap<StatementModel, YearsViewModel>();
 

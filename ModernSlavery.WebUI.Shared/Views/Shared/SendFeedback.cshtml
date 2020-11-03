@@ -36,7 +36,7 @@
                                 <div class="govuk-radios__item">
                                     <input class="govuk-radios__input" id="WhyVisit-@(reason)" name="WhyVisitMSUSite" type="radio" value="@(reason)" checked="@(Model.WhyVisitMSUSite == reason)">
                                     <label class="govuk-label govuk-radios__label" for="WhyVisit-@(reason)">
-                                        @(reason.GetDisplayDescription())
+                                        @(reason.GetEnumDescription())
                                     </label>
                                 </div>
                             }
@@ -58,7 +58,7 @@
                                 <div class="govuk-radios__item">
                                     <input class="govuk-radios__input" id="HowEasy-@(reason)" name="HowEasyIsThisServiceToUse" type="radio" value="@(reason)" checked="@(Model.HowEasyIsThisServiceToUse == reason)">
                                     <label class="govuk-label govuk-radios__label" for="HowEasy-@(reason)">
-                                        @(reason.GetDisplayDescription())
+                                        @(reason.GetEnumDescription())
                                     </label>
                                 </div>
                             }

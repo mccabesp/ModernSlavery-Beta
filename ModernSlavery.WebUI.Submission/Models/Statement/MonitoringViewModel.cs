@@ -32,9 +32,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return !string.IsNullOrWhiteSpace(OtherWorkConditionsMonitoring);
+            if (!string.IsNullOrWhiteSpace(OtherWorkConditionsMonitoring)) return Status.Complete;
+            return Status.Incomplete;
         }
     }
 }

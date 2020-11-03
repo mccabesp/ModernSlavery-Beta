@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
@@ -13,32 +14,25 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public enum CommandType
         {
             Unknown=0,
-            Cancel=1,
+            Skip=1,
             Continue=2,
-            SaveAndExit=3,
-            DiscardAndExit=4,
-            ExitNoChanges = 5,
             Submit = 6,
             Search=7,
             SearchNext = 8,
             SearchPrevious = 9,
             IncludeOrganisation = 10,
-            RemoveOrganisation = 11,
-            ToggleResults=12
+            RemoveOrganisation = 11
         }
 
         public enum Status
         {
-            Incomplete,
-            InProgress,
-            Complete
+            [Description("Not Started")] Incomplete,
+            [Description("In Progress")] InProgress,
+            [Description("Completed")]Complete
         }
 
         [BindRequired]
         public bool Submitted { get; set; }
-
-        [BindRequired]
-        public bool ReturnToReviewPage { get; set; }
 
         [BindNever]
         public DateTime? DraftBackupDate { get; set; }
@@ -49,7 +43,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         [IgnoreMap]
         [BindNever]
-        public string CancelUrl { get; set; }
+        public string SkipUrl { get; set; }
 
         [IgnoreMap]
         [BindNever]

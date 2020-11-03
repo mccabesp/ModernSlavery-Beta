@@ -1,7 +1,7 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model CompliancePageViewModel
+@model ComplianceViewModel
 
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
@@ -12,7 +12,6 @@
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ReturnToReviewPage);
             @Html.HiddenFor(m => m.Submitted);
 
             <h1 class="govuk-heading-l">
@@ -228,9 +227,10 @@
                 Continue
             </button>
 
-            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
-                Cancel
-            </button>
+            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
+            {
+                <a class="govuk-button" href="@(Model.SkipUrl)">Skip</a>
+            }
         }
     </div>
 </div>

@@ -1,58 +1,58 @@
 ﻿@model SearchViewModel
 @inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
 
-    <div class="search-results-list">
-        <div class="govuk-grid-row header-row">
-            <div class="govuk-grid-column-two-thirds">
-                <p class="govuk-body govuk-!-font-weight-bold">Organisation’s modern slavery statement</p>
-            </div>
-            <div class="govuk-grid-column-one-third">
-                <p class="govuk-body govuk-!-font-weight-bold"> Statement year</p>
-            </div>
+<div class="search-results-list">
+    <div class="govuk-grid-row header-row">
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-body govuk-!-font-weight-bold">Organisation’s modern slavery statement</p>
         </div>
-        <ul class="govuk-list govuk-!-margin-bottom-0">
-            @foreach (var organisation in Model.Organisations.Results)
-            {
-                var organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId);
-
-                <li class="document">
-                    <div class="govuk-grid-row">
-                        <div class="govuk-grid-column-two-thirds">
-                            @if (!string.IsNullOrWhiteSpace(organisation.ParentName))
-                            {
-                                <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold parent-header">
-                                    @organisation.OrganisationName
-                                </p>
-                                <p class="govuk-body govuk-!-margin-bottom-2">
-                                    <span class="grey-text">Submitted under </span>
-                                    <span class="blue-header govuk-!-font-weight-bold address">@Html.ActionLink(organisation.ParentName, "StatementSummary", "Viewing", new { organisationIdentifier, year = organisation.SubmissionDeadlineYear })</span>
-                                    <span class="blue-header govuk-!-font-weight-bold small"> (@(organisation.SubmissionDeadlineYear-1) to @(organisation.SubmissionDeadlineYear))</span>
-                                </p>
-                            }
-                            else
-                            {
-                        <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold blue-header">
-                            @Html.ActionLink(organisation.OrganisationName, "StatementSummary", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId), year = organisation.SubmissionDeadlineYear })
-                            <span class="small"> (@organisation.SubmissionDeadlineYear)</span>
-
-                        </p>
-                                @if (organisation.GroupSubmission)
-                                {
-                                    <p class="govuk-body govuk-!-margin-bottom-2 grey-text">Reported as group</p>
-                                }
-                            }
-                            <p class="govuk-body govuk-!-margin-bottom-2 address">@organisation.Address.GetFullAddress()</p>
-                            @if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
-                            {
-                                <p class="govuk-body govuk-!-margin-bottom-2 company-number">Company number: @organisation.CompanyNumber</p>
-                            }
-                        </div>
-                        <div class="govuk-grid-column-one-third wide">
-                            <p class="govuk-body govuk-!-margin-bottom-2">@organisation.SubmissionDeadlineYear</p>
-                        </div>
-                    </div>
-                </li>
-            }
-        </ul>
+        <div class="govuk-grid-column-one-third">
+            <p class="govuk-body govuk-!-font-weight-bold"> Statement year</p>
+        </div>
     </div>
+    <ul class="govuk-list govuk-!-margin-bottom-0">
+        @foreach (var organisation in Model.Organisations.Results)
+        {
+            var organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId);
+
+            <li class="document">
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds">
+                        @if (!string.IsNullOrWhiteSpace(organisation.ParentName))
+                        {
+                            <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold parent-header">
+                                @organisation.OrganisationName
+                            </p>
+                            <p class="govuk-body govuk-!-margin-bottom-2">
+                                <span class="grey-text">Submitted under </span>
+                                <span class="blue-header govuk-!-font-weight-bold address">@Html.ActionLink(organisation.ParentName, "StatementSummary", "Viewing", new { organisationIdentifier, year = organisation.SubmissionDeadlineYear })</span>
+                                <span class="blue-header govuk-!-font-weight-bold small"> (@(organisation.SubmissionDeadlineYear-1) to @(organisation.SubmissionDeadlineYear))</span>
+                            </p>
+                        }
+                        else
+                        {
+                            <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold blue-header">
+                                @Html.ActionLink(organisation.OrganisationName, "StatementSummary", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId), year = organisation.SubmissionDeadlineYear })
+                                <span class="small"> (@organisation.SubmissionDeadlineYear)</span>
+
+                            </p>
+                            @if (organisation.GroupSubmission == true)
+                            {
+                                <p class="govuk-body govuk-!-margin-bottom-2 grey-text">Reported as group</p>
+                            }
+                        }
+                        <p class="govuk-body govuk-!-margin-bottom-2 address">@organisation.Address.GetFullAddress()</p>
+                        @if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
+                        {
+                            <p class="govuk-body govuk-!-margin-bottom-2 company-number">Company number: @organisation.CompanyNumber</p>
+                        }
+                    </div>
+                    <div class="govuk-grid-column-one-third wide">
+                        <p class="govuk-body govuk-!-margin-bottom-2">@organisation.SubmissionDeadlineYear</p>
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+</div>
 <partial name="_SearchPagination.cshtml" model="Model" />

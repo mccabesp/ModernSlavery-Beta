@@ -32,9 +32,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public override bool IsComplete()
+        public override Status GetStatus()
         {
-            return Turnover !=null && Turnover != StatementTurnoverRanges.NotProvided;
+            if (Turnover != null && Turnover != StatementTurnoverRanges.NotProvided) return Status.Complete;
+
+            return Status.Incomplete;
         }
     }
 }

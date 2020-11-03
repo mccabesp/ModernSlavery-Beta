@@ -55,73 +55,54 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         #endregion
 
-        #region Properties
-
-        #endregion
-
         #region Url Methods
         private string GetOrganisationIdentifier() => RouteData.Values["OrganisationIdentifier"].ToString();
         private int GetReportingDeadlineYear() => RouteData.Values["Year"].ToInt32();
-        private object GetOrgAndYearRouteData() => new { OrganisationIdentifier = GetOrganisationIdentifier(), year = GetReportingDeadlineYear() };
+        private object GetOrgAndYearRouteData(object routeValues = null)
+        {
+            var pars = new { OrganisationIdentifier = GetOrganisationIdentifier(), year = GetReportingDeadlineYear() };
+            return routeValues == null ? pars : pars.MergeDynamic(routeValues, true);
+        }
 
-        private string GetReturnUrl() => Url.Action("ManageOrganisation", "Submission", new { organisationIdentifier = GetOrganisationIdentifier() });
+        private string GetReturnUrl() => Url.Action(nameof(SubmissionController.ManageOrganisation), "Submission", new { organisationIdentifier = GetOrganisationIdentifier() });
+        private string GetBeforeYourStartUrl() => Url.Action(nameof(BeforeYouStart), GetOrgAndYearRouteData());
+        private string GetTransparencyUrl() => Url.Action(nameof(Transparency), GetOrgAndYearRouteData());
+        private string GetReviewUrl() => Url.Action(nameof(Review), GetOrgAndYearRouteData());
 
         private string GetGroupStatusUrl() => Url.Action(nameof(GroupStatus), GetOrgAndYearRouteData());
         private string GetGroupSearchUrl() => Url.Action(nameof(GroupSearch), GetOrgAndYearRouteData());
+        private string GetGroupAddUrl() => Url.Action(nameof(GroupAdd), GetOrgAndYearRouteData());
         private string GetGroupReviewUrl() => Url.Action(nameof(GroupReview), GetOrgAndYearRouteData());
 
-        private string GetYourStatementUrl() => Url.Action(nameof(YourStatement), GetOrgAndYearRouteData());
+        private string GetUrlEmailUrl() => Url.Action(nameof(UrlEmail), GetOrgAndYearRouteData());
+        private string GetPeriodUrl() => Url.Action(nameof(Period), GetOrgAndYearRouteData());
+        private string GetSignOffUrl() => Url.Action(nameof(SignOff), GetOrgAndYearRouteData());
 
         private string GetComplianceUrl() => Url.Action(nameof(Compliance), GetOrgAndYearRouteData());
 
-        private string GetYourOrganisationUrl() => Url.Action(nameof(YourOrganisation), GetOrgAndYearRouteData());
+        private string GetSectorsUrl() => Url.Action(nameof(Sectors), GetOrgAndYearRouteData());
+        private string GetTurnoverUrl() => Url.Action(nameof(Turnover), GetOrgAndYearRouteData());
+
+        private string GetYearsUrl() => Url.Action(nameof(Years), GetOrgAndYearRouteData());
+
 
         private string GetPoliciesUrl() => Url.Action(nameof(Policies), GetOrgAndYearRouteData());
-
-        private string GetRisksUrl() => Url.Action(nameof(SupplyChainRisks), GetOrgAndYearRouteData());
-
-        private string GetDueDiligenceUrl() => Url.Action(nameof(DueDiligence), GetOrgAndYearRouteData());
-
         private string GetTrainingUrl() => Url.Action(nameof(Training), GetOrgAndYearRouteData());
+        
+        private string GetPartnersUrl() => Url.Action(nameof(Partners), GetOrgAndYearRouteData());
+        private string GetSocialAuditsUrl() => Url.Action(nameof(SocialAudits), GetOrgAndYearRouteData());
+        private string GetGrievancesUrl() => Url.Action(nameof(Grievances), GetOrgAndYearRouteData());
+        private string GetMonitoringUrl() => Url.Action(nameof(Monitoring), GetOrgAndYearRouteData());
 
-        private string GetProgressUrl() => Url.Action(nameof(MonitoringProgress), GetOrgAndYearRouteData());
+        private string GetHighestRisksUrl() => Url.Action(nameof(HighestRisks), GetOrgAndYearRouteData());
+        private string GetHighRiskUrl(int index) => Url.Action(nameof(HighRisk),GetOrgAndYearRouteData(new { index }));
 
-        private string GetReviewUrl() => Url.Action(nameof(Review), GetOrgAndYearRouteData());
+        private string GetIndicatorsUrl() => Url.Action(nameof(Indicators), GetOrgAndYearRouteData());
+        private string GetRemediationsUrl() => Url.Action(nameof(Remediations), GetOrgAndYearRouteData());
+
+        private string GetProgressUrl() => Url.Action(nameof(Progress), GetOrgAndYearRouteData());
+
         private string GetCompleteUrl() => Url.Action(nameof(SubmissionComplete), GetOrgAndYearRouteData());
-
-        /// <summary>
-        /// Uses the type of cancelling viewmodel stored in sessionm to determine url to the page that is currently cancelling 
-        /// </summary>
-        /// <returns>the url to the page that is currently cancelling </returns>
-        private string GetBackUrlFromCancellingViewModel()
-        {
-            //Get view model that is cancelling
-            var pageViewModel = UnstashCancellingViewModel();
-
-            //Return the page for the cancelling view model
-            switch (pageViewModel)
-            {
-                case YourStatementViewModel vm:
-                    return GetYourStatementUrl();
-                case ComplianceViewModel vm:
-                    return GetComplianceUrl();
-                case YourOrganisationViewModel vm:
-                    return GetYourOrganisationUrl();
-                case PoliciesViewModel vm:
-                    return GetPoliciesUrl();
-                case SupplyChainRisksViewModel vm:
-                    return GetRisksUrl();
-                case DueDiligenceViewModel vm:
-                    return GetDueDiligenceUrl();
-                case TrainingViewModel vm:
-                    return GetTrainingUrl();
-                case ProgressViewModel vm:
-                    return GetProgressUrl();
-            }
-
-            //Default to the review and edit page
-            return GetReviewUrl();
-        }
 
         /// <summary>
         /// Sets the Back, Cancel and continue url
@@ -132,84 +113,116 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             switch (viewModel)
             {
-                case GroupStatusViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetReturnUrl();
-                    vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : vm.GroupSubmission == true ? GetGroupSearchUrl() : GetYourStatementUrl();
+                case BeforeYouStartViewModel vm:
+                    vm.BackUrl = GetReturnUrl();
+                    vm.ContinueUrl = GetTransparencyUrl();
                     break;
-                case GroupSearchViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetGroupStatusUrl();
-                    vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetGroupReviewUrl();
-                    vm.GroupReviewUrl = GetGroupReviewUrl();
-                    break;
-                case GroupReviewViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetGroupSearchUrl();
-                    vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetYourStatementUrl();
-                    vm.GroupStatusUrl = GetGroupStatusUrl();
-                    vm.GroupSearchUrl = GetGroupSearchUrl();
-                    break;
-                case YourStatementViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : vm.GroupSubmission == true ? GetGroupReviewUrl() : GetGroupStatusUrl();
-                    vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetComplianceUrl();
-                    break;
-                case ComplianceViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetYourStatementUrl();
-                    vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetYourOrganisationUrl();
-                    break;
-                case YourOrganisationViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetComplianceUrl();
-                    vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetPoliciesUrl();
-                    break;
-                case PoliciesViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetYourOrganisationUrl();
-                    vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetRisksUrl();
-                    break;
-                case SupplyChainRisksViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetPoliciesUrl();
-                    vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetDueDiligenceUrl();
-                    break;
-                case DueDiligenceViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetRisksUrl();
-                    vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetTrainingUrl();
-                    break;
-                case TrainingViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetDueDiligenceUrl();
-                    vm.CancelUrl = GetCancelUrl();
-                    vm.ContinueUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetProgressUrl();
-                    break;
-                case ProgressViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? GetReviewUrl() : GetTrainingUrl();
-                    vm.CancelUrl = GetCancelUrl();
+                case TransparencyViewModel vm:
+                    vm.BackUrl = GetBeforeYourStartUrl();
                     vm.ContinueUrl = GetReviewUrl();
                     break;
                 case ReviewViewModel vm:
-                    vm.BackUrl = vm.ReturnToReviewPage ? null : GetProgressUrl();
-                    vm.CancelUrl = GetCancelUrl();
+                    vm.BackUrl = GetReturnUrl();
+                    vm.SkipUrl = GetReturnUrl();
                     vm.ContinueUrl = GetReturnUrl();
-                    vm.GroupStatusUrl = GetGroupStatusUrl();
-                    vm.GroupReviewUrl = GetGroupReviewUrl();
-                    vm.YourStatementUrl = GetYourStatementUrl();
-                    vm.YourStatementUrl = GetYourStatementUrl();
+                    vm.GroupReportingUrl = vm.GroupOrganisationsPages.GroupSubmission!=true ? GetGroupStatusUrl() : vm.GroupOrganisationsPages.StatementOrganisations.Any() ? GetGroupReviewUrl(): GetGroupSearchUrl();
+                    vm.UrlSignOffUrl = GetUrlEmailUrl();
                     vm.ComplianceUrl = GetComplianceUrl();
-                    vm.OrganisationUrl = GetYourOrganisationUrl();
+                    vm.SectorsUrl = GetSectorsUrl();
+                    vm.YearsUrl = GetYearsUrl();
                     vm.PoliciesUrl = GetPoliciesUrl();
-                    vm.RisksUrl = GetRisksUrl();
-                    vm.DueDiligenceUrl = GetDueDiligenceUrl();
                     vm.TrainingUrl = GetTrainingUrl();
-                    vm.ProgressUrl = GetProgressUrl();
+                    vm.WorkingConditionsUrl = GetPartnersUrl();
+                    vm.RisksUrl = GetHighestRisksUrl();
+                    vm.IndicatorsUrl = GetIndicatorsUrl();
+                    vm.ProgressUrl = GetReviewUrl();
                     break;
-                case CancelViewModel vm:
-                    var referrer = HttpContext.GetUrlReferrer()?.ToString();
-                    vm.CancelUrl = vm.BackUrl = string.IsNullOrWhiteSpace(referrer) ? GetBackUrlFromCancellingViewModel() : referrer;
-                    vm.ContinueUrl = GetReturnUrl();
+                case GroupStatusViewModel vm:
+                    vm.BackUrl = GetReviewUrl();
+                    vm.SkipUrl = GetUrlEmailUrl();
+                    vm.ContinueUrl = GetReviewUrl();
+                    break;
+                case GroupSearchViewModel vm:
+                    vm.BackUrl = GetGroupStatusUrl();
+                    vm.SkipUrl = GetReviewUrl();
+                    vm.ContinueUrl = GetGroupReviewUrl();
+                    break;
+                case GroupAddViewModel vm:
+                    vm.BackUrl = GetGroupSearchUrl();
+                    vm.SkipUrl = GetReviewUrl();
+                    vm.ContinueUrl = GetGroupReviewUrl();
+                    break;
+                case GroupReviewViewModel vm:
+                    vm.BackUrl = GetGroupSearchUrl();
+                    vm.SkipUrl = vm.ContinueUrl = GetReviewUrl();
+                    break;
+                case UrlEmailViewModel vm:
+                    vm.BackUrl = GetReviewUrl();
+                    vm.SkipUrl = GetPeriodUrl();
+                    vm.ContinueUrl = GetPeriodUrl();
+                    break;
+                case PeriodCoveredViewModel vm:
+                    vm.BackUrl = GetUrlEmailUrl();
+                    vm.SkipUrl = vm.ContinueUrl = GetSignOffUrl();
+                    break;
+                case SignOffViewModel vm:
+                    vm.BackUrl = GetPeriodUrl();
+                    vm.SkipUrl = vm.ContinueUrl = GetReviewUrl();
+                    break;
+                case ComplianceViewModel vm:
+                    vm.BackUrl = vm.SkipUrl = vm.ContinueUrl = GetReviewUrl();
+                    break;
+                case SectorsViewModel vm:
+                    vm.BackUrl = GetReviewUrl();
+                    vm.ContinueUrl = vm.SkipUrl = GetTurnoverUrl();
+                    break;
+                case TurnoverViewModel vm:
+                    vm.BackUrl = GetSectorsUrl();
+                    vm.ContinueUrl= vm.SkipUrl = GetReviewUrl();
+                    break;
+                case YearsViewModel vm:
+                    vm.BackUrl = vm.SkipUrl = vm.ContinueUrl = GetReviewUrl();
+                    break;
+                case TrainingViewModel vm:
+                    vm.BackUrl = vm.SkipUrl = vm.ContinueUrl = GetReviewUrl();
+                    break;
+                case PoliciesViewModel vm:
+                    vm.BackUrl = vm.SkipUrl = vm.ContinueUrl = GetReviewUrl();
+                    break;
+                case PartnersViewModel vm:
+                    vm.BackUrl = GetReviewUrl();
+                    vm.ContinueUrl= vm.SkipUrl = GetSocialAuditsUrl();
+                    break;
+                case SocialAuditsViewModel vm:
+                    vm.BackUrl = GetSocialAuditsUrl();
+                    vm.ContinueUrl = vm.SkipUrl = GetGrievancesUrl();
+                    break;
+                case GrievancesViewModel vm:
+                    vm.BackUrl = GetSocialAuditsUrl();
+                    vm.ContinueUrl = vm.SkipUrl = GetMonitoringUrl();
+                    break;
+                case MonitoringViewModel vm:
+                    vm.BackUrl = GetGrievancesUrl();
+                    vm.SkipUrl = vm.ContinueUrl = GetReviewUrl();
+                    break;
+                case HighestRisksViewModel vm:
+                    vm.BackUrl = GetReviewUrl();
+                    vm.ContinueUrl = vm.SkipUrl = !string.IsNullOrWhiteSpace(vm.HighRisk1) && !string.IsNullOrWhiteSpace(vm.HighRisk2) && !string.IsNullOrWhiteSpace(vm.HighRisk3) ? GetHighRiskUrl(0) : GetReviewUrl();
+                    break;
+                case HighRiskViewModel vm:
+                    vm.BackUrl = vm.Index==0 ? GetHighestRisksUrl() : GetHighRiskUrl(vm.Index-1);
+                    vm.ContinueUrl = vm.SkipUrl = vm.Index == vm.TotalRisks-1 ? GetReviewUrl() : GetHighRiskUrl(vm.Index+1);
+                    break;
+                case IndicatorsViewModel vm:
+                    vm.BackUrl = GetReviewUrl();
+                    vm.ContinueUrl= vm.SkipUrl = GetRemediationsUrl();
+                    break;
+                case RemediationsViewModel vm:
+                    vm.BackUrl = GetIndicatorsUrl();
+                    vm.SkipUrl = vm.ContinueUrl = GetReviewUrl();
+                    break;
+                case ProgressViewModel vm:
+                    vm.BackUrl = vm.SkipUrl = vm.ContinueUrl = GetReviewUrl();
                     break;
                 case SubmissionCompleteViewModel vm:
                     vm.ContinueUrl = GetReturnUrl();
@@ -296,8 +309,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             {
                 //Make sure we show any validation errors
                 TryValidateModel(viewModel);
+
                 //Dont validate the group search or organisation name
-                if (viewModel is GroupSearchViewModel) ModelState.Exclude($"{nameof(GroupSearchViewModel.GroupResults)}.{nameof(GroupSearchViewModel.GroupResults.SearchKeywords)}", $"{nameof(GroupSearchViewModel.GroupResults)}.{nameof(GroupSearchViewModel.GroupResults.OrganisationName)}");
+                if (viewModel is GroupSearchViewModel) ModelState.Exclude($"{nameof(GroupSearchViewModel.SearchKeywords)}");
+                if (viewModel is GroupAddViewModel) ModelState.Exclude($"{nameof(GroupAddViewModel.SearchKeywords)}", $"{nameof(GroupAddViewModel.OrganisationName)}");
                 return View(viewModel);
             }
             
@@ -320,7 +335,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                 //Copy the previous search results
                 var stashedViewModel = UnstashModel<GroupSearchViewModel>();
-                if (stashedViewModel != null) searchViewModel.GroupResults = stashedViewModel.GroupResults;
+                if (stashedViewModel != null)
+                {
+                    searchViewModel.SearchKeywords = stashedViewModel.SearchKeywords;
+                    searchViewModel.ResultsPage = stashedViewModel.ResultsPage;
+                }
 
                 //Populate the extra submission info
                 await SubmissionPresenter.GetOtherSubmissionsInformationAsync(searchViewModel, GetReportingDeadlineYear());
@@ -355,18 +374,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             return View(viewModel);
         }
 
-        private async Task<IActionResult> PostAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command,, params object[] arguments) where TViewModel : BaseViewModel
+        private async Task<IActionResult> PostAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, params object[] arguments) where TViewModel : BaseViewModel
         {
             SetNavigationUrl(viewModel);
 
             switch (command)
             {
-                case BaseViewModel.CommandType.Cancel:
-                    //Save the viewmodel to session
-                    StashCancellingViewModel(viewModel);
-
-                    //Redirect to the cancel page
-                    return Redirect(viewModel.CancelUrl);
                 case BaseViewModel.CommandType.Continue:
                     //Validate the submitted ViewModel data
                     if (!ModelState.IsValid)
@@ -376,7 +389,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     }
 
                     //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
-                    var viewModelResult = await SubmissionPresenter.SaveViewModelAsync(viewModel, organisationIdentifier, year, VirtualUser.UserId);
+                    var viewModelResult = await SubmissionPresenter.SaveViewModelAsync(viewModel, organisationIdentifier, year, VirtualUser.UserId, arguments);
 
                     //Handle any StatementErrors
                     if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
@@ -405,7 +418,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         }
         #endregion
 
-        #region Before You Start
+        #region Transparency
         [HttpGet("{organisationIdentifier}/{year}/transparency")]
         public async Task<IActionResult> Transparency(string organisationIdentifier, int year)
         {
@@ -433,14 +446,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             //Create the view model
             var viewModel = await CreateReviewViewModelAsync(statementModel);
-
-            //Set the flag so we now always return to the review page when we have some content
-            if (!viewModel.ReturnToReviewPage && !statementModel.IsEmpty())
-            {
-                statementModel.ReturnToReviewPage = true;
-                await SubmissionPresenter.SaveStatementModelAsync(statementModel);
-                viewModel.ReturnToReviewPage = true;
-            }
 
             //set the navigation urls
             SetNavigationUrl(viewModel);
@@ -493,20 +498,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                     //Redirect to the continue url
                     return Redirect(GetCompleteUrl());
-                case BaseViewModel.CommandType.ExitNoChanges:
-                case BaseViewModel.CommandType.DiscardAndExit:
-                    //set the navigation urls
-                    SetNavigationUrl(viewModel);
-
-                    //Close the draft and release the user lock
-                    var cancelResult = await SubmissionPresenter.CancelDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
-
-                    //Handle any StatementErrors
-                    if (cancelResult.Fail) return HandleStatementErrors(cancelResult.Errors);
-
-                    //Redirect to the continue url
-                    return Redirect(viewModel.ContinueUrl);
-                case BaseViewModel.CommandType.SaveAndExit:
+                case BaseViewModel.CommandType.Skip:
                     //set the navigation urls
                     SetNavigationUrl(viewModel);
 
@@ -517,7 +509,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     if (closeResult.Fail) return HandleStatementErrors(closeResult.Errors);
 
                     //Redirect to the continue url
-                    return Redirect(viewModel.ContinueUrl);
+                    return Redirect(GetReturnUrl());
                 default:
                     throw new ArgumentOutOfRangeException(nameof(command), $"CommandType {command} is not valid here");
             }
@@ -529,14 +521,29 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var viewModel = SubmissionPresenter.GetViewModelFromStatementModel<ReviewViewModel>(statementModel);
 
             viewModel.GroupOrganisationsPages = SubmissionPresenter.GetViewModelFromStatementModel<GroupOrganisationsViewModel>(statementModel);
-            viewModel.YourStatement = SubmissionPresenter.GetViewModelFromStatementModel<YourStatementViewModel>(statementModel);
-            viewModel.Compliance = SubmissionPresenter.GetViewModelFromStatementModel<ComplianceViewModel>(statementModel);
-            viewModel.Organisation = SubmissionPresenter.GetViewModelFromStatementModel<YourOrganisationViewModel>(statementModel);
-            viewModel.Policies = SubmissionPresenter.GetViewModelFromStatementModel<PoliciesViewModel>(statementModel);
-            viewModel.Risks = SubmissionPresenter.GetViewModelFromStatementModel<SupplyChainRisksViewModel>(statementModel);
-            viewModel.DueDiligence = SubmissionPresenter.GetViewModelFromStatementModel<DueDiligenceViewModel>(statementModel);
-            viewModel.Training = SubmissionPresenter.GetViewModelFromStatementModel<TrainingViewModel>(statementModel);
-            viewModel.Progress = SubmissionPresenter.GetViewModelFromStatementModel<ProgressViewModel>(statementModel);
+            viewModel.UrlPage = SubmissionPresenter.GetViewModelFromStatementModel<UrlEmailViewModel>(statementModel);
+            viewModel.PeriodCoveredPage = SubmissionPresenter.GetViewModelFromStatementModel<PeriodCoveredViewModel>(statementModel);
+            viewModel.SignOffPage = SubmissionPresenter.GetViewModelFromStatementModel<SignOffViewModel>(statementModel);
+            viewModel.CompliancePage = SubmissionPresenter.GetViewModelFromStatementModel<ComplianceViewModel>(statementModel);
+            viewModel.SectorsPage = SubmissionPresenter.GetViewModelFromStatementModel<SectorsViewModel>(statementModel);
+            viewModel.TurnoverPage = SubmissionPresenter.GetViewModelFromStatementModel<TurnoverViewModel>(statementModel);
+            viewModel.YearsPage = SubmissionPresenter.GetViewModelFromStatementModel<YearsViewModel>(statementModel);
+            viewModel.PoliciesPage = SubmissionPresenter.GetViewModelFromStatementModel<PoliciesViewModel>(statementModel);
+            viewModel.TrainingPage = SubmissionPresenter.GetViewModelFromStatementModel<TrainingViewModel>(statementModel);
+            viewModel.PartnersPage = SubmissionPresenter.GetViewModelFromStatementModel<PartnersViewModel>(statementModel);
+            viewModel.SocialAuditsPage = SubmissionPresenter.GetViewModelFromStatementModel<SocialAuditsViewModel>(statementModel);
+            viewModel.GrievancesPage = SubmissionPresenter.GetViewModelFromStatementModel<GrievancesViewModel>(statementModel);
+            viewModel.MonitoringPage = SubmissionPresenter.GetViewModelFromStatementModel<MonitoringViewModel>(statementModel);
+            viewModel.HighestRisksPage = SubmissionPresenter.GetViewModelFromStatementModel<HighestRisksViewModel>(statementModel);
+            viewModel.HighRiskPages.Clear();
+            for (var index = 0; index < statementModel.Summary.Risks.Count; index++)
+                viewModel.HighRiskPages.Add(SubmissionPresenter.GetViewModelFromStatementModel<HighRiskViewModel>(statementModel, index));
+
+            viewModel.IndicatorsPage = SubmissionPresenter.GetViewModelFromStatementModel<IndicatorsViewModel>(statementModel);
+            viewModel.RemediationsPage = SubmissionPresenter.GetViewModelFromStatementModel<RemediationsViewModel>(statementModel);
+            viewModel.ProgressPage = SubmissionPresenter.GetViewModelFromStatementModel<ProgressViewModel>(statementModel);
+
+            //Gewt the modifications
             viewModel.DraftModifications = await SubmissionPresenter.CompareToDraftBackupStatement(statementModel);
             viewModel.SubmittedModifications = await SubmissionPresenter.CompareToSubmittedStatement(statementModel);
 
@@ -578,39 +585,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Get the saved viewmodel information from session
             var stashedModel = UnstashModel<GroupSearchViewModel>();
 
-            //Continue or cancel normally
-            if (command.IsAny(BaseViewModel.CommandType.Continue, BaseViewModel.CommandType.Cancel))
-            {
-                viewModel = stashedModel;
-                //Must clear otherwise hidden for doesnt work
-                ModelState.Clear();
-                return await PostAsync(viewModel, organisationIdentifier, year, command);
-            };
-
             //Rebuild the search model from the postback
-            if (stashedModel.GroupResults.ShowResults)
-            {
-                //Get the search keywords
-                stashedModel.GroupResults.SearchKeywords = viewModel.GroupResults.SearchKeywords;
-            }
-            else
-            {
-                //Get the organisation name if it's there
-                if (viewModel.GroupResults.OrganisationName != null)
-                    stashedModel.GroupResults.OrganisationName = viewModel.GroupResults.OrganisationName;
-                //else get the search keywords
-                else
-                    stashedModel.GroupResults.SearchKeywords = viewModel.GroupResults.SearchKeywords;
-            }
+            stashedModel.SearchKeywords = viewModel.SearchKeywords;
             viewModel = stashedModel;
 
-            ModelState.Exclude(nameof(viewModel.ReturnToReviewPage), nameof(viewModel.Submitted));
+            ModelState.Exclude(nameof(viewModel.Submitted));
 
             if (command.IsAny(BaseViewModel.CommandType.Search, BaseViewModel.CommandType.SearchNext, BaseViewModel.CommandType.SearchPrevious))
             {
-                //Dont validate the organisation name
-                ModelState.Exclude($"{nameof(viewModel.GroupResults)}.{nameof(viewModel.GroupResults.OrganisationName)}");
-
                 //Check the search string
                 if (!ModelState.IsValid)
                 {
@@ -619,95 +601,32 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 }
 
                 if (command == BaseViewModel.CommandType.Search)
-                    viewModel.GroupResults.ResultsPage.CurrentPage = 1;
+                    viewModel.ResultsPage.CurrentPage = 1;
                 else if (command == BaseViewModel.CommandType.SearchNext)
-                    viewModel.GroupResults.ResultsPage.CurrentPage++;
+                    viewModel.ResultsPage.CurrentPage++;
                 else if (command == BaseViewModel.CommandType.SearchPrevious)
-                    viewModel.GroupResults.ResultsPage.CurrentPage--;
-
+                    viewModel.ResultsPage.CurrentPage--;
 
                 var outcome = await SubmissionPresenter.SearchGroupOrganisationsAsync(viewModel, VirtualUser);
                 if (!outcome.Success) HandleStatementErrors(outcome.Errors, viewModel);
-
-                //Show the search results
-                viewModel.GroupResults.ShowResults = true;
-            }
-            else if (command == BaseViewModel.CommandType.ToggleResults)
-            {
-                //Toggle the view
-                viewModel.GroupResults.ShowResults = !viewModel.GroupResults.ShowResults;
-
-                //Copy the search text to the organisation name
-                if (!viewModel.GroupResults.ShowResults && !string.IsNullOrWhiteSpace(viewModel.GroupResults.SearchKeywords))
-                {
-                    viewModel.GroupResults.OrganisationName = viewModel.GroupResults.SearchKeywords;
-
-                    //Add the group search model to session before removing SearchKeywords
-                    StashModel(viewModel);
-
-                    // remove text from searchbox
-                    viewModel.GroupResults.SearchKeywords = null;
-
-                    //Must clear otherwise hidden for doesnt work
-                    ModelState.Clear();
-
-                    //Return the page
-                    return View(viewModel);
-                }
-
             }
             else if (addIndex > -1 || removeIndex > -1)
             {
                 if (addIndex > -1)
                 {
-                    if (!viewModel.GroupResults.ShowResults)
-                    {
-                        //Dont validate the search string
-                        ModelState.Exclude($"{nameof(viewModel.GroupResults)}.{nameof(viewModel.GroupResults.SearchKeywords)}");
-
-                        //Check the search string
-                        if (!ModelState.IsValid)
-                        {
-                            this.SetModelCustomErrors(viewModel);
-                            return View(viewModel);
-                        }
-                    }
-
                     //Add the organisation to the view model
                     var outcome = await SubmissionPresenter.IncludeGroupOrganisationAsync(viewModel, addIndex);
 
                     //Handle any errors
                     if (!outcome.Success) HandleStatementErrors(outcome.Errors);
-
-                    //Clear the input name 
-                    viewModel.GroupResults.OrganisationName = null;
-                    //Clear searchkeywords if manually added an org
-                    if (!viewModel.GroupResults.ShowResults)
-                        viewModel.GroupResults.SearchKeywords = null;
-
                 }
                 else
                 {
-                    //removing from manual orgs table
-                    if (!viewModel.GroupResults.ShowResults)
-                    {
-                        //Remove the selected organisation
-                        viewModel.StatementOrganisations.RemoveAt(removeIndex);
-                        //keep search keywords empty                       
-                        viewModel.GroupResults.SearchKeywords = null;
-
-                    }
-                    else
-                    {
-                        //Add the organisation to the view model
-                        var removeOrg = viewModel.GroupResults.ResultsPage.Results[removeIndex];
-                        var index = viewModel.FindGroupOrganisation(removeOrg);
-                        viewModel.StatementOrganisations.RemoveAt(index);
-                    }
+                    //Add the organisation to the view model
+                    var removeOrg = viewModel.ResultsPage.Results[removeIndex];
+                    var index = viewModel.FindGroupOrganisation(removeOrg);
+                    viewModel.StatementOrganisations.RemoveAt(index);
                 }
-
-                //showBanner when including/removing organisation
-                viewModel.ShowBanner = true;
 
                 //Populate the extra submission info
                 await SubmissionPresenter.GetOtherSubmissionsInformationAsync(viewModel, GetReportingDeadlineYear());
@@ -736,147 +655,44 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/group-add")]
         public async Task<IActionResult> GroupAdd(string organisationIdentifier, int year)
         {
-            return await GetAsync<GroupSearchViewModel>(organisationIdentifier, year);
+            return await GetAsync<GroupAddViewModel>(organisationIdentifier, year);
         }
 
         [HttpPost("{organisationIdentifier}/{year}/group-add")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GroupAdd(GroupSearchViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, int addIndex = -1, int removeIndex = -1)
+        public async Task<IActionResult> GroupAdd(GroupAddViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, int addIndex = -1, int removeIndex = -1)
         {
-            //Get the saved viewmodel information from session
-            var stashedModel = UnstashModel<GroupSearchViewModel>();
-
-            //Continue or cancel normally
-            if (command.IsAny(BaseViewModel.CommandType.Continue, BaseViewModel.CommandType.Cancel))
-            {
-                viewModel = stashedModel;
-                //Must clear otherwise hidden for doesnt work
-                ModelState.Clear();
-                return await PostAsync(viewModel, organisationIdentifier, year, command);
-            };
-
-            //Rebuild the search model from the postback
-            if (stashedModel.GroupResults.ShowResults)
-            {
-                //Get the search keywords
-                stashedModel.GroupResults.SearchKeywords = viewModel.GroupResults.SearchKeywords;
-            }
-            else
-            {
-                //Get the organisation name if it's there
-                if (viewModel.GroupResults.OrganisationName != null)
-                    stashedModel.GroupResults.OrganisationName = viewModel.GroupResults.OrganisationName;
-                //else get the search keywords
-                else
-                    stashedModel.GroupResults.SearchKeywords = viewModel.GroupResults.SearchKeywords;
-            }
-            viewModel = stashedModel;
-
-            ModelState.Exclude(nameof(viewModel.ReturnToReviewPage), nameof(viewModel.Submitted));
-
-            if (command.IsAny(BaseViewModel.CommandType.Search, BaseViewModel.CommandType.SearchNext, BaseViewModel.CommandType.SearchPrevious))
+            if (command.IsAny(BaseViewModel.CommandType.IncludeOrganisation, BaseViewModel.CommandType.RemoveOrganisation) && (addIndex > -1 || removeIndex > -1))
             {
                 //Dont validate the organisation name
-                ModelState.Exclude($"{nameof(viewModel.GroupResults)}.{nameof(viewModel.GroupResults.OrganisationName)}");
+                ModelState.Exclude(nameof(viewModel.Submitted),$"{nameof(viewModel.SearchKeywords)}");
 
-                //Check the search string
-                if (!ModelState.IsValid)
-                {
-                    this.SetModelCustomErrors(viewModel);
-                    return View(viewModel);
-                }
-
-                if (command == BaseViewModel.CommandType.Search)
-                    viewModel.GroupResults.ResultsPage.CurrentPage = 1;
-                else if (command == BaseViewModel.CommandType.SearchNext)
-                    viewModel.GroupResults.ResultsPage.CurrentPage++;
-                else if (command == BaseViewModel.CommandType.SearchPrevious)
-                    viewModel.GroupResults.ResultsPage.CurrentPage--;
-
-
-                var outcome = await SubmissionPresenter.SearchGroupOrganisationsAsync(viewModel, VirtualUser);
-                if (!outcome.Success) HandleStatementErrors(outcome.Errors, viewModel);
-
-                //Show the search results
-                viewModel.GroupResults.ShowResults = true;
-            }
-            else if (command == BaseViewModel.CommandType.ToggleResults)
-            {
-                //Toggle the view
-                viewModel.GroupResults.ShowResults = !viewModel.GroupResults.ShowResults;
-
-                //Copy the search text to the organisation name
-                if (!viewModel.GroupResults.ShowResults && !string.IsNullOrWhiteSpace(viewModel.GroupResults.SearchKeywords))
-                {
-                    viewModel.GroupResults.OrganisationName = viewModel.GroupResults.SearchKeywords;
-
-                    //Add the group search model to session before removing SearchKeywords
-                    StashModel(viewModel);
-
-                    // remove text from searchbox
-                    viewModel.GroupResults.SearchKeywords = null;
-
-                    //Must clear otherwise hidden for doesnt work
-                    ModelState.Clear();
-
-                    //Return the page
-                    return View(viewModel);
-                }
-
-            }
-            else if (addIndex > -1 || removeIndex > -1)
-            {
                 if (addIndex > -1)
                 {
-                    if (!viewModel.GroupResults.ShowResults)
+                    //Check the search string
+                    if (!ModelState.IsValid)
                     {
-                        //Dont validate the search string
-                        ModelState.Exclude($"{nameof(viewModel.GroupResults)}.{nameof(viewModel.GroupResults.SearchKeywords)}");
-
-                        //Check the search string
-                        if (!ModelState.IsValid)
-                        {
-                            this.SetModelCustomErrors(viewModel);
-                            return View(viewModel);
-                        }
+                        this.SetModelCustomErrors(viewModel);
+                        return View(viewModel);
                     }
 
                     //Add the organisation to the view model
-                    var outcome = await SubmissionPresenter.IncludeGroupOrganisationAsync(viewModel, addIndex);
+                    var outcome = await SubmissionPresenter.AddGroupOrganisationAsync(viewModel);
 
                     //Handle any errors
                     if (!outcome.Success) HandleStatementErrors(outcome.Errors);
 
                     //Clear the input name 
-                    viewModel.GroupResults.OrganisationName = null;
-                    //Clear searchkeywords if manually added an org
-                    if (!viewModel.GroupResults.ShowResults)
-                        viewModel.GroupResults.SearchKeywords = null;
-
+                    viewModel.OrganisationName = null;
                 }
                 else
                 {
-                    //removing from manual orgs table
-                    if (!viewModel.GroupResults.ShowResults)
-                    {
-                        //Remove the selected organisation
-                        viewModel.StatementOrganisations.RemoveAt(removeIndex);
-                        //keep search keywords empty                       
-                        viewModel.GroupResults.SearchKeywords = null;
-
-                    }
-                    else
-                    {
-                        //Add the organisation to the view model
-                        var removeOrg = viewModel.GroupResults.ResultsPage.Results[removeIndex];
-                        var index = viewModel.FindGroupOrganisation(removeOrg);
-                        viewModel.StatementOrganisations.RemoveAt(index);
-                    }
+                    //Remove the selected organisation
+                    viewModel.StatementOrganisations.RemoveAt(removeIndex);
+                    //keep search keywords empty                       
+                    viewModel.SearchKeywords = null;
                 }
-
-                //showBanner when including/removing organisation
-                viewModel.ShowBanner = true;
 
                 //Populate the extra submission info
                 await SubmissionPresenter.GetOtherSubmissionsInformationAsync(viewModel, GetReportingDeadlineYear());
@@ -916,7 +732,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Get the saved viewmodel information from session
             var viewModel = UnstashModel<GroupReviewViewModel>();
 
-            if (command.IsAny(BaseViewModel.CommandType.Continue, BaseViewModel.CommandType.Cancel))
+            if (command.IsAny(BaseViewModel.CommandType.Continue, BaseViewModel.CommandType.Skip))
             {
                 //Continue or cancel normally
                 return await PostAsync(viewModel, organisationIdentifier, year, command);
@@ -1172,7 +988,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("{organisationIdentifier}/{year}/highest-risk/{index}")]
         public async Task<IActionResult> HighRisk(string organisationIdentifier, int year, int index)
         {
-            return await GetAsync<HighRiskViewModel>(organisationIdentifier, year);
+            return await GetAsync<HighRiskViewModel>(organisationIdentifier, year, index);
         }
 
         [HttpPost("{organisationIdentifier}/{year}/highest-risk/{index}")]
@@ -1180,7 +996,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> HighRisk(HighRiskViewModel viewModel, string organisationIdentifier, int year, int index, BaseViewModel.CommandType command)
         {
-            return await PostAsync(viewModel, organisationIdentifier, year, command);
+            return await PostAsync(viewModel, organisationIdentifier, year, command, index);
         }
 
         #endregion

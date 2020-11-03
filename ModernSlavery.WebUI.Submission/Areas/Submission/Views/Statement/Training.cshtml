@@ -1,8 +1,8 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model TrainingPageViewModel
-
+@model TrainingViewModel
+@using ModernSlavery.Core.Entities.StatementSummary; 
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
@@ -12,7 +12,6 @@
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.ReturnToReviewPage);
             @Html.HiddenFor(m => m.Submitted);
 
             <h1 class="govuk-heading-l">
@@ -30,17 +29,17 @@
                         Select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var trainingType in Model.TrainingTypes)
+                        @foreach (var trainingType in Enums.GetValues<IStatementSummary1.TrainingTargetTypes>())
                         {
                             <div class="govuk-checkboxes__item">
-                                <input name="Training" value="@trainingType.Id" id="@($"training{trainingType.Id}")" checked=@(Model.Training.Contains(trainingType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="training-conditional-@(trainingType.Id)">
-                                <label class="govuk-label govuk-checkboxes__label" for="@($"training{trainingType.Id}")">
-                                    @trainingType.Description
+                                <input name="Training" value="@((int)trainingType)" id="@($"training{(int)trainingType}")" checked=@(Model.TrainingTargets.Contains(trainingType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="training-conditional-@((int)trainingType)">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"training{(int)trainingType}")">
+                                    @trainingType.GetEnumDescription()
                                 </label>
                             </div>
-                            @if (trainingType.Description.Equals("Other"))
+                            @if (trainingType== IStatementSummary1.TrainingTargetTypes.Other)
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTraining, "govuk-form-group--error")" id="training-conditional-@(trainingType.Id)">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTraining, "govuk-form-group--error")" id="training-conditional-@((int)trainingType)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" asp-for="OtherTraining">
                                             Please specify
@@ -60,10 +59,10 @@
                 Continue
             </button>
 
-            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
-                Cancel
-            </button>
-
+            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
+            {
+                <a class="govuk-button" href="@(Model.SkipUrl)">Skip</a>
+            }
         }
     </div>
 

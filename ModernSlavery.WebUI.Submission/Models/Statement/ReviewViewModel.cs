@@ -44,7 +44,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         private string GetSubtitle()
         {
-            var complete = IsComplete();
+            var complete = BasicsComplete();
 
             var result = $"Submission {(complete ? "" : "in")}complete.";
 
@@ -91,7 +91,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         [IgnoreMap]
         [BindNever]
-        public string UrlApprovalUrl { get; set; }
+        public string UrlSignOffUrl { get; set; }
 
         [IgnoreMap]
         [BindNever]
@@ -99,11 +99,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         [IgnoreMap]
         [BindNever]
-        public string SectorTurnoverUrl { get; set; }
+        public string SectorsUrl { get; set; }
 
         [IgnoreMap]
         [BindNever]
-        public string StatementYearsUrl { get; set; }
+        public string YearsUrl { get; set; }
 
         [IgnoreMap]
         [BindNever]
@@ -127,7 +127,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         [IgnoreMap]
         [BindNever]
-        public string MonitoringProgressUrl { get; set; }
+        public string ProgressUrl { get; set; }
         #endregion
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -187,7 +187,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (ProgressPage.Validate(validationContext).Any())
                 yield return new ValidationResult($"Section '{ProgressPage.PageTitle}' is invalid");
 
-            if (!IsComplete())
+            if (!BasicsComplete())
                 yield return new ValidationResult("You must first complete all sections before you can submit");
 
             else if (Submitted && !HasChanged())
@@ -237,10 +237,23 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public Status GetWorkingConditionsStatus()
         {
-            if (PartnersPage.GetStatus() == Status.Complete && SocialAuditsPage.GetStatus() == Status.Complete && GrievancesPage.GetStatus() == Status.Complete && MonitoringPage.IsComplete()) return Status.Complete;
+            if (PartnersPage.GetStatus() == Status.Complete && SocialAuditsPage.GetStatus() == Status.Complete && GrievancesPage.GetStatus() == Status.Complete && MonitoringPage.GetStatus() == Status.Complete) return Status.Complete;
             if (PartnersPage.GetStatus() == Status.Incomplete && SocialAuditsPage.GetStatus() == Status.Incomplete && GrievancesPage.GetStatus() == Status.Incomplete && MonitoringPage.GetStatus()==Status.Incomplete) return Status.Incomplete;
             return Status.InProgress;
+        }
 
+        public Status GetRisksStatus()
+        {
+            if (HighestRisksPage.GetStatus() == Status.Complete && HighRiskPages.All(r=>r.GetStatus()== Status.Complete)) return Status.Complete;
+            if (HighestRisksPage.GetStatus() == Status.Incomplete && HighRiskPages.All(r => r.GetStatus() == Status.Incomplete)) return Status.Incomplete;
+            return Status.InProgress;
+        }
+
+        public Status GetIndicatorRemediationsStatus()
+        {
+            if (IndicatorsPage.GetStatus() == Status.Complete && RemediationsPage.GetStatus() == Status.Complete) return Status.Complete;
+            if (IndicatorsPage.GetStatus() == Status.Incomplete && RemediationsPage.GetStatus() == Status.Incomplete) return Status.Incomplete;
+            return Status.InProgress;
         }
 
         public bool BasicsComplete()

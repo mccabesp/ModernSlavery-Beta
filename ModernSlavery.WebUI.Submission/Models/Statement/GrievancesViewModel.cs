@@ -9,9 +9,9 @@ using ModernSlavery.Core.Entities.StatementSummary;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class GrievancesPageViewModelMapperProfile : Profile
+    public class GrievancesViewModelMapperProfile : Profile
     {
-        public GrievancesPageViewModelMapperProfile()
+        public GrievancesViewModelMapperProfile()
         {
             CreateMap<StatementSummary1, GrievancesViewModel>();
 
