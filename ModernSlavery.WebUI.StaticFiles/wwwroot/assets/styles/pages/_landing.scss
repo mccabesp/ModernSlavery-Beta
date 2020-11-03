@@ -56,6 +56,7 @@
 
     &__description {
         @include govuk-font($size: 24);
+        line-height:21px;
     }
 
     &__paragraph {
@@ -152,6 +153,10 @@ $app-button-inverted-hover-background-colour: govuk-tint($app-button-inverted-fo
 @media (max-width: 40.0525em) {
     .govuk-header{       
         border-bottom: 10px solid $govuk-brand-colour;
+    }
+    .mobile-no-margin
+    {
+        margin-bottom:15px !important;
     }
 
 }
