@@ -40,6 +40,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task CheckContentOfSignInPage()
         {
+            
             ExpectHeader("Sign in or create an account");
             Expect(What.Contains, "If you have an account, sign in using your email address and password.");
             Expect(What.Contains, "After signing into your account you can register a new organisation or manage your existing organisations.");
@@ -56,6 +57,16 @@ namespace ModernSlavery.Hosts.Web.Tests
             await Task.CompletedTask;
 
         }
+        [Test, Order(14)]
+
+        public async Task BannerCheck()
+        {
+
+            Expect("Modern slavery statement registry");
+            await Task.CompletedTask;
+
+        }
+
 
     }
 }
