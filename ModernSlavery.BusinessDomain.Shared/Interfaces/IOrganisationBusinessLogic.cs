@@ -24,6 +24,12 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <returns></returns>
         Task<List<OrganisationsFileModel>> GetOrganisationFileModelByYearAsync(int year);
 
+        /// <summary>
+        ///     Get all statements that have been submitted for an organisation.
+        ///     Includes group and single statements for all years.
+        /// </summary>
+        IEnumerable<Statement> GetAllStatements(Organisation organisation);
+
         Task SetUniqueOrganisationReferencesAsync();
         Task SetUniqueOrganisationReferenceAsync(Organisation organisation);
         string GenerateOrganisationReference();
