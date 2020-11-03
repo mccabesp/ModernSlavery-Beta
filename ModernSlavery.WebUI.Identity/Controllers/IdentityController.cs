@@ -62,8 +62,8 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             _userRepository = userRepository;
             _interaction = interaction;
             _clientStore = clientStore;
-            _schemeProvider = schemeProvider; 
-             _events = events;
+            _schemeProvider = schemeProvider;
+            _events = events;
         }
 
         #region Ping 
@@ -202,7 +202,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                     user = await _userRepository.FindByEmailAsync(model.Username, UserStatuses.New,
                         UserStatuses.Active);
                 }
-                if (user != null && user.UserId>0)
+                if (user != null && user.UserId > 0)
                 {
                     if (SharedBusinessLogic.AuthenticationBusinessLogic.GetUserLoginLockRemaining(user) > TimeSpan.Zero)
                     {
@@ -211,7 +211,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                                 IdentityOptions.TooManySigninAttemptsErrorMessage));
                         ModelState.AddModelError(
                             "",
-                            $"{IdentityOptions.TooManySigninAttemptsErrorMessage}<br/>Please try again in {SharedBusinessLogic.AuthenticationBusinessLogic.GetUserLoginLockRemaining(user).ToFriendly(maxParts: 2)}.");
+                            $"{IdentityOptions.TooManySigninAttemptsErrorMessage}\n Please try again in {SharedBusinessLogic.AuthenticationBusinessLogic.GetUserLoginLockRemaining(user).ToFriendly(maxParts: 2)}.");
                     }
                     else if (await _userRepository.CheckPasswordAsync(user, model.Password) == false)
                     {
@@ -277,7 +277,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                                 IdentityOptions.TooManySigninAttemptsErrorMessage));
                         ModelState.AddModelError(
                             "",
-                            $"{IdentityOptions.TooManySigninAttemptsErrorMessage}<br/>Please try again in {lockRemaining.ToFriendly(maxParts: 2)}.");
+                            $"{IdentityOptions.TooManySigninAttemptsErrorMessage}\n Please try again in {lockRemaining.ToFriendly(maxParts: 2)}.");
                     }
                     else
                     {
@@ -344,10 +344,10 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                 // build a return URL so the upstream provider will redirect back
                 // to us after the user has logged out. this allows us to then
                 // complete our single sign-out processing.
-                var url = Url.Action("Logout", new {logoutId = vm.LogoutId});
+                var url = Url.Action("Logout", new { logoutId = vm.LogoutId });
 
                 // this triggers a redirect to the external provider for sign-out
-                return SignOut(new AuthenticationProperties {RedirectUri = url}, vm.ExternalAuthenticationScheme);
+                return SignOut(new AuthenticationProperties { RedirectUri = url }, vm.ExternalAuthenticationScheme);
             }
 
             //Automatically redirect
@@ -369,7 +369,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                     EnableLocalLogin = false,
                     ReturnUrl = returnUrl,
                     Username = context?.LoginHint,
-                    ExternalProviders = new[] {new ExternalProvider {AuthenticationScheme = context.IdP}}
+                    ExternalProviders = new[] { new ExternalProvider { AuthenticationScheme = context.IdP } }
                 };
 
             var schemes = await _schemeProvider.GetAllSchemesAsync();
@@ -379,7 +379,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                     x => x.DisplayName != null
                          || x.Name.Equals(IdentityOptions.WindowsAuthenticationSchemeName,
                              StringComparison.OrdinalIgnoreCase))
-                .Select(x => new ExternalProvider {DisplayName = x.DisplayName, AuthenticationScheme = x.Name})
+                .Select(x => new ExternalProvider { DisplayName = x.DisplayName, AuthenticationScheme = x.Name })
                 .ToList();
 
             var allowLocal = true;
@@ -515,7 +515,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                 var props = new AuthenticationProperties
                 {
                     RedirectUri = Url.Action("ExternalLoginCallback"),
-                    Items = {{"returnUrl", returnUrl}, {"scheme", IdentityOptions.WindowsAuthenticationSchemeName}}
+                    Items = { { "returnUrl", returnUrl }, { "scheme", IdentityOptions.WindowsAuthenticationSchemeName } }
                 };
 
                 var id = new ClaimsIdentity(IdentityOptions.WindowsAuthenticationSchemeName);
@@ -588,7 +588,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             // if the external provider issued an id_token, we'll keep it for signout
             var id_token = externalResult.Properties.GetTokenValue("id_token");
             if (id_token != null)
-                localSignInProps.StoreTokens(new[] {new AuthenticationToken {Name = "id_token", Value = id_token}});
+                localSignInProps.StoreTokens(new[] { new AuthenticationToken { Name = "id_token", Value = id_token } });
         }
 
         private void ProcessLoginCallbackForWsFed(AuthenticateResult externalResult,
@@ -640,7 +640,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             var props = new AuthenticationProperties
             {
                 RedirectUri = Url.Action("ExternalLoginCallback"),
-                Items = {{"returnUrl", returnUrl}, {"scheme", provider}}
+                Items = { { "returnUrl", returnUrl }, { "scheme", provider } }
             };
             return Challenge(props, provider);
         }
