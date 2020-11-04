@@ -272,7 +272,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //RightOfText("2020").BelowText("Status of statement published on this service").Expect(What.Contains, "Already included in "+ org.OrganisationName + "’s 2020 group submission, published on " + DateTime.Now.ToString("dd MMM yyyy"));
 
-            AtXPath("(//div[@class = 'gpg-manage-reports__cell gpg-manage-reports__cell--year' and contains(., '2020')][1]//parent::div)[1]").Expect(What.Contains, "Already included in " + org.OrganisationName + "'s 2020 group submission, published on " + DateTime.Now.ToString("dd MMM yyyy"));
+            AtXPath("(//div[@class = 'gpg-manage-reports__cell gpg-manage-reports__cell--year' and contains(., '2020')][1]//parent::div)[1]").Expect(What.Contains, "Already included in " + org.OrganisationName + "'s 2020 group submission, published on " + DateTime.Now.ToString("d MMM yyyy"));
 
             AtXPath("(//div[@class = 'gpg-manage-reports__cell gpg-manage-reports__cell--year' and contains(., '2019')][1]//parent::div)[1]").Expect(What.Contains, "Not Started");
             await Task.CompletedTask;
