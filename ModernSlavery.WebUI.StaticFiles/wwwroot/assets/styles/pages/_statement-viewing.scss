@@ -47,5 +47,11 @@
     }
 
     .app-statement-summary_url-link-working {
+        a:link {            
+            text-decoration:none;
+            p{
+                text-decoration:underline;
+            }  
+        }
     }
 }

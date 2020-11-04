@@ -9,15 +9,21 @@
     }
 }
 @section BeforeMain {
-    <a class="govuk-back-link" href="@Url.WithQuery("Search", null)">Back</a>
-}
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        @using (Html.BeginForm("SearchResults", "Viewing", FormMethod.Get, new { id = "FinderForm", @class = "js-live-search-form" }))
-        {
+    <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Url.WithQuery("Search", null)">Back</a>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
             <div class="right">
                 <a class="govuk-link download govuk-body govuk-!-font-size-19" href="@(Url.ActionArea("Download", "Viewing", "Viewing"))"><span>Download all statement summary data</span></a>
             </div>
+        </div>
+    </div>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      
+        @using (Html.BeginForm("SearchResults", "Viewing", FormMethod.Get, new { id = "FinderForm", @class = "js-live-search-form", novalidate="" }))
+        {
             <div class="govuk-grid-row finder">
                 <div class="govuk-grid-column-two-thirds">
                     <partial name="Parts/_SearchKeywords" model="Model" />

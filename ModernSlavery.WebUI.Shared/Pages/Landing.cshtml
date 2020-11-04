@@ -99,7 +99,7 @@
     <div class="govuk-width-container">
         @(Html.GovUkPhaseBanner(new PhaseBannerViewModel
     {
-        Classes= "phase-banner-beta",
+        Classes= "phase-banner-beta no-bottom-border",
         Phase = "BETA",
         Html = @<text>This is a new service – your <a class="govuk-link" href="@Url.Action("SendFeedback", "Shared")">feedback</a> will help us to improve it.</text>
     }))

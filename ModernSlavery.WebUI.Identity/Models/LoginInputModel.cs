@@ -8,8 +8,11 @@ namespace ModernSlavery.WebUI.Identity.Models
 {
     public class LoginInputModel
     {
+        [EmailAddress]
+        [MaxLength(100)]
         [Required] public string Username { get; set; }
 
+        [MaxLength(100)]
         [Required] public string Password { get; set; }
 
         public bool RememberLogin { get; set; }
