@@ -45,9 +45,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 case Filenames.OrganisationSubmissions:
                     await UpdateSubmissionsAsync(filePath).ConfigureAwait(false);
                     break;
-                case Filenames.OrganisationLateSubmissions:
-                    await UpdateOrganisationLateSubmissionsAsync(filePath, log).ConfigureAwait(false);
-                    break;
                 case Filenames.OrphanOrganisations:
                     await UpdateOrphanOrganisationsAsync(filePath, log).ConfigureAwait(false);
                     break;
