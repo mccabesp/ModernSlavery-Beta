@@ -15,7 +15,7 @@
 
     <div class="grid-row">
         <div class="column-full">
-            @using (Html.BeginForm())
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
             {
                 @await Html.CustomValidationSummaryAsync()
                 @Html.AntiForgeryToken()
@@ -59,7 +59,7 @@
                     <option value="UpdateUsersToContactForFeedback">Update users to contact for feedback download file</option>
                     <option value="UpdateUsersToSendInfo">Update users to send infomation download file</option>
                 </select>
-               
+
                 <p>
                     <button type="submit" class="button" role="button" onclick="if (!confirm('Are you sure you want to trigger this webjob?')) return false;">Execute</button>
                 </p>

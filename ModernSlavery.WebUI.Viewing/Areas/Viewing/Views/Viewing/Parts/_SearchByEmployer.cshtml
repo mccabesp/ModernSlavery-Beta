@@ -1,4 +1,4 @@
-﻿@using (Html.BeginForm("SearchResults", "Viewing", FormMethod.Get, new {id = "FinderForm"}))
+﻿@using (Html.BeginForm("SearchResults", "Viewing", FormMethod.Get, new {id = "FinderForm", novalidate=""}))
 {
     <div id="SearchByOrganisationGroup" class="form-group">
         <div class="gov-uk-c-searchbar">
@@ -13,7 +13,7 @@
                            placeholder="Search for an organisation"
                            aria-label="Search for an organisation"
                            aria-expanded="false"
-                           maxlength="100"/>
+                           />
 
                 </div>
                 <div class="gov-uk-l-searchbar__cell">

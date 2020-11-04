@@ -45,7 +45,7 @@
 
     <div class="grid-row">
         <div class="column-full">
-            @using (Html.BeginForm())
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
             {
                 @await Html.CustomValidationSummaryAsync()
                 @Html.AntiForgeryToken()
@@ -65,21 +65,21 @@
                     <p style="color: #b10e1e; font-weight: bold;">CHECK THE TEST RESULTS BELOW AND CLICK THE 'EXECUTE' BUTTON AGAIN TO IMPLEMENT THE ACTUAL CHANGES</p>
                 }
                 <h3 class="heading-small">COMMAND</h3>
-                @Html.DropDownListFor(model => Model.Command, new SelectList(options), new {@class = "form-control"})
+                @Html.DropDownListFor(model => Model.Command, new SelectList(options), new { @class = "form-control" })
 
                 <h3 class="heading-small">PARAMETERS</h3>
                 <p>
-                    Enter each change on a new line. Use a equal symbol ('=') to separate reference from values, for example <br/><br/>
-                    'MZC3TMGQ=New Org Name Ltd' or<br/>
-                    'SXAT6DGC=[Address1],[Address2],[Address3],[TownCity],[County],[Country],[PostCode]'<br/>Note: ([Address1], [TownCity] and [PostCode] are required)
+                    Enter each change on a new line. Use a equal symbol ('=') to separate reference from values, for example <br /><br />
+                    'MZC3TMGQ=New Org Name Ltd' or<br />
+                    'SXAT6DGC=[Address1],[Address2],[Address3],[TownCity],[County],[Country],[PostCode]'<br />Note: ([Address1], [TownCity] and [PostCode] are required)
                 </p>
 
-                <p>@Html.TextAreaFor(model => Model.Parameters, 6, 60, new {@class = "form-control", style = "width:100%"})</p>
+                <p>@Html.TextAreaFor(model => Model.Parameters, 6, 60, new { @class = "form-control", style = "width:100%" })</p>
 
                 <h3 class="heading-small">COMMENT</h3>
                 <p>Add a comment here which will be stored against the changes</p>
 
-                <p>@Html.TextAreaFor(model => Model.Comment, 3, 60, new {@class = "form-control", style = "width:100%"})</p>
+                <p>@Html.TextAreaFor(model => Model.Comment, 3, 60, new { @class = "form-control", style = "width:100%" })</p>
 
                 <h3 class="heading-small">RESPONSE</h3>
                 <div style="border: 2px solid #6f777b; max-height: 400px; min-height: 100px; overflow: auto;">@Html.Raw(Model.Results.ReplaceI(Environment.NewLine, "</br>"))</div>

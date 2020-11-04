@@ -11,7 +11,7 @@
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @using (Html.BeginForm())
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
@@ -62,7 +62,7 @@
                                                         <label class="govuk-label" for="RelevantRisks[@relevantIndex].Details">
                                                             Please specify
                                                         </label>
-                                                        <input name="RelevantRisks[@relevantIndex].Details" id="RelevantRisks[@relevantIndex].Details" value="@(Model.RelevantRisks.FirstOrDefault(r=>r.Id==childType.Id)?.Details)" class="govuk-input " type="text" maxlength="256">
+                                                        <input name="RelevantRisks[@relevantIndex].Details" id="RelevantRisks[@relevantIndex].Details" value="@(Model.RelevantRisks.FirstOrDefault(r=>r.Id==childType.Id)?.Details)" class="govuk-input " type="text">
                                                         @Html.ValidationMessage($"RelevantRisks[{relevantIndex}].Details", null, new { @class = "govuk-error-message" })
                                                     </div>
                                                 </div>
@@ -90,7 +90,7 @@
                     <label asp-for="OtherRelevantRisks" class="govuk-label">
                         If you want to specify an area not mentioned above, please provide details
                     </label>
-                    <textarea asp-for="OtherRelevantRisks" class="govuk-textarea" rows="5" maxlength="256">@Model.OtherRelevantRisks</textarea>
+                    <textarea asp-for="OtherRelevantRisks" class="govuk-textarea" rows="5">@Model.OtherRelevantRisks</textarea>
                 </div>
             </fieldset>
 
@@ -132,7 +132,7 @@
                                                     <label class="govuk-label" for="@($"HighDetails{childType.Id}")">
                                                         Please explain why
                                                     </label>
-                                                    <textarea name="HighRisks[@highIndex].Details" id="@($"HighDetails{childType.Id}")" class="govuk-textarea" rows="5" maxlength="256">@(Model.HighRisks.FirstOrDefault(r=>r.Id==childType.Id)?.Details)</textarea>
+                                                    <textarea name="HighRisks[@highIndex].Details" id="@($"HighDetails{childType.Id}")" class="govuk-textarea" rows="5">@(Model.HighRisks.FirstOrDefault(r=>r.Id==childType.Id)?.Details)</textarea>
                                                     @Html.ValidationMessage($"HighRisks[{highIndex}].Details", null, new { @class = "govuk-error-message" })
                                                 </div>
                                             </div>
@@ -154,7 +154,7 @@
                     <label asp-for="OtherHighRisks" class="govuk-label">
                         If you want to specify an area not mentioned above, please provide details
                     </label>
-                    <textarea asp-for="OtherHighRisks"class="govuk-textarea" rows="5" maxlength="256">@Model.OtherHighRisks</textarea>
+                    <textarea asp-for="OtherHighRisks" class="govuk-textarea" rows="5">@Model.OtherHighRisks</textarea>
                 </div>
             </fieldset>
 
