@@ -24,8 +24,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.IncludesTraining, opt => opt.MapFrom(s=>s.IncludesTraining))
                 .ForMember(d => d.TrainingDetails, opt => opt.MapFrom(s=>s.TrainingDetails))
                 .ForMember(d => d.IncludesGoals, opt => opt.MapFrom(s=>s.IncludesGoals))
-                .ForMember(d => d.GoalsDetails, opt => opt.MapFrom(s=>s.GoalsDetails))                
-                .ForAllOtherMembers(opt => opt.Ignore());
+                .ForMember(d => d.GoalsDetails, opt => opt.MapFrom(s=>s.GoalsDetails));
         }
     }
     public class ComplianceViewModel : BaseViewModel
