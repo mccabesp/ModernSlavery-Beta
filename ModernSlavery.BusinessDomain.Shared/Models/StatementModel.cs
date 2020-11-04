@@ -167,7 +167,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         #endregion
 
         #region Statement Summary Fields
-        public StatementSummary1 Summary { get; set; }
+        public StatementSummary1 Summary { get; set; } = new StatementSummary1();
         #endregion
 
         #region Methods

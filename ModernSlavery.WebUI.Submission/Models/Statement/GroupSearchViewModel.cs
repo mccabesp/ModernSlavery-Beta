@@ -6,6 +6,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -14,18 +15,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public GroupSearchViewModelMapperProfile()
         {
-            CreateMap<GroupSearchViewModel, StatementModel>(MemberList.Source)
-                .IncludeBase<GroupOrganisationsViewModel, StatementModel>()
-                .ForAllOtherMembers(opt => opt.Ignore());
-
             CreateMap<StatementModel, GroupSearchViewModel>()
-                .IncludeBase<StatementModel, GroupOrganisationsViewModel>()
-                .ForAllOtherMembers(opt => opt.Ignore());
+                .ForMember(d => d.SearchKeywords, opt => opt.Ignore())
+                .ForMember(d => d.ResultsPage, opt => opt.Ignore())
+                .ForMember(s => s.StatementOrganisations, opt => opt.MapFrom(d => d.StatementOrganisations));
+
+            CreateMap<GroupSearchViewModel, StatementModel>(MemberList.None)
+                .ForMember(s => s.StatementOrganisations, opt => opt.MapFrom(d => d.StatementOrganisations));
         }
     }
 
     public class GroupSearchViewModel : GroupOrganisationsViewModel
-    {  
+    {
         public override string PageTitle => "Which organisations are included in your group statement?";
 
         [Required(AllowEmptyStrings = false)]

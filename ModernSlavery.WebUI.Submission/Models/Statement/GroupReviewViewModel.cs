@@ -10,13 +10,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public GroupReviewViewModelMapperProfile()
         {
-            CreateMap<GroupReviewViewModel, StatementModel>(MemberList.Source)
-                .IncludeBase<GroupOrganisationsViewModel, StatementModel>()
-                .ForAllOtherMembers(opt => opt.Ignore());
-
             CreateMap<StatementModel, GroupReviewViewModel>()
-                .IncludeBase<StatementModel, GroupOrganisationsViewModel>()
-                .ForAllOtherMembers(opt => opt.Ignore());
+                .ForMember(s => s.StatementOrganisations, opt => opt.MapFrom(d => d.StatementOrganisations));
+
+            CreateMap<GroupReviewViewModel, StatementModel>(MemberList.None)
+                .ForMember(s => s.StatementOrganisations, opt => opt.MapFrom(d => d.StatementOrganisations));
+
         }
     }
 

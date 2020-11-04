@@ -6,6 +6,7 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 using ModernSlavery.Core.Entities.StatementSummary;
+using ModernSlavery.BusinessDomain.Shared.Models;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -13,12 +14,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public SocialAuditsViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, SocialAuditsViewModel>();
+            CreateMap<StatementModel, SocialAuditsViewModel>()
+                .ForMember(d => d.SocialAudits, opt => opt.MapFrom(s => s.Summary.SocialAudits))
+                .ForMember(d => d.OtherSocialAudits, opt => opt.MapFrom(s => s.Summary.OtherSocialAudits));
 
-            CreateMap<SocialAuditsViewModel, StatementSummary1>(MemberList.Source)
-                .ForMember(d => d.SocialAudits, opt => opt.MapFrom(s=>s.SocialAudits))
-                .ForMember(d => d.OtherSocialAudits, opt => opt.MapFrom(s=>s.OtherSocialAudits))
-                .ForAllOtherMembers(opt => opt.Ignore());
+            CreateMap<SocialAuditsViewModel, StatementModel>(MemberList.None)
+                .ForPath(d => d.Summary.SocialAudits, opt => opt.MapFrom(s=>s.SocialAudits))
+                .ForPath(d => d.Summary.OtherSocialAudits, opt => opt.MapFrom(s=>s.OtherSocialAudits));
         }
     }
 

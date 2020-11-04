@@ -6,6 +6,7 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 using ModernSlavery.Core.Entities.StatementSummary;
+using ModernSlavery.BusinessDomain.Shared.Models;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -13,12 +14,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public TrainingViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, TrainingViewModel>();
+            CreateMap<StatementModel, TrainingViewModel>()
+                .ForMember(d => d.TrainingTargets, opt => opt.MapFrom(s => s.Summary.TrainingTargets))
+                .ForMember(d => d.OtherTrainingTargets, opt => opt.MapFrom(s => s.Summary.OtherTrainingTargets));
 
-            CreateMap<TrainingViewModel, StatementSummary1>(MemberList.Source)
-                .ForMember(d => d.TrainingTargets, opt => opt.MapFrom(s=>s.TrainingTargets))
-                .ForMember(d => d.OtherTrainingTargets, opt => opt.MapFrom(s=>s.OtherTraining))
-                .ForAllOtherMembers(opt => opt.Ignore());
+            CreateMap<TrainingViewModel, StatementModel>(MemberList.None)
+                .ForPath(d => d.Summary.TrainingTargets, opt => opt.MapFrom(s=>s.TrainingTargets))
+                .ForPath(d => d.Summary.OtherTrainingTargets, opt => opt.MapFrom(s=>s.OtherTrainingTargets));
         }
     }
 
@@ -29,14 +31,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public List<TrainingTargetTypes> TrainingTargets { get; set; } = new List<TrainingTargetTypes>();
 
         [MaxLength(256)]
-        public string OtherTraining { get; set; }
+        public string OtherTrainingTargets { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
 
-            if (TrainingTargets.Contains(TrainingTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTraining))
-                validationResults.AddValidationError(3700, nameof(OtherTraining));
+            if (TrainingTargets.Contains(TrainingTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTrainingTargets))
+                validationResults.AddValidationError(3700, nameof(OtherTrainingTargets));
 
             return validationResults;
         }
@@ -45,7 +47,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             if (TrainingTargets.Any())
             {
-                if (TrainingTargets.Contains(TrainingTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTraining)) return Status.InProgress;
+                if (TrainingTargets.Contains(TrainingTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTrainingTargets)) return Status.InProgress;
                 return Status.Complete;
             }
 

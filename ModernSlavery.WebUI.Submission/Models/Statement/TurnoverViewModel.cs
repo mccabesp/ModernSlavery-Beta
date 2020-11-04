@@ -13,9 +13,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<StatementModel, TurnoverViewModel>();
 
-            CreateMap<TurnoverViewModel, StatementModel>(MemberList.Source)
-                .ForMember(d => d.Turnover, opt => opt.MapFrom(s=>s.Turnover))
-                .ForAllOtherMembers(opt => opt.Ignore());
+            CreateMap<TurnoverViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.Turnover, opt => opt.MapFrom(s=>s.Turnover));
         }
     }
 

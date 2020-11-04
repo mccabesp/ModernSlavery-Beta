@@ -208,77 +208,14 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
         public TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel, params object[] arguments) where TViewModel : BaseViewModel
         {
-            //Instantiate the ViewModel
-            var viewModel = ActivatorUtilities.CreateInstance<TViewModel>(_serviceProvider);
-
-            switch (viewModel)
-            {
-                case PoliciesViewModel _:
-                case TrainingViewModel _:
-                case PartnersViewModel _:
-                case SocialAuditsViewModel _:
-                case GrievancesViewModel _:
-                case MonitoringViewModel _:
-                case HighestRisksViewModel _:
-                case IndicatorsViewModel _:
-                case RemediationsViewModel _:
-                case ProgressViewModel _:
-                    //Copy the StatementSummaryModel data to the viewModel
-                    var summary = statementModel.Summary ?? new StatementSummary1();
-                    return _mapper.Map(summary, viewModel);
-                case HighRiskViewModel highRiskViewModel:
-                    //Copy the StatementRisk data to the viewModel
-                    var index = (int)arguments[0];
-                    var risk = statementModel.Summary.Risks.Count > index ? statementModel.Summary.Risks[index] : new IStatementSummary1.StatementRisk();
-                    _mapper.Map(risk, viewModel);
-                    highRiskViewModel.Index = index;
-                    highRiskViewModel.TotalRisks = statementModel.Summary.Risks.Count;
-                    return highRiskViewModel as TViewModel;
-                default:
-                    //Copy the StatementModel data to the viewModel
-                    return _mapper.Map(statementModel, viewModel);
-            }
+            //Instantiate the ViewModel with arguments
+            var viewModel = ActivatorUtilities.CreateInstance<TViewModel>(_serviceProvider,arguments);
+            return _mapper.Map(statementModel, viewModel);
         }
 
         public StatementModel SetViewModelToStatementModel<TViewModel>(TViewModel viewModel, StatementModel statementModel, params object[] arguments)
         {
-            switch (viewModel)
-            {
-                case PoliciesViewModel _:
-                case TrainingViewModel _:
-                case PartnersViewModel _:
-                case SocialAuditsViewModel _:
-                case GrievancesViewModel _:
-                case MonitoringViewModel _:
-                case HighestRisksViewModel _:
-                case IndicatorsViewModel _:
-                case RemediationsViewModel _:
-                case ProgressViewModel _:
-                    //Copy the ViewModel data to the StatementSummaryModel
-                    if (statementModel.Summary==null) statementModel.Summary=new StatementSummary1();
-                    _mapper.Map(viewModel, statementModel.Summary);
-                    return statementModel;
-                case Type type when type == typeof(HighRiskViewModel):
-                    //Copy the ViewModel data to the HighRiskViewModel
-                    var index = (int)arguments[0];
-                    if (statementModel.Summary == null) statementModel.Summary = new StatementSummary1();
-                    if (statementModel.Summary.Risks==null) statementModel.Summary.Risks=new List<StatementRisk>();
-                    StatementRisk risk = null;
-                    if (statementModel.Summary.Risks.Count <= index) 
-                    {
-                        risk = new StatementRisk();
-                        statementModel.Summary.Risks.Add(risk);
-                    }
-                    else
-                    {
-                        risk = statementModel.Summary.Risks[index];
-                    }
-                    _mapper.Map(viewModel,risk);
-                    return statementModel;
-                default:
-                    //Copy the ViewModel data to the StatementModel
-                    return _mapper.Map(viewModel,statementModel);
-            }
+            return _mapper.Map(viewModel, statementModel);
         }
 
         public async Task<Outcome<StatementErrors, StatementModel>> OpenDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
@@ -428,17 +365,17 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         public async Task<Outcome<StatementErrors>> AddGroupOrganisationAsync(GroupAddViewModel groupAddViewModel)
         {
             if (groupAddViewModel == null) throw new ArgumentNullException(nameof(GroupAddViewModel));
-            if (string.IsNullOrWhiteSpace(groupAddViewModel.OrganisationName)) throw new ArgumentNullException(nameof(groupAddViewModel.OrganisationName));
+            if (string.IsNullOrWhiteSpace(groupAddViewModel.NewOrganisationName)) throw new ArgumentNullException(nameof(groupAddViewModel.NewOrganisationName));
 
             //Check the organisation is not already included
-            if (groupAddViewModel.StatementOrganisations.Any(o => o.OrganisationName.EqualsI(groupAddViewModel.OrganisationName)))
-                return new Outcome<StatementErrors>(StatementErrors.DuplicateName, groupAddViewModel.OrganisationName);
+            if (groupAddViewModel.StatementOrganisations.Any(o => o.OrganisationName.EqualsI(groupAddViewModel.NewOrganisationName)))
+                return new Outcome<StatementErrors>(StatementErrors.DuplicateName, groupAddViewModel.NewOrganisationName);
 
             //Add the new organisation manually
             var newStatementOrganisationViewModel = new GroupOrganisationsViewModel.StatementOrganisationViewModel()
             {
                 Included = true,
-                OrganisationName = groupAddViewModel.OrganisationName
+                OrganisationName = groupAddViewModel.NewOrganisationName
             };
 
             //Include the new organisation

@@ -24,6 +24,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         {
             public AutoMapperProfile()
             {
+
                 CreateMap<OrganisationSearchModel, StatementSummaryViewModel>()
                     .ForMember(d => d.StatementSummaryUrl, opt => opt.Ignore())
                     .ForMember(d => d.BackUrl, opt => opt.Ignore())

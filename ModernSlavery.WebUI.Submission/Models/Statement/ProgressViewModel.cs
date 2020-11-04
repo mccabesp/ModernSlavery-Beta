@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities.StatementSummary;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,11 +11,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public ProgressViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, ProgressViewModel>();
+            CreateMap<StatementModel, ProgressViewModel>()
+                .ForMember(d => d.ProgressMeasures, opt => opt.MapFrom(s => s.Summary.ProgressMeasures));
 
-            CreateMap<ProgressViewModel, StatementSummary1>(MemberList.Source)
-                .ForMember(d => d.ProgressMeasures, opt => opt.MapFrom(s=>s.ProgressMeasures))
-                .ForAllOtherMembers(opt => opt.Ignore());
+            CreateMap<ProgressViewModel, StatementModel>(MemberList.None)
+                .ForPath(d => d.Summary.ProgressMeasures, opt => opt.MapFrom(s=>s.ProgressMeasures));
         }
     }
 

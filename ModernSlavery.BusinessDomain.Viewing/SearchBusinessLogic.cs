@@ -265,7 +265,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
                 SubmissionDeadlineYear = reportingDeadlineYear,
                 OrganisationName = organisation.OrganisationName,
                 CompanyNumber = organisation.CompanyNumber,
-                SectorType = new OrganisationSearchModel.KeyName { Key = (int)organisation.SectorType, Name = organisation.SectorType.ToString() },
+                SectorType = _autoMapper.Map<OrganisationSearchModel.KeyName>(organisation.SectorType),
                 Address = AddressModel.Create(organisation.LatestAddress),
 
                 Modified = submittedStatement == null ? organisation.Modified : submittedStatement.Modified,

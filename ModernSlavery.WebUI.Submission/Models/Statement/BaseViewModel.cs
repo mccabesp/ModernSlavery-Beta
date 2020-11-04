@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
     public abstract class BaseViewModel: GovUkViewModel, IValidatableObject
     {
+
         public enum CommandType
         {
             Unknown=0,

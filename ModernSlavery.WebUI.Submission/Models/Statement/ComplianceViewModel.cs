@@ -13,7 +13,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<StatementModel, ComplianceViewModel>();
 
-            CreateMap<ComplianceViewModel, StatementModel>(MemberList.Source)                
+            CreateMap<ComplianceViewModel, StatementModel>(MemberList.None)                
                 .ForMember(d => d.StructureDetails, opt => opt.MapFrom(s=>s.StructureDetails))
                 .ForMember(d => d.IncludesPolicies, opt => opt.MapFrom(s=>s.IncludesPolicies))
                 .ForMember(d => d.PolicyDetails, opt => opt.MapFrom(s=>s.PolicyDetails))

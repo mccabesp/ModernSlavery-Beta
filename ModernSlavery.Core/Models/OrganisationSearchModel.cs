@@ -20,6 +20,8 @@ namespace ModernSlavery.Core.Models
         {
             public AutoMapperProfile() : base()
             {
+                CreateMap<SummarySearchModel.StatementRisk, StatementRisk>().ReverseMap();
+
                 CreateMap<OrganisationSearchModel, OrganisationSearchModel>();
             }
         }
@@ -68,8 +70,7 @@ namespace ModernSlavery.Core.Models
             [Serializable]
             public class StatementRisk
             {
-                public byte Index { get; set; }
-                public string Details { get; set; }
+                public string Description { get; set; }
 
                 #region Risk Source Fields
                 public KeyName LikelySource { get; set; }
@@ -88,25 +89,9 @@ namespace ModernSlavery.Core.Models
 
                 public List<KeyName> Countries { get; set; } = new List<KeyName>();
                 #endregion
-
-                #region Overrides
-                public override bool Equals(object obj)
-                {
-                    // Check for null values and compare run-time types.
-                    var target = obj as StatementRisk;
-                    if (target == null) return false;
-
-                    return Index == target.Index;
-                }
-
-                public override int GetHashCode()
-                {
-                    return Index.GetHashCode();
-                }
-                #endregion
             }
 
-            public List<KeyName> Risks { get; set; } = new List<KeyName>();
+            public List<StatementRisk> Risks { get; set; } = new List<StatementRisk>();
 
             #endregion
 
@@ -135,37 +120,37 @@ namespace ModernSlavery.Core.Models
             {
                 public AutoMapperProfile() : base()
                 {
-                    CreateMap<KeyName, SectorTypes?>().ConstructUsing(s => s == null ? (SectorTypes?)null : (SectorTypes)s.Key);
-                    CreateMap<KeyName, StatementTurnoverRanges?>().ConstructUsing(s => s == null ? (StatementTurnoverRanges?)null : (StatementTurnoverRanges)s.Key);
-                    CreateMap<KeyName, StatementYearRanges?>().ConstructUsing(s => s == null ? (StatementYearRanges?)null : (StatementYearRanges)s.Key);
+                    CreateMap<KeyName, SectorTypes?>().ConvertUsing(s => s == null ? (SectorTypes?)null : (SectorTypes)s.Key);
+                    CreateMap<KeyName, StatementTurnoverRanges?>().ConvertUsing(s => s == null ? (StatementTurnoverRanges?)null : (StatementTurnoverRanges)s.Key);
+                    CreateMap<KeyName, StatementYearRanges?>().ConvertUsing(s => s == null ? (StatementYearRanges?)null : (StatementYearRanges)s.Key);
                     CreateMap<KeyName, SectorTypeIndex.SectorType>().ConvertUsing<SectorConverter>();
 
-                    CreateMap<KeyName, PolicyTypes?>().ConstructUsing(s => s == null ? (PolicyTypes?)null : (PolicyTypes)s.Key);
-                    CreateMap<KeyName, TrainingTargetTypes?>().ConstructUsing(s => s == null ? (TrainingTargetTypes?)null : (TrainingTargetTypes)s.Key);
-                    CreateMap<KeyName, PartnerTypes?>().ConstructUsing(s => s == null ? (PartnerTypes?)null : (PartnerTypes)s.Key);
-                    CreateMap<KeyName, SocialAuditTypes?>().ConstructUsing(s => s == null ? (SocialAuditTypes?)null : (SocialAuditTypes)s.Key);
-                    CreateMap<KeyName, GrievanceMechanismTypes?>().ConstructUsing(s => s == null ? (GrievanceMechanismTypes?)null : (GrievanceMechanismTypes)s.Key);
-                    CreateMap<KeyName, RiskSourceTypes?>().ConstructUsing(s => s == null ? (RiskSourceTypes?)null : (RiskSourceTypes)s.Key);
-                    CreateMap<KeyName, RiskTargetTypes?>().ConstructUsing(s => s == null ? (RiskTargetTypes?)null : (RiskTargetTypes)s.Key);
-                    CreateMap<KeyName, CountryTypes?>().ConstructUsing(s => s == null ? (CountryTypes?)null : (CountryTypes)s.Key);
-                    CreateMap<KeyName, IndicatorTypes?>().ConstructUsing(s => s == null ? (IndicatorTypes?)null : (IndicatorTypes)s.Key);
-                    CreateMap<KeyName, RemediationTypes?>().ConstructUsing(s => s == null ? (RemediationTypes?)null : (RemediationTypes)s.Key);
+                    CreateMap<KeyName, PolicyTypes>().ConvertUsing(s => s == null ? PolicyTypes.Unknown : (PolicyTypes)s.Key);
+                    CreateMap<KeyName, TrainingTargetTypes>().ConvertUsing(s => s == null ? TrainingTargetTypes.Unknown : (TrainingTargetTypes)s.Key);
+                    CreateMap<KeyName, PartnerTypes>().ConvertUsing(s => s == null ? PartnerTypes.Unknown : (PartnerTypes)s.Key);
+                    CreateMap<KeyName, SocialAuditTypes>().ConvertUsing(s => s == null ? SocialAuditTypes.Unknown : (SocialAuditTypes)s.Key);
+                    CreateMap<KeyName, GrievanceMechanismTypes>().ConvertUsing(s => s == null ? GrievanceMechanismTypes.Unknown : (GrievanceMechanismTypes)s.Key);
+                    CreateMap<KeyName, RiskSourceTypes>().ConvertUsing(s => s == null ? RiskSourceTypes.Unknown : (RiskSourceTypes)s.Key);
+                    CreateMap<KeyName, RiskTargetTypes>().ConvertUsing(s => s == null ? RiskTargetTypes.Unknown : (RiskTargetTypes)s.Key);
+                    CreateMap<KeyName, CountryTypes>().ConvertUsing(s => s == null ? CountryTypes.Unknown : (CountryTypes)s.Key);
+                    CreateMap<KeyName, IndicatorTypes>().ConvertUsing(s => s == null ? IndicatorTypes.Unknown : (IndicatorTypes)s.Key);
+                    CreateMap<KeyName, RemediationTypes>().ConvertUsing(s => s == null ? RemediationTypes.Unknown : (RemediationTypes)s.Key);
 
-                    CreateMap<SectorTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<StatementTurnoverRanges,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<StatementYearRanges, KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<SectorTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<StatementTurnoverRanges,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<StatementYearRanges, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<SectorTypeIndex.SectorType,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s.Id, Name = s.Description }); 
 
-                    CreateMap<PolicyTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<TrainingTargetTypes, KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<PartnerTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<SocialAuditTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<GrievanceMechanismTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<RiskSourceTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<RiskTargetTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<CountryTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<IndicatorTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<RemediationTypes,KeyName>().ConstructUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<PolicyTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<TrainingTargetTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<PartnerTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<SocialAuditTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<GrievanceMechanismTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<RiskSourceTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<RiskTargetTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<CountryTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<IndicatorTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<RemediationTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                 }
 
                 public class SectorConverter : ITypeConverter<KeyName, SectorTypeIndex.SectorType>

@@ -15,12 +15,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public PoliciesViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, PoliciesViewModel>();
+            CreateMap<StatementModel, PoliciesViewModel>()
+                .ForMember(d => d.Policies, opt => opt.MapFrom(s => s.Summary.Policies))
+                .ForMember(d => d.OtherPolicies, opt => opt.MapFrom(s => s.Summary.OtherPolicies));
 
-            CreateMap<PoliciesViewModel, StatementSummary1>(MemberList.Source)
-                .ForMember(d => d.Policies, opt => opt.MapFrom(s=>s.Policies))
-                .ForMember(d => d.OtherPolicies, opt => opt.MapFrom(s=>s.OtherPolicies))
-                .ForAllOtherMembers(opt => opt.Ignore());
+            CreateMap<PoliciesViewModel, StatementModel>(MemberList.None)
+                .ForPath(d => d.Summary.Policies, opt => opt.MapFrom(s=>s.Policies))
+                .ForPath(d => d.Summary.OtherPolicies, opt => opt.MapFrom(s=>s.OtherPolicies));
         }
     }
 

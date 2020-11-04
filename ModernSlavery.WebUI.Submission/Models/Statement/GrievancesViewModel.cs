@@ -6,6 +6,7 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 using ModernSlavery.Core.Entities.StatementSummary;
+using ModernSlavery.BusinessDomain.Shared.Models;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -13,12 +14,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public GrievancesViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, GrievancesViewModel>();
+            CreateMap<StatementModel, GrievancesViewModel>()
+                .ForMember(d => d.GrievanceMechanisms, opt => opt.MapFrom(s => s.Summary.GrievanceMechanisms))
+                .ForMember(d => d.OtherGrievanceMechanisms, opt => opt.MapFrom(s => s.Summary.OtherGrievanceMechanisms));
 
-            CreateMap<GrievancesViewModel, StatementSummary1>(MemberList.Source)
-                .ForMember(d => d.GrievanceMechanisms, opt => opt.MapFrom(s=>s.GrievanceMechanisms))
-                .ForMember(d => d.OtherGrievanceMechanisms, opt => opt.MapFrom(s=>s.OtherGrievances))
-                .ForAllOtherMembers(opt => opt.Ignore());
+            CreateMap<GrievancesViewModel, StatementModel>(MemberList.None)
+                .ForPath(d => d.Summary.GrievanceMechanisms, opt => opt.MapFrom(s=>s.GrievanceMechanisms))
+                .ForPath(d => d.Summary.OtherGrievanceMechanisms, opt => opt.MapFrom(s=>s.OtherGrievanceMechanisms));
         }
     }
 
@@ -29,14 +31,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public List<GrievanceMechanismTypes> GrievanceMechanisms { get; set; } = new List<GrievanceMechanismTypes>();
 
         [MaxLength(256)]
-        public string OtherGrievances { get; set; }
+        public string OtherGrievanceMechanisms { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
 
-            if (GrievanceMechanisms.Contains(GrievanceMechanismTypes.Other) && string.IsNullOrWhiteSpace(OtherGrievances))
-                validationResults.AddValidationError(4200, nameof(OtherGrievances));
+            if (GrievanceMechanisms.Contains(GrievanceMechanismTypes.Other) && string.IsNullOrWhiteSpace(OtherGrievanceMechanisms))
+                validationResults.AddValidationError(4200, nameof(OtherGrievanceMechanisms));
 
             return validationResults;
         }
@@ -45,7 +47,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             if (GrievanceMechanisms.Any())
             {
-                if (GrievanceMechanisms.Contains(GrievanceMechanismTypes.Other) && string.IsNullOrWhiteSpace(OtherGrievances)) return Status.InProgress;
+                if (GrievanceMechanisms.Contains(GrievanceMechanismTypes.Other) && string.IsNullOrWhiteSpace(OtherGrievanceMechanisms)) return Status.InProgress;
                 return Status.Complete;
             }
 

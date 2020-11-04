@@ -15,21 +15,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public GroupOrganisationsViewModelMapperProfile()
         {
-            CreateMap<StatementModel.StatementOrganisationModel, GroupOrganisationsViewModel.StatementOrganisationViewModel>()
-                .ForMember(d => d.OtherSubmissionsInformation, opt => opt.Ignore())
-                .ForMember(d => d.ManuallyAdded, opt => opt.Ignore());
-
-            CreateMap<GroupOrganisationsViewModel.StatementOrganisationViewModel, StatementModel.StatementOrganisationModel>();
+            CreateMap<StatementModel.StatementOrganisationModel, GroupOrganisationsViewModel.StatementOrganisationViewModel>(MemberList.Source);
 
             CreateMap<StatementModel, GroupOrganisationsViewModel>()
                 .ForMember(s => s.GroupSubmission, opt => opt.MapFrom(d => d.GroupSubmission))
                 .ForMember(s => s.StatementOrganisations, opt => opt.MapFrom(d => d.StatementOrganisations))
                 .ForAllOtherMembers(opt => opt.Ignore());
 
-            CreateMap<GroupOrganisationsViewModel, StatementModel>(MemberList.Source)
+            CreateMap<GroupOrganisationsViewModel.StatementOrganisationViewModel, StatementModel.StatementOrganisationModel>();
+
+            CreateMap<GroupOrganisationsViewModel, StatementModel>(MemberList.None)
                 .ForMember(s => s.GroupSubmission, opt => opt.MapFrom(d => d.GroupSubmission))
-                .ForMember(s => s.StatementOrganisations, opt => opt.MapFrom(d => d.StatementOrganisations))
-                .ForAllOtherMembers(opt => opt.Ignore());
+                .ForMember(s => s.StatementOrganisations, opt => opt.MapFrom(d => d.StatementOrganisations));
         }
     }
 
@@ -43,12 +40,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public class StatementOrganisationViewModel
         {
             public long? StatementOrganisationId { get; set; }
-            public long? OrganisationId { get; set; }
             public bool Included { get; set; }
+            public long? OrganisationId { get; set; }
             public string OrganisationName { get; set; }
             public AddressModel Address { get; set; }
             public string CompanyNumber { get; set; }
             public DateTime? DateOfCessation { get; set; }
+
             [NotMapped]
             [BindNever]
             public List<string> OtherSubmissionsInformation { get; set; }

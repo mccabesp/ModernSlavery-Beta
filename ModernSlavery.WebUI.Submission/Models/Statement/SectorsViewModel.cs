@@ -16,10 +16,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<StatementModel, SectorsViewModel>();
 
-            CreateMap<SectorsViewModel, StatementModel>(MemberList.Source)
+            CreateMap<SectorsViewModel, StatementModel>(MemberList.None)
                 .ForMember(d => d.Sectors, opt => opt.MapFrom(s => s.Sectors))
-                .ForMember(d => d.OtherSectors, opt => opt.MapFrom(s => s.OtherSector))
-                .ForAllOtherMembers(opt => opt.Ignore());
+                .ForMember(d => d.OtherSectors, opt => opt.MapFrom(s => s.OtherSectors));
         }
     }
 
@@ -44,7 +43,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public List<short> Sectors { get; set; } = new List<short>();
 
         [MaxLength(128)]//We need at least one validation annotation otherwise Validate wont execute
-        public string OtherSector { get; set; }
+        public string OtherSectors { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -52,8 +51,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             var otherId = SectorTypes.Single(x => x.Description.Equals("Other")).Id;
 
-            if (Sectors.Contains(otherId) && string.IsNullOrEmpty(OtherSector))
-                validationResults.AddValidationError(3300, nameof(OtherSector));
+            if (Sectors.Contains(otherId) && string.IsNullOrEmpty(OtherSectors))
+                validationResults.AddValidationError(3300, nameof(OtherSectors));
 
             return validationResults;
         }
@@ -63,7 +62,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (Sectors.Any())
             {
                 var other = SectorTypes.Single(x => x.Description.Equals("Other"));
-                if (!Sectors.Any(t => t == other.Id || !string.IsNullOrWhiteSpace(OtherSector))) return Status.Complete;
+                if (!Sectors.Any(t => t == other.Id || !string.IsNullOrWhiteSpace(OtherSectors))) return Status.Complete;
             }
 
             return Status.Incomplete;

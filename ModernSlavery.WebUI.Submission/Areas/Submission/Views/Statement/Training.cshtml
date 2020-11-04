@@ -39,13 +39,13 @@
                             </div>
                             @if (trainingType== IStatementSummary1.TrainingTargetTypes.Other)
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTraining, "govuk-form-group--error")" id="training-conditional-@((int)trainingType)">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTrainingTargets, "govuk-form-group--error")" id="training-conditional-@((int)trainingType)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" asp-for="OtherTraining">
                                             Please specify
                                         </label>
-                                        <input asp-for="OtherTraining" class="govuk-input" spellcheck="false">
-                                        <span asp-validation-for="OtherTraining" class="govuk-error-message"></span>
+                                        <input asp-for="OtherTrainingTargets" class="govuk-input" spellcheck="false">
+                                        <span asp-validation-for="OtherTrainingTargets" class="govuk-error-message"></span>
                                     </div>
                                 </div>
                             }

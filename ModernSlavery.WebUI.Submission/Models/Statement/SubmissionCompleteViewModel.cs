@@ -8,9 +8,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public SubmissionCompleteViewModelMapperProfile()
         {
             CreateMap<StatementModel, SubmissionCompleteViewModel>();
-
-            CreateMap<SubmissionCompleteViewModel, StatementModel>(MemberList.Source)
-                .ForAllOtherMembers(opt=>opt.Ignore());
         }
     }
 

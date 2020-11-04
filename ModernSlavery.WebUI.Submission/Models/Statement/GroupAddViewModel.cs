@@ -5,6 +5,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
@@ -14,13 +15,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public GroupAddViewModelMapperProfile()
         {
-            CreateMap<GroupAddViewModel, StatementModel>(MemberList.Source)
-                .IncludeBase<GroupOrganisationsViewModel, StatementModel>()
-                .ForAllOtherMembers(opt => opt.Ignore());
-
             CreateMap<StatementModel, GroupAddViewModel>()
-                .IncludeBase<StatementModel, GroupOrganisationsViewModel>()
-                .ForAllOtherMembers(opt => opt.Ignore());
+                .ForMember(d=>d.SearchKeywords, opt=>opt.Ignore())
+                .ForMember(d=>d.NewOrganisationName, opt=>opt.Ignore())
+                .ForMember(d => d.StatementOrganisations, opt => opt.MapFrom(s => s.StatementOrganisations));
+
+            CreateMap<GroupAddViewModel, StatementModel>(MemberList.None)
+                .ForMember(s => s.StatementOrganisations, opt => opt.MapFrom(d => d.StatementOrganisations));
         }
     }
 
@@ -34,7 +35,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         [Required(AllowEmptyStrings = false)]
         [MaxLength(100)]
-        public string OrganisationName { get; set; }
+        public string NewOrganisationName { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

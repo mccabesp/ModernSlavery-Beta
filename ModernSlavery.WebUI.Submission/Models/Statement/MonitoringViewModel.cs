@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities.StatementSummary;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,11 +11,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public MonitoringViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, MonitoringViewModel>();
+            CreateMap<StatementModel, MonitoringViewModel>()
+                .ForMember(d => d.OtherWorkConditionsMonitoring, opt => opt.MapFrom(s => s.Summary.OtherWorkConditionsMonitoring));
 
-            CreateMap<MonitoringViewModel, StatementSummary1>(MemberList.Source)
-                .ForMember(d => d.OtherWorkConditionsMonitoring, opt => opt.MapFrom(s=>s.OtherWorkConditionsMonitoring))
-                .ForAllOtherMembers(opt => opt.Ignore());
+            CreateMap<MonitoringViewModel, StatementModel>(MemberList.None)
+                .ForPath(d => d.Summary.OtherWorkConditionsMonitoring, opt => opt.MapFrom(s=>s.OtherWorkConditionsMonitoring));
         }
     }
 

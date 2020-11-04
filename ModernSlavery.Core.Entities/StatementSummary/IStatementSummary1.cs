@@ -137,7 +137,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
                 [Description("Children")] Children
             }
 
-            public SortedSet<RiskSourceTypes> Targets { get; set; } = new SortedSet<RiskSourceTypes>();
+            public SortedSet<RiskTargetTypes> Targets { get; set; } = new SortedSet<RiskTargetTypes>();
 
             public string OtherTargets { get; set; }
             #endregion

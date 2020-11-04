@@ -15,14 +15,19 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public SignOffViewModelMapperProfile()
         {
             CreateMap<StatementModel, SignOffViewModel>()
+                .ForMember(d => d.ApproverFirstName, opt => opt.MapFrom(s => s.ApproverFirstName))
+                .ForMember(d => d.ApproverLastName, opt => opt.MapFrom(s => s.ApproverLastName))
+                .ForMember(d => d.ApproverJobTitle, opt => opt.MapFrom(s => s.ApproverJobTitle))
                 .ForMember(d => d.ApprovedDay, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Day))
                 .ForMember(d => d.ApprovedMonth, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Month))
                 .ForMember(d => d.ApprovedYear, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Year))
                 .ForAllOtherMembers(opt => opt.Ignore());
 
-            CreateMap<SignOffViewModel, StatementModel>(MemberList.Source)
-                .ForMember(d => d.ApprovedDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.ApprovedDate); })
-                .ForAllOtherMembers(opt => opt.Ignore());
+            CreateMap<SignOffViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.ApproverFirstName, opt => opt.MapFrom(s => s.ApproverFirstName))
+                .ForMember(d => d.ApproverLastName, opt => opt.MapFrom(s => s.ApproverLastName))
+                .ForMember(d => d.ApproverJobTitle, opt => opt.MapFrom(s => s.ApproverJobTitle))
+                .ForMember(d => d.ApprovedDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.ApprovedDate); });
         }
     }
 

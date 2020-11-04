@@ -21,19 +21,30 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(s => s.CompliancePage, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.SectorsPage, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.YearsPage, opt => opt.MapFrom(s => s))
-                .ForMember(s => s.PoliciesPage, opt => opt.MapFrom(s => s.Summary))
-                .ForMember(s => s.TrainingPage, opt => opt.MapFrom(s => s.Summary))
-                .ForMember(s => s.PartnersPage, opt => opt.MapFrom(s => s.Summary))
-                .ForMember(s => s.SocialAuditsPage, opt => opt.MapFrom(s => s.Summary))
-                .ForMember(s => s.GrievancesPage, opt => opt.MapFrom(s => s.Summary))
-                .ForMember(s => s.MonitoringPage, opt => opt.MapFrom(s => s.Summary))
-                .ForMember(s => s.HighestRisksPage, opt => opt.MapFrom(s => s.Summary))
-                .ForMember(s => s.HighRiskPages, opt => opt.MapFrom(s => s.Summary.Risks))
-                .ForMember(s => s.IndicatorsPage, opt => opt.MapFrom(s => s.Summary))
-                .ForMember(s => s.RemediationsPage, opt => opt.MapFrom(s => s.Summary))
-                .ForMember(s => s.ProgressPage, opt => opt.MapFrom(s => s.Summary))
+                .ForMember(s => s.PoliciesPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.TrainingPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.PartnersPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.SocialAuditsPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.GrievancesPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.MonitoringPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.HighestRisksPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.HighRiskPages, opt => opt.ConvertUsing(new RiskListConverter(),s=>s))
+                .ForMember(s => s.IndicatorsPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.RemediationsPage, opt => opt.MapFrom(s => s))
+                .ForMember(s => s.ProgressPage, opt => opt.MapFrom(s => s))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
+
+        public class RiskListConverter : IValueConverter<StatementModel, List<HighRiskViewModel>>
+        {
+            public List<HighRiskViewModel> Convert(StatementModel sourceMember, ResolutionContext context)
+            {
+                int index = 0;
+                var highRiskPages = sourceMember.Summary.Risks.Select(r => new HighRiskViewModel(index++)).Select(vm => context.Mapper.Map(sourceMember, vm)).ToList();
+                return highRiskPages;
+            }
+        }
+
     }
 
     public class ReviewViewModel : BaseViewModel

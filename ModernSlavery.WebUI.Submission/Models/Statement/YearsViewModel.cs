@@ -13,9 +13,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<StatementModel, YearsViewModel>();
 
-            CreateMap<YearsViewModel, StatementModel>(MemberList.Source)
-                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s=>s.StatementYears))
-                .ForAllOtherMembers(opt => opt.Ignore());
+            CreateMap<YearsViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s=>s.StatementYears));
         }
     }
 

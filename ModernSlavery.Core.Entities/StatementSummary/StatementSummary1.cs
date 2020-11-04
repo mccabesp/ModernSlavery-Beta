@@ -50,6 +50,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         #region Risks
 
         public List<StatementRisk> Risks { get; set; } = new List<StatementRisk>();
+        public bool NoRisks { get; set; }
 
         #endregion
 

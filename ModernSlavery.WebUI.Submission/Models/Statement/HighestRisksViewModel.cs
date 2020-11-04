@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities.StatementSummary;
 using System;
 using System.Collections.Generic;
@@ -11,14 +12,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public HighestRisksViewModelMapperProfile()
         {
-            CreateMap<StatementSummary1, HighestRisksViewModel>()
-                .ForMember(d => d.HighRisk1, opt => opt.MapFrom(s => s.Risks.Count < 1 ? null : s.Risks[0].Description))
-                .ForMember(d => d.HighRisk1, opt => opt.MapFrom(s => s.Risks.Count < 2 ? null : s.Risks[1].Description))
-                .ForMember(d => d.HighRisk1, opt => opt.MapFrom(s => s.Risks.Count < 3 ? null : s.Risks[2].Description));
+            CreateMap<StatementModel, HighestRisksViewModel>()
+                .ForMember(d => d.HighRisk1, opt => opt.MapFrom(s => s.Summary.Risks.Count < 1 ? null : s.Summary.Risks[0].Description))
+                .ForMember(d => d.HighRisk2, opt => opt.MapFrom(s => s.Summary.Risks.Count < 2 ? null : s.Summary.Risks[1].Description))
+                .ForMember(d => d.HighRisk3, opt => opt.MapFrom(s => s.Summary.Risks.Count < 3 ? null : s.Summary.Risks[2].Description))
+                .ForMember(d => d.NoRisks, opt => opt.MapFrom(s => s.Summary.NoRisks));
 
-            CreateMap<HighestRisksViewModel, StatementSummary1>(MemberList.Source)
+            CreateMap<HighestRisksViewModel, StatementModel>(MemberList.None)
+                .ForPath(d => d.Summary.NoRisks, opt => opt.MapFrom(s => s.NoRisks))
                 .AfterMap((s, d) =>
                 {
+                    //Clear all risks if no risks selected
+                    if (s.NoRisks)s.HighRisk1 = s.HighRisk2 = s.HighRisk3 = null;
 
                     //Create or clear each risk description
                     foreach (var pars in new[] { (s.HighRisk1, 0), (s.HighRisk2, 1), (s.HighRisk3, 2) })
@@ -27,11 +32,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                     void SetRiskDetails(string description, int index)
                     {
                         //Ensure there is a risk for every item
-                        var risk = d.Risks.Count <= index ? null : d.Risks[index];
+                        var risk = d.Summary.Risks.Count <= index ? null : d.Summary.Risks[index];
                         if (risk == null)
                         {
                             risk = new IStatementSummary1.StatementRisk();
-                            d.Risks.Add(risk);
+                            d.Summary.Risks.Add(risk);
                         }
 
                         //Clearing the associated details when the description is cleared
@@ -49,10 +54,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                     }
 
                     //Remove empty risks
-                    for (var i = d.Risks.Count - 1; i >= 0; i--)
-                        if (d.Risks[i].IsEmpty()) d.Risks.RemoveAt(i);
-                })
-                .ForAllMembers(opt => opt.Ignore());
+                    for (var i = d.Summary.Risks.Count - 1; i >= 0; i--)
+                        if (d.Summary.Risks[i].IsEmpty()) d.Summary.Risks.RemoveAt(i);
+                });
         }
 
 
@@ -65,18 +69,19 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [MaxLength(200)]
         public string HighRisk1 { get; set; }
 
-
         [MaxLength(200)]
         public string HighRisk2 { get; set; }
 
         [MaxLength(200)]
         public string HighRisk3 { get; set; }
 
-        public bool None { get; set; }
+        public bool NoRisks { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
+
+            //TODO: throw error when any disk description and norisks selected
 
             return validationResults;
         }
