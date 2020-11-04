@@ -16,7 +16,7 @@
 
     <div class="grid-row">
         <div class="column-two-thirds">
-            @using (Html.BeginForm())
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
             {
                 @await Html.CustomValidationSummaryAsync()
                 @Html.AntiForgeryToken()
@@ -31,14 +31,14 @@
                     <div class="form-group">
                         <label for="emailAddress" class="form-label col-md-10">Email address</label>
                         <div class="col-md-10">
-                            <input type="email" class="form-control" name="emailAddress" id="emailAddress"/>
+                            <input class="form-control" name="emailAddress" id="emailAddress" />
                         </div>
                     </div>
                 </fieldset>
 
                 <fieldset>
                     <div class="form-group">
-                        <input id="NextStep" type="submit" class="button" value="Impersonate"/>
+                        <input id="NextStep" type="submit" class="button" value="Impersonate" />
                     </div>
                 </fieldset>
             }

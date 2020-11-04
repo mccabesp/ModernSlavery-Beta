@@ -9,7 +9,7 @@
     }
 }
 
-@using (Html.BeginForm())
+@using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
 {
     @await Html.GovUkValidationSummaryAsync();
     @Html.AntiForgeryToken();
@@ -38,7 +38,7 @@
 
     @if (Model.ShowBanner == true)
     {
-        <a class="govuk-button" href="@Model.GroupReviewUrl">View your group</a>    
+        <a class="govuk-button" href="@Model.GroupReviewUrl">View your group</a>
     }
     else
     {
@@ -46,10 +46,10 @@
             Continue
         </button>
     }
-<div>
-    <button class="link-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
-        Cancel
-    </button>
-</div>
+    <div>
+        <button class="link-button" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Cancel">
+            Cancel
+        </button>
+    </div>
 }
 

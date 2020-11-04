@@ -12,7 +12,7 @@
         </li>
     </ol>
 </div>
-@using (Html.BeginForm())
+@using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
 {
     @Html.AntiForgeryToken()
 
@@ -26,209 +26,209 @@
     @Html.HiddenFor(model => model.ManualAddress)
 
     <div class="grid-row">
-    <div class="column-two-thirds">
-    @await Html.CustomValidationSummaryAsync()
-    <h1 class="heading-large">
-        <span>Approve registration request</span>
-    </h1>
-    <table class="confirm-details">
-        <tbody>
-        <tr>
-            <td colspan="3">
-                <br>
-                <span class="heading-medium">Person registering to report</span>
-            </td>
-        </tr>
-        <tr class="row dynamic-content publicManual privateManual" style="display: table-row;">
-            <td>
-                Your name
-            </td>
-            <td>
-                <!-- Default Dynamic Section -->
-                @Model.ContactFirstName @Model.ContactLastName (@Model.ContactJobTitle)
-            </td>
-            <td></td>
-        </tr>
+        <div class="column-two-thirds">
+            @await Html.CustomValidationSummaryAsync()
+            <h1 class="heading-large">
+                <span>Approve registration request</span>
+            </h1>
+            <table class="confirm-details">
+                <tbody>
+                    <tr>
+                        <td colspan="3">
+                            <br>
+                            <span class="heading-medium">Person registering to report</span>
+                        </td>
+                    </tr>
+                    <tr class="row dynamic-content publicManual privateManual" style="display: table-row;">
+                        <td>
+                            Your name
+                        </td>
+                        <td>
+                            <!-- Default Dynamic Section -->
+                            @Model.ContactFirstName @Model.ContactLastName (@Model.ContactJobTitle)
+                        </td>
+                        <td></td>
+                    </tr>
 
-        <tr class="row dynamic-content publicManual ">
-            <td>
-                Contact Email
-            </td>
-            <td>
-                <!-- Default Dynamic Section -->
-                @Model.ContactEmailAddress
-            </td>
-            <td></td>
-        </tr>
-        <tr class="row dynamic-content publicManual ">
-            <td>
-                Registered Email
-            </td>
-            <td>
-                <!-- Default Dynamic Section -->
-                @Model.EmailAddress
-            </td>
-            <td></td>
-        </tr>
-        <tr class="row dynamic-content publicManual privateManual" style="display: table-row;">
-            <td>
-                Telephone
-            </td>
-            <td>
-                <!-- Default Dynamic Section -->
-                @Model.ContactPhoneNumber
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <br>
-                <span class="heading-medium">Organisation being registered</span>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Organisation
-            </td>
-            <td>
-                @Model.OrganisationName
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>
-                Business&nbsp;Sectors (SIC&nbsp;Codes)
-            </td>
-            <td colspan="2">
-                @await Html.PartialAsync("_SicCodeList", Model.SicCodes)
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td style="vertical-align: top;">
-                Address to register
-            </td>
-            <td>
-                @Html.Raw(Model.GetFullAddress().Replace(",", ",<br/>"))
-            </td>
-            <td></td>
-        </tr>
-        @if (!string.IsNullOrWhiteSpace(Model.RegisteredAddress))
-        {
-            <tr>
-                <td style="vertical-align: top;">
-                    Current address
-                </td>
-                <td>
-                    @Html.Raw(Model.RegisteredAddress.Replace(",", ",<br/>"))
-                </td>
-                <td></td>
-            </tr>
-        }
-        @if (ViewBag.NoDUNS)
-        {
-            <tr>
-                <td>
-                    DUNS number<span class="optional">(Optional)</span>
-                </td>
-                <td>
-                    @Html.ValidationMessageFor(model => model.DUNSNumber, "", new {id = "DUNSNumberError", @class = "error-message"})
-                    @Html.CustomEditorFor(model => model.DUNSNumber, new {@class = "form-control"})
-                </td>
-                <td></td>
-            </tr>
-        }
-        else
-        {
-            <tr>
-                <td>
-                    DUNS number
-                </td>
-                <td>
-                    @Html.HiddenFor(model => model.DUNSNumber)
-                    @Html.DisplayFor(model => model.DUNSNumber)
-                </td>
-                <td></td>
-            </tr>
-        }
-        <tr>
-            <td colspan="3">
-                <br>
-                <span class="heading-medium">Provided references</span>
-            </td>
-        </tr>
+                    <tr class="row dynamic-content publicManual ">
+                        <td>
+                            Contact Email
+                        </td>
+                        <td>
+                            <!-- Default Dynamic Section -->
+                            @Model.ContactEmailAddress
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr class="row dynamic-content publicManual ">
+                        <td>
+                            Registered Email
+                        </td>
+                        <td>
+                            <!-- Default Dynamic Section -->
+                            @Model.EmailAddress
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr class="row dynamic-content publicManual privateManual" style="display: table-row;">
+                        <td>
+                            Telephone
+                        </td>
+                        <td>
+                            <!-- Default Dynamic Section -->
+                            @Model.ContactPhoneNumber
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <br>
+                            <span class="heading-medium">Organisation being registered</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Organisation
+                        </td>
+                        <td>
+                            @Model.OrganisationName
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Business&nbsp;Sectors (SIC&nbsp;Codes)
+                        </td>
+                        <td colspan="2">
+                            @await Html.PartialAsync("_SicCodeList", Model.SicCodes)
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top;">
+                            Address to register
+                        </td>
+                        <td>
+                            @Html.Raw(Model.GetFullAddress().Replace(",", ",<br/>"))
+                        </td>
+                        <td></td>
+                    </tr>
+                    @if (!string.IsNullOrWhiteSpace(Model.RegisteredAddress))
+                    {
+                        <tr>
+                            <td style="vertical-align: top;">
+                                Current address
+                            </td>
+                            <td>
+                                @Html.Raw(Model.RegisteredAddress.Replace(",", ",<br/>"))
+                            </td>
+                            <td></td>
+                        </tr>
+                    }
+                    @if (ViewBag.NoDUNS)
+                    {
+                        <tr>
+                            <td>
+                                DUNS number<span class="optional">(Optional)</span>
+                            </td>
+                            <td>
+                                @Html.ValidationMessageFor(model => model.DUNSNumber, "", new { id = "DUNSNumberError", @class = "error-message" })
+                                @Html.CustomEditorFor(model => model.DUNSNumber, new { @class = "form-control" })
+                            </td>
+                            <td></td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                DUNS number
+                            </td>
+                            <td>
+                                @Html.HiddenFor(model => model.DUNSNumber)
+                                @Html.DisplayFor(model => model.DUNSNumber)
+                            </td>
+                            <td></td>
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="3">
+                            <br>
+                            <span class="heading-medium">Provided references</span>
+                        </td>
+                    </tr>
 
-        @await Html.PartialAsync("DisplayReference", new {name = "Company number", value = Model.CompanyNumber, defaultValue = ""})
+                    @await Html.PartialAsync("DisplayReference", new { name = "Company number", value = Model.CompanyNumber, defaultValue = "" })
 
-        @await Html.PartialAsync("DisplayReference", new {name = "Charity number", value = Model.CharityNumber, defaultValue = ""})
+                    @await Html.PartialAsync("DisplayReference", new { name = "Charity number", value = Model.CharityNumber, defaultValue = "" })
 
-        @await Html.PartialAsync("DisplayReference", new {name = "Mutual partnership number", value = Model.MutualNumber, defaultValue = ""})
+                    @await Html.PartialAsync("DisplayReference", new { name = "Mutual partnership number", value = Model.MutualNumber, defaultValue = "" })
 
-        @await Html.PartialAsync("DisplayReference", new {name = Model.OtherName, value = Model.OtherValue, defaultValue = ""})
+                    @await Html.PartialAsync("DisplayReference", new { name = Model.OtherName, value = Model.OtherValue, defaultValue = "" })
 
-        </tbody>
-    </table>
-    <h1 class="heading-medium">
-        Similar organisations
-    </h1>
-    @if (Model.ManualOrganisations != null && Model.ManualOrganisations.Any())
-    {
-        <table class="search search3" summary="A list organisations that match your organisation details">
-            <caption class="visuallyhidden">Customer and Business listing</caption>
-            <thead>
-            <tr>
-                <th scope="col">Organisation and address</th>
-                <th scope="col">References</th>
-                <th scope="col">Registration Status</th>
-            </tr>
-            </thead>
-            <tbody>
-            @for (var i = 0; i < Model.ManualOrganisations.Count; i++)
+                </tbody>
+            </table>
+            <h1 class="heading-medium">
+                Similar organisations
+            </h1>
+            @if (Model.ManualOrganisations != null && Model.ManualOrganisations.Any())
             {
-                <tr>
-                    <td>
-                        @Model.ManualOrganisations[i].OrganisationName <span>@Model.ManualOrganisations[i].GetFullAddress()</span>
-                    </td>
-                    <td>
-                        @{ var references = Model.GetReferences(i); }
-                        @foreach (var key in references.Keys)
+                <table class="search search3" summary="A list organisations that match your organisation details">
+                    <caption class="visuallyhidden">Customer and Business listing</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Organisation and address</th>
+                            <th scope="col">References</th>
+                            <th scope="col">Registration Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (var i = 0; i < Model.ManualOrganisations.Count; i++)
                         {
-                            if (key.EqualsI("DUNS No") && references[key].EqualsI(Model.DUNSNumber)
-                                || key.EqualsI("Company No") && references[key].EqualsI(Model.CompanyNumber)
-                                || key.EqualsI("Charity No") && references[key].EqualsI(Model.CharityNumber)
-                                || key.EqualsI("Mutual No") && references[key].EqualsI(Model.MutualNumber)
-                                || key.EqualsI(Model.OtherName) && references[key].EqualsI(Model.OtherValue)
-                                )
-                            {
-                                <span style="color: red; display: block; white-space: nowrap;">@key: @(references[key])</span>
-                            }
-                            else
-                            {
-                                <span style="display: block; white-space: nowrap;">@key: @(references[key])</span>
-                            }
+                            <tr>
+                                <td>
+                                    @Model.ManualOrganisations[i].OrganisationName <span>@Model.ManualOrganisations[i].GetFullAddress()</span>
+                                </td>
+                                <td>
+                                    @{ var references = Model.GetReferences(i); }
+                                    @foreach (var key in references.Keys)
+                                    {
+                                        if (key.EqualsI("DUNS No") && references[key].EqualsI(Model.DUNSNumber)
+                                            || key.EqualsI("Company No") && references[key].EqualsI(Model.CompanyNumber)
+                                            || key.EqualsI("Charity No") && references[key].EqualsI(Model.CharityNumber)
+                                            || key.EqualsI("Mutual No") && references[key].EqualsI(Model.MutualNumber)
+                                            || key.EqualsI(Model.OtherName) && references[key].EqualsI(Model.OtherValue)
+                                            )
+                                        {
+                                            <span style="color: red; display: block; white-space: nowrap;">@key: @(references[key])</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="display: block; white-space: nowrap;">@key: @(references[key])</span>
+                                        }
+                                    }
+                                </td>
+                                <td>
+                                    @Model.ManualOrganisations[i].RegistrationStatus
+                                </td>
+                            </tr>
                         }
-                    </td>
-                    <td>
-                        @Model.ManualOrganisations[i].RegistrationStatus
-                    </td>
-                </tr>
+                    </tbody>
+                </table>
             }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>No similar organisations found.</p>
-    }
-    <fieldset>
-        <br>
-        <p>
-            <button type="submit" class="button" name="command" value="approve">Confirm and complete registration</button>
-        </p>
-        <p>
-            <button type="submit" class="link-button" name="command" value="decline">Reject registration</button>
-        </p>
-    </fieldset>
-    </div>
+            else
+            {
+                <p>No similar organisations found.</p>
+            }
+            <fieldset>
+                <br>
+                <p>
+                    <button type="submit" class="button" name="command" value="approve">Confirm and complete registration</button>
+                </p>
+                <p>
+                    <button type="submit" class="link-button" name="command" value="decline">Reject registration</button>
+                </p>
+            </fieldset>
+        </div>
     </div>
 }

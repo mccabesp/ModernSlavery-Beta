@@ -9,7 +9,7 @@
 @*<input type="submit" style="display: none" name="command" value="search">*@
 <div class="govuk-grid-row choose-organisation">
     <div class="govuk-grid-column-full">
-        @using (Html.BeginForm())
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
             @Html.HiddenFor(m => m.SectorType)
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                 </div>
-              </div>
+            </div>
 
             <div class="govuk-grid-column-full ">
                 @if (!string.IsNullOrWhiteSpace(Model.SearchText))
@@ -85,8 +85,8 @@
                                 {
                                     <tr class="govuk-table__row" style="background-color: @(Model.Organisations.Results[i].OrganisationId > 0 ? "inherit" : "#E6F1FA")">
                                         <td class="govuk-table__cell">
-                                            @Model.Organisations.Results[i].OrganisationName 
-                                            <span class="govuk-!-font-size-14" >@Model.Organisations.Results[i].GetFullAddress()</span>
+                                            @Model.Organisations.Results[i].OrganisationName
+                                            <span class="govuk-!-font-size-14">@Model.Organisations.Results[i].GetFullAddress()</span>
                                         </td>
                                         @if (Model.SectorType == SectorTypes.Private)
                                         {
@@ -148,10 +148,10 @@
                     <div class="govuk-details__text" id="details-content-0">
                         @Html.ActionLink("Tell us about your organisation", "AddOrganisation")
                     </div>
-                </details>              
+                </details>
 
             </div>
-            
+
         }
-        </div>
+    </div>
     </div>

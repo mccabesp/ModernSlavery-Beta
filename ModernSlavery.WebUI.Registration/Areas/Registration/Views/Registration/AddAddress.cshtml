@@ -16,7 +16,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-        @using (Html.BeginForm())
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
             @Html.HiddenFor(model => model.AddressReturnAction)
@@ -60,28 +60,28 @@
                     @Html.LabelFor(model => model.Address1, "Address 1", new { @class = "govuk-label" })
                     @Html.ValidationMessageFor(model => model.Address1, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
                     @Html.CustomEditorFor(model => model.Address1, new { @class = "govuk-input govuk-!-width-one-half" })
-                
+
                 </div>
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.Address2, "govuk-form-group--error")">
                     @Html.LabelFor(model => model.Address2, "Address 2", new { @class = "govuk-label" })
                     @Html.ValidationMessageFor(model => model.Address2, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
                     @Html.CustomEditorFor(model => model.Address2, new { @class = "govuk-input govuk-!-width-one-half", placeholder = "optional" })
-                  
+
                 </div>
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.Address3, "govuk-form-group--error")">
                     @Html.LabelFor(model => model.Address3, "Address 3", new { @class = "govuk-label" })
                     @Html.ValidationMessageFor(model => model.Address3, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
                     @Html.CustomEditorFor(model => model.Address3, new { @class = "govuk-input govuk-!-width-one-half" })
-                   
+
                 </div>
 
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.Postcode, "govuk-form-group--error")">
                     @Html.LabelFor(model => model.Postcode, new { @class = "govuk-label" })
                     @Html.ValidationMessageFor(model => model.Postcode, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
                     @Html.CustomEditorFor(model => model.Postcode, new { @class = "govuk-input govuk-!-width-one-third" })
-                    
+
                 </div>
-                <br/>
+                <br />
                 <input class="govuk-button" type="submit" role="button" name="command" value="Continue" aria-label="Continue" />
             </div>
         }

@@ -12,7 +12,7 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @using (Html.BeginForm())
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
             @Html.HiddenFor(m => m.EncOrganisationId)
@@ -24,7 +24,7 @@
                 Confirm removal of user
             </h1>
             <p class="govuk-body">Once the user has been removed, they will no longer be able to submit a modern slavery statement for this organisation.</p>
-            
+
             <dl class="govuk-summary-list">
                 <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">
@@ -54,15 +54,15 @@
                         @Html.Raw(Model.OrganisationAddress.Replace(",", "&#44;<br/>"))
                     </dd>
                 </div>
-            </dl>          
-           
-              
-                    <button type="submit" class="govuk-button button-warning" name="id">Remove user</button>
-              
-                <p class="govuk-body">
-                    <a class="govuk-link" href="@(Url.ActionArea("ManageOrganisation", "Submission", "Submission", new {organisationIdentifier = Model.EncOrganisationId}))">Cancel</a>
-                </p>
-           
+            </dl>
+
+
+            <button type="submit" class="govuk-button button-warning" name="id">Remove user</button>
+
+            <p class="govuk-body">
+                <a class="govuk-link" href="@(Url.ActionArea("ManageOrganisation", "Submission", "Submission", new {organisationIdentifier = Model.EncOrganisationId}))">Cancel</a>
+            </p>
+
 
         }
     </div>

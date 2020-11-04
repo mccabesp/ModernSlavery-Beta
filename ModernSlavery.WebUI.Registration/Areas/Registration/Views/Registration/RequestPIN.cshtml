@@ -8,7 +8,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-        @using (Html.BeginForm())
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
 
@@ -17,14 +17,14 @@
             </h1>
             <p class="govuk-body">A PIN will be posted to the following name and address:</p>
             <p class="govuk-body">@ViewBag.UserFullName (@ViewBag.UserJobTitle),<br> @ViewBag.Organisation, <br />@Html.Raw(ViewBag.Address)</p>
-            
-           
-           <button type="submit" class="govuk-button" name="command" value="Resend">Request a new pin</button>
-         
+
+
+            <button type="submit" class="govuk-button" name="command" value="Resend">Request a new pin</button>
+
             <p class="govuk-body">
-               @Html.ActionLink("Cancel", "ActivateService", new { id = Model, @class="govuk-link"})
+                @Html.ActionLink("Cancel", "ActivateService", new { id = Model, @class = "govuk-link" })
             </p>
         }
-        </div>
+    </div>
     </div>
 

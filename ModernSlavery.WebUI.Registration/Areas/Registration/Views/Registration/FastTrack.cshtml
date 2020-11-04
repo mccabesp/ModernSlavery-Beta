@@ -9,12 +9,12 @@
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        @using (Html.BeginForm())
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
             @(await Html.GovUkValidationSummaryAsync())
 
-   
+
             <h1 class="govuk-heading-l">
                 Fast track registration
             </h1>

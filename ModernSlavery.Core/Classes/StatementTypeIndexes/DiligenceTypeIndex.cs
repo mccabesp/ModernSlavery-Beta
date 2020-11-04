@@ -1,6 +1,7 @@
 ﻿using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace ModernSlavery.Core.Classes.StatementTypeIndexes
@@ -19,6 +20,7 @@ namespace ModernSlavery.Core.Classes.StatementTypeIndexes
         {
             public short Id { get; set; }
             public short? ParentId { get; set; }
+            [MaxLength(256)]
             public string Description { get; set; }
             public DiligenceType Clone() => (DiligenceType)MemberwiseClone();
         }
