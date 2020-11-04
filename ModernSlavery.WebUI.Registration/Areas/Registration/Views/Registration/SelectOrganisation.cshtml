@@ -9,7 +9,7 @@
 
 <div class="govuk-grid-row select-organisation">
     <div class="govuk-grid-column-full">
-        @using (Html.BeginForm())
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
             @Html.HiddenFor(model => model.RegistrationType)
@@ -20,49 +20,49 @@
                 <span>Select your organisation</span>
             </h1>
 
-     @if (Model.MatchedReferenceCount == 0)
-     {
-                    <p class="govuk-body">Select the organisation you wish to report from the list below or click "Continue" to register a new organisation.</p>
-     }
-     else
-     {
-                    <p>The following organisations match your references. Select the organisation you wish to report for from the list below.</p>
-     }
-                <table class="search govuk-table govuk-!-font-size-16" summary="A list organisations that match your organisation details">                  
-                    <thead class="govuk-table__head">
+            @if (Model.MatchedReferenceCount == 0)
+            {
+                <p class="govuk-body">Select the organisation you wish to report from the list below or click "Continue" to register a new organisation.</p>
+            }
+            else
+            {
+                <p>The following organisations match your references. Select the organisation you wish to report for from the list below.</p>
+            }
+            <table class="search govuk-table govuk-!-font-size-16" summary="A list organisations that match your organisation details">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Organisation name and registered address</th>
+                        <th scope="col" class="govuk-table__header">References</th>
+                        <th scope="col" class="govuk-table__header">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @for (var i = 0; i < Model.ManualOrganisations.Count; i++)
+                    {
                         <tr class="govuk-table__row">
-                            <th scope="col" class="govuk-table__header">Organisation name and registered address</th>
-                            <th scope="col" class="govuk-table__header">References</th>
-                            <th scope="col" class="govuk-table__header">&nbsp;</th>
+                            <td class="govuk-table__cell">
+                                @Model.ManualOrganisations[i].OrganisationName
+                                <span class="govuk-!-font-size-14">@Model.ManualOrganisations[i].GetFullAddress()</span>
+                            </td>
+                            <td class="govuk-table__cell">
+                                @{ var references = Model.GetReferences(i); }
+                                @foreach (var key in references.Keys)
+                                {
+                                    <span>@key: @(references[key])</span>
+                                }
+                            </td>
+                            <td class="govuk-table__cell">
+                                <button type="submit" class="link-button govuk-link govuk-!-font-size-16" name="command" value="organisation_@i">Choose&nbsp;organisation</button>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody class="govuk-table__body">
-                        @for (var i = 0; i < Model.ManualOrganisations.Count; i++)
-                        {
-                            <tr class="govuk-table__row">
-                                <td class="govuk-table__cell">
-                                    @Model.ManualOrganisations[i].OrganisationName 
-                                    <span class="govuk-!-font-size-14">@Model.ManualOrganisations[i].GetFullAddress()</span>
-                                </td>
-                                <td class="govuk-table__cell">
-                                    @{ var references = Model.GetReferences(i); }
-                                    @foreach (var key in references.Keys)
-                                    {
-                                        <span >@key: @(references[key])</span>
-                                    }
-                                </td>
-                                <td class="govuk-table__cell">
-                                    <button type="submit" class="link-button govuk-link govuk-!-font-size-16" name="command" value="organisation_@i">Choose&nbsp;organisation</button>
-                                </td>
-                            </tr>
-                                        }
-                    </tbody>
-                </table>
-                @if (Model.MatchedReferenceCount == 0)
-                {
-                    <br />
-                    <input class="govuk-button" type="submit" role="button" name="command" value="Continue" />
-                }
+                    }
+                </tbody>
+            </table>
+            @if (Model.MatchedReferenceCount == 0)
+            {
+                <br />
+                <input class="govuk-button" type="submit" role="button" name="command" value="Continue" />
+            }
         }
     </div>
     </div>

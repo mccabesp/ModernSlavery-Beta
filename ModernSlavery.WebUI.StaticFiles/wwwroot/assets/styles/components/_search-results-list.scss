@@ -2,7 +2,9 @@
     clear: both
 }
 
+
 .search-results-list {
+
     .govuk-grid-row {
         border-bottom: solid 1px $govuk-border-colour;
         margin: 15px 0px;
@@ -26,16 +28,15 @@
     }
 
     .grey-text {
-        color: $govuk-border-colour;
+        color: $govuk-secondary-text-colour;
     }
 
     .small {
         display: none;
     }
 
-    .govuk-list > li:last-child
-    {
-        margin-bottom:0px;
+    .govuk-list > li:last-child {
+        margin-bottom: 0px;
     }
 }
 

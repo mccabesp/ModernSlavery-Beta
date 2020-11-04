@@ -52,6 +52,7 @@
 
     &__title {
         @include govuk-font($size: 48, $weight: bold);
+        width:90%;
     }
 
     &__description {
@@ -159,6 +160,9 @@ $app-button-inverted-hover-background-colour: govuk-tint($app-button-inverted-fo
         margin-bottom:15px !important;
     }
 
+}
+.govuk-phase-banner.phase-banner-beta.no-bottom-border{
+    border-bottom:none;
 }
     
 
