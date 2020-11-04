@@ -176,6 +176,17 @@ namespace ModernSlavery.BusinessDomain.Registration
             return earliestSubmittedGroup;
         }
 
+        public IEnumerable<Statement> GetAllStatements(Organisation organisation)
+        {
+            var single = organisation.Statements.AsEnumerable();
+            var group = DataRepository.GetAll<StatementOrganisation>()
+                .Where(so => so.OrganisationId == organisation.OrganisationId)
+                .Select(so => so.Statement)
+                .AsEnumerable();
+
+            return single.Concat(group);
+        }
+
         public virtual async Task SetUniqueOrganisationReferencesAsync()
         {
             var orgs = await DataRepository.ToListAsync<Organisation>(o => o.OrganisationReference == null);
