@@ -24,6 +24,13 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         private string SecondUrl;
 
+
+        public Create_Account_Add_Second_User() : base(_firstname, _lastname, _title, _email, _password)
+        {
+
+
+        }
+
         [Test, Order(11)]
         public async Task ReturnToCreateAccountPage()
         {
