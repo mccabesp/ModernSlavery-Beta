@@ -55,7 +55,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 validationResults.AddValidationError(4700, nameof(Risk.OtherLikelySource));
 
             if (Risk.LikelySource == RiskSourceTypes.SupplyChains && !Risk.SupplyChainTiers.Any(sct=> sct!= SupplyChainTierTypes.Unknown))
-                validationResults.AddValidationError(4700, nameof(Risk.OtherLikelySource));
+                validationResults.AddValidationError(4700, nameof(Risk.LikelySource));
+
+            //Clear SupplyChainTiers when LikelySource not SupplyChains
+            if (Risk.LikelySource != RiskSourceTypes.SupplyChains)
+                Risk.SupplyChainTiers.Clear();
 
             if (Risk.Targets.Contains(RiskTargetTypes.Other) && string.IsNullOrWhiteSpace(Risk.OtherTargets))
                 validationResults.AddValidationError(4700, nameof(Risk.OtherTargets));
@@ -66,6 +70,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override Status GetStatus()
         {
             if (Risk.LikelySource == RiskSourceTypes.Other && string.IsNullOrWhiteSpace(Risk.OtherLikelySource)) return Status.InProgress;
+            if (Risk.LikelySource == RiskSourceTypes.SupplyChains && !Risk.SupplyChainTiers.Any(sct => sct != SupplyChainTierTypes.Unknown)) return Status.InProgress;
             if (Risk.Targets.Contains(RiskTargetTypes.Other) && string.IsNullOrWhiteSpace(Risk.OtherTargets)) return Status.InProgress;
             if (Risk.LikelySource != RiskSourceTypes.Unknown && Risk.Targets.Any()) return Status.Complete;
 
