@@ -50,7 +50,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             var validationResults = new List<ValidationResult>();
 
+            //TODO: Double check error numbers are all correct - I just copied and pasted for now
             if (Risk.LikelySource == RiskSourceTypes.Other && string.IsNullOrWhiteSpace(Risk.OtherLikelySource))
+                validationResults.AddValidationError(4700, nameof(Risk.OtherLikelySource));
+
+            if (Risk.LikelySource == RiskSourceTypes.SupplyChains && !Risk.SupplyChainTiers.Any(sct=> sct!= SupplyChainTierTypes.Unknown))
                 validationResults.AddValidationError(4700, nameof(Risk.OtherLikelySource));
 
             if (Risk.Targets.Contains(RiskTargetTypes.Other) && string.IsNullOrWhiteSpace(Risk.OtherTargets))

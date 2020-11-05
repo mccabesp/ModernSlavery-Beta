@@ -123,6 +123,17 @@ namespace ModernSlavery.Core.Entities.StatementSummary
 
             public RiskSourceTypes LikelySource { get; set; }
 
+            public enum SupplyChainTierTypes
+            {
+                Unknown,
+                [Description("Don't know")] None,
+                [Description("Tier1")] Tier1,
+                [Description("Tier2")] Tier2,
+                [Description("Tier3 and below")] Tier3
+            }
+
+            public List<SupplyChainTierTypes> SupplyChainTiers { get; set; } = new List<SupplyChainTierTypes>();
+
             public string OtherLikelySource { get; set; }
             #endregion
 
