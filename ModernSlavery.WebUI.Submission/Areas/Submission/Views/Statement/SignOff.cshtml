@@ -1,0 +1,98 @@
+﻿@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model SignOffViewModel
+
+@section BeforeMain {
+    @if (!string.IsNullOrWhiteSpace(Model.BackUrl))
+    {
+        <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+    }
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+        {
+            @await Html.GovUkValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.Submitted);
+
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
+
+            <fieldset class="govuk-fieldset">
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverFirstName, "govuk-form-group--error")">
+                    <label asp-for="ApproverFirstName" class="govuk-label">First name</label>
+                    <input asp-for="ApproverFirstName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="ApproverFirstName" class="govuk-error-message"></span>
+                </div>
+
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverLastName, "govuk-form-group--error")">
+                    <label asp-for="ApproverLastName" class="govuk-label">Last name</label>
+                    <input asp-for="ApproverLastName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="ApproverLastName" class="govuk-error-message"></span>
+                </div>
+
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverJobTitle, "govuk-form-group--error")">
+                    <label asp-for="ApproverJobTitle" class="govuk-label">Job title</label>
+                    <input asp-for="ApproverJobTitle" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                    <span asp-validation-for="ApproverJobTitle" class="govuk-error-message"></span>
+                </div>
+            </fieldset>
+
+            <div class="govuk-form-group @Html.SetErrorClass(new[] {nameof(Model.ApprovedDate), nameof(Model.ApprovedDay),nameof(Model.ApprovedMonth),nameof(Model.ApprovedYear)}, "govuk-form-group--error")">
+                <fieldset class="govuk-fieldset" role="group" aria-describedby="statement-approved-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading">
+                            What date was your statement approved by the board or equivalent management body?
+                        </h2>
+                    </legend>
+                    <span id="statement-approved-hint" class="govuk-hint">
+                        For example, 31 3 1980
+                    </span>
+                    <div class="govuk-date-input" id="statement-approved">
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" asp-for="ApprovedDay">
+                                    Day
+                                </label>
+                                <input asp-for="ApprovedDay" class="govuk-input govuk-date-input__input govuk-input--width-2" inputmode="number">
+                            </div>
+                        </div>
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" asp-for="ApprovedMonth">
+                                    Month
+                                </label>
+                                <input asp-for="ApprovedMonth" class="govuk-input govuk-date-input__input govuk-input--width-2" inputmode="number">
+                            </div>
+                        </div>
+                        <div class="govuk-date-input__item">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-date-input__label" asp-for="ApprovedYear">
+                                    Year
+                                </label>
+                                <input asp-for="ApprovedYear" class="govuk-input govuk-date-input__input govuk-input--width-3" inputmode="number">
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="ApprovedDay" class="govuk-error-message"></span>
+                    <span asp-validation-for="ApprovedMonth" class="govuk-error-message"></span>
+                    <span asp-validation-for="ApprovedYear" class="govuk-error-message"></span>
+                    <span asp-validation-for="ApprovedDate" class="govuk-error-message"></span>
+
+                </fieldset>
+            </div>
+
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                Save and continue
+            </button>
+
+            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
+            {
+                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
+            }
+        }
+    </div>
+</div>

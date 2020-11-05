@@ -19,14 +19,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.OtherSocialAudits, opt => opt.MapFrom(s => s.Summary.OtherSocialAudits));
 
             CreateMap<SocialAuditsViewModel, StatementModel>(MemberList.None)
-                .ForPath(d => d.Summary.SocialAudits, opt => opt.MapFrom(s=>s.SocialAudits))
-                .ForPath(d => d.Summary.OtherSocialAudits, opt => opt.MapFrom(s=>s.OtherSocialAudits));
+                .ForPath(d => d.Summary.SocialAudits, opt => opt.MapFrom(s => s.SocialAudits))
+                .ForPath(d => d.Summary.OtherSocialAudits, opt => opt.MapFrom(s => s.OtherSocialAudits));
         }
     }
 
     public class SocialAuditsViewModel : BaseViewModel
     {
-        public override string PageTitle => "What type of social audits did you carry out?";
+        public override string PageTitle => "Did you carry out any social audits? \n If so, what type?";
 
         public List<SocialAuditTypes> SocialAudits { get; set; } = new List<SocialAuditTypes>();
 

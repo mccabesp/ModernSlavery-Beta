@@ -1,14 +1,15 @@
-﻿@{
+﻿@using System.Linq;
+@{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model PoliciesViewModel
-@using ModernSlavery.Core.Entities.StatementSummary; 
+@model SectorsViewModel
+
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate="" }))
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
@@ -19,28 +20,33 @@
             </h1>
 
             <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">                    
+                <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading">
+                            If your statement is for a group, select sectors for all organisations in the group.
+                        </h2>
+                    </legend>
                     <span id="organisation-hint" class="govuk-hint">
                         Select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var policyType in Enums.GetValues<IStatementSummary1.PolicyTypes>())
+                        @foreach (var sectorType in Model.SectorTypes)
                         {
                             <div class="govuk-checkboxes__item">
-                                <input name="Policies" value="@((int)policyType)" id="@($"policy{(int)policyType}")" checked=@(Model.Policies.Contains(policyType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="policies-conditional@((int)policyType)">
-                                <label class="govuk-label govuk-checkboxes__label" for="@($"policy{(int)policyType}")">
-                                    @policyType.GetEnumDescription()
+                                <input name="Sectors" value="@sectorType.Id" id="@($"sector{sectorType.Id}")" checked=@(Model.Sectors.Contains(sectorType.Id)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="organisation-conditional-@(sectorType.Id)">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"sector{sectorType.Id}")">
+                                    @sectorType.Description
                                 </label>
                             </div>
-                            @if (policyType== IStatementSummary1.PolicyTypes.Other)
+                            @if (sectorType.Description.Equals("Other"))
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPolicies, "govuk-form-group--error")" id="policies-conditional@((int)policyType)">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherSectors, "govuk-form-group--error")" id="organisation-conditional-@(sectorType.Id)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
-                                            Please provide details
+                                            Please specify
                                         </label>
-                                        <textarea asp-for="OtherPolicies" name="OtherPolicies" class="govuk-textarea" id="policies-other" spellcheck="false" rows="5">@Model.OtherPolicies</textarea>
-                                        <span asp-validation-for="OtherPolicies" class="govuk-error-message"></span>
+                                        <textarea asp-for="OtherSectors" class="govuk-textarea" name="OtherSector"rows="5">@Model.OtherSectors</textarea>
+                                        <span asp-validation-for="OtherSectors" class="govuk-error-message"></span>
                                     </div>
                                 </div>
                             }
@@ -58,7 +64,5 @@
                 <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
             }
         }
-
     </div>
-
 </div>

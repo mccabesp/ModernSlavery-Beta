@@ -53,13 +53,13 @@
                         <div class="govuk-radios__item">
                             <input asp-for="GroupSubmission" value="false" id="GroupSubmission_False" checked="@(Model.GroupSubmission==false)" class="govuk-radios__input" type="radio">
                             <label class="govuk-label govuk-radios__label" for="GroupSubmission_False">
-                                a single organisation
+                                A single organisation
                             </label>
                         </div>
                         <div class="govuk-radios__item">
                             <input asp-for="GroupSubmission" value="true" id="GroupSubmission_True" checked="@(Model.GroupSubmission==true)" class="govuk-radios__input" type="radio">
                             <label class="govuk-label govuk-radios__label" for="GroupSubmission_True">
-                                a group of organisations
+                                A group of organisations
                             </label>
                         </div>
                     </div>
@@ -67,8 +67,13 @@
             </div>
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
-                Continue
+                Save and continue
             </button>
+
+            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
+            {
+                <a class="govuk-button" href="@(Model.SkipUrl)">Skip</a>
+            }
         }
     </div>
 </div>

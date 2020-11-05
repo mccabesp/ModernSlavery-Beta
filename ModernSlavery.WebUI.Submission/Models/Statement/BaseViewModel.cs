@@ -10,16 +10,16 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public abstract class BaseViewModel: GovUkViewModel, IValidatableObject
+    public abstract class BaseViewModel : GovUkViewModel, IValidatableObject
     {
 
         public enum CommandType
         {
-            Unknown=0,
-            Skip=1,
-            Continue=2,
+            Unknown = 0,
+            Skip = 1,
+            Continue = 2,
             Submit = 6,
-            Search=7,
+            Search = 7,
             SearchNext = 8,
             SearchPrevious = 9,
             IncludeOrganisation = 10,
@@ -28,9 +28,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public enum Status
         {
+            Unknown,
             [Description("Not Started")] Incomplete,
             [Description("In Progress")] InProgress,
-            [Description("Completed")]Complete
+            [Description("Completed")] Complete
         }
 
         [BindRequired]
@@ -70,6 +71,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return validationResults;
         }
 
-        public virtual Status GetStatus() =>  Status.Incomplete;
+        public virtual Status GetStatus() => Status.Incomplete;
     }
 }

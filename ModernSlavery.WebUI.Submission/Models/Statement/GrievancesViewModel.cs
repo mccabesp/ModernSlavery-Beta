@@ -19,14 +19,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.OtherGrievanceMechanisms, opt => opt.MapFrom(s => s.Summary.OtherGrievanceMechanisms));
 
             CreateMap<GrievancesViewModel, StatementModel>(MemberList.None)
-                .ForPath(d => d.Summary.GrievanceMechanisms, opt => opt.MapFrom(s=>s.GrievanceMechanisms))
-                .ForPath(d => d.Summary.OtherGrievanceMechanisms, opt => opt.MapFrom(s=>s.OtherGrievanceMechanisms));
+                .ForPath(d => d.Summary.GrievanceMechanisms, opt => opt.MapFrom(s => s.GrievanceMechanisms))
+                .ForPath(d => d.Summary.OtherGrievanceMechanisms, opt => opt.MapFrom(s => s.OtherGrievanceMechanisms));
         }
     }
 
     public class GrievancesViewModel : BaseViewModel
     {
-        public override string PageTitle => "What types of anonymous grievance mechanisms do you have in place?";
+        public override string PageTitle => "What types of anonymous grievance mechanisms did you have in place?";
 
         public List<GrievanceMechanismTypes> GrievanceMechanisms { get; set; } = new List<GrievanceMechanismTypes>();
 

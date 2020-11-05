@@ -1,0 +1,69 @@
+﻿@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model RemediationsViewModel
+@using ModernSlavery.Core.Entities.StatementSummary;
+@section BeforeMain {
+    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+        {
+            @await Html.GovUkValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.Submitted);
+
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
+
+            <p class="govuk-body">
+                Does your statement refer to any actions your organisation took after finding indicators of forced labour?
+            </p>
+
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="remediations-hint">
+                    <span id="remediations-hint" class="govuk-hint">
+                        Select all that apply
+                    </span>
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        @foreach (var remediationType in Enums.GetValues<IStatementSummary1.RemediationTypes>())
+                        {
+                            <div class="govuk-checkboxes__item">
+                                <input name="Remediations" value="@((int)remediationType)" id="@($"remediation{(int)remediationType}")" checked=@(Model.Remediations.Contains(remediationType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="remediation-conditional-@((int)remediationType)">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"remediation{(int)remediationType}")">
+                                    @remediationType.GetEnumDescription()
+                                </label>
+                            </div>
+                            @if (remediationType == IStatementSummary1.RemediationTypes.Other)
+            {
+                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherRemediations, "govuk-form-group--error")" id="remediation-conditional-@((int)remediationType)">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="OtherRemediations">
+                            Please specify
+                        </label>
+                        <input asp-for="OtherRemediations" class="govuk-input" spellcheck="false">
+                        <span asp-validation-for="OtherRemediations" class="govuk-error-message"></span>
+                    </div>
+                </div>
+            }
+                        }
+                    </div>
+                </fieldset>
+            </div>
+
+
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                Save and continue
+            </button>
+
+            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
+            {
+                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
+            }
+        }
+    </div>
+
+</div>

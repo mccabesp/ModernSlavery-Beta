@@ -28,7 +28,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(s => s.GrievancesPage, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.MonitoringPage, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.HighestRisksPage, opt => opt.MapFrom(s => s))
-                .ForMember(s => s.HighRiskPages, opt => opt.ConvertUsing(new RiskListConverter(),s=>s))
+                .ForMember(s => s.HighRiskPages, opt => opt.ConvertUsing(new RiskListConverter(), s => s))
                 .ForMember(s => s.IndicatorsPage, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.RemediationsPage, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.ProgressPage, opt => opt.MapFrom(s => s))
@@ -50,19 +50,21 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     public class ReviewViewModel : BaseViewModel
     {
 
-        public override string PageTitle => $"Review before submitting";
+        public override string PageTitle => $"Add your {ReportingDeadlineYear} modern slavery statement to the registry";
         public override string SubTitle => GetSubtitle();
+
+        public string SectionCountTitle => $"You have completed {CompleteCount()} of {SectionCount} sections.";
 
         private string GetSubtitle()
         {
             var complete = BasicsComplete();
 
-            var result = $"Submission {(complete ? "" : "in")}complete.";
+            var result = $"Submission {(complete ? "" : "in")}complete for {OrganisationName}";
 
-            if (complete)
-                return result;
+            //if (complete)
+            //    return result;
 
-            result += " Section 1 must be completed in order to submit.";
+            //result += "\n Section 1 must be completed in order to submit.";
 
             return result;
         }
@@ -185,9 +187,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (HighestRisksPage.Validate(validationContext).Any())
                 yield return new ValidationResult($"Section '{HighestRisksPage.PageTitle}' is invalid");
 
-            for (var pageIndex=0; pageIndex<HighRiskPages.Count; pageIndex++)
+            for (var pageIndex = 0; pageIndex < HighRiskPages.Count; pageIndex++)
                 if (HighRiskPages[pageIndex].Validate(validationContext).Any())
-                    yield return new ValidationResult($"Section '{HighRiskPages[pageIndex].PageTitle} {pageIndex+1}' is invalid");
+                    yield return new ValidationResult($"Section '{HighRiskPages[pageIndex].PageTitle} {pageIndex + 1}' is invalid");
 
             if (IndicatorsPage.Validate(validationContext).Any())
                 yield return new ValidationResult($"Section '{IndicatorsPage.PageTitle}' is invalid");
@@ -210,7 +212,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             int count = 0;
             //1
-            if (GroupOrganisationsPages.GetStatus()==Status.Complete) count++;
+            if (GroupOrganisationsPages.GetStatus() == Status.Complete) count++;
             //2
             if (GetUrlSignOffStatus() == Status.Complete) count++;
             //3
@@ -236,7 +238,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public Status GetUrlSignOffStatus()
         {
-            if (UrlPage.GetStatus() == Status.Complete && PeriodCoveredPage.GetStatus() == Status.Complete && SignOffPage.GetStatus()== Status.Complete)return Status.Complete;
+            if (UrlPage.GetStatus() == Status.Complete && PeriodCoveredPage.GetStatus() == Status.Complete && SignOffPage.GetStatus() == Status.Complete) return Status.Complete;
             return Status.Incomplete;
         }
 
@@ -249,13 +251,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public Status GetWorkingConditionsStatus()
         {
             if (PartnersPage.GetStatus() == Status.Complete && SocialAuditsPage.GetStatus() == Status.Complete && GrievancesPage.GetStatus() == Status.Complete && MonitoringPage.GetStatus() == Status.Complete) return Status.Complete;
-            if (PartnersPage.GetStatus() == Status.Incomplete && SocialAuditsPage.GetStatus() == Status.Incomplete && GrievancesPage.GetStatus() == Status.Incomplete && MonitoringPage.GetStatus()==Status.Incomplete) return Status.Incomplete;
+            if (PartnersPage.GetStatus() == Status.Incomplete && SocialAuditsPage.GetStatus() == Status.Incomplete && GrievancesPage.GetStatus() == Status.Incomplete && MonitoringPage.GetStatus() == Status.Incomplete) return Status.Incomplete;
             return Status.InProgress;
         }
 
         public Status GetRisksStatus()
         {
-            if (HighestRisksPage.GetStatus() == Status.Complete && HighRiskPages.All(r=>r.GetStatus()== Status.Complete)) return Status.Complete;
+            if (HighestRisksPage.GetStatus() == Status.Complete && HighRiskPages.All(r => r.GetStatus() == Status.Complete)) return Status.Complete;
             if (HighestRisksPage.GetStatus() == Status.Incomplete && HighRiskPages.All(r => r.GetStatus() == Status.Incomplete)) return Status.Incomplete;
             return Status.InProgress;
         }
@@ -269,8 +271,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public bool BasicsComplete()
         {
-            return GroupOrganisationsPages.GetStatus() == Status.Complete 
-                && GetUrlSignOffStatus() == Status.Complete 
+            return GroupOrganisationsPages.GetStatus() == Status.Complete
+                && GetUrlSignOffStatus() == Status.Complete
                 && CompliancePage.GetStatus() == Status.Complete
                 && GetSectorTurnoverStatus() == Status.Complete
                 && YearsPage.GetStatus() == Status.Complete;
@@ -293,7 +295,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public bool HasSubmissionChanged()
         {
-            return  SubmittedModifications != null && SubmittedModifications.Any();
+            return SubmittedModifications != null && SubmittedModifications.Any();
         }
     }
 }

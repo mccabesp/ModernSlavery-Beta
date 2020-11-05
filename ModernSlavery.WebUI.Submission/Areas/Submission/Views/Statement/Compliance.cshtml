@@ -18,14 +18,6 @@
                 @Model.PageTitle
             </h1>
 
-            <h2 class="govuk-heading-s">
-                Does your modern slavery statement cover the following areas in relation to slavery and human trafficking?
-            </h2>
-            <h2 class="govuk-heading-s govuk-!-margin-bottom-7">
-                If you select 'no', please tell us why this area is not covered.
-            </h2>
-
-
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
@@ -47,11 +39,19 @@
                             </label>
                         </div>
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-structure-conditional">
-                            <div class="govuk-form-group @Html.SetErrorClass(model => model.StructureDetails, "govuk-form-group--error")">
-                                <label class="govuk-label" for="include-structure-detail">
-                                    Please provide details
-                                </label>
-                                <textarea asp-for="StructureDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-structure-detail" type="text" >@Model.StructureDetails</textarea>
+                             <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+                                <div class="govuk-form-group @Html.SetErrorClass(model => model.StructureDetails, "govuk-form-group--error")">
+                                    <label class="govuk-label" for="include-structure-detail">
+                                        Provide more details (optional)
+                                    </label>
+                                    <div id="include-structure-detail-hint" class="govuk-hint">
+                                        For example, you’re working on this area for your next statement.
+                                    </div>
+                                    <textarea asp-for="StructureDetails" class="govuk-textarea govuk-js-character-count" id="include-structure-detail" rows="5" aria-describedby="include-structure-detail-info include-structure-detail-hint"></textarea>
+                                </div>
+                                <div id="include-structure-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                                    You can enter up to 200 characters
+                                </div>
                                 <span asp-validation-for="StructureDetails" class="govuk-error-message"></span>
                             </div>
                         </div>
@@ -80,11 +80,19 @@
                             </label>
                         </div>
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-policies-conditional">
-                            <div class="govuk-form-group @Html.SetErrorClass(model => model.PolicyDetails, "govuk-form-group--error")">
-                                <label class="govuk-label" for="include-policies-detail">
-                                    Please provide details
-                                </label>
-                                <textarea asp-for="PolicyDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-policies-detail" type="text" >@Model.PolicyDetails</textarea>
+                            <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+                                <div class="govuk-form-group @Html.SetErrorClass(model => model.PolicyDetails, "govuk-form-group--error")">
+                                    <label class="govuk-label" for="include-policies-detail">
+                                        Provide more details (optional)
+                                    </label>
+                                    <div id="include-policies-detail-hint" class="govuk-hint">
+                                        For example, you’re working on this area for your next statement.
+                                    </div>
+                                    <textarea asp-for="PolicyDetails" class="govuk-textarea govuk-js-character-count" id="include-policies-detail" rows="5" aria-describedby="include-policies-detail-info include-policies-detail-hint"></textarea>
+                                </div>
+                                <div id="include-policies-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                                    You can enter up to 200 characters
+                                </div>
                                 <span asp-validation-for="PolicyDetails" class="govuk-error-message"></span>
                             </div>
                         </div>
@@ -95,7 +103,7 @@
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
-                            Risk assessment and management
+                            Risk assessment
                         </h2>
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
@@ -112,11 +120,19 @@
                             </label>
                         </div>
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-risks-conditional">
-                            <div class="govuk-form-group @Html.SetErrorClass(model => model.RisksDetails, "govuk-form-group--error")">
-                                <label class="govuk-label" for="include-risks-detail">
-                                    Please provide details
-                                </label>
-                                <textarea asp-for="RisksDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-risks-detail">@Model.RisksDetails</textarea>
+                            <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+                                <div class="govuk-form-group @Html.SetErrorClass(model => model.RisksDetails, "govuk-form-group--error")">
+                                    <label class="govuk-label" for="include-risks-detail">
+                                        Provide more details (optional)
+                                    </label>
+                                    <div id="include-risks-detail-hint" class="govuk-hint">
+                                        For example, you’re working on this area for your next statement.
+                                    </div>
+                                    <textarea asp-for="RisksDetails" class="govuk-textarea govuk-js-character-count" id="include-risks-detail" rows="5" aria-describedby="include-risks-detail-info include-risks-detail-hint"></textarea>
+                                </div>
+                                <div id="include-risks-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                                    You can enter up to 200 characters
+                                </div>
                                 <span asp-validation-for="RisksDetails" class="govuk-error-message"></span>
                             </div>
                         </div>
@@ -128,7 +144,7 @@
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
-                            Due diligence processes
+                            Due diligence (steps to address risk)
                         </h2>
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
@@ -145,11 +161,19 @@
                             </label>
                         </div>
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-dueDiligence-conditional">
-                            <div class="govuk-form-group @Html.SetErrorClass(model => model.DueDiligenceDetails, "govuk-form-group--error")">
-                                <label class="govuk-label" for="include-dueDiligence-detail">
-                                    Please provide details
-                                </label>
-                                <textarea asp-for="DueDiligenceDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-dueDiligence-detail">@Model.DueDiligenceDetails</textarea>
+                            <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+                                <div class="govuk-form-group @Html.SetErrorClass(model => model.DueDiligenceDetails, "govuk-form-group--error")">
+                                    <label class="govuk-label" for="include-dueDiligence-detail">
+                                        Provide more details (optional)
+                                    </label>
+                                    <div id="include-dueDiligence-detail-hint" class="govuk-hint">
+                                        For example, you’re working on this area for your next statement.
+                                    </div>
+                                    <textarea asp-for="DueDiligenceDetails" class="govuk-textarea govuk-js-character-count" id="include-dueDiligence-detail" rows="5" aria-describedby="include-dueDiligence-detail-info include-dueDiligence-detail-hint"></textarea>
+                                </div>
+                                <div id="include-dueDiligence-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                                    You can enter up to 200 characters
+                                </div>
                                 <span asp-validation-for="DueDiligenceDetails" class="govuk-error-message"></span>
                             </div>
                         </div>
@@ -160,7 +184,7 @@
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
-                            Staff training about slavery and human trafficking
+                            Staff training about modern slavery
                         </h2>
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
@@ -177,11 +201,19 @@
                             </label>
                         </div>
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-training-conditional">
-                            <div class="govuk-form-group @Html.SetErrorClass(model => model.TrainingDetails, "govuk-form-group--error")">
-                                <label class="govuk-label" for="include-training-detail">
-                                    Please provide details
-                                </label>
-                                <textarea asp-for="TrainingDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-training-detail" >@Model.TrainingDetails</textarea>
+                            <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+                                <div class="govuk-form-group @Html.SetErrorClass(model => model.TrainingDetails, "govuk-form-group--error")">
+                                    <label class="govuk-label" for="include-training-detail">
+                                        Provide more details (optional)
+                                    </label>
+                                    <div id="include-training-detail-hint" class="govuk-hint">
+                                        For example, you’re working on this area for your next statement.
+                                    </div>
+                                    <textarea asp-for="TrainingDetails" class="govuk-textarea govuk-js-character-count" id="include-training-detail" rows="5" aria-describedby="include-training-detail-info include-training-detail-hint"></textarea>
+                                </div>
+                                <div id="include-training-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                                    You can enter up to 200 characters
+                                </div>
                                 <span asp-validation-for="TrainingDetails" class="govuk-error-message"></span>
                             </div>
                         </div>
@@ -211,11 +243,19 @@
                             </label>
                         </div>
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-effectiveness-conditional">
-                            <div class="govuk-form-group @Html.SetErrorClass(model => model.GoalsDetails, "govuk-form-group--error")">
-                                <label class="govuk-label" for="include-goals-detail">
-                                    Please provide details
-                                </label>
-                                <textarea asp-for="GoalsDetails" class="govuk-textarea govuk-!-width-two-thirds" rows="5" id="include-goals-detail" >@Model.GoalsDetails</textarea>
+                            <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+                                <div class="govuk-form-group @Html.SetErrorClass(model => model.GoalsDetails, "govuk-form-group--error")">
+                                    <label class="govuk-label" for="include-effectiveness-detail">
+                                        Provide more details (optional)
+                                    </label>
+                                    <div id="include-effectiveness-detail-hint" class="govuk-hint">
+                                        For example, you’re working on this area for your next statement.
+                                    </div>
+                                    <textarea asp-for="GoalsDetails" class="govuk-textarea govuk-js-character-count" id="include-effectiveness-detail" rows="5" aria-describedby="include-effectiveness-detail-info include-effectiveness-detail-hint"></textarea>
+                                </div>
+                                <div id="include-effectiveness-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                                    You can enter up to 200 characters
+                                </div>
                                 <span asp-validation-for="GoalsDetails" class="govuk-error-message"></span>
                             </div>
                         </div>
@@ -224,12 +264,12 @@
             </div>
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
-                Continue
+                Save and continue
             </button>
 
             @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
             {
-                <a class="govuk-button" href="@(Model.SkipUrl)">Skip</a>
+                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
             }
         }
     </div>

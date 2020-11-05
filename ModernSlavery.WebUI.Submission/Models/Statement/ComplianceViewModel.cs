@@ -13,23 +13,23 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<StatementModel, ComplianceViewModel>();
 
-            CreateMap<ComplianceViewModel, StatementModel>(MemberList.None)                
-                .ForMember(d => d.StructureDetails, opt => opt.MapFrom(s=>s.StructureDetails))
-                .ForMember(d => d.IncludesPolicies, opt => opt.MapFrom(s=>s.IncludesPolicies))
-                .ForMember(d => d.PolicyDetails, opt => opt.MapFrom(s=>s.PolicyDetails))
-                .ForMember(d => d.IncludesRisks, opt => opt.MapFrom(s=>s.IncludesRisks))
-                .ForMember(d => d.RisksDetails, opt => opt.MapFrom(s=>s.RisksDetails))
-                .ForMember(d => d.IncludesDueDiligence, opt => opt.MapFrom(s=>s.IncludesDueDiligence))
-                .ForMember(d => d.DueDiligenceDetails, opt => opt.MapFrom(s=>s.DueDiligenceDetails))
-                .ForMember(d => d.IncludesTraining, opt => opt.MapFrom(s=>s.IncludesTraining))
-                .ForMember(d => d.TrainingDetails, opt => opt.MapFrom(s=>s.TrainingDetails))
-                .ForMember(d => d.IncludesGoals, opt => opt.MapFrom(s=>s.IncludesGoals))
-                .ForMember(d => d.GoalsDetails, opt => opt.MapFrom(s=>s.GoalsDetails));
+            CreateMap<ComplianceViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.StructureDetails, opt => opt.MapFrom(s => s.StructureDetails))
+                .ForMember(d => d.IncludesPolicies, opt => opt.MapFrom(s => s.IncludesPolicies))
+                .ForMember(d => d.PolicyDetails, opt => opt.MapFrom(s => s.PolicyDetails))
+                .ForMember(d => d.IncludesRisks, opt => opt.MapFrom(s => s.IncludesRisks))
+                .ForMember(d => d.RisksDetails, opt => opt.MapFrom(s => s.RisksDetails))
+                .ForMember(d => d.IncludesDueDiligence, opt => opt.MapFrom(s => s.IncludesDueDiligence))
+                .ForMember(d => d.DueDiligenceDetails, opt => opt.MapFrom(s => s.DueDiligenceDetails))
+                .ForMember(d => d.IncludesTraining, opt => opt.MapFrom(s => s.IncludesTraining))
+                .ForMember(d => d.TrainingDetails, opt => opt.MapFrom(s => s.TrainingDetails))
+                .ForMember(d => d.IncludesGoals, opt => opt.MapFrom(s => s.IncludesGoals))
+                .ForMember(d => d.GoalsDetails, opt => opt.MapFrom(s => s.GoalsDetails));
         }
     }
     public class ComplianceViewModel : BaseViewModel
     {
-        public override string PageTitle => "Areas covered by your modern slavery statement";
+        public override string PageTitle => "Does your statement cover the following areas in relation to modern slavery?";
 
         public bool? IncludesStructure { get; set; }
         [MaxLength(128)]

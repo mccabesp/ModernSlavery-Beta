@@ -1,0 +1,64 @@
+﻿@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model UrlEmailViewModel
+
+@section BeforeMain {
+    @if (!string.IsNullOrWhiteSpace(Model.BackUrl))
+    {
+        <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+    }
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+        {
+            @await Html.GovUkValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.Submitted);
+
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
+          
+            <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementUrl, "govuk-form-group--error")">
+                <label asp-for="StatementUrl" class="govuk-label">URL</label>
+                <span class="govuk-hint">
+                    URL must begin with ‘https://' or ‘http://'
+                </span>
+                <input asp-for="StatementUrl" class="govuk-input" inputmode="url" spellcheck="false">
+                <span asp-validation-for="StatementUrl" class="govuk-error-message"></span>
+            </div>
+
+            <p class="govuk-body">
+                If you do not have a link, please provide a contact email address that can be used to request a copy of the statement.
+            </p>
+
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                        If you do not have a website
+                    </span>
+                </summary>
+                <div class="govuk-details__text">
+                    If your organisation does not have a website, but is required by law to publish a modern slavery statement, you must provide a copy of the statement in writing to anyone who requests one within 30 days. If your organisation is part of a group, we would encourage you to publish your statement on the website of your parent organisation, and add that URL to our online service.
+                </div>
+            </details>
+
+            <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementUrl, "govuk-form-group--error")">
+                <label asp-for="StatementEmail" class="govuk-label">Email</label>
+                <input asp-for="StatementEmail" class="govuk-input" spellcheck="false" inputmode="email">
+                <span asp-validation-for="StatementEmail" class="govuk-error-message"></span>
+            </div>
+
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                Save and continue
+            </button>
+
+            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
+            {
+                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
+            }
+        }
+    </div>
+</div>

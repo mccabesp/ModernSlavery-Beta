@@ -1,0 +1,60 @@
+﻿@using System.Linq; 
+@{
+    Layout = "/Views/GdsLayout.cshtml";
+}
+@model TurnoverViewModel
+
+@section BeforeMain {
+    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+        {
+            @await Html.GovUkValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.Submitted);
+
+            <h1 class="govuk-heading-l">
+                @Model.PageTitle
+            </h1>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                Read about how to calclate turnover or budget for groups
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            If your statement is for a group, you should include the total turnover or budget of all the organisations in the group – regardless of where they are located or carry out their business.
+                        </div>
+                    </details>
+
+                    <div class="govuk-radios">
+                        @foreach (var item in Enums.GetValues<Statement.StatementTurnoverRanges>().Where(x => x != Statement.StatementTurnoverRanges.NotProvided))
+                        {
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="Turnover-@(item)" name="Turnover" type="radio" checked="@(Model.Turnover==item)" value="@(item)">
+                                <label class="govuk-label govuk-radios__label" for="Turnover-@(item)">
+                                    @(item.GetEnumDescription())
+                                </label>
+                            </div>
+                        }
+                    </div>
+                </fieldset>
+            </div>
+
+
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                Save and continue
+            </button>
+
+            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
+            {
+                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
+            }
+        }
+    </div>
+</div>
