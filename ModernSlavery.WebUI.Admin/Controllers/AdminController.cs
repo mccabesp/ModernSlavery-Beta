@@ -533,17 +533,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             download.ShowUpdateButton = !await GetFileUpdatingAsync(download.Filepath);
             model.Downloads.Add(download);
 
-            download = new DownloadViewModel.Download
-            {
-                Type = "Users",
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DownloadsPath,
-                    Filenames.UnverifiedRegistrations),
-                Title = "Unverified User Organisation Registrations",
-                Description = "A list of all unverified organisations pending verification from a user."
-            };
-            download.ShowUpdateButton = !await GetFileUpdatingAsync(download.Filepath);
-            model.Downloads.Add(download);
-
             #endregion
 
             #region Create Consent downloads
