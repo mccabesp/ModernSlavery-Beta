@@ -76,6 +76,9 @@ namespace ModernSlavery.Core.Models
                 public KeyName LikelySource { get; set; }
 
                 public string OtherLikelySource { get; set; }
+
+                public List<KeyName> SupplyChainTiers { get; set; } = new List<KeyName>();
+
                 #endregion
 
                 #region Risk Target Fields
@@ -131,6 +134,7 @@ namespace ModernSlavery.Core.Models
                     CreateMap<KeyName, SocialAuditTypes>().ConvertUsing(s => s == null ? SocialAuditTypes.Unknown : (SocialAuditTypes)s.Key);
                     CreateMap<KeyName, GrievanceMechanismTypes>().ConvertUsing(s => s == null ? GrievanceMechanismTypes.Unknown : (GrievanceMechanismTypes)s.Key);
                     CreateMap<KeyName, RiskSourceTypes>().ConvertUsing(s => s == null ? RiskSourceTypes.Unknown : (RiskSourceTypes)s.Key);
+                    CreateMap<KeyName, SupplyChainTierTypes>().ConvertUsing(s => s == null ? SupplyChainTierTypes.Unknown : (SupplyChainTierTypes)s.Key);
                     CreateMap<KeyName, RiskTargetTypes>().ConvertUsing(s => s == null ? RiskTargetTypes.Unknown : (RiskTargetTypes)s.Key);
                     CreateMap<KeyName, CountryTypes>().ConvertUsing(s => s == null ? CountryTypes.Unknown : (CountryTypes)s.Key);
                     CreateMap<KeyName, IndicatorTypes>().ConvertUsing(s => s == null ? IndicatorTypes.Unknown : (IndicatorTypes)s.Key);
@@ -147,6 +151,7 @@ namespace ModernSlavery.Core.Models
                     CreateMap<SocialAuditTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<GrievanceMechanismTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<RiskSourceTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<SupplyChainTierTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });                    
                     CreateMap<RiskTargetTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<CountryTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<IndicatorTypes,KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
