@@ -15,6 +15,13 @@ namespace ModernSlavery.Hosts.Web.Tests
         public const string roger_job_title = "Company Reporter";
         public const string roger_password = "Test1234!";
 
+        //roger successfull created users
+        public const string second_email = "second@uat.co";
+        public const string second_first = "Secomd";
+        public const string second_last = "User";
+        public const string second_job_title = "AdditionalReporter";
+        public const string second_password = "Test1234!";
+
         //existing user
         public const string existing_email = "roger@uat.co";
 
