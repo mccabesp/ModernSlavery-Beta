@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using EFCore.BulkExtensions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -45,17 +47,16 @@ namespace ModernSlavery.Infrastructure.Database
             if (_migrationEnsured)
                 return MigrationsApplied; //This static variable is a temporary measure otherwise each request for a Database context takes a few seconds to check for migrations or if the database exists
 
-            var migrationsPending = Database.GetPendingMigrations().Any();
-
             Database.Migrate();
             _migrationEnsured = true;
 
-            var migrationsApplied = Database.GetPendingMigrations().Any();
+            var lastDefinedMigration = Database.GetMigrations().LastOrDefault();
+            var lastAppliedMigration = Database.GetAppliedMigrations().LastOrDefault();
 
-            return migrationsPending && !migrationsApplied;
+            return lastAppliedMigration == lastDefinedMigration;
         }
 
- 
+
 
         public async Task<int> SaveChangesAsync()
         {
@@ -137,8 +138,23 @@ namespace ModernSlavery.Infrastructure.Database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
+            {
+                #region On local development machines add migration version to database name
+                if (_sharedOptions.IsDevelopment())
+                {
+                    var connectionString = new SqlConnectionStringBuilder(ConnectionString);
+                    if (connectionString.DataSource.ContainsI("(localdb"))
+                    {
+                        var migrationClasses = Assembly.GetExecutingAssembly().ExportedTypes.Where(p => p.IsClass && typeof(Migration).IsAssignableFrom(p)).ToList();
+                        connectionString.InitialCatalog = $"{connectionString.InitialCatalog.BeforeLast("-V")}-V{migrationClasses.Count}";
+                        ConnectionString = connectionString.ToString();
+                    }
+                }
+                #endregion
+
                 //Setup the SQL server with automatic retry on failure
                 optionsBuilder.UseSqlServer(ConnectionString, options => options.EnableRetryOnFailure());
+            }
 
             //Use lazy loading for related virtual items
             optionsBuilder.UseLazyLoadingProxies();
