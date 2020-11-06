@@ -56,7 +56,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //if chosing "other" details must be provided
             ClickLabel("Other");
-            ClearField("OtherTraining");
+            ClearField("Please Specify");
             await Task.CompletedTask;
         }
 
@@ -68,14 +68,14 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect("There is a problem");
             Expect("Missing details");
 
-            BelowField("OtherTraining").Expect("Enter details");
+            BelowField("Please specify").Expect("Enter details");
             await Task.CompletedTask;
         }
 
         [Test, Order(46)]
         public async Task FormCanBeSubmittedWithDetailsGiven()
         {
-            Set("OtherTraining").To("details");
+            Set("Please specify").To("details");
             Click("Continue");
             await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
             ExpectHeader("Monitoring progress");

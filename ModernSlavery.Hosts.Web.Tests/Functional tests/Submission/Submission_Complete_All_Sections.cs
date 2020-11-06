@@ -312,7 +312,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Training
             Submission_Helper.ChekcboxSelector(this, "Training", Submission.SelectedTrainings,
                 OtherOption: "Other",
-                OtherFieldLabel: "OtherTraining",
+                OtherFieldLabel: "Please Specify",
                 OtherDetails: Submission.OtherTrainings,
                 NeedExpand: false);
 
