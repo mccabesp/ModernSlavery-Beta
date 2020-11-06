@@ -205,7 +205,7 @@ namespace ModernSlavery.Hosts.Web.Tests
                     }            
             }
 
-            Set("If you want to specify an area not mentioned above, please provide details").To(Submission.SuppliChainRisks_OtherArea);
+            Set(The.Top, "If you want to specify an area not mentioned above, please provide details").To(Submission.SuppliChainRisks_OtherArea);
 
 
             //NearHeader(The.Top, "Sectors").Expect(What.Contains, Submission.SupplyChainRisks_SelectedSectors.Length.ToString() + " Selected");
@@ -225,7 +225,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             
 
-            Set("If you want to specify an area not mentioned above, please provide details").To(Submission.SuppliChainRisks_OtherArea);
+            Set(The.Bottom, "If you want to specify an area not mentioned above, please provide details").To(Submission.SuppliChainRisks_OtherArea);
 
 
             //countries
@@ -312,7 +312,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Training
             Submission_Helper.ChekcboxSelector(this, "Training", Submission.SelectedTrainings,
                 OtherOption: "Other",
-                OtherFieldLabel: "OtherTraining",
+                OtherFieldLabel: "Please Specify",
                 OtherDetails: Submission.OtherTrainings,
                 NeedExpand: false);
 

@@ -161,7 +161,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
             if (records == null || !records.Any()) return;
 
-            var filePath = Path.Combine(LoggingHelper.AxeResultsFilepath, $"AxeResultSummary({DateTime.Now:yy-MM-dd}).csv");
+            var filePath = Path.Combine(LoggingHelper.AxeResultsFilepath, $"AxeResultSummary.csv");
             if (File.Exists(filePath)) File.Delete(filePath);
 
             var table = records.ToDataTable();

@@ -49,7 +49,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task ExpectErrorMessages() {
 
-            Expect("The following errors were detected");
+            Expect("There is a problem");
             Expect("You are already registered for this organisation");
             await Task.CompletedTask;
 

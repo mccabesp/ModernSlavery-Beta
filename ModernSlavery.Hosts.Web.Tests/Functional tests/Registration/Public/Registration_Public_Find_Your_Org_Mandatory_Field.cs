@@ -45,8 +45,10 @@ namespace ModernSlavery.Hosts.Web.Tests
             //clicking search without field filled should cause validaiton
             Click(The.Bottom, "Search");
             await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            Expect("The following errors were detected");
+            Expect("There is a problem");
             Expect("There's a problem with your search");
+            Expect("Please enter an organisation to search for");
+
         }
     }
 }
