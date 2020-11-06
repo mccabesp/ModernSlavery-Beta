@@ -493,17 +493,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 model.Downloads.Add(download);
             }
 
-            download = new DownloadViewModel.Download
-            {
-                Type = "Late Submissions",
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DownloadsPath,
-                    Filenames.OrganisationLateSubmissions),
-                Title = "Organisation Late Submissions",
-                Description = "Organisations who reported or changed their submission late the previous snapshot date."
-            };
-            download.ShowUpdateButton = !await GetFileUpdatingAsync(download.Filepath);
-            model.Downloads.Add(download);
-
             #endregion
 
             #region Users
@@ -529,17 +518,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Title = "User Organisation Registrations",
                 Description =
                     "A list of all organisations that have been registered by a user. This includes all users for each organisation."
-            };
-            download.ShowUpdateButton = !await GetFileUpdatingAsync(download.Filepath);
-            model.Downloads.Add(download);
-
-            download = new DownloadViewModel.Download
-            {
-                Type = "Users",
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DownloadsPath,
-                    Filenames.UnverifiedRegistrations),
-                Title = "Unverified User Organisation Registrations",
-                Description = "A list of all unverified organisations pending verification from a user."
             };
             download.ShowUpdateButton = !await GetFileUpdatingAsync(download.Filepath);
             model.Downloads.Add(download);

@@ -7,7 +7,7 @@
 <div id="verify-email-content" class="grid-row">
     <div class="column-two-thirds">
         @await Html.CustomValidationSummaryAsync()
-        @using (Html.BeginForm())
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
 
@@ -17,7 +17,7 @@
                     Verify your email address
                 </h1>
                 <p>
-                    We have sent a confirmation email to <br/>
+                    We have sent a confirmation email to <br />
                     @if (!string.IsNullOrWhiteSpace(ViewBag.VerifyCode))
                     {
                         <a href="@Url.Action("VerifyEmail", new {code = ViewBag.VerifyCode, login = Model.EmailAddress})">
@@ -41,7 +41,7 @@
                 <p>
                     To send another verification email to <b>@Model.EmailAddress</b> click the button below:
                 </p>
-                <input type="submit" class="button" value="Resend"/>
+                <input type="submit" class="button" value="Resend" />
             }
         }
     </div>

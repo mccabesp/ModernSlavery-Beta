@@ -9,7 +9,7 @@
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @using (Html.BeginForm())
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
@@ -50,7 +50,7 @@
                         How is your organisation measuring progress towards these goals?
                     </label>
                 </h1>
-                <textarea asp-for="ProgressMeasures" class="govuk-textarea " rows="5" type="text" maxlength="1024">@Model.ProgressMeasures</textarea>
+                <textarea asp-for="ProgressMeasures" class="govuk-textarea " rows="5" type="text">@Model.ProgressMeasures</textarea>
             </div>
 
             <div class="govuk-form-group">
@@ -59,7 +59,7 @@
                         What were your key achievements in relation to reducing modern slavery during the period covered by this statement?
                     </label>
                 </h1>
-                <textarea asp-for="KeyAchievements" class="govuk-textarea" rows="5" maxlength="1024">@Model.KeyAchievements</textarea>
+                <textarea asp-for="KeyAchievements" class="govuk-textarea" rows="5">@Model.KeyAchievements</textarea>
             </div>
 
             <fieldset class="govuk-fieldset govuk-!-margin-top-6" describedby="GovUk_StatementYears-hint">

@@ -1,0 +1,242 @@
+﻿@page "/landing"
+
+@using ModernSlavery.Core.Models
+@using ModernSlavery.WebUI.Shared.Classes.Cookies
+@using ModernSlavery.WebUI.GDSDesignSystem
+@using ModernSlavery.WebUI.GDSDesignSystem.Models
+@using ModernSlavery.WebUI.Shared.Classes.Extensions
+@using ModernSlavery.WebUI.Shared.Options
+
+@inject SharedOptions sharedOptions
+@inject FeatureSwitchOptions featureSwitchOptions
+
+@addTagHelper "*, Microsoft.AspNetCore.Mvc.TagHelpers"
+@addTagHelper "*, ModernSlavery.WebUI.Shared.Classes.TagHelpers"
+
+@{
+    ViewBag.Title = "@text";    
+    var text = "Modern slavery statement registry";
+}
+
+<!DOCTYPE html>
+<html lang="en" class="govuk-template">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta property="og:description" content="Use this service to @text">
+    <meta property="og:title" content="@text">   
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="GOV.UK">
+    <meta name="govuk:section" content="employing people">
+    <meta name="govuk:analytics:organisations" content="&lt;OT506&gt;">
+    <meta name="govuk:content-id" content="b9621530-aec4-41af-a396-7449fc908ae3">
+    <meta name="govuk:schema-name" content="transaction">
+    <meta name="govuk:publishing-application" content="publisher">
+    <meta name="govuk:format" content="transaction">
+    <meta name="description" content="Use this service to @text">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary">
+    <meta charset="utf-8">
+    <title>@text - GOV.UK</title>
+
+    <link rel="shortcut icon" href="https://www.gov.uk/assets/static/favicon-8d811b8c3badbc0b0e2f6e25d3660a96cc0cca7993e6f32e98785f205fc40907.ico" type="image/x-icon">
+    <link rel="mask-icon" href="https://www.gov.uk/assets/static/gov.uk_logotype_crown-de738c3fcce8ce2a91b67e89787090dc24a5cda0275ab6b75f6226c5b9619d3d.svg" color="#0b0c0c">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://www.gov.uk/assets/static/apple-touch-icon-180x180-ea1cbb1cbbeddfff275dfa6e8e46b84cd530892df79dc4882a8f99b802b49a90.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="https://www.gov.uk/assets/static/apple-touch-icon-167x167-181e404a50c572923285fb83f0fbd78da6b4e38e3ce52f8e6b8e29da8586450a.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://www.gov.uk/assets/static/apple-touch-icon-152x152-02457fcdcee8d309276305af2233d41bfb8fd055e855727d355e61bce7ffa9bb.png">
+    <link rel="apple-touch-icon" href="https://www.gov.uk/assets/static/apple-touch-icon-a318f305290c523aed80082456175b46c95350c0eeac93f42e78a71c7a55544e.png">
+
+    <meta name="theme-color" content="#0b0c0c">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <environment exclude="Development, DEV, TEST">
+        <link href="/assets/styles/app-all.min.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
+    </environment>
+    <environment include="Development, DEV, TEST">
+        <link href="/assets/styles/app-all.css" rel="stylesheet" type="text/css" media="all" />
+    </environment>
+
+</head>
+
+<body class="govuk-template__body govuk-body app-body-class">
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+
+    @if (featureSwitchOptions.IsEnabled("CookiePolicyLink") && !CookieHelper.HasSeenLatestCookieMessage(HttpContext.Request))
+    {
+        await Html.RenderPartialAsync("~/Views/Components/CookieBanner.cshtml");
+    }
+
+    <a href="#landingpage-content" class="govuk-skip-link">Skip to main content</a>
+
+    @{
+        var headerNavigationLinks = new List<HeaderNavigationViewModel>();
+
+        if (User.Identity.IsAuthenticated)
+        {
+            headerNavigationLinks.Add(new HeaderNavigationViewModel
+            {
+                Text = "Sign out",
+                Href = Url.ActionArea("SignOut", "Account", "Account"),
+                Classes = "sign-out-link"
+            });
+        }
+        else if (!Url.IsAction("Login", "Identity", "Identity"))
+        {
+            headerNavigationLinks.Add(new HeaderNavigationViewModel
+            {
+                Text = "Sign in",
+                Href = Url.ActionArea("ManageOrganisations", "Submission", "Submission"),
+                Classes = "sign-out-link"
+            });
+        }
+
+        @(Html.GovUkHeader(new HeaderViewModel
+{
+    ServiceName = sharedOptions.ServiceName,
+    HomepageUrl = "https://www.gov.uk",
+    ServiceUrl = featureSwitchOptions.IsEnabled("NavigationLinks") ? "/" : null,
+    Navigation = headerNavigationLinks
+}))
+    }
+    <div class="govuk-width-container">
+        @(Html.GovUkPhaseBanner(new PhaseBannerViewModel
+    {
+        Classes= "phase-banner-beta no-bottom-border",
+        Phase = "BETA",
+        Html = @<text>This is a new service – your <a class="govuk-link" href="@Url.Action("SendFeedback", "Shared")">feedback</a> will help us to improve it.</text>
+    }))
+    </div>
+
+    <div class="masthead">
+        <div class="hero">
+            <div class="hero__content">
+                <div class="hero__body">
+                    <h1 class="hero__title">
+                        See what organisations are doing to tackle modern slavery
+                    </h1>
+                    <p class="hero__description">
+                        Use the Modern slavery statement registry to find or add statements. See what organisations are doing to eliminate modern slavery from their operations and supply chains.
+                    </p>
+                    <a href="@Url.ActionArea("Search","Viewing", "Viewing")" role="button" draggable="false" class="govuk-button govuk-button--start app-button--inverted" data-module="govuk-button" data-click-events data-click-category="Hero" data-click-action="Button clicked">
+                        Find statements
+                        <image src="/assets/images/arrow.png" xlink:href="" class="arrow" role="presentation"></image>
+                    </a>
+                    <span class="hero-alternative-action">
+                        or <a class="govuk-link" href="@Url.ActionArea("Login", "Identity", "Identity")" data-click-events data-click-category="Hero" data-click-action="Internal link clicked"> add a statement</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="govuk-main-wrapper" id="landingpage-content" role="main">
+        <div class="govuk-width-container">
+
+
+            <section class="product-page-!-border-bottom ">
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-one-half govuk-!-padding-bottom-5">
+                        <h2 class="govuk-heading-l govuk-!-margin-bottom-3">Find statements</h2>
+                        <p class="govuk-body">Search for statements using a range of filters. You can also download statement data as CSV files.</p>
+                        <p class="govuk-body govuk-!-font-weight-bold"><a href="@(Url.ActionArea("Search", "Viewing", "Viewing"))" class="govuk-link">Search the registry</a></p>
+                        <p class="govuk-body govuk-!-font-weight-bold"><a href="@(Url.ActionArea("Download", "Viewing", "Viewing"))" class="govuk-link">Download statement data</a></p>
+                    </div>
+                    <div class="govuk-grid-column-one-half govuk-!-padding-bottom-5">
+                        <h2 class="govuk-heading-l govuk-!-margin-bottom-3">Add a statement to the registry</h2>
+                        <p class="govuk-body govuk-!-margin-bottom-7 mobile-no-margin">
+                            To add your organisation’s statement to the registry, you’ll need to create an account. To get started, go to the sign-in page.
+                        </p>                        
+                        <p class="govuk-body"><a href="@(Url.ActionArea("Login", "Identity", "Identity"))" class="govuk-link govuk-!-font-weight-bold">Create an account or sign in</a></p>
+                    </div>
+                </div>
+            </section>
+
+
+            <section class="product-page-!-border-bottom">
+                <div class="govuk-grid-row ">
+                    <div class="govuk-grid-column-two-thirds govuk-!-margin-bottom-5 govuk-!-margin-top-9 ">
+                        <h2 class="govuk-heading-l">Who can add their statement to the registry</h2>
+                        <p class="govuk-body">Any organisation with a modern slavery statement can add it to the registry, including:</p>
+                        <ul class="govuk-list govuk-list--bullet">
+                            <li>those that have to publish a statement by law, and want to show they’ve met their legal obligations</li>
+                            <li>those that have produced a statement voluntarily</li>
+                        </ul>
+                        <details class="govuk-details" data-module="govuk-details">
+                            <summary class="govuk-details__summary">
+                                <span class="govuk-details__summary-text">
+                                    Who has to publish a statement by law?
+                                </span>
+                            </summary>
+                            <div class="govuk-details__text">
+                                <p class="govuk-body">Section 54 of the Modern slavery Act 2015 requires organisations that meet certain criteria to publish an annual modern slavery statement on their website. Currently, the legislation applies to commercial organisations that:</p>
+                                <ul class="govuk-list govuk-list--bullet">
+                                    <li>are a body corporate or a partnership (described as an ‘organisation’ in this service), wherever incorporated</li>
+                                    <li>carry on a business, or part of a business, in the UK</li>
+                                    <li>supply goods or services</li>
+                                    <li>have an annual turnover of £36m or more</li>
+                                </ul>
+                                <p class="govuk-body">Many other organisations produce a modern slavery statement voluntarily. In the future, the requirement to publish a statement will be extended to public sector organisations with a budget of £36 million or more.</p>
+
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds govuk-!-margin-bottom-5 govuk-!-margin-top-9 ">
+                        <h2 class="govuk-heading-l content-section__first-heading">Find resources on modern slavery statements</h2>
+                        <p class="govuk-body">Resources and guidance on modern slavery statements are available on the GOV.UK modern slavery collection page. </p>
+                        <a href="https://www.gov.uk/government/collections/modern-slavery" class="govuk-link govuk-!-font-weight-bold">Find resources and guidance</a>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    @{
+        var links = new List<FooterLinksViewModel>();
+
+        links.Add(new FooterLinksViewModel
+        {
+            Text = "Contact us",
+            Href = Url.Page("/ContactUs")
+        });
+
+        if (featureSwitchOptions.IsEnabled("CookiePolicyLink"))
+            links.Add(new FooterLinksViewModel
+            {
+                Text = "Cookies",
+                Href = Url.Action("CookieSettings", "Shared")
+            });
+        if (featureSwitchOptions.IsEnabled("PrivacyPolicyLink"))
+            links.Add(new FooterLinksViewModel
+            {
+                Text = "Privacy Policy",
+                Href = Url.Action("PrivacyPolicy", "Shared")
+            });
+        if (featureSwitchOptions.IsEnabled("ReportConcernsLink"))
+            links.Add(new FooterLinksViewModel
+            {
+                Text = "Report Concerns",
+                Href = Url.Action("ReportConcerns", "Shared")
+            });
+
+    }
+    @(Html.GovUkFooter(new FooterViewModel { MetaNavigation = new FooterMetaNavigationViewModel() { Links = links.ToArray() } }))
+
+    <script src="/assets/scripts/jquery-1.11.3.js"></script>
+
+    <environment exclude="Development, DEV, TEST, QAT, PROD, PREPROD, UR">
+        <script src="/assets/scripts/app.min.js" type="text/javascript" asp-append-version="true"></script>
+        <script src="/assets/javascripts/**/*.min.js" type="text/javascript" asp-append-version="true"></script>
+    </environment>
+    <environment include="Development, DEV, TEST, QAT, PROD, PREPROD, UR">
+        <script asp-src-include="/assets/scripts/**/*.js" asp-src-exclude="/assets/scripts/app.min.js" type="text/javascript"></script>
+        <script asp-src-include="/assets/javascripts/**/*.js" asp-src-exclude="/assets/javascripts/**/*.min.js" type="text/javascript"></script>
+    </environment>
+
+    <script>window.GOVUKFrontend.initAll()</script>
+    <script>if (typeof window.GOVUK === 'undefined') document.body.className = document.body.className.replace('js-enabled', '');</script>
+</body>
+</html>

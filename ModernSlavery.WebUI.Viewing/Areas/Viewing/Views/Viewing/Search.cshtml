@@ -31,51 +31,61 @@
     };
     var filters = new List<FilterGroup> { sectors, turnover, years };
 }
-    <div class="govuk-grid-row search-landing">        
+@section BeforeMain {    
+    <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <div class="right">
+            <div class="right govuk-!-margin-top-4">
                 <a class="govuk-link download govuk-body govuk-!-font-size-19" href="@(Url.ActionArea("Download", "Viewing", "Viewing"))"><span>Download all statement summary data</span></a>
             </div>
-            @using (Html.BeginForm("SearchResults", "Viewing", FormMethod.Get, new { id = "SearchForm", @class = "search-form" }))
-            {
-                <div class="govuk-grid-row finder">
-                    <div class="govuk-grid-column-two-thirds">
-                        <partial name="Parts/_SearchKeywords" model="Model" />
-                    </div>
-                </div>
-                <div class="govuk-form-group">
-                    <details class="govuk-details advanced-search-details" data-module="govuk-details">
-                        <summary data-open="Fewer search options" data-close="Advanced search" class="govuk-details__summary">
-
-                        </summary>
-                        <div class="govuk-details__text">
-                            @foreach (var filter in filters)
-                            {
-                                <div id="checkboxes-@(filter.Id)" class="advanced-search-checkboxes govuk-form-group govuk-checkboxes--small" data-module="govuk-checkboxes">
-                                    <fieldset class="govuk-fieldset">
-                                        <h4 class="govuk-heading-s">
-                                            @filter.Label
-                                        </h4>
-                                        <ul class="govuk-checkboxes advanced-search-checkboxes__list @(filter.Id == "SectorFilter"? "two-columns": "")">
-                                            @foreach (var item in filter.Metadata)
-                                            {
-                                                <li class="govuk-checkboxes__item">
-                                                    <input type="checkbox" name="@(filter.Group)" id="@(item.Id)" value="@(item.Value)" checked="@(item.Checked)" class="govuk-checkboxes__input" />
-                                                    <label for="@(item.Id)" class="govuk-label govuk-checkboxes__label">@item.Label</label>
-                                                </li>
-                                            }
-                                        </ul>
-                                    </fieldset>
-                                </div>
-                            }
-                            <button class="govuk-button govuk-!-margin-top-3" data-module="govuk-button" name="search" type="submit">Search</button>
-
-                        </div>                       
-                    </details>
-                    <a class="govuk-button govuk-button--secondary" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">See all statements</a>
-                </div>
-                    }
         </div>
     </div>
+}
+
+<div class="govuk-grid-row search-landing">
+    <div class="govuk-grid-column-full">
+        
+        @using (Html.BeginForm("SearchResults", "Viewing", FormMethod.Get, new { id = "SearchForm", @class = "search-form", novalidate="" }))
+        {
+            <div class="govuk-grid-row finder">
+                <div class="govuk-grid-column-two-thirds">
+                    <partial name="Parts/_SearchKeywords" model="Model" />
+                </div>
+            </div>
+            <div class="govuk-form-group">
+                <details class="govuk-details advanced-search-details" data-module="govuk-details">
+                    <summary data-open="Fewer search options" data-close="Advanced search" class="govuk-details__summary">
+
+                    </summary>
+                    <div class="govuk-details__text">
+                        @foreach (var filter in filters)
+                        {
+                            <div id="checkboxes-@(filter.Id)" class="advanced-search-checkboxes govuk-form-group govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                <fieldset class="govuk-fieldset">
+                                    <span class="govuk-heading-s">
+                                        @filter.Label
+                                    </span>
+                                    <ul class="govuk-checkboxes advanced-search-checkboxes__list @(filter.Id == "SectorFilter" ? "two-columns" : "")">
+                                        @foreach (var item in filter.Metadata)
+                                        {
+                                            <li class="govuk-checkboxes__item">
+                                                <input type="checkbox" name="@(filter.Group)" id="@(item.Id)" value="@(item.Value)" checked="@(item.Checked)" class="govuk-checkboxes__input" />
+                                                <label for="@(item.Id)" class="govuk-label govuk-checkboxes__label">@item.Label</label>
+                                            </li>
+                                        }
+                                    </ul>
+                                </fieldset>
+                            </div>
+                        }
+                        <button class="govuk-button" data-module="govuk-button" name="search" type="submit">Search</button>
+
+                    </div>
+
+                </details>
+                <a class="govuk-button govuk-button--secondary" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">See all statements</a>
+
+            </div>
+        }
+    </div>
+</div>
 
 

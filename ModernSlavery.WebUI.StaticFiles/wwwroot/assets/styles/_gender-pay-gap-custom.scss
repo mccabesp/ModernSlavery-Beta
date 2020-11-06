@@ -3,6 +3,8 @@
 @import "./pages/statement-viewing";
 @import "./pages/search";
 @import "./pages/download";
+@import "./pages/landing";
+
 //styling of organisation results list in registration journey
 @import "./pages/choose-organisation";
 
@@ -46,4 +48,4 @@
 @import "./components/button-link";
 
 //styling of service info
-@import "./components/_service-info";
+@import "./components/service-info";

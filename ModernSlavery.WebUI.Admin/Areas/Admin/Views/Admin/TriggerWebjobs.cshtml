@@ -15,7 +15,7 @@
 
     <div class="grid-row">
         <div class="column-full">
-            @using (Html.BeginForm())
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
             {
                 @await Html.CustomValidationSummaryAsync()
                 @Html.AntiForgeryToken()
@@ -47,7 +47,6 @@
                     <option value="TakeSnapshotAsync">Take a snapshot of all the file storage</option>
                     <option value="UpdateDownloadFiles">Update files for statement data used for downloads</option>
                     <option value="UpdateFromCompaniesHouseAsync">Update organisations names, addresses and SIC Codes from companies house</option>
-                    <option value="UpdateOrganisationLateSubmissions">Update late submissions download file</option>
                     <option value="UpdateOrganisationsAsync">Update organisations download file</option>
                     <option value="UpdateOrganisationSearchIndexesAsync">Update the azure search indexes</option>
                     <option value="UpdateOrphanOrganisationsAsync">Update orphan organisations download file</option>
@@ -60,7 +59,7 @@
                     <option value="UpdateUsersToContactForFeedback">Update users to contact for feedback download file</option>
                     <option value="UpdateUsersToSendInfo">Update users to send infomation download file</option>
                 </select>
-               
+
                 <p>
                     <button type="submit" class="button" role="button" onclick="if (!confirm('Are you sure you want to trigger this webjob?')) return false;">Execute</button>
                 </p>

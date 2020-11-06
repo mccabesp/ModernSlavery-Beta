@@ -16,7 +16,7 @@
 
 <div class="govuk-grid-row cookie-settings-page">
     <div class="govuk-grid-column-two-thirds">
-        <form method="POST" action="@Url.Action("SendFeedback", "Shared")">
+        <form method="POST" action="@Url.Action("SendFeedback", "Shared")" novalidate>
             @(Html.AntiForgeryToken())
             @(await Html.GovUkValidationSummaryAsync())          
 

@@ -10,7 +10,7 @@
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @using (Html.BeginForm())
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
@@ -48,7 +48,7 @@
                                         <label class="govuk-label" for="other">
                                             Please specify
                                         </label>
-                                        <textarea asp-for="OtherSector" class="govuk-textarea" id="contact-by-email" name="OtherSector" maxlength="128" rows="5">@Model.OtherSector</textarea>
+                                        <textarea asp-for="OtherSector" class="govuk-textarea" id="contact-by-email" name="OtherSector" rows="5">@Model.OtherSector</textarea>
                                         <span asp-validation-for="OtherSector" class="govuk-error-message"></span>
                                     </div>
                                 </div>

@@ -12,7 +12,7 @@
         </li>
     </ol>
 </div>
-@using (Html.BeginForm("ReviewRequest"))
+@using (Html.BeginForm("ReviewRequest", null, FormMethod.Post, new { novalidate=""}))
 {
     @Html.AntiForgeryToken()
 

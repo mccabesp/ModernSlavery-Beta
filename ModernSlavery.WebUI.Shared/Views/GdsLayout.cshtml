@@ -149,10 +149,10 @@
     }))
 
     }
-
     <div class="govuk-width-container">
-
-        @(RenderSection("BeforeMain", false))
+        <div class="navigation" role="navigation" aria-label="page-navigation">
+            @(RenderSection("BeforeMain", false))
+        </div>
 
         <main class="govuk-main-wrapper" id="main-content" role="main">
             @RenderBody()

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -33,7 +34,6 @@ namespace ModernSlavery.Core
         public const string OrphanOrganisations = "MSU-OrphanOrganisations.csv";
         public const string OrganisationScopes = "MSU-Scopes.csv";
         public const string OrganisationSubmissions = "MSU-Submissions.csv";
-        public const string OrganisationLateSubmissions = "MSU-LateSubmissions.csv";
         public const string ShortCodes = "MSU-ShortCodes.csv";
         public const string SicCodes = "MSU-SicCodes.csv";
         public const string SicSections = "MSU-SicSections.csv";

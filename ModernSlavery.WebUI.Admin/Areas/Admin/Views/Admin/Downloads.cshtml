@@ -15,7 +15,7 @@
 
     <div class="grid-row">
         <div class="column-full">
-            @using (Html.BeginForm())
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
             {
                 @await Html.CustomValidationSummaryAsync()
                 @Html.AntiForgeryToken()
@@ -48,26 +48,18 @@
                                     <div>
                                         <a href="@Url.Action("Read", new {filePath = download.Filepath})">
                                             <b>@download.Title</b>
-                                        </a><br/>@download.Description</div>
+                                        </a><br />@download.Description
+                                    </div>
                                     <div class="info">
                                         &#9642; <a href="@Url.Action("Download", new {filePath = download.Filepath})" target="_blank" style="white-space: nowrap">@download.Filename</a>
                                         &#9642; Records: @download.Count
                                         &#9642; Modified: <span title="@download.Modified.Value.ToShortTimeString()">@download.Modified.Value.ToString("d MMM yy HH:mm")</span>
-                                        @if (!string.IsNullOrWhiteSpace(download.EhrcAccessKey))
-                                        {
-                                            <span>&#9642;</span>
-                                            <a href="@download.EhrcAccessKey" target="_blank" style="white-space: nowrap">EHRC Link</a>
-                                        }
-                                        @if (download.ShowUpdateButton)
-                                        {
-                                            <button type="submit" style="cursor: pointer; float: right;" class="link-button" id="btnUpdate" name="Command" value="Update:@download.Filepath" title="Updates the data records">Update</button>
-                                        }
                                     </div>
                                 }
                                 else
                                 {
                                     <span style="font-weight: bold">@download.Title</span>
-                                    <br/>
+                                    <br />
                                     @download.Description
                                     <div class="info">
                                         &#9642; No files found

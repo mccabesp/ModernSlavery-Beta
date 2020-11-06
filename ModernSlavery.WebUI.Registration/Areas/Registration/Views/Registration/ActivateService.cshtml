@@ -9,7 +9,7 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            @using (Html.BeginForm())
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
             {
                 @Html.AntiForgeryToken()
 
@@ -30,20 +30,20 @@
                     <div class="col-md-10">
                         @Html.CustomEditorFor(model => model.PIN, new { @class = "govuk-input govuk-!-width-one-half", style = "text-transform: uppercase;", autocomplete = "off" })
                     </div>
-                </div>              
+                </div>
                 <details class="govuk-details" data-module="govuk-details">
-                    <summary class="govuk-details__summary">                       
+                    <summary class="govuk-details__summary">
                         <span class="govuk-details__summary-text">
                             Problems with your PIN?
                         </span>
                     </summary>
-                    <div class="govuk-details__text">                        
-                            If your PIN hasn't arrived after 7 days or has expired, <a class="govuk-link" href="@Url.Action("RequestPIN")">request a new PIN</a>.
+                    <div class="govuk-details__text">
+                        If your PIN hasn't arrived after 7 days or has expired, <a class="govuk-link" href="@Url.Action("RequestPIN")">request a new PIN</a>.
                     </div>
-                </details> 
+                </details>
 
                 <input type="submit" class="govuk-button" name="command" value="Activate and continue" />
-                <p class="govuk-body">                    
+                <p class="govuk-body">
                     <a class="govuk-link" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Cancel</a>
                 </p>
 

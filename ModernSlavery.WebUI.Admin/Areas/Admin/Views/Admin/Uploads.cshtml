@@ -23,7 +23,7 @@
 
     <div class="grid-row">
         <div class="column-full">
-            @using (Html.BeginForm("Uploads", "Admin", FormMethod.Post, new {enctype = "multipart/form-data"}))
+            @using (Html.BeginForm("Uploads", "Admin", FormMethod.Post, new {enctype = "multipart/form-data", novalidate=""}))
             {
                 @await Html.CustomValidationSummaryAsync()
                 @Html.AntiForgeryToken()
