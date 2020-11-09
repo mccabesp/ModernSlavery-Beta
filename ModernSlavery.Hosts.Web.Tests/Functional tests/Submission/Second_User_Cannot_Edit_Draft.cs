@@ -31,7 +31,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
 
             await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
-            await this.RegisterUserOrganisationAsync(org.OrganisationName, Create_Account.second_email);
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, SecondEmail);
             RefreshPage();
 
             await this.SaveDatabaseAsync();
