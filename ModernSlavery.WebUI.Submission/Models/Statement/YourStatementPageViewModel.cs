@@ -209,6 +209,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 //The period between from and to dates must be a minimum of 12 months and a max of 24 months
                 var monthsDiff = ((StatementEndDate.Value.Year - StatementStartDate.Value.Year) * 12)
                     + StatementEndDate.Value.Month - StatementStartDate.Value.Month;
+
+                // start is first day of the month and end is last day of the month
+                // 1st Feb 2019 to 31st Jan 2020 fails incorrectly
+                // 31st Jan 2019 to 30th Jan 2020 AND 2nd Feb 2019 to 1st Feb works correctly
+                if (StatementStartDate.Value.AddDays(-1).Month != StatementStartDate.Value.Month
+                    && StatementEndDate.Value.AddDays(1).Month != StatementEndDate.Value.Month)
+                {
+                    monthsDiff += 1;
+                }
                 if (monthsDiff < 12 || monthsDiff > 24)
                     validationResults.AddValidationError(3135, nameof(StatementStartDate));
             }
@@ -234,7 +243,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             // Must be a real date
             if (partsComplete && !ApprovedDate.HasValue)
-                validationResults.AddValidationError(3130, nameof(ApprovedDate));
+                validationResults.AddValidationError(3131, nameof(ApprovedDate));
 
             // Cannot be later than today's date
             if (ApprovedDate.HasValue && ApprovedDate.Value > VirtualDateTime.Now)

@@ -42,7 +42,7 @@
                     <span id="reporting-start-hint" class="govuk-hint">
                         For example, 31 3 1980
                     </span>
-                    <div class="app-date-range__container @Html.SetErrorClass(new[] {nameof(Model.StatementStartDate),nameof(Model.StatementStartDay),nameof(Model.StatementStartMonth),nameof(Model.StatementStartYear),nameof(Model.StatementEndDay),nameof(Model.StatementEndMonth),nameof(Model.StatementEndYear)}, "govuk-form-group--error")">
+                    <div class="app-date-range__container @Html.SetErrorClass(new[] {nameof(Model.StatementStartDate), nameof(Model.StatementEndDate),nameof(Model.StatementStartDay),nameof(Model.StatementStartMonth),nameof(Model.StatementStartYear),nameof(Model.StatementEndDay),nameof(Model.StatementEndMonth),nameof(Model.StatementEndYear)}, "govuk-form-group--error")">
                         <div class="app-date-range__child">
                             <div class="govuk-date-input" id="reporting-start">
                                 <div class="govuk-date-input__item">
@@ -107,6 +107,7 @@
                         <span asp-validation-for="StatementStartMonth" class="govuk-error-message"></span>
                         <span asp-validation-for="StatementStartYear" class="govuk-error-message"></span>
                         <span asp-validation-for="StatementStartDate" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementEndDate" class="govuk-error-message"></span>
                         <span asp-validation-for="StatementEndDay" class="govuk-error-message"></span>
                         <span asp-validation-for="StatementEndMonth" class="govuk-error-message"></span>
                         <span asp-validation-for="StatementEndYear" class="govuk-error-message"></span>
