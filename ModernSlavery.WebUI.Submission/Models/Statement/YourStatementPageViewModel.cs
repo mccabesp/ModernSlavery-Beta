@@ -243,7 +243,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             // Must be a real date
             if (partsComplete && !ApprovedDate.HasValue)
-                validationResults.AddValidationError(3130, nameof(ApprovedDate));
+                validationResults.AddValidationError(3131, nameof(ApprovedDate));
 
             // Cannot be later than today's date
             if (ApprovedDate.HasValue && ApprovedDate.Value > VirtualDateTime.Now)
