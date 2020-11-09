@@ -84,7 +84,11 @@
         <div class="app-statement-summary_url" data-statement-url="@Model.StatementUrl">
 
             <div class="app-statement-summary_url-link-working">
-                <a class="govuk-link" href="@Model.StatementUrl">
+                <a class="govuk-link" target="_blank"
+                   asp-controller="Viewing"
+                   asp-action="StatementSummaryUrl"
+                   asp-route-organisationIdentifier="@Model.ParentOrganisationId"
+                   asp-route-year="@Model.SubmissionDeadlineYear">
                     <div class="govuk-panel govuk-panel--blue">
                         <div class="govuk-panel__body govuk-!-font-size-16">
                             <span class="govuk-!-font-size-24 govuk-!-font-weight-bold">Link to full statement</span>

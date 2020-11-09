@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
@@ -31,6 +32,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(string organisationIdentifier, int reportingDeadlineYear);
         Task<Outcome<StatementErrors, List<StatementSummaryViewModel>>> GetStatementSummaryGroupViewModel(string organisationIdentifier, int reportingDeadlineYear);
         SearchViewModel GetSearchViewModel(SearchQueryModel searchQuery);
+        Task<Outcome<StatementErrors, string>> GetLinkRedirectUrl(string organisationIdentifier, int reportingDeadlineYear);
     }
 
     public class ViewingPresenter : IViewingPresenter
@@ -39,6 +41,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
         private readonly IStatementBusinessLogic _statementBusinessLogic;
         private readonly IViewingService _viewingService;
+        private readonly IUrlChecker _urlChecker;
         public IObfuscator Obfuscator { get; }
         private readonly IMapper _mapper;
         private readonly IServiceProvider _serviceProvider;
@@ -54,6 +57,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             IServiceProvider serviceProvider,
             IMapper mapper,
             ISearchBusinessLogic searchBusinessLogic,
+            IUrlChecker urlChecker,
             SectorTypeIndex sectorTypes)
         {
             _viewingService = viewingService;
@@ -64,6 +68,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             _serviceProvider = serviceProvider;
             _sectorTypes = sectorTypes;
             _searchBusinessLogic = searchBusinessLogic;
+            _urlChecker = urlChecker;
         }
         #endregion
 
@@ -223,6 +228,22 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
 
             var vm = _mapper.Map<List<StatementSummaryViewModel>>(groups);
             return new Outcome<StatementErrors, List<StatementSummaryViewModel>>(vm);
+        }
+
+        public async Task<Outcome<StatementErrors, string>> GetLinkRedirectUrl(string organisationIdentifier, int reportingDeadlineYear)
+        {
+            var organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
+            var organisationSearchModel = await _searchBusinessLogic.GetOrganisationAsync(organisationId, reportingDeadlineYear);
+
+            if (organisationSearchModel == null)
+                return new Outcome<StatementErrors, string>(StatementErrors.NotFound, $"Cannot find statement summary for Organisation:{organisationId} due for reporting deadline year {reportingDeadlineYear}");
+
+            var isWorking = await _urlChecker.IsUrlWorking(organisationSearchModel.StatementUrl);
+
+            if (isWorking)
+                return new Outcome<StatementErrors, string>(organisationSearchModel.StatementUrl);
+            else
+                return new Outcome<StatementErrors, string>(result: null);
         }
 
         #endregion

@@ -260,6 +260,25 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             return View("StatementSummary", viewModel);
         }
 
+        [HttpGet("statement-summary/{organisationIdentifier}/{year}/url")]
+        public async Task<IActionResult> StatementSummaryUrl(string organisationIdentifier, int year)
+        {
+            var openResult = await ViewingPresenter.GetLinkRedirectUrl(organisationIdentifier, year);
+            if (openResult.Fail)
+                return HandleStatementViewErrors(openResult.Errors);
+
+            if (string.IsNullOrEmpty(openResult.Result))
+                return RedirectToAction(nameof(StatementSummaryLinkNotWorking), new { organisationIdentifier, year });
+            else
+                return Redirect(openResult.Result);
+        }
+
+        [HttpGet("statement-summary/{organisationIdentifier}/{year}/link-not-working")]
+        public async Task<IActionResult> StatementSummaryLinkNotWorking(string organisationIdentifier, int year)
+        {
+            return View("StatementSummaryLinkNotWorking");
+        }
+
         [HttpGet("statement-summary/{organisationIdentifier}/{year}/group")]
         public async Task<IActionResult> StatementSummaryGroup(string organisationIdentifier, int year)
         {

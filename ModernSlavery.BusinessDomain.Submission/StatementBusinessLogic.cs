@@ -912,7 +912,6 @@ namespace ModernSlavery.BusinessDomain.Submission
         }
 
 
-
         public async Task<List<string>> GetExistingStatementInformationAsync(long organisationId, int reportingDeadlineYear)
         {
             var results = new List<string>();
