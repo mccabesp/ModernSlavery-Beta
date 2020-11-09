@@ -218,7 +218,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 {
                     monthsDiff += 1;
                 }
-                if (monthsDiff < 12 || monthsDiff > 24)
+                if (monthsDiff < 12 || monthsDiff > 18)
                     validationResults.AddValidationError(3135, nameof(StatementStartDate));
             }
 
