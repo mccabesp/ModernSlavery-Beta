@@ -19,6 +19,9 @@ namespace ModernSlavery.BusinessDomain.Account
 
         public bool IsAdministrator(User user)
         {
+            if (IsSystemUser(user))
+                return false;
+
             if (!user.EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
 
             if (string.IsNullOrWhiteSpace(_sharedOptions.AdminEmails))
@@ -29,6 +32,9 @@ namespace ModernSlavery.BusinessDomain.Account
 
         public bool IsSuperAdministrator(User user)
         {
+            if (IsSystemUser(user))
+                return false;
+
             if (!user.EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
 
             if (string.IsNullOrWhiteSpace(_sharedOptions.SuperAdminEmails))
@@ -39,12 +45,20 @@ namespace ModernSlavery.BusinessDomain.Account
 
         public bool IsDatabaseAdministrator(User user)
         {
+            if (IsSystemUser(user))
+                return false;
+
             if (!user.EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
 
             if (string.IsNullOrWhiteSpace(_sharedOptions.DatabaseAdminEmails))
                 return IsSuperAdministrator(user);
 
             return user.EmailAddress.LikeAny(_sharedOptions.DatabaseAdminEmails.SplitI(";"));
+        }
+
+        public bool IsSystemUser(User user)
+        {
+            return user.UserId == -1;
         }
     }
 }

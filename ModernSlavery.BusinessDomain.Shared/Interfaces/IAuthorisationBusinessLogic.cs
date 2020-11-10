@@ -7,5 +7,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         bool IsAdministrator(User user);
         bool IsSuperAdministrator(User user);
         bool IsDatabaseAdministrator(User user);
+        bool IsSystemUser(User user);
     }
 }
