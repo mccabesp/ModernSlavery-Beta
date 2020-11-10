@@ -60,7 +60,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             var prefix = fileName.BeforeFirst("_");
             var datePart = fileName.AfterLast("_", includeWhenNoSeparator: false);
 
-            var endYear = _reportingDeadlineHelper.GetReportingStartDate(SectorTypes.Private).Year;
+            var endYear = _reportingDeadlineHelper.GetReportingDeadline(SectorTypes.Private).Year;
             var startYear = _sharedOptions.FirstReportingDeadlineYear;
             if (!string.IsNullOrWhiteSpace(datePart))
             {
