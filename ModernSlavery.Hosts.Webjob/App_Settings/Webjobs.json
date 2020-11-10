@@ -66,7 +66,7 @@
       "Trigger": "00:01:00:00"
     },
     "UpdateOrganisationsAsync": { "Action": "Enable" },
-    "UpdateOrphanOrganisationsAsync": { "Action": "Disable" },
+    "UpdateOrphanOrganisationsAsync": { "Action": "Enable" },
     "UpdateRegistrationAddressesAsync": { "Action": "Enable" },
     "UpdateRegistrations": { "Action": "Enable" },
     "UpdateScopes": { "Action": "Disable" },
