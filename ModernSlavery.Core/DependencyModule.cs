@@ -37,6 +37,8 @@ namespace ModernSlavery.Core
                 .WithParameter("seed", _sharedOptions.ObfuscationSeed);
 
             builder.RegisterType<SourceComparer>().As<ISourceComparer>().SingleInstance();
+
+            builder.RegisterType<UrlChecker>().As<IUrlChecker>().InstancePerLifetimeScope();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

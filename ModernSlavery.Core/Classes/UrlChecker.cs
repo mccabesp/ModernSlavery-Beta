@@ -1,11 +1,13 @@
-﻿using Microsoft.Rest;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Rest;
+using ModernSlavery.Core.Options;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModernSlavery.BusinessDomain.Viewing
+namespace ModernSlavery.Core.Classes
 {
     public interface IUrlChecker
     {
@@ -14,11 +16,18 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
     public class UrlChecker : IUrlChecker
     {
-        IHttpClientFactory ClientFactory;
+        readonly ILogger<UrlChecker> Logger;
+        readonly UrlCheckerOptions Options;
+        readonly IHttpClientFactory ClientFactory;
 
-        public UrlChecker(IHttpClientFactory clientFactory)
+        public UrlChecker(
+            ILogger<UrlChecker> logger,
+            UrlCheckerOptions options,
+            IHttpClientFactory clientFactory)
         {
             ClientFactory = clientFactory;
+            Logger = logger;
+            Options = options;
         }
 
         public async Task<bool> IsUrlWorking(string url)
@@ -28,9 +37,9 @@ namespace ModernSlavery.BusinessDomain.Viewing
             if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
                 return false;
 
-            var request = new HttpRequestMessage(HttpMethod.Head, uri);
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
             var client = ClientFactory.CreateClient();
-            client.Timeout = TimeSpan.FromSeconds(10);
+            client.Timeout = TimeSpan.FromSeconds(Options.Timeout);
 
             try
             {
@@ -44,6 +53,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
             catch (Exception ex)
             {
                 // exception due to timeout or DNS error
+                Logger.LogError(ex, "Failed loading {url} when checking exists", url);
                 return false;
             }
         }
