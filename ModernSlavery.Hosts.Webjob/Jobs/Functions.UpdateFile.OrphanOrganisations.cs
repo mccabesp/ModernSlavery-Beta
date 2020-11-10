@@ -73,7 +73,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 // Cache the latest unregistered organisations
                 var unregisteredOrganisations = await GetOrphanOrganisationsAsync().ConfigureAwait(false);
 
-                var year = _reportingDeadlineHelper.GetReportingStartDate(SectorTypes.Private).Year;
+                var year = _reportingDeadlineHelper.GetReportingDeadline(SectorTypes.Private).Year;
 
                 // Write yearly records to csv files
                 await WriteRecordsForYearAsync(
