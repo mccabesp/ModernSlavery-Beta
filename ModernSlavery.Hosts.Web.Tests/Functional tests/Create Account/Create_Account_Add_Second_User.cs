@@ -31,6 +31,8 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         }
 
+         public string SecondEmail = Create_Account.second_email + DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+        
         [Test, Order(11)]
         public async Task ReturnToCreateAccountPage()
         {
@@ -61,8 +63,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(12)]
         public async Task EnterPersonalDetails_Second_User()
         {
-            Set("Email address").To(Create_Account.second_email);
-            Set("Confirm your email address").To(Create_Account.second_email);
+            Set("Email address").To(SecondEmail);
+            Set("Confirm your email address").To(SecondEmail);
 
             Set("First name").To(Create_Account.second_first);
             Set("Last name").To(Create_Account.second_last);
@@ -94,12 +96,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Expect(What.Contains, "We have sent a confirmation email to");
-            Expect(What.Contains, Create_Account.second_email);
+            Expect(What.Contains, SecondEmail);
             Expect(What.Contains, "Follow the instructions in the email to finish creating your account.");
 
 
             //get email verification link
-            SecondUrl = WebDriver.FindElement(By.LinkText(Create_Account.second_email)).GetAttribute("href");
+            SecondUrl = WebDriver.FindElement(By.LinkText(SecondEmail)).GetAttribute("href");
 
             await Task.CompletedTask;
 
@@ -113,7 +115,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Goto(SecondUrl);
             await AxeHelper.CheckAccessibilityAsync(this);
 
-            Set("Email").To(Create_Account.second_email);
+            Set("Email").To(SecondEmail);
             Set("Password").To(_password);
 
             Click(The.Bottom, "Sign In");
