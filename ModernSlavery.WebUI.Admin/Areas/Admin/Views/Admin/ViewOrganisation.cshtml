@@ -238,7 +238,6 @@
             <th scope="col" class="govuk-table__header">Is group</th>
             <th scope="col" class="govuk-table__header">Submitted by</th>
             <th scope="col" class="govuk-table__header">Submitted on</th>
-            <th scope="col" class="govuk-table__header">Last updated date</th>
         </tr>
     </thead>
     <tbody class="govuk-table__body">
@@ -270,7 +269,6 @@
                 <td class="govuk-table__cell">@(isGroup ? "Yes" : "No")</td>
                 <td class="govuk-table__cell">@(isGroup && statement.Organisation != Model ? statement.Organisation.OrganisationName : "")</td>
                 <td class="govuk-table__cell">@(statement.Created)</td>
-                <td class="govuk-table__cell">@(statement.Modified)</td>
             </tr>
             previousSubmissionDeadline = statement.SubmissionDeadline;
         }
