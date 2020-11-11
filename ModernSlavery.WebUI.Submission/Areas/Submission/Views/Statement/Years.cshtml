@@ -14,16 +14,19 @@
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
+            @Html.HiddenFor(m => m.OrganisationId);
+            @Html.HiddenFor(m => m.SubmissionDeadline);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
             </h1>
-
-            <fieldset class="govuk-fieldset govuk-!-margin-top-6" describedby="GovUk_StatementYears-hint">                
-                <div class="govuk-form-group ">
-                    <span class="govuk-hint" id="GovUk_StatementYears-hint">
-                        If your statement is for a group of organisations, select the answer that applies to the organisation with the longest history of producing statements.
-                    </span>
+            <div class="govuk-form-group ">
+                <fieldset class="govuk-fieldset govuk-!-margin-top-6">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                        <h2 class="govuk-fieldset__heading govuk-!-font-weight-regular">
+                            If your statement is for a group of organisations, select the answer that applies to the organisation with the longest history of producing statements.
+                        </h2>
+                    </legend>                
                     <div class="govuk-radios">
                         @foreach (var item in (Enums.GetValues<Statement.StatementYearRanges>()).Where(x => x != Statement.StatementYearRanges.NotProvided))
                         {
@@ -35,18 +38,17 @@
                             </div>
                         }
                     </div>
-
-                </div>
-            </fieldset>
+                </fieldset>
+            </div>
+     
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Save and continue
             </button>
 
-            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
-            {
-                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
-            }
+            <div class="skip-link">
+                <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+            </div>
         }
     </div>
 </div>

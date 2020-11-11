@@ -14,7 +14,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<StatementModel, YearsViewModel>();
 
             CreateMap<YearsViewModel, StatementModel>(MemberList.None)
-                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s=>s.StatementYears));
+                .ForMember(d => d.StatementYears, opt => opt.MapFrom(s => s.StatementYears));
         }
     }
 
@@ -23,13 +23,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override string PageTitle => "How many years has your organisation been producing modern slavery statements?";
 
         public StatementYearRanges? StatementYears { get; set; }
-
-        public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            var validationResults = new List<ValidationResult>();
-
-            return validationResults;
-        }
 
         public override Status GetStatus()
         {

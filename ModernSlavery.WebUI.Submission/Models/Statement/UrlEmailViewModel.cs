@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using static ModernSlavery.WebUI.Submission.Models.Statement.GroupOrganisationsViewModel;
@@ -16,8 +17,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<StatementModel, UrlEmailViewModel>();
 
             CreateMap<UrlEmailViewModel, StatementModel>(MemberList.None)
-                .ForMember(d => d.StatementUrl, opt => opt.MapFrom(s=>s.StatementUrl))
-                .ForMember(d => d.StatementEmail, opt => opt.MapFrom(s=>s.StatementEmail));
+                .ForMember(d => d.StatementUrl, opt => opt.MapFrom(s => s.StatementUrl))
+                .ForMember(d => d.StatementEmail, opt => opt.MapFrom(s => s.StatementEmail));
+
         }
     }
 
@@ -38,7 +40,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             var validationResults = new List<ValidationResult>();
 
-            //TODO: Any validation required here?
+            if (string.IsNullOrWhiteSpace(StatementUrl) && string.IsNullOrWhiteSpace(StatementEmail))
+            {
+                validationResults.AddValidationError(3102, nameof(StatementUrl));
+                validationResults.AddValidationError(3102, nameof(StatementEmail));
+            }
+
 
             return validationResults;
         }

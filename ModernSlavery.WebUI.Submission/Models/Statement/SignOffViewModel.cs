@@ -21,7 +21,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.ApprovedDay, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Day))
                 .ForMember(d => d.ApprovedMonth, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Month))
                 .ForMember(d => d.ApprovedYear, opt => opt.MapFrom(s => s.ApprovedDate == null ? (int?)null : s.ApprovedDate.Value.Year))
-                .ForAllOtherMembers(opt => opt.Ignore());
+                .ForMember(d => d.StatementEndDate, opt => opt.MapFrom(s => s.StatementEndDate));
 
             CreateMap<SignOffViewModel, StatementModel>(MemberList.None)
                 .ForMember(d => d.ApproverFirstName, opt => opt.MapFrom(s => s.ApproverFirstName))
@@ -65,11 +65,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public int? ApprovedMonth { get; set; }
         public int? ApprovedYear { get; set; }
 
+        public DateTime? StatementEndDate { get; set; }
+
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
 
             #region Approved date validation
+
 
             //Validate the approved date parts
             var partsComplete = !Text.IsAnyNull(ApprovedDay, ApprovedMonth, ApprovedYear);
@@ -77,28 +80,33 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (!partsComplete && !partsEmpty)
             {
                 if (ApprovedDay == null)
-                    validationResults.AddValidationError(3109, nameof(ApprovedDay));
+                    validationResults.AddValidationError(3300, nameof(ApprovedDay));
 
                 if (ApprovedMonth == null)
-                    validationResults.AddValidationError(3110, nameof(ApprovedMonth));
+                    validationResults.AddValidationError(3301, nameof(ApprovedMonth));
 
                 if (ApprovedYear == null)
-                    validationResults.AddValidationError(3111, nameof(ApprovedYear));
+                    validationResults.AddValidationError(3302, nameof(ApprovedYear));
             }
 
             // Must be a real date
             if (partsComplete && !ApprovedDate.HasValue)
-                validationResults.AddValidationError(3130, nameof(ApprovedDate));
+                validationResults.AddValidationError(3303, nameof(ApprovedDate));
 
             // Cannot be later than today's date
             if (ApprovedDate.HasValue && ApprovedDate.Value > VirtualDateTime.Now)
-                validationResults.AddValidationError(3134, nameof(ApprovedDate));
+                validationResults.AddValidationError(3304, nameof(ApprovedDate));
 
             // Must be within the allowed years
             if (ApprovedYear != null && (ApprovedYear.Value > MaxApprovedYear || ApprovedYear.Value < MinApprovedYear))
-                validationResults.AddValidationError(3125, nameof(ApprovedYear), new { minYear = MinApprovedYear, maxYear = MaxApprovedYear });
+                validationResults.AddValidationError(3305, nameof(ApprovedYear), new { minYear = MinApprovedYear, maxYear = MaxApprovedYear });
 
-            #endregion
+            // Cannot be before the statment end date
+            if (ApprovedDate.HasValue && StatementEndDate.HasValue && ApprovedDate.Value < StatementEndDate.Value)
+                validationResults.AddValidationError(3309, nameof(ApprovedDate));
+
+            #endregion    
+
 
             #region Approver validation
 
@@ -108,13 +116,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (!partsComplete && !partsEmpty)
             {
                 if (string.IsNullOrWhiteSpace(ApproverFirstName))
-                    validationResults.AddValidationError(3113, nameof(ApproverFirstName));
+                    validationResults.AddValidationError(3306, nameof(ApproverFirstName));
 
                 if (string.IsNullOrWhiteSpace(ApproverLastName))
-                    validationResults.AddValidationError(3114, nameof(ApproverLastName));
+                    validationResults.AddValidationError(3307, nameof(ApproverLastName));
 
                 if (string.IsNullOrWhiteSpace(ApproverJobTitle))
-                    validationResults.AddValidationError(3115, nameof(ApproverJobTitle));
+                    validationResults.AddValidationError(3308, nameof(ApproverJobTitle));
             }
 
             #endregion
@@ -124,14 +132,19 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override Status GetStatus()
         {
-            if (!string.IsNullOrWhiteSpace(ApproverFirstName)
+            var approverDetailsComplete = !string.IsNullOrWhiteSpace(ApproverFirstName)
                 && !string.IsNullOrWhiteSpace(ApproverLastName)
-                && !string.IsNullOrWhiteSpace(ApproverJobTitle)
-                && ApprovedDay.HasValue
-                && ApprovedMonth.HasValue
-                && ApprovedYear.HasValue) return Status.Complete;
+                && !string.IsNullOrWhiteSpace(ApproverJobTitle);
 
-            return Status.Incomplete;
+            var approverDateComplete = ApprovedDay.HasValue
+                && ApprovedMonth.HasValue
+                && ApprovedYear.HasValue;
+
+            if (approverDetailsComplete && approverDateComplete) return Status.Complete;
+
+            else if (approverDateComplete || approverDetailsComplete) return Status.InProgress;
+
+            else return Status.Incomplete;
         }
     }
 }

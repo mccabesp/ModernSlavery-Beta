@@ -52,7 +52,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             var otherId = SectorTypes.Single(x => x.Description.Equals("Other")).Id;
 
             if (Sectors.Contains(otherId) && string.IsNullOrEmpty(OtherSectors))
-                validationResults.AddValidationError(3300, nameof(OtherSectors));
+                validationResults.AddValidationError(3500, nameof(OtherSectors));
 
             return validationResults;
         }
@@ -62,7 +62,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (Sectors.Any())
             {
                 var other = SectorTypes.Single(x => x.Description.Equals("Other"));
-                if (!Sectors.Any(t => t == other.Id || !string.IsNullOrWhiteSpace(OtherSectors))) return Status.Complete;
+
+                if (Sectors.Any(t => t == other.Id) && string.IsNullOrWhiteSpace(OtherSectors)) return Status.InProgress;
+
+                else return Status.Complete;
             }
 
             return Status.Incomplete;

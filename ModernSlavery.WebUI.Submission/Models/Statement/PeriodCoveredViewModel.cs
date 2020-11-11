@@ -231,6 +231,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 && StatementEndMonth.HasValue
                 && StatementEndYear.HasValue) return Status.Complete;
 
+            else if (StatementStartDate.HasValue || StatementEndDate.HasValue) return Status.InProgress;
+
             return Status.Incomplete;
         }
 

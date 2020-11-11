@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.ProgressMeasures, opt => opt.MapFrom(s => s.Summary.ProgressMeasures));
 
             CreateMap<ProgressViewModel, StatementModel>(MemberList.None)
-                .ForPath(d => d.Summary.ProgressMeasures, opt => opt.MapFrom(s=>s.ProgressMeasures));
+                .ForPath(d => d.Summary.ProgressMeasures, opt => opt.MapFrom(s => s.ProgressMeasures));
         }
     }
 

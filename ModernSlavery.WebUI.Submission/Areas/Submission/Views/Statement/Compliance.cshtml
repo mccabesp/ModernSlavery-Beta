@@ -13,6 +13,8 @@
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
+            @Html.HiddenFor(m => m.OrganisationId);
+            @Html.HiddenFor(m => m.SubmissionDeadline);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
@@ -20,8 +22,8 @@
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        <h2 class="govuk-fieldset__heading">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading grey-details">
                             Your organisation’s structure, business and supply chains
                         </h2>
                     </legend>
@@ -39,7 +41,7 @@
                             </label>
                         </div>
                         <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-include-structure-conditional">
-                             <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+                            <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
                                 <div class="govuk-form-group @Html.SetErrorClass(model => model.StructureDetails, "govuk-form-group--error")">
                                     <label class="govuk-label" for="include-structure-detail">
                                         Provide more details (optional)
@@ -47,7 +49,7 @@
                                     <div id="include-structure-detail-hint" class="govuk-hint">
                                         For example, you’re working on this area for your next statement.
                                     </div>
-                                    <textarea asp-for="StructureDetails" class="govuk-textarea govuk-js-character-count" id="include-structure-detail" rows="5" aria-describedby="include-structure-detail-info include-structure-detail-hint"></textarea>
+                                    <textarea name="StructureDetails" class="govuk-textarea govuk-js-character-count" id="include-structure-detail" rows="5" aria-describedby="include-structure-detail-info include-structure-detail-hint">@(Model.StructureDetails)</textarea>
                                 </div>
                                 <div id="include-structure-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
                                     You can enter up to 200 characters
@@ -61,8 +63,8 @@
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        <h2 class="govuk-fieldset__heading">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading grey-details">
                             Policies
                         </h2>
                     </legend>
@@ -88,7 +90,7 @@
                                     <div id="include-policies-detail-hint" class="govuk-hint">
                                         For example, you’re working on this area for your next statement.
                                     </div>
-                                    <textarea asp-for="PolicyDetails" class="govuk-textarea govuk-js-character-count" id="include-policies-detail" rows="5" aria-describedby="include-policies-detail-info include-policies-detail-hint"></textarea>
+                                    <textarea name="PolicyDetails" class="govuk-textarea govuk-js-character-count" id="include-policies-detail" rows="5" aria-describedby="include-policies-detail-info include-policies-detail-hint">@(Model.PolicyDetails)</textarea>
                                 </div>
                                 <div id="include-policies-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
                                     You can enter up to 200 characters
@@ -101,8 +103,8 @@
             </div>
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        <h2 class="govuk-fieldset__heading">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading grey-details">
                             Risk assessment
                         </h2>
                     </legend>
@@ -128,7 +130,7 @@
                                     <div id="include-risks-detail-hint" class="govuk-hint">
                                         For example, you’re working on this area for your next statement.
                                     </div>
-                                    <textarea asp-for="RisksDetails" class="govuk-textarea govuk-js-character-count" id="include-risks-detail" rows="5" aria-describedby="include-risks-detail-info include-risks-detail-hint"></textarea>
+                                    <textarea name="RisksDetails" class="govuk-textarea govuk-js-character-count" id="include-risks-detail" rows="5" aria-describedby="include-risks-detail-info include-risks-detail-hint">@(Model.RisksDetails)</textarea>
                                 </div>
                                 <div id="include-risks-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
                                     You can enter up to 200 characters
@@ -142,8 +144,8 @@
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        <h2 class="govuk-fieldset__heading">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading grey-details">
                             Due diligence (steps to address risk)
                         </h2>
                     </legend>
@@ -169,7 +171,7 @@
                                     <div id="include-dueDiligence-detail-hint" class="govuk-hint">
                                         For example, you’re working on this area for your next statement.
                                     </div>
-                                    <textarea asp-for="DueDiligenceDetails" class="govuk-textarea govuk-js-character-count" id="include-dueDiligence-detail" rows="5" aria-describedby="include-dueDiligence-detail-info include-dueDiligence-detail-hint"></textarea>
+                                    <textarea name="DueDiligenceDetails" class="govuk-textarea govuk-js-character-count" id="include-dueDiligence-detail" rows="5" aria-describedby="include-dueDiligence-detail-info include-dueDiligence-detail-hint">@(Model.DueDiligenceDetails)</textarea>
                                 </div>
                                 <div id="include-dueDiligence-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
                                     You can enter up to 200 characters
@@ -182,8 +184,8 @@
             </div>
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        <h2 class="govuk-fieldset__heading">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading grey-details">
                             Staff training about modern slavery
                         </h2>
                     </legend>
@@ -209,7 +211,7 @@
                                     <div id="include-training-detail-hint" class="govuk-hint">
                                         For example, you’re working on this area for your next statement.
                                     </div>
-                                    <textarea asp-for="TrainingDetails" class="govuk-textarea govuk-js-character-count" id="include-training-detail" rows="5" aria-describedby="include-training-detail-info include-training-detail-hint"></textarea>
+                                    <textarea name="TrainingDetails" class="govuk-textarea govuk-js-character-count" id="include-training-detail" rows="5" aria-describedby="include-training-detail-info include-training-detail-hint">@(Model.TrainingDetails)</textarea>
                                 </div>
                                 <div id="include-training-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
                                     You can enter up to 200 characters
@@ -223,8 +225,8 @@
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        <h2 class="govuk-fieldset__heading">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading grey-details">
                             Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions
                         </h2>
                     </legend>
@@ -251,7 +253,7 @@
                                     <div id="include-effectiveness-detail-hint" class="govuk-hint">
                                         For example, you’re working on this area for your next statement.
                                     </div>
-                                    <textarea asp-for="GoalsDetails" class="govuk-textarea govuk-js-character-count" id="include-effectiveness-detail" rows="5" aria-describedby="include-effectiveness-detail-info include-effectiveness-detail-hint"></textarea>
+                                    <textarea name="GoalsDetails" class="govuk-textarea govuk-js-character-count" id="include-effectiveness-detail" rows="5" aria-describedby="include-effectiveness-detail-info include-effectiveness-detail-hint">@(Model.GoalsDetails)</textarea>
                                 </div>
                                 <div id="include-effectiveness-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
                                     You can enter up to 200 characters
@@ -267,10 +269,9 @@
                 Save and continue
             </button>
 
-            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
-            {
-                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
-            }
+            <div class="skip-link">
+                <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+            </div>
         }
     </div>
 </div>

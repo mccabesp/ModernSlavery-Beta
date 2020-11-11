@@ -32,7 +32,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(s => s.IndicatorsPage, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.RemediationsPage, opt => opt.MapFrom(s => s))
                 .ForMember(s => s.ProgressPage, opt => opt.MapFrom(s => s))
-                .ForAllOtherMembers(opt => opt.Ignore());
+                .ForMember(s => s.TurnoverPage, opt => opt.MapFrom(s => s));
         }
 
         public class RiskListConverter : IValueConverter<StatementModel, List<HighRiskViewModel>>
@@ -61,13 +61,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             var result = $"Submission {(complete ? "" : "in")}complete for {OrganisationName}";
 
-            //if (complete)
-            //    return result;
-
-            //result += "\n Section 1 must be completed in order to submit.";
-
             return result;
         }
+        [IgnoreMap]
+        public bool AcceptedDeclaration { get; set; }
 
         #region Individual Page ViewModels
         public GroupOrganisationsViewModel GroupOrganisationsPages { get; set; }
@@ -205,6 +202,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             else if (Submitted && !HasChanged())
                 yield return new ValidationResult("You must edit the statement before you can submit");
+
+            //if (AcceptedDeclaration != true)
+            //    yield return new ValidationResult("You must accept the declaration to submit this statement");
         }
 
         public const int SectionCount = 11;
@@ -239,13 +239,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public Status GetUrlSignOffStatus()
         {
             if (UrlPage.GetStatus() == Status.Complete && PeriodCoveredPage.GetStatus() == Status.Complete && SignOffPage.GetStatus() == Status.Complete) return Status.Complete;
-            return Status.Incomplete;
+            else if (UrlPage.GetStatus() == Status.Incomplete && PeriodCoveredPage.GetStatus() == Status.Incomplete && SignOffPage.GetStatus() == Status.Incomplete) return Status.Incomplete;
+            else return Status.InProgress;
         }
 
         public Status GetSectorTurnoverStatus()
         {
             if (SectorsPage.GetStatus() == Status.Complete && TurnoverPage.GetStatus() == Status.Complete) return Status.Complete;
-            return Status.Incomplete;
+            else if (SectorsPage.GetStatus() == Status.Incomplete && TurnoverPage.GetStatus() == Status.Incomplete) return Status.Incomplete;
+            else return Status.InProgress;
         }
 
         public Status GetWorkingConditionsStatus()

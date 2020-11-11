@@ -16,41 +16,44 @@
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
+            @Html.HiddenFor(m => m.OrganisationId);
+            @Html.HiddenFor(m => m.SubmissionDeadline);
+            @Html.HiddenFor(m => m.StatementEndDate);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
             </h1>
 
-            <fieldset class="govuk-fieldset">
-                <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverFirstName, "govuk-form-group--error")">
-                    <label asp-for="ApproverFirstName" class="govuk-label">First name</label>
-                    <input asp-for="ApproverFirstName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
-                    <span asp-validation-for="ApproverFirstName" class="govuk-error-message"></span>
-                </div>
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverFirstName, "govuk-form-group--error")">
+                        <label asp-for="ApproverFirstName" class="govuk-label">First name</label>
+                        <input asp-for="ApproverFirstName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                        <span asp-validation-for="ApproverFirstName" class="govuk-error-message"></span>
+                    </div>
 
-                <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverLastName, "govuk-form-group--error")">
-                    <label asp-for="ApproverLastName" class="govuk-label">Last name</label>
-                    <input asp-for="ApproverLastName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
-                    <span asp-validation-for="ApproverLastName" class="govuk-error-message"></span>
-                </div>
+                    <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverLastName, "govuk-form-group--error")">
+                        <label asp-for="ApproverLastName" class="govuk-label">Last name</label>
+                        <input asp-for="ApproverLastName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                        <span asp-validation-for="ApproverLastName" class="govuk-error-message"></span>
+                    </div>
 
-                <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverJobTitle, "govuk-form-group--error")">
-                    <label asp-for="ApproverJobTitle" class="govuk-label">Job title</label>
-                    <input asp-for="ApproverJobTitle" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
-                    <span asp-validation-for="ApproverJobTitle" class="govuk-error-message"></span>
-                </div>
-            </fieldset>
+                    <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverJobTitle, "govuk-form-group--error")">
+                        <label asp-for="ApproverJobTitle" class="govuk-label">Job title</label>
+                        <input asp-for="ApproverJobTitle" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
+                        <span asp-validation-for="ApproverJobTitle" class="govuk-error-message"></span>
+                    </div>
+                </fieldset>
+            </div>
 
             <div class="govuk-form-group @Html.SetErrorClass(new[] {nameof(Model.ApprovedDate), nameof(Model.ApprovedDay),nameof(Model.ApprovedMonth),nameof(Model.ApprovedYear)}, "govuk-form-group--error")">
                 <fieldset class="govuk-fieldset" role="group" aria-describedby="statement-approved-hint">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
-                        <h2 class="govuk-fieldset__heading">
-                            What date was your statement approved by the board or equivalent management body?
-                        </h2>
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">                       
+                            What date was your statement approved by the board or equivalent management body?                      
                     </legend>
-                    <span id="statement-approved-hint" class="govuk-hint">
+                    <div id="statement-approved-hint" class="govuk-hint">
                         For example, 31 3 1980
-                    </span>
+                    </div>
                     <div class="govuk-date-input" id="statement-approved">
                         <div class="govuk-date-input__item">
                             <div class="govuk-form-group">
@@ -89,10 +92,9 @@
                 Save and continue
             </button>
 
-            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
-            {
-                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
-            }
+            <div class="skip-link">
+                <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+            </div>
         }
     </div>
 </div>

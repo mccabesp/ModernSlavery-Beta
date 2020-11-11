@@ -24,10 +24,10 @@
 
             <p class="govuk-body govuk-!-font-weight-bold">
                 @Model.SubTitle
-            </p> 
-            
+            </p>
+
             <p class="govuk-body">
-             @Model.SectionCountTitle
+                @Model.SectionCountTitle
             </p>
 
             <ol class="app-task-list">
@@ -48,7 +48,7 @@
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
                                 <a class="govuk-link" href="@Model.UrlSignOffUrl" aria-describedby="slavery-statement">
-                                   Statement URL, dates and sign-off
+                                    Statement URL, dates and sign-off
                                 </a>
                             </span>
                             <strong class="govuk-tag @(Model.GetUrlSignOffStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetUrlSignOffStatus().GetEnumDescription().ToUpper())</strong>
@@ -56,7 +56,7 @@
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
                                 <a class="govuk-link" href="@Model.ComplianceUrl" aria-describedby="slavery-statement">
-                                   Recommended areas covered by the statement
+                                    Recommended areas covered by the statement
                                 </a>
                             </span>
                             <strong class="govuk-tag @(Model.CompliancePage.GetStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.CompliancePage.GetStatus().GetEnumDescription().ToUpper())</strong>
@@ -139,13 +139,47 @@
                     </ul>
                 </li>
             </ol>
+            if (Model.CanSubmit())
+            {
+    <h3 class="govuk-heading-m">Submit your answers</h3>
 
-            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled="@(!Model.CanSubmit())" name="command" value="@BaseViewModel.CommandType.Submit">
-                Submit for publication
-            </button>
+                <details class="govuk-details" data-module="govuk-details">
+                    <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">
+                            Declaration
+                        </span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        <p class="govuk-body govuk-!-font-weight-bold">I confirm that:</p>
+                        <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+                            <li>the information I have supplied is complete and true to the best of my knowledge</li>
+                            <li>I am authorised to supply this information on behalf of the organisation(s) the modern slavery statement is for</li>
+                            <li>if the statement is for a group, all organisations in the group know that this statement is being submitted to the service on their behalf</li>
+                        </ul>
+                        <p class="govuk-body govuk-!-font-weight-bold">I understand that:</p>
+                        <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
+                            <li>the answers I submit will be published on GOV.UK</li>
+                            <li>my statement will be removed from the service if it is found to contain inaccuracies</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <div class="govuk-form-group">
+
+                    <div class="govuk-checkboxes__item @Html.SetErrorClass(model => model.AcceptedDeclaration, "govuk-form-group--error")">
+                        @Html.CheckBoxFor(model => model.AcceptedDeclaration, new { @class = "govuk-checkboxes__input" })
+                        @Html.LabelFor(m => m.AcceptedDeclaration, "I understand and agree with the above declaration", new { @class = "govuk-label govuk-checkboxes__label" })
+                        <span asp-validation-for="AcceptedDeclaration" class="govuk-error-message"></span>
+                    </div>
+                </div>
+               
+                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled="@(!Model.CanSubmit())" name="command" value="@BaseViewModel.CommandType.Submit">
+                    Submit for publication
+                </button>
+            }
 
             <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.Skip">
-               View all statements for this organisation
+               Save Draft
             </button>
         }
     </div>
