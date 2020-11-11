@@ -2,6 +2,8 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model GroupSearchViewModel
+@using ModernSlavery.Core.Interfaces;
+@inject IObfuscator Obfuscator;
 @section BeforeMain{
     @if (!string.IsNullOrWhiteSpace(Model.BackUrl))
     {
@@ -13,19 +15,22 @@
 {
     @await Html.GovUkValidationSummaryAsync();
     @Html.AntiForgeryToken();
+    @Html.HiddenFor(m => m.Submitted);
+    @Html.HiddenFor(m => m.OrganisationId);
+    @Html.HiddenFor(m => m.SubmissionDeadline);
+
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
             </h1>
-
-            <partial name="GroupSearch/_SearchHeader" model="Model.SearchKeywords" />
+            <partial name="GroupSearch/_SearchHeader" model="Model" />
 
         </div>
     </div>
 
-    <partial name="GroupSearch/_SearchKeywords" model="Model" />
+    <partial name="GroupSearch/_SearchKeywords" model="Model.SearchKeywords" />
 
     if (Model?.ResultsPage != null && !string.IsNullOrWhiteSpace(Model.SearchKeywords))
     {

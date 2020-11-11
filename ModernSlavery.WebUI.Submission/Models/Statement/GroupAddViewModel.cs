@@ -16,8 +16,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public GroupAddViewModelMapperProfile()
         {
             CreateMap<StatementModel, GroupAddViewModel>()
-                .ForMember(d=>d.SearchKeywords, opt=>opt.Ignore())
-                .ForMember(d=>d.NewOrganisationName, opt=>opt.Ignore())
+                .ForMember(d => d.NewOrganisationName, opt => opt.Ignore())
                 .ForMember(d => d.StatementOrganisations, opt => opt.MapFrom(s => s.StatementOrganisations));
 
             CreateMap<GroupAddViewModel, StatementModel>(MemberList.None)
@@ -26,12 +25,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     }
 
     public class GroupAddViewModel : GroupOrganisationsViewModel
-    {  
+    {
         public override string PageTitle => "Which organisations are included in your group statement?";
 
-        [Required(AllowEmptyStrings = false)]
-        [StringLength(100,ErrorMessage = "You must enter an organisations name or company number between 3 and 100 characters in length",MinimumLength = 3)]
-        public string SearchKeywords { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [MaxLength(100)]

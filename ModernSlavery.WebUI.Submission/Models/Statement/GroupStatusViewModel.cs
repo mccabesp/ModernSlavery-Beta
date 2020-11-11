@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .IncludeBase<StatementModel, GroupOrganisationsViewModel>();
 
             CreateMap<GroupStatusViewModel, StatementModel>(MemberList.None)
-                .ForMember(d => d.GroupSubmission, opt => opt.MapFrom(s=>s.GroupSubmission));
+                .ForMember(d => d.GroupSubmission, opt => opt.MapFrom(s => s.GroupSubmission));
         }
     }
 
@@ -26,7 +26,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
-            if (GroupSubmission==null)validationResults.AddValidationError(3900, nameof(GroupSubmission));
+            if (GroupSubmission == null) validationResults.AddValidationError(3900, nameof(GroupSubmission));
+
             return validationResults;
         }
     }

@@ -19,8 +19,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             CreateMap<StatementModel, GroupOrganisationsViewModel>()
                 .ForMember(s => s.GroupSubmission, opt => opt.MapFrom(d => d.GroupSubmission))
-                .ForMember(s => s.StatementOrganisations, opt => opt.MapFrom(d => d.StatementOrganisations))
-                .ForAllOtherMembers(opt => opt.Ignore());
+                .ForMember(s => s.StatementOrganisations, opt => opt.MapFrom(d => d.StatementOrganisations));
 
             CreateMap<GroupOrganisationsViewModel.StatementOrganisationViewModel, StatementModel.StatementOrganisationModel>();
 
@@ -69,7 +68,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override Status GetStatus()
         {
             if (GroupSubmission.HasValue && (GroupSubmission == false || StatementOrganisations.Any())) return Status.Complete;
-            return Status.Incomplete;
+            else if (GroupSubmission == true && !StatementOrganisations.Any()) return Status.InProgress;
+            else return Status.Incomplete;
         }
     }
 }

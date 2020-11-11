@@ -1,7 +1,10 @@
-﻿@model GroupSearchViewModel
+﻿@model GroupSearchViewModel;
+@using ModernSlavery.Core.Interfaces;
+@inject IObfuscator Obfuscator;
+
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <a href="@Url.Action(nameof(StatementController.GroupAdd))">Can't find the organisation you're looking for?</a>
+        <a class="govuk-link" href="@Url.Action(nameof(StatementController.GroupAdd), new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = Model.ReportingDeadlineYear})">Can't find the organisation you're looking for?</a>
     </div>
 </div>
 

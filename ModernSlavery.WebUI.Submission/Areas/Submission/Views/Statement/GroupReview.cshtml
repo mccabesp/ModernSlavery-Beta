@@ -1,7 +1,9 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
 }
-@model GroupReviewViewModel
+@using ModernSlavery.Core.Interfaces;
+@model GroupReviewViewModel;
+@inject IObfuscator Obfuscator;
 @section BeforeMain {
     @if (!string.IsNullOrWhiteSpace(Model.BackUrl))
     {
@@ -14,6 +16,9 @@
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.Submitted);
+            @Html.HiddenFor(m => m.OrganisationId);
+            @Html.HiddenFor(m => m.SubmissionDeadline);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
@@ -33,7 +38,7 @@
                     </p>
 
                     <p class="govuk-body">
-                        If your statement is for a single organisation, and not a group, you can return to the ‘Who is your statement for?’ page and <a class="govuk-link" href="@Url.Action(nameof(StatementController.GroupStatus))">specify a single organisation</a>.
+                        If your statement is for a single organisation, and not a group, you can return to the ‘Who is your statement for?’ page and <a class="govuk-link" href="@Url.Action(nameof(StatementController.GroupStatus), new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year=Model.ReportingDeadlineYear })">specify a single organisation</a>.
                     </p>
                 </fieldset>
 
@@ -59,10 +64,11 @@
                         </div>
                     </div>
                 }
+                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                    Save and continue
+                </button>
 
-                <a class="govuk-button" href="@(Model.StatementOrganisations.Count > 0 ? Model.ContinueUrl : Model.SkipUrl)">Continue</a>
-
-                <a href="@Url.Action(nameof(StatementController.GroupSearch))" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-5" data-module="govuk-button">
+                <a href="@Url.Action(nameof(StatementController.GroupSearch), new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year=Model.ReportingDeadlineYear })" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-5" data-module="govuk-button">
                     Select more organisations
                 </a>
 

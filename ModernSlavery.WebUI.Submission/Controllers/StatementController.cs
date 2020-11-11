@@ -90,14 +90,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         private string GetPoliciesUrl() => Url.Action(nameof(Policies), GetOrgAndYearRouteData());
         private string GetTrainingUrl() => Url.Action(nameof(Training), GetOrgAndYearRouteData());
-        
+
         private string GetPartnersUrl() => Url.Action(nameof(Partners), GetOrgAndYearRouteData());
         private string GetSocialAuditsUrl() => Url.Action(nameof(SocialAudits), GetOrgAndYearRouteData());
         private string GetGrievancesUrl() => Url.Action(nameof(Grievances), GetOrgAndYearRouteData());
         private string GetMonitoringUrl() => Url.Action(nameof(Monitoring), GetOrgAndYearRouteData());
 
         private string GetHighestRisksUrl() => Url.Action(nameof(HighestRisks), GetOrgAndYearRouteData());
-        private string GetHighRiskUrl(int index) => Url.Action(nameof(HighRisk),GetOrgAndYearRouteData(new { index }));
+        private string GetHighRiskUrl(int index) => Url.Action(nameof(HighRisk), GetOrgAndYearRouteData(new { index }));
 
         private string GetIndicatorsUrl() => Url.Action(nameof(Indicators), GetOrgAndYearRouteData());
         private string GetRemediationsUrl() => Url.Action(nameof(Remediations), GetOrgAndYearRouteData());
@@ -127,7 +127,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.BackUrl = GetReturnUrl();
                     vm.SkipUrl = GetReturnUrl();
                     vm.ContinueUrl = GetReturnUrl();
-                    vm.GroupReportingUrl = vm.GroupOrganisationsPages.GroupSubmission!=true ? GetGroupStatusUrl() : vm.GroupOrganisationsPages.StatementOrganisations.Any() ? GetGroupReviewUrl(): GetGroupSearchUrl();
+                    vm.GroupReportingUrl = vm.GroupOrganisationsPages.GroupSubmission != true ? GetGroupStatusUrl() : vm.GroupOrganisationsPages.StatementOrganisations.Any() ? GetGroupReviewUrl() : GetGroupStatusUrl();
                     vm.UrlSignOffUrl = GetUrlEmailUrl();
                     vm.ComplianceUrl = GetComplianceUrl();
                     vm.SectorsUrl = GetSectorsUrl();
@@ -141,8 +141,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     break;
                 case GroupStatusViewModel vm:
                     vm.BackUrl = GetReviewUrl();
-                    vm.SkipUrl = GetUrlEmailUrl();
-                    vm.ContinueUrl = GetReviewUrl();
+                    vm.SkipUrl = GetReviewUrl();
+                    vm.ContinueUrl = vm.GroupSubmission != true ? GetReviewUrl() : GetGroupSearchUrl();
                     break;
                 case GroupSearchViewModel vm:
                     vm.BackUrl = GetGroupStatusUrl();
@@ -157,6 +157,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 case GroupReviewViewModel vm:
                     vm.BackUrl = GetGroupSearchUrl();
                     vm.SkipUrl = vm.ContinueUrl = GetReviewUrl();
+                    vm.ContinueUrl = GetReviewUrl();
                     break;
                 case UrlEmailViewModel vm:
                     vm.BackUrl = GetReviewUrl();
@@ -180,7 +181,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     break;
                 case TurnoverViewModel vm:
                     vm.BackUrl = GetSectorsUrl();
-                    vm.ContinueUrl= vm.SkipUrl = GetReviewUrl();
+                    vm.ContinueUrl = vm.SkipUrl = GetReviewUrl();
                     break;
                 case YearsViewModel vm:
                     vm.BackUrl = vm.SkipUrl = vm.ContinueUrl = GetReviewUrl();
@@ -193,7 +194,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     break;
                 case PartnersViewModel vm:
                     vm.BackUrl = GetReviewUrl();
-                    vm.ContinueUrl= vm.SkipUrl = GetSocialAuditsUrl();
+                    vm.ContinueUrl = vm.SkipUrl = GetSocialAuditsUrl();
                     break;
                 case SocialAuditsViewModel vm:
                     vm.BackUrl = GetSocialAuditsUrl();
@@ -212,12 +213,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.ContinueUrl = vm.SkipUrl = !string.IsNullOrWhiteSpace(vm.HighRisk1) && !string.IsNullOrWhiteSpace(vm.HighRisk2) && !string.IsNullOrWhiteSpace(vm.HighRisk3) ? GetHighRiskUrl(0) : GetReviewUrl();
                     break;
                 case HighRiskViewModel vm:
-                    vm.BackUrl = vm.Index==0 ? GetHighestRisksUrl() : GetHighRiskUrl(vm.Index-1);
-                    vm.ContinueUrl = vm.SkipUrl = vm.Index == vm.TotalRisks-1 ? GetReviewUrl() : GetHighRiskUrl(vm.Index+1);
+                    vm.BackUrl = vm.Index == 0 ? GetHighestRisksUrl() : GetHighRiskUrl(vm.Index - 1);
+                    vm.ContinueUrl = vm.SkipUrl = vm.Index == vm.TotalRisks - 1 ? GetReviewUrl() : GetHighRiskUrl(vm.Index + 1);
                     break;
                 case IndicatorsViewModel vm:
                     vm.BackUrl = GetReviewUrl();
-                    vm.ContinueUrl= vm.SkipUrl = GetRemediationsUrl();
+                    vm.ContinueUrl = vm.SkipUrl = GetRemediationsUrl();
                     break;
                 case RemediationsViewModel vm:
                     vm.BackUrl = GetIndicatorsUrl();
@@ -314,10 +315,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                 //Dont validate the group search or organisation name
                 if (viewModel is GroupSearchViewModel) ModelState.Exclude($"{nameof(GroupSearchViewModel.SearchKeywords)}");
-                if (viewModel is GroupAddViewModel) ModelState.Exclude($"{nameof(GroupAddViewModel.SearchKeywords)}", $"{nameof(GroupAddViewModel.OrganisationName)}");
+                if (viewModel is GroupAddViewModel) ModelState.Exclude($"{nameof(GroupAddViewModel.NewOrganisationName)}", $"{nameof(GroupAddViewModel.OrganisationName)}");
                 return View(viewModel);
             }
-            
+
             //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
             var viewModelResult = await SubmissionPresenter.GetViewModelAsync<TViewModel>(organisationIdentifier, year, VirtualUser.UserId, arguments);
 
@@ -349,6 +350,23 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 //Add the group search model to session
                 StashModel(searchViewModel);
             }
+            else if (viewModel is GroupAddViewModel)
+            {
+                var addViewModel = viewModel as GroupAddViewModel;
+                //Copy changes to the review model
+                var reviewViewModel = UnstashModel<GroupReviewViewModel>();
+                if (reviewViewModel != null) addViewModel.StatementOrganisations = reviewViewModel.StatementOrganisations;
+
+                //Copy the previous search keywords
+                var stashedViewModel = UnstashModel<GroupSearchViewModel>();
+                if (stashedViewModel != null)
+                {
+                    addViewModel.NewOrganisationName = stashedViewModel.SearchKeywords;
+                }
+
+                //Add the add search model to session
+                StashModel(addViewModel);
+            }
             else if (viewModel is GroupReviewViewModel)
             {
                 var reviewViewModel = viewModel as GroupReviewViewModel;
@@ -370,6 +388,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                 //Remove the group review model from session
                 UnstashModel<GroupReviewViewModel>(true);
+
+                //remove the group add model from session
+                UnstashModel<GroupAddViewModel>(true);
             }
 
             //Otherwise return the view using the populated ViewModel
@@ -396,7 +417,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     //Handle any StatementErrors
                     if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
 
-                    //Remove the group search from session
+                    //Remove the group search from session                  
                     UnstashModel<GroupSearchViewModel>(true);
 
                     //Redirect to the continue url
@@ -416,7 +437,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             //Show the correct view
-            return View("BeforeYouStart", new BeforeYouStartViewModel { BackUrl = GetReturnUrl(), ContinueUrl = GetGroupStatusUrl() });
+            return View("BeforeYouStart", new BeforeYouStartViewModel { BackUrl = GetReturnUrl(), ContinueUrl = GetTransparencyUrl() });
         }
         #endregion
 
@@ -429,7 +450,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (openResult.Fail) return HandleStatementErrors(openResult.Errors);
 
             //Show the correct view
-            return View("Transparency", new TransparencyViewModel { BackUrl = GetReturnUrl(), ContinueUrl = GetGroupStatusUrl() });
+            return View("Transparency", new TransparencyViewModel { BackUrl = GetBeforeYourStartUrl(), ContinueUrl = GetReviewUrl() });
         }
         #endregion
 
@@ -650,8 +671,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Must clear otherwise hidden for doesnt work
             ModelState.Clear();
 
-            //Return the page
-            return View(viewModel);
+            //Redirect to the page
+            return RedirectToAction(nameof(GroupSearch), GetOrgAndYearRouteData());
+
         }
 
         [HttpGet("{organisationIdentifier}/{year}/group-add")]
@@ -665,10 +687,17 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GroupAdd(GroupAddViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, int addIndex = -1, int removeIndex = -1)
         {
-            if (command.IsAny(BaseViewModel.CommandType.IncludeOrganisation, BaseViewModel.CommandType.RemoveOrganisation) && (addIndex > -1 || removeIndex > -1))
+            //Get the saved viewmodel information from session
+            var stashedModel = UnstashModel<GroupAddViewModel>();
+
+            //Rebuild the search model from the postback          
+            stashedModel.NewOrganisationName = viewModel.NewOrganisationName;
+            viewModel = stashedModel;
+
+            if (addIndex > -1 || removeIndex > -1)
             {
                 //Dont validate the organisation name
-                ModelState.Exclude(nameof(viewModel.Submitted),$"{nameof(viewModel.SearchKeywords)}");
+                ModelState.Exclude(nameof(viewModel.Submitted), $"{nameof(viewModel.NewOrganisationName)}");
 
                 if (addIndex > -1)
                 {
@@ -686,14 +715,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     if (!outcome.Success) HandleStatementErrors(outcome.Errors);
 
                     //Clear the input name 
-                    viewModel.OrganisationName = null;
+                    viewModel.NewOrganisationName = null;
                 }
                 else
                 {
                     //Remove the selected organisation
                     viewModel.StatementOrganisations.RemoveAt(removeIndex);
                     //keep search keywords empty                       
-                    viewModel.SearchKeywords = null;
+                    viewModel.NewOrganisationName = null;
                 }
 
                 //Populate the extra submission info
@@ -710,14 +739,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             else
                 throw new NotImplementedException();
 
-            //Add the group search model to session
+            //Add the add search model to session
             StashModel(viewModel);
 
             //Must clear otherwise hidden for doesnt work
             ModelState.Clear();
 
-            //Return the page
-            return View(viewModel);
+            //Redirect to the page
+            return RedirectToAction(nameof(GroupAdd), GetOrgAndYearRouteData());
         }
 
         [HttpGet("{organisationIdentifier}/{year}/group-review")]
@@ -761,8 +790,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Must clear otherwise hidden for doesnt work
             ModelState.Clear();
 
-            //Return the page
-            return View(viewModel);
+            //Redirect to the page          
+            return RedirectToAction(nameof(GroupReview), GetOrgAndYearRouteData());
         }
 
         #endregion
