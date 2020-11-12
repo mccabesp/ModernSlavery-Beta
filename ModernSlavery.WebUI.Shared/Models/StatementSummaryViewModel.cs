@@ -43,7 +43,7 @@ namespace ModernSlavery.WebUI.Shared.Models
                     .ForMember(d => d.Indicators, opt => opt.MapFrom(s=>s.Summary.Indicators))
                     .ForMember(d => d.OtherIndicators, opt => opt.MapFrom(s=>s.Summary.OtherIndicators))
                     .ForMember(d => d.Remediations, opt => opt.MapFrom(s=>s.Summary.Remediations))
-                    .ForMember(d => d.OtherRemediations, opt => opt.MapFrom(s=>s.Summary.OtherRemedations))
+                    .ForMember(d => d.OtherRemediations, opt => opt.MapFrom(s=>s.Summary.OtherRemediations))
                     .ForMember(d => d.ProgressMeasures, opt => opt.MapFrom(s=>s.Summary.ProgressMeasures))
                     .AfterMap<ObfuscateAction>();
             }
