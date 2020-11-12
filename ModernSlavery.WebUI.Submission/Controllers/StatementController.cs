@@ -127,7 +127,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.BackUrl = GetReturnUrl();
                     vm.SkipUrl = GetReturnUrl();
                     vm.ContinueUrl = GetReturnUrl();
-                    vm.GroupReportingUrl = vm.GroupOrganisationsPages.GroupSubmission != true ? GetGroupStatusUrl() : vm.GroupOrganisationsPages.StatementOrganisations.Any() ? GetGroupReviewUrl() : GetGroupStatusUrl();
+                    vm.GroupReportingUrl = vm.GroupOrganisationsPages?.GroupSubmission != true ? GetGroupStatusUrl() : (vm.GroupOrganisationsPages?.StatementOrganisations.Any() == true) ? GetGroupReviewUrl() : GetGroupStatusUrl();
                     vm.UrlSignOffUrl = GetUrlEmailUrl();
                     vm.ComplianceUrl = GetComplianceUrl();
                     vm.SectorsUrl = GetSectorsUrl();
@@ -307,7 +307,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         private async Task<IActionResult> GetAsync<TViewModel>(string organisationIdentifier, int year, params object[] arguments) where TViewModel : BaseViewModel
         {
             //Try and get the viewmodel from session
-            var viewModel = UnstashCancellingViewModel<TViewModel>();
+            var viewModel = UnstashModel<TViewModel>();
             if (viewModel != null)
             {
                 //Make sure we show any validation errors
@@ -740,7 +740,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 //Populate the extra submission info
                 await SubmissionPresenter.GetOtherSubmissionsInformationAsync(viewModel, GetReportingDeadlineYear());
 
-                //Copy changes to the search review model
+                //Copy changes to the search review model 
                 var reviewViewModel = UnstashModel<GroupReviewViewModel>();
                 if (reviewViewModel != null)
                 {

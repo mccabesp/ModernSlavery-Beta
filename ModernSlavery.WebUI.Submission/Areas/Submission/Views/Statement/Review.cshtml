@@ -16,8 +16,7 @@
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
-
-
+         
             <h1 class="govuk-heading-xl">
                 @Model.PageTitle
             </h1>
@@ -141,7 +140,7 @@
             </ol>
             if (Model.CanSubmit())
             {
-    <h3 class="govuk-heading-m">Submit your answers</h3>
+                <h3 class="govuk-heading-m">Submit your answers</h3>
 
                 <details class="govuk-details" data-module="govuk-details">
                     <summary class="govuk-details__summary">
@@ -164,22 +163,24 @@
                     </div>
                 </details>
 
-                <div class="govuk-form-group">
-
-                    <div class="govuk-checkboxes__item @Html.SetErrorClass(model => model.AcceptedDeclaration, "govuk-form-group--error")">
-                        @Html.CheckBoxFor(model => model.AcceptedDeclaration, new { @class = "govuk-checkboxes__input" })
-                        @Html.LabelFor(m => m.AcceptedDeclaration, "I understand and agree with the above declaration", new { @class = "govuk-label govuk-checkboxes__label" })
-                        <span asp-validation-for="AcceptedDeclaration" class="govuk-error-message"></span>
+                //TODO - bind to a variable instead of a view model property
+                @*<div class="govuk-checkboxes">
+                    <div class="govuk-checkboxes__item @Html.SetErrorClass($"AcceptedDeclaration", "govuk-form-group--error")">
+                        <input name="AcceptedDeclaration" id="AcceptedDeclaration" class="govuk-checkboxes__input" type="checkbox" value="AcceptedDeclaration">
+                        <label class="govuk-label govuk-checkboxes__label" for="AcceptedDeclaration">
+                            I understand and agree with the above declaration
+                        </label>
+                        @Html.ValidationMessage($"AcceptedDeclaration", "Accept the declartion to submit", new { @class = "govuk-error-message" })
                     </div>
-                </div>
-               
+                </div>*@
+
                 <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled="@(!Model.CanSubmit())" name="command" value="@BaseViewModel.CommandType.Submit">
                     Submit for publication
                 </button>
             }
 
             <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.Skip">
-               Save Draft
+                Save draft
             </button>
         }
     </div>

@@ -65,7 +65,7 @@
                     </div>
                 }
                 <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
-                    Save and continue
+                    Continue
                 </button>
 
                 <a href="@Url.Action(nameof(StatementController.GroupSearch), new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year=Model.ReportingDeadlineYear })" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-5" data-module="govuk-button">

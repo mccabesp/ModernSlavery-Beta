@@ -63,8 +63,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             return result;
         }
-        [IgnoreMap]
-        public bool AcceptedDeclaration { get; set; }
+
 
         #region Individual Page ViewModels
         public GroupOrganisationsViewModel GroupOrganisationsPages { get; set; }
@@ -203,8 +202,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             else if (Submitted && !HasChanged())
                 yield return new ValidationResult("You must edit the statement before you can submit");
 
-            //if (AcceptedDeclaration != true)
-            //    yield return new ValidationResult("You must accept the declaration to submit this statement");
         }
 
         public const int SectionCount = 11;
