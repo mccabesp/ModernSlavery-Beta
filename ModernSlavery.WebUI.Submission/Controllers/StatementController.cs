@@ -357,11 +357,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 var reviewViewModel = UnstashModel<GroupReviewViewModel>();
                 if (reviewViewModel != null) addViewModel.StatementOrganisations = reviewViewModel.StatementOrganisations;
 
-                //Copy the previous search keywords
-                var stashedViewModel = UnstashModel<GroupSearchViewModel>();
-                if (stashedViewModel != null)
+                var history = PageHistory.FirstOrDefault();
+                if (!history.Contains("add"))
                 {
-                    addViewModel.NewOrganisationName = stashedViewModel.SearchKeywords;
+                    //Copy the previous search keywords
+                    var stashedViewModel = UnstashModel<GroupSearchViewModel>();
+                    if (stashedViewModel != null)
+                    {
+                        addViewModel.NewOrganisationName = stashedViewModel.SearchKeywords;
+                    }
                 }
 
                 //Add the add search model to session
@@ -370,10 +374,18 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             else if (viewModel is GroupReviewViewModel)
             {
                 var reviewViewModel = viewModel as GroupReviewViewModel;
-
-                //Copy changes to the review model
-                var searchViewModel = UnstashModel<GroupSearchViewModel>();
-                if (searchViewModel != null) reviewViewModel.StatementOrganisations = searchViewModel.StatementOrganisations;
+                var history = PageHistory.FirstOrDefault();
+                if (history.Contains("add"))
+                {
+                    // Copy changes to the review model from add view model
+                    var addViewModel = UnstashModel<GroupAddViewModel>();
+                    if (addViewModel != null) reviewViewModel.StatementOrganisations = addViewModel.StatementOrganisations;
+                }
+                else
+                {   //copy changes to the review model from the search view model
+                    var searchViewModel = UnstashModel<GroupSearchViewModel>();
+                    if (searchViewModel != null) reviewViewModel.StatementOrganisations = searchViewModel.StatementOrganisations;
+                }
 
                 //Populate the extra submission info
                 await SubmissionPresenter.GetOtherSubmissionsInformationAsync(reviewViewModel, GetReportingDeadlineYear());
