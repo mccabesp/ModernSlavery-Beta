@@ -8,33 +8,48 @@
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate=""}))
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
-
-            <h1 class="govuk-heading-l">
-                @Model.PageTitle
-            </h1>
+            @Html.HiddenFor(m => m.OrganisationId);
+            @Html.HiddenFor(m => m.SubmissionDeadline);
 
             <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset" aria-describedby="conditions-hint">                    
+                <fieldset class="govuk-fieldset" aria-describedby="conditions-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-fieldset__heading">
+                            @Model.PageTitle
+                        </h1>
+                    </legend>
+
                     <span id="conditions-hint" class="govuk-hint">
                         Select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var partnerType in Enums.GetValues<IStatementSummary1.PartnerTypes>())
+                        @foreach (var partnerType in Enums.GetValues<IStatementSummary1.PartnerTypes>().Where(t => t != IStatementSummary1.PartnerTypes.Unknown))
                         {
+                            var value = (int)partnerType;
+                            var isOther = partnerType == IStatementSummary1.PartnerTypes.Other;
+                            var isNone = partnerType == IStatementSummary1.PartnerTypes.None;
+
+                            if (isNone)
+                            {
+                                <div class="govuk-!-margin-bottom-2">
+                                    or
+                                </div>
+                            }
+
                             <div class="govuk-checkboxes__item">
-                                <input name="Partners" value="@((int)partnerType)" id="@($"partner{(int)partnerType}")" checked=@(Model.Partners.Contains(partnerType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="partners-conditional-@((int)partnerType)">
-                                <label class="govuk-label govuk-checkboxes__label" for="@($"partner{(int)partnerType}")">
+                                <input name="Partners" value="@value" id="@($"partner{value}")" checked=@(Model.Partners.Contains(partnerType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="partners-conditional-@value">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"partner{value}")">
                                     @partnerType.GetEnumDescription()
+                                    @if (partnerType == IStatementSummary1.PartnerTypes.Other)
+                                    {
+                                        <span class="govuk-hint">For example, within the same industry</span>
+                                    }
                                 </label>
-                                @if (partnerType == IStatementSummary1.PartnerTypes.Other)
-                                { 
-                            <span class="govuk-hint">For example, within the same industry</span>
-                                }
                             </div>
                             @*@if (partnerType == IStatementSummary1.PartnerTypes.Other)
                             {
@@ -53,14 +68,15 @@
                 </fieldset>
             </div>
 
-
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Save and continue
             </button>
 
             @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
             {
-                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
+                <span class="skip-link">
+                    <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+                </span>
             }
         }
     </div>
