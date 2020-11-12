@@ -10,8 +10,6 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         public enum PolicyTypes
         {
             Unknown = 0,
-            [Description("Your organisation does not have any policies and codes in relation to modern slavery")] None,
-            [Description("Other")] Other,
             [Description("Adherence to local and national laws")] Laws,
             [Description("Freedom of workers to terminate employment")] FreedomToTerminate,
             [Description("Freedom of movement")] FreedomOfMovement,
@@ -22,7 +20,9 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             [Description("Prohibits child labour")] ChildLabour,
             [Description("Prohibits discrimination")] Discrimination,
             [Description("Prohibits confiscation of workers original identification documents")] DocumentRetention,
-            [Description("Provides access to remedy, compensation and justice for victims of modern slavery")] RemedyAccess
+            [Description("Provides access to remedy, compensation and justice for victims of modern slavery")] RemedyAccess,
+            [Description("Other")] Other,
+            [Description("Your organisation does not have any policies and codes in relation to modern slavery")] None
         }
 
         SortedSet<PolicyTypes> Policies { get; set; }

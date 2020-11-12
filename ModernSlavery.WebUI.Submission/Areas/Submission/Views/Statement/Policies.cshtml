@@ -2,44 +2,60 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model PoliciesViewModel
-@using ModernSlavery.Core.Entities.StatementSummary; 
+@using ModernSlavery.Core.Entities.StatementSummary;
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate="" }))
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
-
-            <h1 class="govuk-heading-l">
-                @Model.PageTitle
-            </h1>
+            @Html.HiddenFor(m => m.OrganisationId);
+            @Html.HiddenFor(m => m.SubmissionDeadline);
 
             <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">                    
+                <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-fieldset__heading">
+                            @Model.PageTitle
+                        </h1>
+                    </legend>
+
                     <span id="organisation-hint" class="govuk-hint">
                         Select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var policyType in Enums.GetValues<IStatementSummary1.PolicyTypes>())
+                        @foreach (var policyType in Enums.GetValues<IStatementSummary1.PolicyTypes>().Where(t => t != IStatementSummary1.PolicyTypes.Unknown))
                         {
+                            var value = (int)policyType;
+                            var isOther = policyType == IStatementSummary1.PolicyTypes.Other;
+                            var isNone = policyType == IStatementSummary1.PolicyTypes.None;
+
+                            if (isNone)
+                            {
+                                <div class="govuk-!-margin-bottom-2">
+                                    or
+                                </div>
+                            }
+
                             <div class="govuk-checkboxes__item">
-                                <input name="Policies" value="@((int)policyType)" id="@($"policy{(int)policyType}")" checked=@(Model.Policies.Contains(policyType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="policies-conditional@((int)policyType)">
-                                <label class="govuk-label govuk-checkboxes__label" for="@($"policy{(int)policyType}")">
+                                <input name="Policies" value="@(value)" id="@($"policy{value}")" checked=@(Model.Policies.Contains(policyType)) class="govuk-checkboxes__input" type="checkbox" @(isOther ? $"data-aria-controls=policies-conditional-{value}" : "")>
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"policy{value}")">
                                     @policyType.GetEnumDescription()
                                 </label>
                             </div>
-                            @if (policyType== IStatementSummary1.PolicyTypes.Other)
+
+                            if (isOther)
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPolicies, "govuk-form-group--error")" id="policies-conditional@((int)policyType)">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPolicies, "govuk-form-group--error")" id="policies-conditional-@value">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="other">
-                                            Please provide details
+                                            Please specify
                                         </label>
-                                        <textarea asp-for="OtherPolicies" name="OtherPolicies" class="govuk-textarea" id="policies-other" spellcheck="false" rows="5">@Model.OtherPolicies</textarea>
+                                        <input asp-for="OtherPolicies" name="OtherPolicies" class="govuk-textarea" id="policies-other" spellcheck="false" />
                                         <span asp-validation-for="OtherPolicies" class="govuk-error-message"></span>
                                     </div>
                                 </div>
@@ -55,7 +71,9 @@
 
             @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
             {
-                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
+                <div class="skip-link">
+                    <a class="govuk-link govuk-!-padding-top-2" href="@(Model.SkipUrl)">Skip this question</a>
+                </div>
             }
         }
 
