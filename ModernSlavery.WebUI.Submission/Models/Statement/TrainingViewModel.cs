@@ -40,6 +40,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (TrainingTargets.Contains(TrainingTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTrainingTargets))
                 validationResults.AddValidationError(3700, nameof(OtherTrainingTargets));
 
+            if (TrainingTargets.Contains(TrainingTargetTypes.None) && TrainingTargets.Count() > 1)
+                validationResults.AddValidationError(3702);
+
             return validationResults;
         }
 

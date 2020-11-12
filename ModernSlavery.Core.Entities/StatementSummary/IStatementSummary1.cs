@@ -34,15 +34,15 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         public enum TrainingTargetTypes
         {
             Unknown,
-            [Description("Your organisation did not provide training on modern slavery, or any other activities to raise awareness during the period of the statement")] None,
-            [Description("Other")] Other,
             [Description("Your whole organisation")] OwnOrganisation,
             [Description("Your front line staff")] OwnStaff,
             [Description("Human resources")] OwnHumanResources,
             [Description("Executive-level staff")] OwnExecutives,
             [Description("Procurement staff")] OwnProcurers,
             [Description("Your suppliers")] Suppliers,
-            [Description("The wider community")] WiderCommunity
+            [Description("The wider community")] WiderCommunity,
+            [Description("Other")] Other,
+            [Description("Your organisation did not provide training on modern slavery, or any other activities to raise awareness during the period of the statement")] None
         }
 
         SortedSet<TrainingTargetTypes> TrainingTargets { get; set; }
