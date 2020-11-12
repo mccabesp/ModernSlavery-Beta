@@ -165,59 +165,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             #endregion
 
-            #region Approved date validation
 
-            //Validate the approved date parts
-            partsComplete = !Text.IsAnyNull(ApprovedDay, ApprovedMonth, ApprovedYear);
-            partsEmpty = Text.IsAllNull(ApprovedDay, ApprovedMonth, ApprovedYear);
-            if (!partsComplete && !partsEmpty)
-            {
-                if (ApprovedDay == null)
-                    validationResults.AddValidationError(3300, nameof(ApprovedDay));
 
-                if (ApprovedMonth == null)
-                    validationResults.AddValidationError(3301, nameof(ApprovedMonth));
 
-                if (ApprovedYear == null)
-                    validationResults.AddValidationError(3302, nameof(ApprovedYear));
-            }
-
-            // Must be a real date
-            if (partsComplete && !ApprovedDate.HasValue)
-                validationResults.AddValidationError(3303, nameof(ApprovedDate));
-
-            // Cannot be later than today's date
-            if (ApprovedDate.HasValue && ApprovedDate.Value > VirtualDateTime.Now)
-                validationResults.AddValidationError(3304, nameof(ApprovedDate));
-
-            // Cannot be before the statment end date
-            if (ApprovedDate.HasValue && StatementEndDate.HasValue && ApprovedDate.Value < StatementEndDate.Value)
-                validationResults.AddValidationError(3303, nameof(ApprovedDate));
-
-            // Must be within the allowed years
-            if (ApprovedYear != null && (ApprovedYear.Value > MaxApprovedYear || ApprovedYear.Value < MinApprovedYear))
-                validationResults.AddValidationError(3305, nameof(ApprovedYear), new { minYear = MinApprovedYear, maxYear = MaxApprovedYear });
-
-            #endregion
-
-            #region Approver validation
-
-            //Validate the approver parts
-            partsComplete = !Text.IsAnyNullOrWhiteSpace(ApproverFirstName, ApproverLastName, ApproverJobTitle);
-            partsEmpty = Text.IsAllNullOrWhiteSpace(ApproverFirstName, ApproverLastName, ApproverJobTitle);
-            if (!partsComplete && !partsEmpty)
-            {
-                if (string.IsNullOrWhiteSpace(ApproverFirstName))
-                    validationResults.AddValidationError(3306, nameof(ApproverFirstName));
-
-                if (string.IsNullOrWhiteSpace(ApproverLastName))
-                    validationResults.AddValidationError(3307, nameof(ApproverLastName));
-
-                if (string.IsNullOrWhiteSpace(ApproverJobTitle))
-                    validationResults.AddValidationError(3308, nameof(ApproverJobTitle));
-            }
-
-            #endregion
 
             return validationResults;
         }

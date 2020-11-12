@@ -261,7 +261,7 @@
                         </a>
                     </th>
                 }
-                <td class="govuk-table__cell">@(statement.GetStatementTurnover().GetDisplayDescription())</td>
+                <td class="govuk-table__cell">@(statement.Turnover.GetEnumDescription())</td>
                 <td class="govuk-table__cell">@(statement.Status)</td>
                 @{
                     var isGroup = statement.StatementOrganisations.Any();
