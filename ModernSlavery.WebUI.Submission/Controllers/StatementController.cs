@@ -493,7 +493,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/review-statement")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReviewPost(string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> ReviewPost(string organisationIdentifier, int year, bool acceptedDeclaration, BaseViewModel.CommandType command)
         {
             //Create the view model
             var viewModel = new ReviewViewModel();
@@ -514,6 +514,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                     //set the navigation urls
                     SetNavigationUrl(viewModel);
+
+                    if (!acceptedDeclaration)
+                        ModelState.AddModelError(3999, "AcceptedDeclaration");
 
                     //Validate the view model
                     TryValidateModel(viewModel);

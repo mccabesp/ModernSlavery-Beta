@@ -16,7 +16,7 @@
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
-         
+
             <h1 class="govuk-heading-xl">
                 @Model.PageTitle
             </h1>
@@ -163,16 +163,15 @@
                     </div>
                 </details>
 
-                //TODO - bind to a variable instead of a view model property
-                @*<div class="govuk-checkboxes">
-                    <div class="govuk-checkboxes__item @Html.SetErrorClass($"AcceptedDeclaration", "govuk-form-group--error")">
-                        <input name="AcceptedDeclaration" id="AcceptedDeclaration" class="govuk-checkboxes__input" type="checkbox" value="AcceptedDeclaration">
+                <div class="govuk-checkboxes @Html.SetErrorClass("AcceptedDeclaration", "govuk-form-group--error")">
+                    <div class="govuk-checkboxes__item">
+                        <input name="AcceptedDeclaration" id="AcceptedDeclaration" class="govuk-checkboxes__input" type="checkbox" value="true">
                         <label class="govuk-label govuk-checkboxes__label" for="AcceptedDeclaration">
                             I understand and agree with the above declaration
                         </label>
-                        @Html.ValidationMessage($"AcceptedDeclaration", "Accept the declartion to submit", new { @class = "govuk-error-message" })
                     </div>
-                </div>*@
+                    @Html.ValidationMessage("AcceptedDeclaration", new { @class = "govuk-error-message" })
+                </div>
 
                 <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled="@(!Model.CanSubmit())" name="command" value="@BaseViewModel.CommandType.Submit">
                     Submit for publication
