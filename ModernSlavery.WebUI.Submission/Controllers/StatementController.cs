@@ -137,7 +137,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.WorkingConditionsUrl = GetPartnersUrl();
                     vm.RisksUrl = GetHighestRisksUrl();
                     vm.IndicatorsUrl = GetIndicatorsUrl();
-                    vm.ProgressUrl = GetReviewUrl();
+                    vm.ProgressUrl = GetProgressUrl();
                     break;
                 case GroupStatusViewModel vm:
                     vm.BackUrl = GetReviewUrl();
