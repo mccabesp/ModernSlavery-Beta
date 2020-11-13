@@ -24,6 +24,9 @@ namespace ModernSlavery.Core.Extensions
             return Enum.GetValues(typeof(T)).Cast<T>();
         }
 
+        public static IEnumerable<T> GetValuesExcept<T>(params T[] except) where T : Enum
+            => GetValues<T>().Where(e => !except.Contains(e));
+
         /// <summary>
         /// Returns the description text provided by a DescriptionAttribute or DisplayAttribute
         /// If neigther of these attributes or the text is null then the name of the enum is returned as a string

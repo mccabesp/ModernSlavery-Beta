@@ -3,6 +3,7 @@
 }
 @model PartnersViewModel
 @using ModernSlavery.Core.Entities.StatementSummary;
+@using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
@@ -28,11 +29,11 @@
                         Select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var partnerType in Enums.GetValues<IStatementSummary1.PartnerTypes>().Where(t => t != IStatementSummary1.PartnerTypes.Unknown))
+                        @foreach (var partnerType in Enums.GetValuesExcept<PartnerTypes>(PartnerTypes.Unknown))
                         {
                             var value = (int)partnerType;
-                            var isOther = partnerType == IStatementSummary1.PartnerTypes.Other;
-                            var isNone = partnerType == IStatementSummary1.PartnerTypes.None;
+                            var isOther = partnerType == PartnerTypes.Other;
+                            var isNone = partnerType == PartnerTypes.None;
 
                             if (isNone)
                             {
@@ -52,17 +53,17 @@
                                 </label>
                             </div>
                             @*@if (partnerType == IStatementSummary1.PartnerTypes.Other)
-                            {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPartners, "govuk-form-group--error")" id="partners-conditional-@((int)partnerType)">
-                                    <div class="govuk-form-group">
-                                        <label class="govuk-label" for="other">
-                                            Please specify
-                                        </label>
-                                        <input asp-for="OtherPartners" class="govuk-input" spellcheck="false">
-                                        <span asp-validation-for="OtherPartners" class="govuk-error-message"></span>
+                                {
+                                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPartners, "govuk-form-group--error")" id="partners-conditional-@((int)partnerType)">
+                                        <div class="govuk-form-group">
+                                            <label class="govuk-label" for="other">
+                                                Please specify
+                                            </label>
+                                            <input asp-for="OtherPartners" class="govuk-input" spellcheck="false">
+                                            <span asp-validation-for="OtherPartners" class="govuk-error-message"></span>
+                                        </div>
                                     </div>
-                                </div>
-                            }*@
+                                }*@
                         }
                     </div>
                 </fieldset>

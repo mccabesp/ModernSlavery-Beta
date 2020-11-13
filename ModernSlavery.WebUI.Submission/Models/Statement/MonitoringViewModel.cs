@@ -23,7 +23,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public override string PageTitle => "Do you want to tell us about any other ways you monitored working conditions across your organisation and supply chain?";
 
-        [MaxLength(1024)]
+        [MaxLength(200)]
         public string OtherWorkConditionsMonitoring { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

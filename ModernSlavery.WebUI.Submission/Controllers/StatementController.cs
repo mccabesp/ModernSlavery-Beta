@@ -197,7 +197,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     vm.ContinueUrl = vm.SkipUrl = GetSocialAuditsUrl();
                     break;
                 case SocialAuditsViewModel vm:
-                    vm.BackUrl = GetSocialAuditsUrl();
+                    vm.BackUrl = GetPartnersUrl();
                     vm.ContinueUrl = vm.SkipUrl = GetGrievancesUrl();
                     break;
                 case GrievancesViewModel vm:

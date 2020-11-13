@@ -3,6 +3,7 @@
 }
 @model SocialAuditsViewModel
 @using ModernSlavery.Core.Entities.StatementSummary;
+@using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
@@ -13,28 +14,44 @@
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
-
-            <h1 class="govuk-heading-l">
-                @Model.PageTitle
-            </h1>
+            @Html.HiddenFor(m => m.OrganisationId);
+            @Html.HiddenFor(m => m.SubmissionDeadline);
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="conditions-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-fieldset__heading">
+                            @Model.PageTitle
+                        </h1>
+                    </legend>
+
                     <span id="conditions-hint" class="govuk-hint">
                         Select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var auditType in Enums.GetValues<IStatementSummary1.SocialAuditTypes>())
+                        @foreach (var auditType in Enums.GetValuesExcept<SocialAuditTypes>(SocialAuditTypes.Unknown))
                         {
+                            var value = (int)auditType;
+                            var isOther = auditType == SocialAuditTypes.Other;
+                            var isNone = auditType == SocialAuditTypes.None;
+
+                            if (isNone)
+                            {
+                                <div class="govuk-!-margin-bottom-2">
+                                    or
+                                </div>
+                            }
+
                             <div class="govuk-checkboxes__item">
-                                <input name="SocailAudits" value="@((int)auditType)" id="@($"audit{(int)auditType}")" checked=@(Model.SocialAudits.Contains(auditType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="audits-conditional-@((int)auditType)">
-                                <label class="govuk-label govuk-checkboxes__label" for="@($"audit{(int)auditType}")">
+                                <input name="SocialAudits" value="@value" id="@($"audit{value}")" checked=@(Model.SocialAudits.Contains(auditType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="audits-conditional-@value">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"audit{value}")">
                                     @auditType.GetEnumDescription()
-                                </label>                               
+                                </label>
                             </div>
+
                             @*@if (auditType == IStatementSummary1.SocialAuditTypes.Other)
                                 {
-                                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherSocialAudits, "govuk-form-group--error")" id="audits-conditional-@((int)auditType)">
+                                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherSocialAudits, "govuk-form-group--error")" id="audits-conditional-@(value)">
                                         <div class="govuk-form-group">
                                             <label class="govuk-label" for="other">
                                                 Please specify
@@ -49,14 +66,15 @@
                 </fieldset>
             </div>
 
-
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Save and continue
             </button>
 
             @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
             {
-                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
+                <div class="skip-link">
+                    <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+                </div>
             }
         }
     </div>

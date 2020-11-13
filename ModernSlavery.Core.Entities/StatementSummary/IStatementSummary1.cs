@@ -75,12 +75,12 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         public enum SocialAuditTypes
         {
             Unknown = 0,
-            [Description("Your organisation did not carry out any social audits")] None,
-            [Description("Other type of social audit")] Other,
             [Description("By your own staff")] OwnWorkers,
             [Description("By a third party")] ThirdParty,
             [Description("Announced social audits")] Announced,
-            [Description("Unannounced social audits")] Unannounced
+            [Description("Unannounced social audits")] Unannounced,
+            [Description("Other type of social audit")] Other,
+            [Description("Your organisation did not carry out any social audits")] None,
         }
 
         SortedSet<SocialAuditTypes> SocialAudits { get; set; }
@@ -92,10 +92,10 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         public enum GrievanceMechanismTypes
         {
             Unknown,
+            [Description("Whistleblowing services")] WhistleblowingServices,
+            [Description("Worker voice platforms")] WorkerVoicePlatforms,
             [Description("Your organisation does not have any anonymous grievance mechanisms in place")] None,
             [Description("Other grievance mechanism")] Other,
-            [Description("Whistleblowing services")] WhistleblowingServices,
-            [Description("Worker voice platforms")] WorkerVoicePlatforms
         }
 
         SortedSet<GrievanceMechanismTypes> GrievanceMechanisms { get; set; }

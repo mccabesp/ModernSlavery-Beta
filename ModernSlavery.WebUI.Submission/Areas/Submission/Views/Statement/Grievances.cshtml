@@ -3,6 +3,7 @@
 }
 @model GrievancesViewModel
 @using ModernSlavery.Core.Entities.StatementSummary;
+@using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
@@ -13,22 +14,38 @@
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
+            @Html.HiddenFor(m => m.OrganisationId);
+            @Html.HiddenFor(m => m.SubmissionDeadline);
 
-            <h1 class="govuk-heading-l">
-                @Model.PageTitle
-            </h1>
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="conditions-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-fieldset__heading">
+                            @Model.PageTitle
+                        </h1>
+                    </legend>
+
                     <span id="conditions-hint" class="govuk-hint">
                         Select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var grievanceType in Enums.GetValues<IStatementSummary1.GrievanceMechanismTypes>())
+                        @foreach (var grievanceType in Enums.GetValuesExcept<GrievanceMechanismTypes>(GrievanceMechanismTypes.Unknown, GrievanceMechanismTypes.Other))
                         {
+                            var value = (int)grievanceType;
+                            var isOther = grievanceType == GrievanceMechanismTypes.Other;
+                            var isNone = grievanceType == GrievanceMechanismTypes.None;
+
+                            if (isNone)
+                            {
+                                <div class="govuk-!-margin-bottom-2">
+                                    or
+                                </div>
+                            }
+
                             <div class="govuk-checkboxes__item">
-                                <input name="GrievanceMechanismType" value="@((int)grievanceType)" id="@($"grievance{(int)grievanceType}")" checked=@(Model.GrievanceMechanisms.Contains(grievanceType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="audits-conditional-@((int)grievanceType)">
-                                <label class="govuk-label govuk-checkboxes__label" for="@($"grievance{(int)grievanceType}")">
+                                <input name="GrievanceMechanisms" value="@value" id="@($"grievance{value}")" checked=@(Model.GrievanceMechanisms.Contains(grievanceType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="audits-conditional-@value">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"grievance{value}")">
                                     @grievanceType.GetEnumDescription()
                                 </label>
                             </div>
@@ -49,14 +66,15 @@
                 </fieldset>
             </div>
 
-
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Save and continue
             </button>
 
             @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
             {
-                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
+                <div class="skip-link">
+                    <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+                </div>
             }
         }
     </div>
