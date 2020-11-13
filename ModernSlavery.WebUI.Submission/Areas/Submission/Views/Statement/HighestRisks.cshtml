@@ -1,5 +1,5 @@
 ﻿@{
-    Layout = "/Views/GdsLayout.cshtml";    
+    Layout = "/Views/GdsLayout.cshtml";
 }
 @model HighestRisksViewModel
 @section BeforeMain {
@@ -13,57 +13,64 @@
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
 
-            <h1 class="govuk-heading-l">
-                @Model.PageTitle
-            </h1>
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="training-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-fieldset__heading">
+                            @Model.PageTitle
+                        </h1>
+                    </legend>
 
-            <p class="govuk-body">
-                What did you identify as your highest modern slavery risks in your operations and supply chain during the period of the statement? Briefly describe up to 3 risks.
-            </p>
+                    <p class="govuk-body">
+                        What did you identify as your highest modern slavery risks in your operations and supply chain during the period of the statement?
+                        Briefly describe up to 3 risks.
+                    </p>
 
-            <p class="govuk-hint">
-                For example, ‘Bangladeshi migrant workers in apparel factories in Mauritius’ or ‘Temporary construction workers building new retail premises in the UK’
-            </p>
+                    <p class="govuk-hint">
+                        For example, ‘Bangladeshi migrant workers in apparel factories in Mauritius’ or ‘Temporary construction workers building new retail premises in the UK’
+                    </p>
 
+                    <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+                        <div class="govuk-form-group @Html.SetErrorClass(model => model.HighRisk1, "govuk-form-group--error")">
+                            <label class="govuk-label" for="high-risk-detail-1">
+                                Risk
+                            </label>
+                            <textarea asp-for="HighRisk1" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="high-risk-detail-1-info high-risk-detail-1-hint">@(Model.HighRisk1)</textarea>
+                            <span asp-validation-for="HighRisk1" class="govuk-error-message"></span>
+                        </div>
+                    </div>
 
-            <fieldset class="govuk-fieldset">
-                <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
-                    <div class="govuk-form-group @Html.SetErrorClass(model => model.HighRisk1, "govuk-form-group--error")">
-                        <label class="govuk-label" for="high-risk-detail-1">
-                            Risk
+                    <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+                        <div class="govuk-form-group @Html.SetErrorClass(model => model.HighRisk2, "govuk-form-group--error")">
+                            <label class="govuk-label" for="high-risk-detail-2">
+                                Risk
+                            </label>
+                            <textarea asp-for="HighRisk2" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="high-risk-detail-2-info high-risk-detail-2-hint">@(Model.HighRisk2)</textarea>
+                            <span asp-validation-for="HighRisk2" class="govuk-error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+                        <div class="govuk-form-group @Html.SetErrorClass(model => model.HighRisk3, "govuk-form-group--error")">
+                            <label class="govuk-label" for="high-risk-detail-3">
+                                Risk
+                            </label>
+                            <textarea asp-for="HighRisk3" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="high-risk-detail-3-info high-risk-detail-3-hint">@(Model.HighRisk3)</textarea>
+                            <span asp-validation-for="HighRisk3" class="govuk-error-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="govuk-!-margin-bottom-2">
+                        or
+                    </div>
+                    <div class="govuk-checkboxes__item">
+                        <input asp-for="NoRisks" class="govuk-checkboxes__input" />
+                        <label asp-for="NoRisks" class="govuk-label govuk-checkboxes__label">
+                            My organisation did not identify any modern slavery risks in its operations or supply chain during the period of the statement
                         </label>
-                        <textarea asp-for="HighRisk1" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="high-risk-detail-1-info high-risk-detail-1-hint">@(Model.HighRisk1)</textarea>
                     </div>
-                    <div id="high-risk-detail-1-hint" class="govuk-hint govuk-character-count__message" aria-live="polite">
-                        You have 200 characters remaining
-                    </div>
-                    <span asp-validation-for="HighRisk1" class="govuk-error-message"></span>
-                </div>
-                <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
-                    <div class="govuk-form-group @Html.SetErrorClass(model => model.HighRisk2, "govuk-form-group--error")">
-                        <label class="govuk-label" for="high-risk-detail-2">
-                            Risk
-                        </label>
-                        <textarea asp-for="HighRisk2" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="high-risk-detail-2-info high-risk-detail-2-hint">@(Model.HighRisk2)</textarea>
-                    </div>
-                    <div id="high-risk-detail-2-hint" class="govuk-hint govuk-character-count__message" aria-live="polite">
-                        You have 200 characters remaining
-                    </div>
-                    <span asp-validation-for="HighRisk2" class="govuk-error-message"></span>
-                </div>
-                <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
-                    <div class="govuk-form-group @Html.SetErrorClass(model => model.HighRisk3, "govuk-form-group--error")">
-                        <label class="govuk-label" for="high-risk-detail-3">
-                            Risk
-                        </label>
-                        <textarea asp-for="HighRisk3" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="high-risk-detail-3-info high-risk-detail-3-hint">@(Model.HighRisk3)</textarea>
-                    </div>
-                    <div id="high-risk-detail-3-hint" class="govuk-hint govuk-character-count__message" aria-live="polite">
-                        You have 200 characters remaining
-                    </div>
-                    <span asp-validation-for="HighRisk3" class="govuk-error-message"></span>
-                </div>
-            </fieldset>
+                </fieldset>
+            </div>
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Save and continue
@@ -71,7 +78,9 @@
 
             @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
             {
-                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
+                <div class="skip-link">
+                    <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+                </div>
             }
         }
     </div>

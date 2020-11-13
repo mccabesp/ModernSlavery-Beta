@@ -3,6 +3,7 @@
 }
 @model HighRiskViewModel
 @using ModernSlavery.Core.Entities.StatementSummary;
+@using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
@@ -22,81 +23,84 @@
                 <a href="@Model.BackUrl">Edit</a>
             </div>
 
-            //TODO: add tiers
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                        <h1 class="govuk-fieldset__heading">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading">
                             Where was the risk you described most likely to occur?
-                        </h1>
+                        </h2>
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                        @foreach (var item in Enums.GetValues<IStatementSummary1.StatementRisk.RiskSourceTypes>().Where(x => x != IStatementSummary1.StatementRisk.RiskSourceTypes.Unknown))
+                        @foreach (var item in Enums.GetValuesExcept<StatementRisk.RiskSourceTypes>(StatementRisk.RiskSourceTypes.Unknown))
                         {
+                            var value = (int)item;
+                            var isOther = item == StatementRisk.RiskSourceTypes.Other;
                             <div class="govuk-radios__item">
-                                <input class="govuk-radios__input" id="@($"source{(int)item }")" type="radio" data-aria-controls="conditional-source">
-                                <label class="govuk-label govuk-radios__label" for="@($"source{(int)item }")">
+                                <input name="RiskType" class="govuk-radios__input" id="@($"source{value}")" type="radio" @(isOther ? "data-aria-controls=conditional-source" :"")>
+                                <label class="govuk-label govuk-radios__label" for="@($"source{value}")">
                                     @item.GetEnumDescription()
                                 </label>
                             </div>
-                            @if (item == IStatementSummary1.StatementRisk.RiskSourceTypes.Other)
+                            @if (item == StatementRisk.RiskSourceTypes.Other)
                             {
-                            <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-source">
-                                <div class="govuk-form-group">
-                                    <label class="govuk-label" for="OtherLikelySource">
-                                        Please specify
-                                    </label>
-                                    <textarea class="govuk-textarea" id="OtherLikelySource" spellcheck="false" rows="5" >@Model.Risk.OtherLikelySource</textarea>
-                                    <span asp-validation-for="Risk.OtherLikelySource" class="govuk-error-message"></span>
-                                </div>
-
-                            </div>
-                                }
-                            }
-                     </div>
-                    </fieldset>
-                </div>
-
-                    <div class="govuk-form-group">
-                        <fieldset class="govuk-fieldset">
-                            <label>Who was most likely to be affected?</label>
-                            <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                                @foreach (var targetType in Enums.GetValues<IStatementSummary1.StatementRisk.RiskTargetTypes>().Where(x => x != IStatementSummary1.StatementRisk.RiskTargetTypes.Unknown))
-                                {
-                                    <div class="govuk-checkboxes__item">
-                                        <input name="Targets" value="@((int)targetType)" id="@($"target{(int)targetType}")" checked=@(Model.Risk.Targets.Contains(targetType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="targets-conditional-@((int)targetType)">
-                                        <label class="govuk-label govuk-checkboxes__label" for="@($"partner{(int)targetType}")">
-                                            @targetType.GetEnumDescription()
-                                        </label>                                        
+                                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-source">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="OtherLikelySource">
+                                            Please specify
+                                        </label>
+                                        <textarea class="govuk-textarea" id="OtherLikelySource" spellcheck="false" rows="5">@Model.Risk.OtherLikelySource</textarea>
+                                        <span asp-validation-for="Risk.OtherLikelySource" class="govuk-error-message"></span>
                                     </div>
-                                    @if (targetType == IStatementSummary1.StatementRisk.RiskTargetTypes.Other)
-                    {
-                        <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.Risk.OtherTargets, "govuk-form-group--error")" id="targets-conditional-@((int)targetType)">
-                            <div class="govuk-form-group">
-                                <label class="govuk-label" for="OtherTargets">
-                                    Please specify
+                                </div>
+                            }
+                        }
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading">
+                            Who was most likely to be affected?
+                        </h2>
+                    </legend>
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        @foreach (var targetType in Enums.GetValuesExcept<StatementRisk.RiskTargetTypes>(StatementRisk.RiskTargetTypes.Unknown))
+                        {
+                            <div class="govuk-checkboxes__item">
+                                <input name="Targets" value="@((int)targetType)" id="@($"target{(int)targetType}")" checked=@(Model.Risk.Targets.Contains(targetType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="targets-conditional-@((int)targetType)">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"target{(int)targetType}")">
+                                    @targetType.GetEnumDescription()
                                 </label>
-                                <input asp-for="Risk.OtherTargets" class="govuk-input" spellcheck="false">
-                                <span asp-validation-for="Risk.OtherTargets" class="govuk-error-message"></span>
                             </div>
-                        </div>
-                    }
-                                }
-                            </div>
-                        </fieldset>
+                            @if (targetType == StatementRisk.RiskTargetTypes.Other)
+                            {
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.Risk.OtherTargets, "govuk-form-group--error")" id="targets-conditional-@((int)targetType)">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="OtherTargets">
+                                            Please specify
+                                        </label>
+                                        <input asp-for="Risk.OtherTargets" class="govuk-input" spellcheck="false">
+                                        <span asp-validation-for="Risk.OtherTargets" class="govuk-error-message"></span>
+                                    </div>
+                                </div>
+                            }
+                        }
                     </div>
+                </fieldset>
+            </div>
 
-                    //TODO:
-                    <div class="govuk-form-group">
-                        <h1 class="govuk-label-wrapper">
-                            <label asp-for="Risk.Countries" class="govuk-label govuk-label--m">
-                               In which country
-                            </label>
-                        </h1>
-                        <input asp-for="Risk.Countries"class="govuk-input" >
-                    </div>
-
-          
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading">
+                            In which country?
+                        </h2>
+                    </legend>
+                    @* TODO - countries are multiple inputs, but what pattern will it follow *@
+                </fieldset>
+            </div>
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Save and continue
@@ -104,7 +108,9 @@
 
             @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
             {
-                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
+                <div class="skip-link">
+                    <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+                </div>
             }
         }
     </div>

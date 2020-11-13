@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities.StatementSummary;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -81,13 +82,24 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             var validationResults = new List<ValidationResult>();
 
-            //TODO: throw error when any disk description and norisks selected
+            if (NoRisks)
+            {
+                if (!string.IsNullOrWhiteSpace(HighRisk1))
+                    validationResults.AddValidationError(3913, nameof(HighRisk1));
+                if (!string.IsNullOrWhiteSpace(HighRisk2))
+                    validationResults.AddValidationError(3913, nameof(HighRisk2));
+                if (!string.IsNullOrWhiteSpace(HighRisk3))
+                    validationResults.AddValidationError(3913, nameof(HighRisk3));
+            }
 
             return validationResults;
         }
 
         public override Status GetStatus()
         {
+            if (NoRisks)
+                return Status.Complete;
+
             if (!string.IsNullOrWhiteSpace(HighRisk1) || !string.IsNullOrWhiteSpace(HighRisk2) || !string.IsNullOrWhiteSpace(HighRisk3))
             {
                 if (!string.IsNullOrWhiteSpace(HighRisk1) && !string.IsNullOrWhiteSpace(HighRisk2) && !string.IsNullOrWhiteSpace(HighRisk3)) return Status.Complete;

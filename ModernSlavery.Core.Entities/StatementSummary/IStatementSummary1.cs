@@ -116,9 +116,9 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             public enum RiskSourceTypes
             {
                 Unknown,
-                [Description("Other")] Other,
                 [Description("Within your own operations")] OwnOperations,
-                [Description("Within your supply chains")] SupplyChains
+                [Description("Within your supply chains")] SupplyChains,
+                [Description("Other")] Other,
             }
 
             public RiskSourceTypes LikelySource { get; set; }
@@ -141,11 +141,11 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             public enum RiskTargetTypes
             {
                 Unknown,
-                [Description("Other vulnerable group(s)")] Other,
                 [Description("Women")] Women,
                 [Description("Migrants")] Migrants,
                 [Description("Refugees")] Refugees,
-                [Description("Children")] Children
+                [Description("Children")] Children,
+                [Description("Other vulnerable group(s)")] Other,
             }
 
             public SortedSet<RiskTargetTypes> Targets { get; set; } = new SortedSet<RiskTargetTypes>();

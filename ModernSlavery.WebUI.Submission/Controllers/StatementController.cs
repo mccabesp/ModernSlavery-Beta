@@ -210,7 +210,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     break;
                 case HighestRisksViewModel vm:
                     vm.BackUrl = GetReviewUrl();
-                    vm.ContinueUrl = vm.SkipUrl = !string.IsNullOrWhiteSpace(vm.HighRisk1) && !string.IsNullOrWhiteSpace(vm.HighRisk2) && !string.IsNullOrWhiteSpace(vm.HighRisk3) ? GetHighRiskUrl(0) : GetReviewUrl();
+                    vm.ContinueUrl = vm.SkipUrl = !string.IsNullOrWhiteSpace(vm.HighRisk1) || !string.IsNullOrWhiteSpace(vm.HighRisk2) || !string.IsNullOrWhiteSpace(vm.HighRisk3) ? GetHighRiskUrl(0) : GetReviewUrl();
                     break;
                 case HighRiskViewModel vm:
                     vm.BackUrl = vm.Index == 0 ? GetHighestRisksUrl() : GetHighRiskUrl(vm.Index - 1);
