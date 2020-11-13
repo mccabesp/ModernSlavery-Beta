@@ -16,9 +16,6 @@
     @await Html.GovUkValidationSummaryAsync();
     @Html.AntiForgeryToken();
     @Html.HiddenFor(m => m.Submitted);
-    @Html.HiddenFor(m => m.OrganisationId);
-    @Html.HiddenFor(m => m.SubmissionDeadline);
-
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">

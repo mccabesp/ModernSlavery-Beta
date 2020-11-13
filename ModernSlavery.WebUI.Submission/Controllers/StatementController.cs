@@ -412,6 +412,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         private async Task<IActionResult> PostAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, params object[] arguments) where TViewModel : BaseViewModel
         {
             SetNavigationUrl(viewModel);
+            var getResult = await SetSensitiveOrgFields(viewModel, organisationIdentifier, year, arguments);
+            if (getResult.Fail) return HandleStatementErrors(getResult.Errors);
+            else viewModel = getResult.Result;
 
             switch (command)
             {
@@ -429,7 +432,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     //Handle any StatementErrors
                     if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
 
-                    //Remove the group search from session                  
+                    //Remove the group search from session
                     UnstashModel<GroupSearchViewModel>(true);
 
                     //Redirect to the continue url
@@ -438,6 +441,23 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     throw new ArgumentOutOfRangeException(nameof(command), $"CommandType {command} is not valid here");
             }
         }
+
+        /// <summary>
+        /// Set fields that cant be handled via hidden fields because they contain information considered sensitive or uneditable. 
+        /// </summary>
+        private async Task<Outcome<StatementErrors, TViewModel>> SetSensitiveOrgFields<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year, params object[] arguments) where TViewModel : BaseViewModel
+        {
+            var original = await SubmissionPresenter.GetViewModelAsync<TViewModel>(organisationIdentifier, year, VirtualUser.UserId, arguments);
+            if (original.Fail)
+                return original;
+
+            viewModel.SubmissionDeadline = original.Result.SubmissionDeadline;
+            viewModel.OrganisationId = original.Result.OrganisationId;
+            viewModel.OrganisationName = original.Result.OrganisationName;
+
+            return new Outcome<StatementErrors, TViewModel>(viewModel);
+        }
+
         #endregion
 
         #region Before You Start

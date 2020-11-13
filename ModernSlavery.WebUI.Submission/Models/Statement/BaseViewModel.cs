@@ -57,12 +57,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [IgnoreMap]
         public virtual string SubTitle { get; }
 
+        [BindNever]
         public DateTime SubmissionDeadline { get; set; }
 
         [IgnoreMap]
         public int ReportingDeadlineYear => SubmissionDeadline.Year;
 
+        [BindNever]
         public long OrganisationId { get; set; }
+        [BindNever]
         public string OrganisationName { get; set; }
 
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
