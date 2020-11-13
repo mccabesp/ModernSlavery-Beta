@@ -40,6 +40,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (Remediations.Contains(RemediationTypes.Other) && string.IsNullOrWhiteSpace(OtherRemediations))
                 validationResults.AddValidationError(4500, nameof(OtherRemediations));
 
+            if (Remediations.Contains(RemediationTypes.None) && Remediations.Count() > 1)
+                validationResults.AddValidationError(4501);
+
             return validationResults;
         }
 

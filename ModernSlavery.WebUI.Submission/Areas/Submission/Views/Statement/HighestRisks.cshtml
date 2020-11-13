@@ -14,7 +14,7 @@
             @Html.HiddenFor(m => m.Submitted);
 
             <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset" aria-describedby="training-hint">
+                <fieldset class="govuk-fieldset" aria-describedby="highest-risk-hint">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                         <h1 class="govuk-fieldset__heading">
                             @Model.PageTitle
@@ -26,7 +26,7 @@
                         Briefly describe up to 3 risks.
                     </p>
 
-                    <p class="govuk-hint">
+                    <p id="highest-risk-hint" class="govuk-hint">
                         For example, ‘Bangladeshi migrant workers in apparel factories in Mauritius’ or ‘Temporary construction workers building new retail premises in the UK’
                     </p>
 

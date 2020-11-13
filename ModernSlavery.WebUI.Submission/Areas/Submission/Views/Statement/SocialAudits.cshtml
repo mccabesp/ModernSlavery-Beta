@@ -41,7 +41,7 @@
                             }
 
                             <div class="govuk-checkboxes__item">
-                                <input name="SocialAudits" value="@value" id="@($"audit{value}")" checked=@(Model.SocialAudits.Contains(auditType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="audits-conditional-@value">
+                                <input name="SocialAudits" value="@value" id="@($"audit{value}")" checked=@(Model.SocialAudits.Contains(auditType)) class="govuk-checkboxes__input" type="checkbox" @*data-aria-controls="audits-conditional"*@>
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"audit{value}")">
                                     @auditType.GetEnumDescription()
                                 </label>
@@ -49,7 +49,7 @@
 
                             @*@if (auditType == IStatementSummary1.SocialAuditTypes.Other)
                                 {
-                                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherSocialAudits, "govuk-form-group--error")" id="audits-conditional-@(value)">
+                                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherSocialAudits, "govuk-form-group--error")" id="audits-conditional">
                                         <div class="govuk-form-group">
                                             <label class="govuk-label" for="other">
                                                 Please specify

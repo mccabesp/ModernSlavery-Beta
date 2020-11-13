@@ -433,8 +433,6 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         public enum IndicatorTypes
         {
             Unknown,
-            [Description("My statement does not refer to any indicators of forced labour")] None,
-            [Description("Other")] Other,
             [Description("Abuse of vulnerability")] VulnerabilityAbuse,
             [Description("Deception")] Deception,
             [Description("Restriction of Movement")] MovementRestriction,
@@ -445,7 +443,9 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             [Description("Withholding of wages")] WageWithholding,
             [Description("Debt bondage")] DebtBondage,
             [Description("Abusive working and living conditions")] WorkLiveConditions,
-            [Description("Excessive overtime")] ExcessiveOvertime
+            [Description("Excessive overtime")] ExcessiveOvertime,
+            [Description("Other")] Other,
+            [Description("My statement does not refer to any indicators of forced labour")] None,
         }
 
         SortedSet<IndicatorTypes> Indicators { get; set; }
@@ -457,14 +457,14 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         public enum RemediationTypes
         {
             Unknown,
-            [Description("My statement does not refer to actions taken in response to finding indicators of forced labour")] None,
-            [Description("Other")] Other,
             [Description("Repayment of recruitment fees")] FeeRepayment,
             [Description("Change in policy")] PolicyChange,
             [Description("Change in training")] TrainingChange,
             [Description("Referring victims to government service")] VictimReferral,
             [Description("Supporting victims via NGO")] NGOSupport,
-            [Description("Supporting criminal justice against perpetrator")] CRiminalJustice,
+            [Description("Supporting criminal justice against perpetrator")] CriminalJustice,
+            [Description("Other")] Other,
+            [Description("My statement does not refer to actions taken in response to finding indicators of forced labour")] None,
         }
 
         SortedSet<RemediationTypes> Remediations { get; set; }

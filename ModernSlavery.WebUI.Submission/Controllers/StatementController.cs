@@ -1098,13 +1098,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         #endregion
 
         #region Monitoring Progress
-        [HttpGet("{organisationIdentifier}/{year}/Progress")]
+        [HttpGet("{organisationIdentifier}/{year}/progress")]
         public async Task<IActionResult> Progress(string organisationIdentifier, int year)
         {
             return await GetAsync<ProgressViewModel>(organisationIdentifier, year);
         }
 
-        [HttpPost("{organisationIdentifier}/{year}/monitoring-progress")]
+        [HttpPost("{organisationIdentifier}/{year}/progress")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Progress(ProgressViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)

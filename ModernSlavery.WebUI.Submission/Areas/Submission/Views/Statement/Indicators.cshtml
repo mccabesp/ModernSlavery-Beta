@@ -3,6 +3,7 @@
 }
 @model IndicatorsViewModel
 @using ModernSlavery.Core.Entities.StatementSummary;
+@using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
@@ -14,41 +15,53 @@
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
 
-            <h1 class="govuk-heading-l">
-                @Model.PageTitle
-            </h1>
-
-            <details class="govuk-details" data-module="govuk-details">
-                <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">
-                        Read more about the ILO indicators of forced labour
-                    </span>
-                </summary>
-                <div class="govuk-details__text">
-                    The International Labour Organization (ILO) has produced a list of the most common signs of forced labour. They’re based on the definition of forced labour as ‘all work or service which is extracted from any person under the menace of any penalty and for which the said person has not offered himself voluntarily.’ More details and guidance are available on the ILO website, and in their publication ‘ILO indicators of forced labour’.
-                </div>
-            </details>
-
-
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="conditions-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-fieldset__heading">
+                            @Model.PageTitle
+                        </h1>
+                    </legend>
+
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                Read more about the ILO indicators of forced labour
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            The International Labour Organization (ILO) has produced a list of the most common signs of forced labour.
+                            They’re based on the definition of forced labour as ‘all work or service which is extracted from any person under the menace of any penalty and for which the said person has not offered himself voluntarily.’
+                            More details and guidance are available on the ILO website, and in their publication ‘ILO indicators of forced labour’.
+                        </div>
+                    </details>
+
                     <span id="conditions-hint" class="govuk-hint">
                         Select all that apply
                     </span>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var indicatorType in Enums.GetValues<IStatementSummary1.IndicatorTypes>())
+                        @foreach (var indicatorType in Enums.GetValuesExcept<IndicatorTypes>(IndicatorTypes.Unknown, IndicatorTypes.Other))
                         {
+                            var value = (int)indicatorType;
+                            var isNone = indicatorType == IndicatorTypes.None;
+
+                            if (isNone)
+                            {
+                                <div class="govuk-!-margin-bottom-2">
+                                    or
+                                </div>
+                            }
+
                             <div class="govuk-checkboxes__item">
-                                <input name="Indicators" value="@((int)indicatorType)" id="@($"indicator{(int)indicatorType}")" checked=@(Model.Indicators.Contains(indicatorType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="indicator-conditional-@((int)indicatorType)">
-                                <label class="govuk-label govuk-checkboxes__label" for="@($"grievance{(int)indicatorType}")">
+                                <input name="Indicators" value="@value" id="@($"indicator{value}")" checked=@(Model.Indicators.Contains(indicatorType)) class="govuk-checkboxes__input" type="checkbox">
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"indicator{value}")">
                                     @indicatorType.GetEnumDescription()
                                 </label>
-                            </div>                          
+                            </div>
                         }
                     </div>
                 </fieldset>
             </div>
-
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Save and continue
@@ -56,7 +69,9 @@
 
             @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
             {
-                <a class="govuk-button" href="@(Model.SkipUrl)">Skip this question</a>
+                <div class="skip-link">
+                    <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+                </div>
             }
         }
     </div>
