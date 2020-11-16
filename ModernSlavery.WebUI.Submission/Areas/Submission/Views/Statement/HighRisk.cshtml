@@ -4,6 +4,7 @@
 @model HighRiskViewModel
 @using ModernSlavery.Core.Entities.StatementSummary;
 @using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
+@using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1.StatementRisk;
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
@@ -31,19 +32,50 @@
                         </h2>
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                        @foreach (var item in Enums.GetValuesExcept<StatementRisk.RiskSourceTypes>(StatementRisk.RiskSourceTypes.Unknown))
+                        @foreach (var item in Enums.GetValuesExcept<RiskSourceTypes>(RiskSourceTypes.Unknown))
                         {
                             var value = (int)item;
-                            var isOther = item == StatementRisk.RiskSourceTypes.Other;
+                            var isOther = item == RiskSourceTypes.Other;
+                            var isSupplyChain = item == RiskSourceTypes.SupplyChains;
+
                             <div class="govuk-radios__item">
-                                <input name="RiskType" class="govuk-radios__input" id="@($"source{value}")" type="radio" @(isOther ? "data-aria-controls=conditional-source" :"")>
-                                <label class="govuk-label govuk-radios__label" for="@($"source{value}")">
+                                <input name="RiskType" class="govuk-radios__input" id="source-@value" type="radio" data-aria-controls="@(isOther || isSupplyChain ? $"conditional-source-{value}" : "")">
+                                <label class="govuk-label govuk-radios__label" for="source-@value">
                                     @item.GetEnumDescription()
                                 </label>
                             </div>
-                            @if (item == StatementRisk.RiskSourceTypes.Other)
+
+                            if (isSupplyChain)
                             {
-                                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-source">
+                                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-source-@value">
+                                    <span id="supply-chains-hint" class="govuk-hint">
+                                        Select all that apply
+                                    </span>
+
+                                    <div class="govuk-checkboxes">
+                                        @foreach (var tier in Enums.GetValuesExcept<SupplyChainTierTypes>(SupplyChainTierTypes.Unknown))
+                                        {
+                                            var tierValue = (int)tier;
+                                            if (tier == SupplyChainTierTypes.None)
+                                            {
+                                                <div>
+                                                    or
+                                                </div>
+                                            }
+                                            <div class="govuk-checkboxes__item">
+                                                <input name="SupplyChainTiers" class="govuk-checkboxes__input" id="tier-@tierValue" type="checkbox" checked="@(Model.SupplyChainTiers.Contains(tier))">
+                                                <label class="govuk-label govuk-checkboxes__label" for="tier-@tierValue">
+                                                    @tier.GetEnumDescription()
+                                                </label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            if (isOther)
+                            {
+                                <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-source-@value">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="OtherLikelySource">
                                             Please specify
@@ -66,7 +98,7 @@
                         </h2>
                     </legend>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var targetType in Enums.GetValuesExcept<StatementRisk.RiskTargetTypes>(StatementRisk.RiskTargetTypes.Unknown))
+                        @foreach (var targetType in Enums.GetValuesExcept<RiskTargetTypes>(RiskTargetTypes.Unknown))
                         {
                             <div class="govuk-checkboxes__item">
                                 <input name="Targets" value="@((int)targetType)" id="@($"target{(int)targetType}")" checked=@(Model.Risk.Targets.Contains(targetType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="targets-conditional-@((int)targetType)">
@@ -74,7 +106,7 @@
                                     @targetType.GetEnumDescription()
                                 </label>
                             </div>
-                            @if (targetType == StatementRisk.RiskTargetTypes.Other)
+                            @if (targetType == RiskTargetTypes.Other)
                             {
                                 <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.Risk.OtherTargets, "govuk-form-group--error")" id="targets-conditional-@((int)targetType)">
                                     <div class="govuk-form-group">

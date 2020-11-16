@@ -21,7 +21,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<StatementModel, HighRiskViewModel>()
                 .ForMember(d => d.Index, opt => opt.Ignore())
                 .ForMember(d => d.TotalRisks, opt => opt.MapFrom(s => s.Summary.Risks.Count))
-                .ForMember(d => d.Risk, opt => opt.MapFrom((s, d) => s.Summary.Risks.Count > d.Index ? s.Summary.Risks[d.Index] : new StatementRisk()));
+                .ForMember(d => d.Risk, opt => opt.MapFrom((s, d) => s.Summary.Risks.Count > d.Index ? s.Summary.Risks[d.Index] : new StatementRisk()))
+                .ForMember(d => d.SupplyChainTiers, opt => opt.MapFrom((s, d) => s.Summary.Risks.Count > d.Index ? new List<SupplyChainTierTypes>(s.Summary.Risks[d.Index].SupplyChainTiers) : new List<SupplyChainTierTypes>()));
 
             CreateMap<HighRiskViewModel, StatementModel>(MemberList.None)
                 .ForMember(d => d.OrganisationId, opt => opt.Ignore())
@@ -49,6 +50,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public StatementRisk Risk { get; set; }
 
+        public List<SupplyChainTierTypes> SupplyChainTiers { get; set; } = new List<SupplyChainTierTypes>();
+
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
@@ -66,6 +69,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             if (Risk.Targets.Contains(RiskTargetTypes.Other) && string.IsNullOrWhiteSpace(Risk.OtherTargets))
                 validationResults.AddValidationError(4700, nameof(Risk.OtherTargets));
+
+            if (SupplyChainTiers.Contains(SupplyChainTierTypes.None) && SupplyChainTiers.Count > 1)
+                validationResults.AddValidationError(0, nameof(SupplyChainTiers));
 
             return validationResults;
         }
