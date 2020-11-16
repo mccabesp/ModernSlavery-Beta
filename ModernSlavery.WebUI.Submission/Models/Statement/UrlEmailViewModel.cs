@@ -17,6 +17,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<StatementModel, UrlEmailViewModel>();
 
             CreateMap<UrlEmailViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.OrganisationId, opt => opt.Ignore())
+                .ForMember(d => d.OrganisationName, opt => opt.Ignore())
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForMember(d => d.StatementUrl, opt => opt.MapFrom(s => s.StatementUrl))
                 .ForMember(d => d.StatementEmail, opt => opt.MapFrom(s => s.StatementEmail));
 

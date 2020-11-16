@@ -22,6 +22,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.OtherPolicies, opt => opt.MapFrom(s => s.Summary.OtherPolicies));
 
             CreateMap<PoliciesViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.OrganisationId, opt => opt.Ignore())
+                .ForMember(d => d.OrganisationName, opt => opt.Ignore())
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForPath(d => d.Summary.Policies, opt => opt.MapFrom(s=>s.Policies))
                 .ForPath(d => d.Summary.OtherPolicies, opt => opt.MapFrom(s=>s.OtherPolicies));
         }

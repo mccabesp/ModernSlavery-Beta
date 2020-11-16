@@ -23,6 +23,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.StatementEndYear, opt => opt.MapFrom(s => s.StatementEndDate == null ? (int?)null : s.StatementEndDate.Value.Year));
 
             CreateMap<PeriodCoveredViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.OrganisationId, opt => opt.Ignore())
+                .ForMember(d => d.OrganisationName, opt => opt.Ignore())
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForMember(d => d.StatementStartDate, opt => { opt.MapFrom(s => s.StatementStartDate); })
                 .ForMember(d => d.StatementEndDate, opt => { opt.AllowNull(); opt.MapFrom(s => s.StatementEndDate); });
         }

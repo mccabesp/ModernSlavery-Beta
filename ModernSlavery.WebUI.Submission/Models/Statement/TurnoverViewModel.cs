@@ -14,6 +14,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<StatementModel, TurnoverViewModel>();
 
             CreateMap<TurnoverViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.OrganisationId, opt => opt.Ignore())
+                .ForMember(d => d.OrganisationName, opt => opt.Ignore())
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForMember(d => d.Turnover, opt => opt.MapFrom(s => s.Turnover));
         }
     }

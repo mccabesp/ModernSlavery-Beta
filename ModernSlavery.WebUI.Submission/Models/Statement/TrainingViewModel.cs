@@ -19,6 +19,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.OtherTrainingTargets, opt => opt.MapFrom(s => s.Summary.OtherTrainingTargets));
 
             CreateMap<TrainingViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.OrganisationId, opt => opt.Ignore())
+                .ForMember(d => d.OrganisationName, opt => opt.Ignore())
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForPath(d => d.Summary.TrainingTargets, opt => opt.MapFrom(s=>s.TrainingTargets))
                 .ForPath(d => d.Summary.OtherTrainingTargets, opt => opt.MapFrom(s=>s.OtherTrainingTargets));
         }

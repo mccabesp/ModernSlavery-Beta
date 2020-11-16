@@ -19,6 +19,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.GrievanceMechanisms, opt => opt.MapFrom(s => s.Summary.GrievanceMechanisms));
 
             CreateMap<GrievancesViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.OrganisationId, opt => opt.Ignore())
+                .ForMember(d => d.OrganisationName, opt => opt.Ignore())
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 //.ForPath(d => d.Summary.OtherGrievanceMechanisms, opt => opt.MapFrom(s => s.OtherGrievanceMechanisms))
                 .ForPath(d => d.Summary.GrievanceMechanisms, opt => opt.MapFrom(s => s.GrievanceMechanisms));
         }

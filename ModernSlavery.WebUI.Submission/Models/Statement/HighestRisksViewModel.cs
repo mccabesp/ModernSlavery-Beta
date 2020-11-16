@@ -20,6 +20,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.NoRisks, opt => opt.MapFrom(s => s.Summary.NoRisks));
 
             CreateMap<HighestRisksViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.OrganisationId, opt => opt.Ignore())
+                .ForMember(d => d.OrganisationName, opt => opt.Ignore())
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForPath(d => d.Summary.NoRisks, opt => opt.MapFrom(s => s.NoRisks))
                 .AfterMap((s, d) =>
                 {

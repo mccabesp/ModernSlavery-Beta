@@ -17,6 +17,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<StatementModel, SectorsViewModel>();
 
             CreateMap<SectorsViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.OrganisationId, opt => opt.Ignore())
+                .ForMember(d => d.OrganisationName, opt => opt.Ignore())
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForMember(d => d.Sectors, opt => opt.MapFrom(s => s.Sectors))
                 .ForMember(d => d.OtherSectors, opt => opt.MapFrom(s => s.OtherSectors));
         }

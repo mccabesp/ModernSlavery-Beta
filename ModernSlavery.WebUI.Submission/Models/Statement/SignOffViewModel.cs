@@ -24,6 +24,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.StatementEndDate, opt => opt.MapFrom(s => s.StatementEndDate));
 
             CreateMap<SignOffViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.OrganisationId, opt => opt.Ignore())
+                .ForMember(d => d.OrganisationName, opt => opt.Ignore())
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForMember(d => d.ApproverFirstName, opt => opt.MapFrom(s => s.ApproverFirstName))
                 .ForMember(d => d.ApproverLastName, opt => opt.MapFrom(s => s.ApproverLastName))
                 .ForMember(d => d.ApproverJobTitle, opt => opt.MapFrom(s => s.ApproverJobTitle))

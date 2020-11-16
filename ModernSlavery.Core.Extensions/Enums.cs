@@ -24,8 +24,8 @@ namespace ModernSlavery.Core.Extensions
             return Enum.GetValues(typeof(T)).Cast<T>();
         }
 
-        public static IEnumerable<T> GetValuesExcept<T>(params T[] except) where T : Enum
-            => GetValues<T>().Where(e => !except.Contains(e));
+        public static IEnumerable<T> GetValuesExcept<T>(params T[] exceptions) where T : Enum
+            => GetValues<T>().Except(exceptions);
 
         /// <summary>
         /// Returns the description text provided by a DescriptionAttribute or DisplayAttribute
@@ -38,7 +38,7 @@ namespace ModernSlavery.Core.Extensions
         {
             if (value==null || value.Equals(default(T))) throw new ArgumentNullException(nameof(value));
 
-            var description=value.GetAttribute<DescriptionAttribute>()?.Description;
+            var description = value.GetAttribute<DescriptionAttribute>()?.Description;
             if (string.IsNullOrWhiteSpace(description)) description=value.GetAttribute<DisplayAttribute>()?.Description;
             if (string.IsNullOrWhiteSpace(description)) description= value.ToString();
             return description;

@@ -14,6 +14,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<StatementModel, ComplianceViewModel>();
 
             CreateMap<ComplianceViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.OrganisationId, opt => opt.Ignore())
+                .ForMember(d => d.OrganisationName, opt => opt.Ignore())
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForMember(d => d.StructureDetails, opt => opt.MapFrom(s => s.StructureDetails))
                 .ForMember(d => d.IncludesPolicies, opt => opt.MapFrom(s => s.IncludesPolicies))
                 .ForMember(d => d.PolicyDetails, opt => opt.MapFrom(s => s.PolicyDetails))

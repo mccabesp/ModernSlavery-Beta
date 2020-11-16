@@ -24,6 +24,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.Risk, opt => opt.MapFrom((s, d) => s.Summary.Risks.Count > d.Index ? s.Summary.Risks[d.Index] : new StatementRisk()));
 
             CreateMap<HighRiskViewModel, StatementModel>(MemberList.None)
+                .ForMember(d => d.OrganisationId, opt => opt.Ignore())
+                .ForMember(d => d.OrganisationName, opt => opt.Ignore())
+                .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .BeforeMap((s, d) => s.Risk.Description = d.Summary.Risks[s.Index].Description)
                 .AfterMap((s, d) => d.Summary.Risks[s.Index] = s.Risk);
         }
