@@ -332,9 +332,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             if (viewModel is GroupSearchViewModel)
             {
                 var searchViewModel = viewModel as GroupSearchViewModel;
-                //Copy changes to the review model
-                var reviewViewModel = UnstashModel<GroupReviewViewModel>();
-                if (reviewViewModel != null) searchViewModel.StatementOrganisations = reviewViewModel.StatementOrganisations;
 
                 //Copy the previous search results
                 var stashedViewModel = UnstashModel<GroupSearchViewModel>();
@@ -353,10 +350,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             else if (viewModel is GroupAddViewModel)
             {
                 var addViewModel = viewModel as GroupAddViewModel;
-                //Copy changes to the review model
-                var reviewViewModel = UnstashModel<GroupReviewViewModel>();
-                if (reviewViewModel != null) addViewModel.StatementOrganisations = reviewViewModel.StatementOrganisations;
 
+                //TODO: better way to handle this??
                 var history = PageHistory.FirstOrDefault();
                 if (!history.Contains("add"))
                 {
@@ -367,42 +362,19 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                         addViewModel.NewOrganisationName = stashedViewModel.SearchKeywords;
                     }
                 }
-
-                //Add the add search model to session
-                StashModel(addViewModel);
             }
             else if (viewModel is GroupReviewViewModel)
             {
                 var reviewViewModel = viewModel as GroupReviewViewModel;
-                var history = PageHistory.FirstOrDefault();
-                if (history.Contains("add"))
-                {
-                    // Copy changes to the review model from add view model
-                    var addViewModel = UnstashModel<GroupAddViewModel>();
-                    if (addViewModel != null) reviewViewModel.StatementOrganisations = addViewModel.StatementOrganisations;
-                }
-                else
-                {   //copy changes to the review model from the search view model
-                    var searchViewModel = UnstashModel<GroupSearchViewModel>();
-                    if (searchViewModel != null) reviewViewModel.StatementOrganisations = searchViewModel.StatementOrganisations;
-                }
 
                 //Populate the extra submission info
                 await SubmissionPresenter.GetOtherSubmissionsInformationAsync(reviewViewModel, GetReportingDeadlineYear());
 
-                //Add the group search model to session
-                StashModel(reviewViewModel);
             }
             else
             {
                 //Remove the group search model from session
                 UnstashModel<GroupSearchViewModel>(true);
-
-                //Remove the group review model from session
-                UnstashModel<GroupReviewViewModel>(true);
-
-                //remove the group add model from session
-                UnstashModel<GroupAddViewModel>(true);
             }
 
             //Otherwise return the view using the populated ViewModel
@@ -426,7 +398,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                         return View(viewModel);
                     }
 
-                    //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+                    //Save the new ViewMOdel
                     var viewModelResult = await SubmissionPresenter.SaveViewModelAsync(viewModel, organisationIdentifier, year, VirtualUser.UserId, arguments);
 
                     //Handle any StatementErrors
@@ -676,7 +648,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     var outcome = await SubmissionPresenter.IncludeGroupOrganisationAsync(viewModel, addIndex);
 
                     //Handle any errors
-                    if (!outcome.Success) HandleStatementErrors(outcome.Errors);
+                    if (!outcome.Success) return HandleStatementErrors(outcome.Errors);
                 }
                 else
                 {
@@ -689,13 +661,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 //Populate the extra submission info
                 await SubmissionPresenter.GetOtherSubmissionsInformationAsync(viewModel, GetReportingDeadlineYear());
 
-                //Copy changes to the search review model
-                var reviewViewModel = UnstashModel<GroupReviewViewModel>();
-                if (reviewViewModel != null)
-                {
-                    reviewViewModel.StatementOrganisations = viewModel.StatementOrganisations;
-                    StashModel(reviewViewModel);
-                }
+                //Save to Draft file
+                var viewModelResult = await SubmissionPresenter.SaveViewModelAsync(viewModel, organisationIdentifier, year, VirtualUser.UserId, null);
+
+                //Handle any StatementErrors
+                if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
+
             }
             else
                 throw new NotImplementedException();
@@ -720,14 +691,18 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/group-add")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GroupAdd(GroupAddViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, int addIndex = -1, int removeIndex = -1)
+        public async Task<IActionResult> GroupAdd(GroupAddViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, int addIndex = -1, int removeIndex = -1, params object[] arguments)
         {
-            //Get the saved viewmodel information from session
-            var stashedModel = UnstashModel<GroupAddViewModel>();
+            //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+            var viewModelResult = await SubmissionPresenter.GetViewModelAsync<GroupAddViewModel>(organisationIdentifier, year, VirtualUser.UserId, arguments);
+            ////Handle any StatementErrors
+            if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
+            var viewModelDraft = viewModelResult.Result;
 
             //Rebuild the search model from the postback          
-            stashedModel.NewOrganisationName = viewModel.NewOrganisationName;
-            viewModel = stashedModel;
+            viewModelDraft.NewOrganisationName = viewModel.NewOrganisationName;
+            viewModel = viewModelDraft;
+
 
             if (addIndex > -1 || removeIndex > -1)
             {
@@ -747,35 +722,35 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     var outcome = await SubmissionPresenter.AddGroupOrganisationAsync(viewModel);
 
                     //Handle any errors
-                    if (!outcome.Success) HandleStatementErrors(outcome.Errors);
+                    if (!outcome.Success) return HandleStatementErrors(outcome.Errors);
 
-                    //Clear the input name 
-                    viewModel.NewOrganisationName = null;
                 }
                 else
                 {
                     //Remove the selected organisation
                     viewModel.StatementOrganisations.RemoveAt(removeIndex);
-                    //keep search keywords empty                       
-                    viewModel.NewOrganisationName = null;
                 }
 
-                //Populate the extra submission info
-                await SubmissionPresenter.GetOtherSubmissionsInformationAsync(viewModel, GetReportingDeadlineYear());
+                //Clear the input name 
+                viewModel.NewOrganisationName = null;
 
-                //Copy changes to the search review model 
-                var reviewViewModel = UnstashModel<GroupReviewViewModel>();
-                if (reviewViewModel != null)
+                //Save the new ViewModel
+                var viewModelResultForSave = await SubmissionPresenter.SaveViewModelAsync(viewModel, organisationIdentifier, year, VirtualUser.UserId, arguments);
+
+                //Handle any StatementErrors
+                if (viewModelResultForSave.Fail) return HandleStatementErrors(viewModelResultForSave.Errors);
+
+                //Copy changes to the search view model
+                var searchViewModel = UnstashModel<GroupSearchViewModel>();
+                if (searchViewModel != null)
                 {
-                    reviewViewModel.StatementOrganisations = viewModel.StatementOrganisations;
-                    StashModel(reviewViewModel);
+                    searchViewModel.StatementOrganisations = viewModel.StatementOrganisations;
+                    StashModel(searchViewModel);
                 }
+
             }
             else
                 throw new NotImplementedException();
-
-            //Add the add search model to session
-            StashModel(viewModel);
 
             //Must clear otherwise hidden for doesnt work
             ModelState.Clear();
@@ -793,10 +768,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/group-review")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GroupReview(string organisationIdentifier, int year, BaseViewModel.CommandType command, int removeIndex = -1)
+        public async Task<IActionResult> GroupReview(GroupReviewViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, int removeIndex = -1, params object[] arguments)
         {
-            //Get the saved viewmodel information from session
-            var viewModel = UnstashModel<GroupReviewViewModel>();
+            //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
+            var viewModelDraft = await SubmissionPresenter.GetViewModelAsync<GroupReviewViewModel>(organisationIdentifier, year, VirtualUser.UserId, arguments);
+            ////Handle any StatementErrors
+            if (viewModelDraft.Fail) return HandleStatementErrors(viewModelDraft.Errors);
+
+            viewModel = viewModelDraft.Result;
 
             if (command.IsAny(BaseViewModel.CommandType.Continue, BaseViewModel.CommandType.Skip))
             {
@@ -808,6 +787,12 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 //Remove the selected organisation
                 viewModel.StatementOrganisations.RemoveAt(removeIndex);
 
+                //Save the new ViewModel
+                var viewModelResult = await SubmissionPresenter.SaveViewModelAsync(viewModel, organisationIdentifier, year, VirtualUser.UserId, null);
+
+                //Handle any StatementErrors
+                if (viewModelResult.Fail) return HandleStatementErrors(viewModelResult.Errors);
+
                 //Copy changes to the search view model
                 var searchViewModel = UnstashModel<GroupSearchViewModel>();
                 if (searchViewModel != null)
@@ -818,9 +803,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
             else
                 throw new NotImplementedException();
-
-            //Add the group search model to session
-            StashModel(viewModel);
 
             //Must clear otherwise hidden for doesnt work
             ModelState.Clear();
