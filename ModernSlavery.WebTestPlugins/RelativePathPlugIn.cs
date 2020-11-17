@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net;
 using Microsoft.VisualStudio.TestTools.WebTesting;
-using System.Linq;
-namespace WebPlugins
+namespace ModernSlavery.WebTestPlugins
 {
     public class RelativePathPlugIn : WebTestPlugin
     {

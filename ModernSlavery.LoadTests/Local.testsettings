@@ -2,7 +2,11 @@
 <TestSettings name="Local" id="13ee58c6-fc1e-4f2d-b380-fe80a527b73f" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Description>These are default test settings for a local test run.</Description>
   <Deployment enabled="false" />
-  <Execution hostProcessPlatform="MSIL">
+  <NamingScheme baseName="Local" useDefault="false" />
+  <Execution>
+    <Hosts skipUnhostableTests="false">
+      <AspNet name="ASP.NET" executionType="WebDev" />
+    </Hosts>
     <TestTypeSpecific>
       <UnitTestRunConfig testTypeId="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b">
         <AssemblyResolution>

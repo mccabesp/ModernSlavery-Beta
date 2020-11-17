@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.WebTesting;
 
-namespace WebPlugins
+namespace ModernSlavery.WebTestPlugins
 {
     public class RandomIntPlugin : WebTestPlugin
     {

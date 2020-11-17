@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web;
+﻿using System.Web;
 using Microsoft.VisualStudio.TestTools.WebTesting;
 
-namespace WebPlugins
+namespace ModernSlavery.WebTestPlugins
 {
     public class HtmlDecodePlugin : WebTestPlugin
     {

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<TestSettings name="Web Tests Runner" id="e016428c-413a-47cd-9155-363486b630e5" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestSettings name="Azure Load Tests" id="e016428c-413a-47cd-9155-363486b630e5" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Description>These are default test settings for a local test run.</Description>
   <Execution hostProcessPlatform="MSIL">
     <TestTypeSpecific>

@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using Microsoft.VisualStudio.TestTools.WebTesting;
-using System.Linq;
-using System.Diagnostics;
 
-namespace WebPlugins
+namespace ModernSlavery.WebTestPlugins
 {
     public class CookieManagerPlugin : WebTestPlugin
     {

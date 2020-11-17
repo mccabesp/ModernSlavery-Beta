@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.WebTesting;
 
-namespace WebPlugins
+namespace ModernSlavery.WebTestPlugins
 {
-    public class RandomAdminPlugin : WebTestPlugin
+    public class RandomEmailPlugin : WebTestPlugin
     {
         // Properties for the plugin.  
         public string ContextParamTarget { get; set; }
@@ -13,7 +12,7 @@ namespace WebPlugins
         {
             var guid = Guid.NewGuid().ToString().ToLower().Replace("-", "");
             //var val=new Random().Next(1,int.MaxValue-1);
-            e.WebTest.Context[ContextParamTarget] = $"GPGTEST{guid}@geo.gov.uk";
+            e.WebTest.Context[ContextParamTarget] = $"TISCTEST{guid}@domain.co.uk";
         }
     }
 }

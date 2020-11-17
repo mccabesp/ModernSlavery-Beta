@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -8,10 +7,9 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{637D90F3-7735-45CE-B101-D9BEC62AAC19}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ModernSlavery.LoadTests</RootNamespace>
     <AssemblyName>ModernSlavery.LoadTests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TestProjectType>WebTest</TestProjectType>
@@ -19,6 +17,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,24 +36,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'TEST.Debug|AnyCPU'">
-    <OutputPath>bin\TEST.Debug\</OutputPath>
-    <DefineConstants>TRACE;TEST</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.LoadTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.VisualStudio.QualityTools.LoadTestFramework.15.0.26208\lib\Microsoft.VisualStudio.QualityTools.LoadTestFramework\Microsoft.VisualStudio.QualityTools.LoadTestFramework.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.VisualStudio.QualityTools.WebTestFramework.12.0.40629.1\lib\net40\Microsoft.VisualStudio.QualityTools.WebTestFramework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.LoadTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -68,139 +52,74 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WebTestPlugins\HtmlDecodePlugin.cs" />
-    <Compile Include="WebTestPlugins\ExtractTagInnerHtml.cs" />
-    <Compile Include="WebTestPlugins\RandomIntPlugin.cs" />
-    <Compile Include="WebTestPlugins\RelativePathPlugIn.cs" />
-    <Compile Include="WebTestPlugins\RandomAdminPlugin.cs" />
-    <Compile Include="WebTestPlugins\CookieManagerPlugin.cs" />
-    <Compile Include="WebTestPlugins\RandomGuidPlugin.cs" />
-    <Compile Include="WebTestPlugins\RandomEmailPlugin.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Archive\DV QuickSmokeTest.webtest">
+    <None Include="Load Tests\MSU increment to 1k - core.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="MSU increment to 1k - core.loadtest">
+    <None Include="Load Tests\MSU increment to 20k in 3 hr - core.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="MSU increment to 20k in 3 hr - core.loadtest">
+    <None Include="Load Tests\MSU Quick Load2.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="MSU Quick Load2.loadtest">
+    <None Include="Load Tests\MSU Quick Soak.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="MSU Quick Soak.loadtest">
+    <None Include="Load Tests\MSU Quick Load.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="MSU Quick Load.loadtest">
+    <None Include="Load Tests\MSU increment to 20k in 3 hr.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Archive\LoadTest1.loadtest">
+    <None Include="Load Tests\MSU Quick Soak2.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="MSU increment to 20k in 3 hr.loadtest">
+    <None Include="Scenarios\Administrator User Journey.webtest" />
+    <None Include="Scenarios\Anonymous User Journey.webtest" />
+    <None Include="Scenarios\Private Organisation User Journey.webtest" />
+    <None Include="Scenarios\Public Organisation User Journey.webtest" />
+    <None Include="Web Tests\Reset Password.webtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="MSU Quick Soak2.loadtest">
+    <None Include="Web Tests\Logout.webtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Local.testsettings" />
-    <None Include="Login2.webtest">
+    <None Include="Web Tests\Create Draft Statement.webtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Logout2.webtest">
+    <None Include="Web Tests\Register Private Organisation.webtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="LogoutDelete.webtest">
+    <None Include="Web Tests\Create User Account.webtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Logout.webtest">
+    <None Include="Web Tests\Scoping\EnterAnswers.webtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="LogoutDelete2.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="packages.config" />
-    <None Include="Archive\PP QuickSmokeTest.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Archive\RegisterPrivate.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="runner.testsettings" />
-    <None Include="Scenarios\Create Draft Statement.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Scenarios\Register Private Organisation.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Scenarios\Create User Account.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Scenarios\Reset Password.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Scoping\EnterAnswers.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Scoping\OutOfScope.webtest">
+    <None Include="Web Tests\Scoping\OutOfScope.webtest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Scoping\PreviousSubmission.webtest">
+    <None Include="Web Tests\Scoping\PreviousSubmission.webtest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Archive\ST QuickSmokeTest.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Archive\PR QuickSmokeTest.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Archive\Local QuickSmokeTest.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Archive\TE QuickSmokeTest.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Archive\RegisterManual.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Archive\RegisterPrivate5.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="SmokeTest.webtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Archive\RegisterPublic5.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Archive\Viewing.webtest">
+    <None Include="Web Tests\Scoping\EnterCodes.webtest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Archive\RegisterPublic.webtest">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Archive\RegisterManual5.webtest">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Archive\Viewing5.webtest">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Scoping\EnterCodes.webtest">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Login.webtest">
+    <None Include="Web Tests\Login.webtest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="SearchTest.webtest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="SmokeTest2.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\ModernSlavery.WebTestPlugins\ModernSlavery.WebTestPlugins.csproj">
+      <Project>{944cd711-4459-444d-90f3-6c18adf25753}</Project>
+      <Name>ModernSlavery.WebTestPlugins</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
