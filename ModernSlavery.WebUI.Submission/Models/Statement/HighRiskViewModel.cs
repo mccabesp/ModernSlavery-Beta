@@ -36,9 +36,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .AfterMap((s, d) =>
                 {
                     d.Summary.Risks[s.Index].Targets = new SortedSet<RiskTargetTypes>(s.Targets);
-                    d.Summary.Risks[s.Index].OtherTargets = s.OtherTargets;
+                    d.Summary.Risks[s.Index].OtherTargets = s.Targets.Contains(RiskTargetTypes.Other) ? s.OtherTargets : null;
                     d.Summary.Risks[s.Index].LikelySource = s.LikelySource;
-                    d.Summary.Risks[s.Index].OtherLikelySource = s.OtherLikelySource;
+                    d.Summary.Risks[s.Index].OtherLikelySource = s.LikelySource == RiskSourceTypes.Other ? s.OtherLikelySource : null;
                     d.Summary.Risks[s.Index].SupplyChainTiers = s.SupplyChainTiers.ToList();
                     d.Summary.Risks[s.Index].Countries = new SortedSet<CountryTypes>(s.Countries);
                 });

@@ -22,8 +22,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.OrganisationId, opt => opt.Ignore())
                 .ForMember(d => d.OrganisationName, opt => opt.Ignore())
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
-                .ForPath(d => d.Summary.TrainingTargets, opt => opt.MapFrom(s=>s.TrainingTargets))
-                .ForPath(d => d.Summary.OtherTrainingTargets, opt => opt.MapFrom(s=>s.OtherTrainingTargets));
+                .ForPath(d => d.Summary.TrainingTargets, opt => opt.MapFrom(s => s.TrainingTargets))
+                .ForPath(d => d.Summary.OtherTrainingTargets, opt => opt.MapFrom(s => s.TrainingTargets.Contains(TrainingTargetTypes.Other) ? s.OtherTrainingTargets : null));
         }
     }
 
