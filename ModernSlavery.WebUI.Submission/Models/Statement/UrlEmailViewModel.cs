@@ -49,6 +49,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 validationResults.AddValidationError(3102, nameof(StatementEmail));
             }
 
+            if (!string.IsNullOrWhiteSpace(StatementUrl) && !string.IsNullOrWhiteSpace(StatementEmail))
+            {
+                validationResults.AddValidationError(3105, nameof(StatementUrl));
+                validationResults.AddValidationError(3105, nameof(StatementEmail));
+            }
+
 
             return validationResults;
         }
