@@ -34,10 +34,12 @@ namespace ModernSlavery.Infrastructure.Search
         private readonly TelemetryClient _telemetryClient;
         public readonly IAuditLogger SearchLog;
         private readonly SharedOptions _sharedOptions;
+        private readonly TestOptions _testOptions;
         private readonly SearchOptions _searchOptions;
 
         public AzureOrganisationSearchRepository(
             SharedOptions sharedOptions,
+            TestOptions testOptions,
             SearchOptions searchOptions,
             [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog,
             IMapper autoMapper,
@@ -45,6 +47,7 @@ namespace ModernSlavery.Infrastructure.Search
             TelemetryClient telemetryClient = null)
         {
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
+            _testOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions));
             _searchOptions = searchOptions ?? throw new ArgumentNullException(nameof(searchOptions));
 
             Disabled = searchOptions.Disabled;
@@ -254,8 +257,8 @@ namespace ModernSlavery.Infrastructure.Search
                 throw new ArgumentNullException(nameof(newRecords), "You must supply at least one record to index");
 
             //Remove all test organisations
-            if (!string.IsNullOrWhiteSpace(_sharedOptions.TestPrefix))
-                newRecords = newRecords.Where(e => !e.OrganisationName.StartsWithI(_sharedOptions.TestPrefix));
+            if (!string.IsNullOrWhiteSpace(_testOptions.TestPrefix))
+                newRecords = newRecords.Where(e => !e.OrganisationName.StartsWithI(_testOptions.TestPrefix));
 
             //Ensure the records are ordered by name
             newRecords = newRecords.OrderBy(o => o.OrganisationName);

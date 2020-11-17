@@ -8,6 +8,7 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Interfaces;
@@ -21,7 +22,8 @@ namespace ModernSlavery.WebUI.Shared
         private readonly SharedOptions _sharedOptions;
         public DependencyModule(
             ILogger<DependencyModule> logger,
-            SharedOptions sharedOptions
+            SharedOptions sharedOptions,
+            TestOptions testOptions
         )
         {
             _logger = logger;
@@ -56,7 +58,6 @@ namespace ModernSlavery.WebUI.Shared
             //Configure dependencies here
             PasswordAttribute.SharedOptions = _sharedOptions;
             PinAttribute.SharedOptions = _sharedOptions;
-            SpamProtectionAttribute.SharedOptions = _sharedOptions;
         }
 
         public void RegisterModules(IList<Type> modules)
@@ -64,7 +65,6 @@ namespace ModernSlavery.WebUI.Shared
             //Register references dependency modules
             modules.AddDependency<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
             modules.AddDependency<ModernSlavery.WebUI.GDSDesignSystem.DependencyModule>();
-
         }
     }
 }

@@ -174,7 +174,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         protected async Task<TimeSpan> GetRetryLockRemainingTimeAsync(string retryLockKey, int expiryMinutes)
         {
-            if (SharedBusinessLogic.SharedOptions.SkipSpamProtection) return TimeSpan.Zero;
+            if (SharedBusinessLogic.TestOptions.SkipSpamProtection) return TimeSpan.Zero;
 
             var lockDate = await Cache.GetAsync<DateTime>($"{UserHostAddress}:{retryLockKey}");
             var remainingTime =
@@ -387,7 +387,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         public bool IsSuperAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(CurrentUser);
         public bool IsDatabaseAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsDatabaseAdministrator(CurrentUser);
 
-        public bool IsTestUser => CurrentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix);
+        public bool IsTestUser => CurrentUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix);
         public bool IsImpersonatingUser => OriginalUser != null && SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(OriginalUser);
 
         protected User VirtualUser =>

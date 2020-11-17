@@ -104,7 +104,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
                 ? TimeSpan.Zero
                 : lastPasswordResetDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes) -
                   VirtualDateTime.Now;
-            if (!SharedBusinessLogic.SharedOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
+            if (!SharedBusinessLogic.TestOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
                 return View("CustomError",
                     WebService.ErrorViewModelFactory.Create(1133,
                         new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
@@ -135,7 +135,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
                 ? TimeSpan.Zero
                 : lastPasswordResetDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes) -
                   VirtualDateTime.Now;
-            if (!SharedBusinessLogic.SharedOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
+            if (!SharedBusinessLogic.TestOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
                 ModelState.AddModelError(3026, null, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) });
 
             if (!ModelState.IsValid)
@@ -161,7 +161,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             //Ensure signup is restricted to every 10 mins
             await SetLastPasswordResetDateAsync(
-                model.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)
+                model.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix)
                     ? DateTime.MinValue
                     : VirtualDateTime.Now);
 
@@ -188,7 +188,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             //show confirmation
             ViewBag.EmailAddress = user.EmailAddress;
-            if (SharedBusinessLogic.SharedOptions.ShowEmailVerifyLink || user.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+            if (SharedBusinessLogic.TestOptions.ShowEmailVerifyLink || user.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
                 ViewBag.TestUrl = Url.Action(
                     "NewPassword",
                     "Account",

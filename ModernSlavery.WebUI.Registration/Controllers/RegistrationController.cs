@@ -113,7 +113,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
                     // Check if we are a test user (for load testing)
-                    if (SharedBusinessLogic.SharedOptions.PinInPostTestMode || userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+                    if (SharedBusinessLogic.TestOptions.PinInPostTestMode || userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
                     {
                         ViewBag.PinCode = pin;
                     }

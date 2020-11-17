@@ -5,12 +5,14 @@ using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.BusinessDomain.Shared
 {
     public interface ISharedBusinessLogic
     {
         SharedOptions SharedOptions { get; }
+        TestOptions TestOptions { get; }
         IFileRepository FileRepository { get; }
         IDataRepository DataRepository { get; }
         ISourceComparer SourceComparer { get; }
@@ -26,6 +28,7 @@ namespace ModernSlavery.BusinessDomain.Shared
     {
         public IObfuscator Obfuscator { get; }
         public SharedOptions SharedOptions { get; }
+        public TestOptions TestOptions { get; }
         public IFileRepository FileRepository { get; }
         public IDataRepository DataRepository { get; }
         public ISourceComparer SourceComparer { get; }
@@ -34,7 +37,7 @@ namespace ModernSlavery.BusinessDomain.Shared
         public IAuthorisationBusinessLogic AuthorisationBusinessLogic { get; }
         public IAuthenticationBusinessLogic AuthenticationBusinessLogic { get; }
         public IReportingDeadlineHelper ReportingDeadlineHelper { get; }
-        public SharedBusinessLogic(SharedOptions sharedOptions, IReportingDeadlineHelper reportingDeadlineHelper,
+        public SharedBusinessLogic(SharedOptions sharedOptions, TestOptions testOptions, IReportingDeadlineHelper reportingDeadlineHelper,
             ISourceComparer sourceComparer,
             ISendEmailService sendEmailService, 
             INotificationService notificationService, 
@@ -43,6 +46,7 @@ namespace ModernSlavery.BusinessDomain.Shared
             IFileRepository fileRepository, IDataRepository dataRepository, IObfuscator obfuscator)
         {
             SharedOptions = sharedOptions;
+            TestOptions = testOptions;
             ReportingDeadlineHelper = reportingDeadlineHelper;
             SourceComparer = sourceComparer;
             SendEmailService = sendEmailService;

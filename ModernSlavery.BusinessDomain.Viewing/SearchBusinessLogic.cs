@@ -23,6 +23,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
         #region Dependencies
         public SearchOptions SearchOptions { get; }
         public readonly SharedOptions _sharedOptions;
+        public readonly TestOptions _testOptions;
         private readonly IDataRepository _dataRepository;
         private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
         private readonly ISearchRepository<OrganisationSearchModel> _organisationSearchRepository;
@@ -35,6 +36,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
         public SearchBusinessLogic(
             SearchOptions searchOptions,
             SharedOptions sharedOptions,
+            TestOptions testOptions,
             IDataRepository dataRepository,
             IReportingDeadlineHelper reportingDeadlineHelper,
             ISearchRepository<OrganisationSearchModel> organisationSearchRepository,
@@ -43,6 +45,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
         {
             SearchOptions = searchOptions;
             _sharedOptions = sharedOptions;
+            _testOptions = testOptions;
             _dataRepository = dataRepository;
             _reportingDeadlineHelper = reportingDeadlineHelper;
             _organisationSearchRepository = organisationSearchRepository;
@@ -73,8 +76,8 @@ namespace ModernSlavery.BusinessDomain.Viewing
         public async Task RefreshSearchDocumentsAsync(IEnumerable<Organisation> organisations)
         {
             //Remove the test organisations
-            if (!string.IsNullOrWhiteSpace(_sharedOptions.TestPrefix))
-                organisations = organisations.Where(o => !o.OrganisationName.StartsWithI(_sharedOptions.TestPrefix));
+            if (!string.IsNullOrWhiteSpace(_testOptions.TestPrefix))
+                organisations = organisations.Where(o => !o.OrganisationName.StartsWithI(_testOptions.TestPrefix));
 
             //Remove those which are not to be searched
             organisations = LookupSearchableOrganisations(organisations.ToArray()).ToList();

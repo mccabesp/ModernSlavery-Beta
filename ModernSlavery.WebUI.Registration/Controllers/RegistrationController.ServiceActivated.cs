@@ -195,7 +195,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Log the registration
-            if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+            if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
                 await _registrationService.RegistrationLog.WriteAsync(
                     new RegisterLogModel
                     {

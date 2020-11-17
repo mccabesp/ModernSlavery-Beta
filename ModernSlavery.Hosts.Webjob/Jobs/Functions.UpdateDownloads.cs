@@ -77,7 +77,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             && r.Organisation.Status == OrganisationStatuses.Active)
                         .ToListAsync().ConfigureAwait(false);
                     statements.RemoveAll(r =>
-                        r.Organisation.OrganisationName.StartsWithI(_sharedOptions.TestPrefix));
+                        r.Organisation.OrganisationName.StartsWithI(_testOptions.TestPrefix));
 
                     var downloadData = statements.ToList()
                         .Select(r => DownloadModel.Create(r))

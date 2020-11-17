@@ -8,6 +8,7 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.WebUI.Registration.Classes
 {
@@ -16,15 +17,18 @@ namespace ModernSlavery.WebUI.Registration.Classes
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
         private readonly IDataRepository _DataRepository;
         private readonly SharedOptions _sharedOptions;
+        private readonly TestOptions _testOptions;
         private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
 
         public PublicSectorRepository(IDataRepository dataRepository, ICompaniesHouseAPI companiesHouseAPI,
             SharedOptions sharedOptions,
+            TestOptions testOptions,
             IOrganisationBusinessLogic organisationBusinessLogic)
         {
             _DataRepository = dataRepository;
             _CompaniesHouseAPI = companiesHouseAPI;
             _sharedOptions = sharedOptions;
+            _testOptions = testOptions;
             _organisationBusinessLogic = organisationBusinessLogic;
         }
 
@@ -41,7 +45,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
                 var id = Numeric.Rand(min, int.MaxValue - 1);
                 var organisation = new OrganisationRecord
                 {
-                    OrganisationName = _sharedOptions.TestPrefix + "_GovDept_" + id,
+                    OrganisationName = _testOptions.TestPrefix + "_GovDept_" + id,
                     CompanyNumber = ("_" + id).Left(10),
                     Address1 = "Test Address 1",
                     Address2 = "Test Address 2",

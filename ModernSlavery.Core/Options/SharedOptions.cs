@@ -47,8 +47,6 @@ namespace ModernSlavery.Core.Models
         public bool EnableSubmitAlerts { get; set; } = true;
 
         public bool MaintenanceMode { get; set; }
-        public bool StickySessions { get; set; } = true;
-
 
         public DateTime PrivacyChangedDate { get; set; }
         public int EmailVerificationExpiryHours { get; set; }
@@ -85,7 +83,6 @@ namespace ModernSlavery.Core.Models
         public string PinChars { get; set; }
         public string PinRegex { get; set; }
         public string PinRegexError { get; set; }
-        public string TestPrefix { get; set; }
         public string WhoNeedsToReportGuidanceLink { get; set; }
 
         public Version Version => Misc.GetTopAssembly().GetName().Version;
@@ -109,16 +106,12 @@ namespace ModernSlavery.Core.Models
         public string CertFilepath { get; set; }
         public string CertPassword { get; set; }
 
-        public bool SkipSpamProtection { get; set; }
-
         public int[] ReminderEmailDays
         {
             get => _reminderEmailDays;
             set => _reminderEmailDays = value.OrderBy(d => d).ToArray();
         }
 
-        public bool PinInPostTestMode { get; set; }
-        public bool ShowEmailVerifyLink { get; set; }
         public string GoogleAnalyticsAccountId { get; set; }
 
         #region Environment
@@ -175,9 +168,6 @@ namespace ModernSlavery.Core.Models
             //Check security settings for production environment
             if (IsProduction())
             {
-                if (ShowEmailVerifyLink) exceptions.Add(new ConfigurationErrorsException("ShowEmailVerifyLink is not permitted in Production environment"));
-                if (PinInPostTestMode) exceptions.Add(new ConfigurationErrorsException("PinInPostTestMode is not permitted in Production environment"));
-                if (SkipSpamProtection) exceptions.Add(new ConfigurationErrorsException("SkipSpamProtection is not permitted in Production environment"));
                 if (string.IsNullOrWhiteSpace(DefaultEncryptionKey)) exceptions.Add(new ConfigurationErrorsException("DefaultEncryptionKey cannot be empty in Production environment"));
                 if (DefaultEncryptionKey == Encryption.DefaultEncryptionKey) exceptions.Add(new ConfigurationErrorsException("DefaultEncryptionKey cannot use default value in Production environment"));
                 if (ObfuscationSeed.IsAny(0, 127)) exceptions.Add(new ConfigurationErrorsException("ObfuscationSeed cannot use default value in Production environment"));

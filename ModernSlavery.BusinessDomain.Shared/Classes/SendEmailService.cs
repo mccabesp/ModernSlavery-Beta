@@ -16,12 +16,14 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
     {
         private readonly EmailOptions EmailOptions;
         private readonly SharedOptions SharedOptions;
+        private readonly TestOptions TestOptions;
 
-        public SendEmailService(SharedOptions sharedOptions, EmailOptions emailOptions,
+        public SendEmailService(EmailOptions emailOptions, SharedOptions sharedOptions, TestOptions testOptions,
             ILogger<SendEmailService> logger, [KeyFilter(QueueNames.SendEmail)] IQueue sendEmailQueue)
         {
-            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             EmailOptions = emailOptions ?? throw new ArgumentNullException(nameof(emailOptions));
+            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
+            TestOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             SendEmailQueue = sendEmailQueue ?? throw new ArgumentNullException(nameof(sendEmailQueue));
         }
@@ -46,7 +48,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             {
                 Url = verifyUrl,
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
+                Test = emailAddress.StartsWithI(TestOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(createAccountPendingTemplate);
@@ -58,7 +60,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             {
                 Url = verifyUrl,
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
+                Test = emailAddress.StartsWithI(TestOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changeEmailPendingTemplate);
@@ -69,7 +71,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             var changeEmailCompletedVerification = new ChangeEmailCompletedVerificationTemplate
             {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
+                Test = emailAddress.StartsWithI(TestOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changeEmailCompletedVerification);
@@ -80,7 +82,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             var changeEmailCompletedNotification = new ChangeEmailCompletedNotificationTemplate
             {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
+                Test = emailAddress.StartsWithI(TestOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changeEmailCompletedNotification);
@@ -91,7 +93,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             var changePasswordCompleted = new ChangePasswordCompletedTemplate
             {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix)
+                Test = emailAddress.StartsWithI(TestOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(changePasswordCompleted);
@@ -103,8 +105,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             {
                 Url = resetUrl,
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(SharedOptions.TestPrefix)
+                Test = emailAddress.StartsWithI(TestOptions.TestPrefix),
+                Simulate = emailAddress.StartsWithI(TestOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(resetPasswordVerification);
@@ -115,8 +117,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             var resetPasswordCompleted = new ResetPasswordCompletedTemplate
             {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(SharedOptions.TestPrefix)
+                Test = emailAddress.StartsWithI(TestOptions.TestPrefix),
+                Simulate = emailAddress.StartsWithI(TestOptions.TestPrefix)
             };
 
             return await QueueEmailAsync(resetPasswordCompleted);
@@ -166,8 +168,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             var organisationRegistrationApproved = new OrganisationRegistrationApprovedTemplate
             {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(SharedOptions.TestPrefix),
+                Test = emailAddress.StartsWithI(TestOptions.TestPrefix),
+                Simulate = emailAddress.StartsWithI(TestOptions.TestPrefix),
                 OrganisationName = organisationName,
                 Url = returnUrl
             };
@@ -180,8 +182,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             var organisationRegistrationDeclined = new OrganisationRegistrationDeclinedTemplate
             {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(SharedOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(SharedOptions.TestPrefix),
+                Test = emailAddress.StartsWithI(TestOptions.TestPrefix),
+                Simulate = emailAddress.StartsWithI(TestOptions.TestPrefix),
                 OrganisationName = organisationName,
                 Reason = reason
             };

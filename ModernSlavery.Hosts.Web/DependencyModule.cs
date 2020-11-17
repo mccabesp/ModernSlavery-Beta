@@ -39,6 +39,7 @@ namespace ModernSlavery.Hosts.Web
         private readonly ILogger _logger;
 
         private readonly SharedOptions _sharedOptions;
+        private readonly TestOptions _testOptions;
         private readonly ResponseCachingOptions _responseCachingOptions;
         private readonly DistributedCacheOptions _distributedCacheOptions;
         private readonly DataProtectionOptions _dataProtectionOptions;
@@ -48,7 +49,8 @@ namespace ModernSlavery.Hosts.Web
 
         public DependencyModule(
             ILogger<DependencyModule> logger,
-            SharedOptions sharedOptions, 
+            SharedOptions sharedOptions,
+            TestOptions testOptions,
             ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions,
             DataProtectionOptions dataProtectionOptions, BasicAuthenticationOptions basicAuthenticationOptions,
             DynamicRoutesOptions dynamicRoutesOptions,
@@ -56,6 +58,7 @@ namespace ModernSlavery.Hosts.Web
         {
             _logger = logger;
             _sharedOptions = sharedOptions;
+            _testOptions = testOptions;
             _responseCachingOptions = responseCachingOptions;
             _distributedCacheOptions = distributedCacheOptions;
             _dataProtectionOptions = dataProtectionOptions;
@@ -222,7 +225,7 @@ namespace ModernSlavery.Hosts.Web
             app.UseAuthorization();
             app.UseCookiePolicy();
             app.UseMiddleware<MaintenancePageMiddleware>(_sharedOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
-            app.UseMiddleware<StickySessionMiddleware>(_sharedOptions.StickySessions); //Enable/Disable sticky sessions based on  
+            app.UseMiddleware<StickySessionMiddleware>(_testOptions.StickySessions); //Enable/Disable sticky sessions based on  
             app.UseMiddleware<SecurityHeaderMiddleware>(); //Add/remove security headers from all responses
 
             //Force basic authentication

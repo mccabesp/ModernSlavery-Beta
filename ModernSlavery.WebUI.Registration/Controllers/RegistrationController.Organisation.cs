@@ -163,7 +163,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             model.SearchText,
                             1,
                             SharedBusinessLogic.SharedOptions.OrganisationPageSize,
-                            VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
+                            VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
                     }
                     catch (Exception ex)
                     {
@@ -181,7 +181,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         await _registrationService.SharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
                             "GPG - COMPANIES HOUSE ERROR",
                             $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
-                            VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
+                            VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
                         return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                     }
 
@@ -191,7 +191,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         model.SearchText,
                         1,
                         SharedBusinessLogic.SharedOptions.OrganisationPageSize,
-                        VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
+                        VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
 
                     break;
 
@@ -359,7 +359,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                                 model.SearchText,
                                 nextPage,
                                 SharedBusinessLogic.SharedOptions.OrganisationPageSize,
-                                VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
+                                VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
                         }
                         catch (Exception ex)
                         {
@@ -377,7 +377,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             await _registrationService.SharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
                                 "GPG - COMPANIES HOUSE ERROR",
                                 $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
-                                VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
+                                VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
                             return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                         }
 
@@ -400,7 +400,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             model.SearchText,
                             nextPage,
                             SharedBusinessLogic.SharedOptions.OrganisationPageSize,
-                            VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
+                            VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
                         break;
 
                     default:
@@ -971,7 +971,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 if (!model.ManualRegistration && string.IsNullOrWhiteSpace(organisation.SicCodeIds))
                 {
                     organisation.SicSource = "CoHo";
-                    if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+                    if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
                     {
                         var sic = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<SicCode>(s =>
                             s.SicSectionId != "X");
@@ -1018,7 +1018,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             await _registrationService.SharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
                                 "GPG - COMPANIES HOUSE ERROR",
                                 $"Cant get SIC Codes from Companies House API for company {organisation.OrganisationName} No:{organisation.CompanyNumber} due to following error:\n\n{ex.Message}",
-                                VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
+                                VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
                             return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                         }
 
@@ -1207,7 +1207,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 var reviewCode = Encryption.EncryptQuerystring(
                     userOrg.UserId + ":" + userOrg.OrganisationId + ":" + VirtualDateTime.Now.ToSmallDateTime());
 
-                if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+                if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
                     TempData["TestUrl"] = Url.ActionArea("ReviewRequest", "Admin", "Admin", new { code = reviewCode });
 
                 return RedirectToAction("RequestReceived");
@@ -1217,7 +1217,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (sector == SectorTypes.Public || model.IsFastTrackAuthorised)
             {
                 //Log the registration
-                if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+                if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
                     await _registrationService.RegistrationLog.WriteAsync(
                         new RegisterLogModel
                         {
@@ -1648,14 +1648,14 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         $"{model.ContactFirstName} {VirtualUser.ContactLastName} ({VirtualUser.JobTitle})",
                         org.OrganisationName,
                         address.GetAddressString(),
-                        VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
+                        VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
                 else
                     await SendGEORegistrationRequestAsync(
                         userOrg,
                         $"{VirtualUser.Fullname} ({VirtualUser.JobTitle})",
                         org.OrganisationName,
                         address.GetAddressString(),
-                        VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix));
+                        VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
             }
 
             return userOrg;
@@ -1673,7 +1673,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var reviewUrl = Url.ActionArea("ReviewRequest", "Admin", "Admin", new { code = reviewCode }, protocol: "https");
 
             //If the email address is a test email then simulate sending
-            if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)) return;
+            if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix)) return;
 
             await _registrationService.SharedBusinessLogic.SendEmailService.SendGEORegistrationRequestAsync(reviewUrl,
                 contactName, reportingOrg, reportingAddress, test);
@@ -1691,7 +1691,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             //Clear the stash
             ClearStash();
 
-            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) &&
+            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix) &&
                 TempData.ContainsKey("TestUrl")) ViewBag.TestUrl = TempData["TestUrl"];
 
             return View("RequestReceived");

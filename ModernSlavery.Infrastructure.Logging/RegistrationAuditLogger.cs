@@ -6,15 +6,18 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.Core.Options;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
 
 namespace ModernSlavery.Infrastructure.Logging
 {
     public class RegistrationAuditLogger : AuditLogger, IRegistrationLogger
     {
-        public RegistrationAuditLogger(SharedOptions sharedOptions,
+        public RegistrationAuditLogger(
+            SharedOptions sharedOptions,
+            TestOptions testOptions,
             LogRecordQueue queue)
-            : base(sharedOptions, queue,Filenames.RegistrationLog)
+            : base(sharedOptions, testOptions, queue, Filenames.RegistrationLog)
         {
         }
 
@@ -39,7 +42,7 @@ namespace ModernSlavery.Infrastructure.Logging
             var logUser = logUserOrg.User;
             var logAddress = logUserOrg.Address;
 
-            if (logUser.EmailAddress.StartsWithI(SharedOptions.TestPrefix)) return;
+            if (logUser.EmailAddress.StartsWithI(TestOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new RegisterLogModel

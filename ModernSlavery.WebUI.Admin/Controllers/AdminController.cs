@@ -111,7 +111,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     .OrderBy(uo => uo.PINConfirmedDate))
                 {
                     //Dont log test registrations
-                    if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)) continue;
+                    if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix)) continue;
 
                     var status = await SharedBusinessLogic.DataRepository.GetAll<OrganisationStatus>()
                         .FirstOrDefaultAsync(
@@ -189,7 +189,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (var statement in SharedBusinessLogic.DataRepository.GetAll<Statement>().OrderBy(r => r.StatusDate))
                 {
                     //Dont log return for test organisations
-                    if (statement.Organisation.OrganisationName.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+                    if (statement.Organisation.OrganisationName.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
                         continue;
 
                     var status = await SharedBusinessLogic.DataRepository.GetAll<StatementStatus>()
@@ -1036,7 +1036,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             //Throw error if the user is not a super administrator of a test admin
             if (!IsSuperAdministrator && (!IsAdministrator || !IsTestUser ||
-                                          !emailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)))
+                                          !emailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix)))
                 return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a super administrator");
 
             if (string.IsNullOrWhiteSpace(emailAddress) || !emailAddress.IsEmailAddress())
@@ -1049,8 +1049,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var currentUser = SharedBusinessLogic.DataRepository.FindUser(User);
             if (currentUser == null || !_adminService.SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(currentUser)) throw new IdentityNotMappedException();
 
-            if (currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) &&
-                !emailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+            if (currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix) &&
+                !emailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
             {
                 ModelState.AddModelError(
                     "",

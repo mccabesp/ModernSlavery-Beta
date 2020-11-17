@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.Core.Options;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
 
 namespace ModernSlavery.Infrastructure.Logging
@@ -14,10 +15,12 @@ namespace ModernSlavery.Infrastructure.Logging
 
         private readonly IQueue queue;
         protected readonly SharedOptions SharedOptions;
+        protected readonly TestOptions TestOptions;
 
-        public AuditLogger(SharedOptions sharedOptions, LogRecordQueue queue, string fileName, string applicationName=null)
+        public AuditLogger(SharedOptions sharedOptions, TestOptions testOptions, LogRecordQueue queue, string fileName, string applicationName=null)
         {
             SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
+            TestOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions));
             if (string.IsNullOrWhiteSpace(applicationName)) applicationName=sharedOptions.ApplicationName;
             if (string.IsNullOrWhiteSpace(applicationName)) applicationName= AppDomain.CurrentDomain.FriendlyName;
 

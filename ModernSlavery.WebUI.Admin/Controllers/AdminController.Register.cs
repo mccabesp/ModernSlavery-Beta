@@ -501,7 +501,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (!await SendRegistrationAcceptedAsync(
                     userOrg.Organisation.OrganisationName,
                     userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress),
-                    userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)))
+                    userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix)))
                 {
                     ModelState.AddModelError(1132);
                     this.SetModelCustomErrors<OrganisationViewModel>();
@@ -509,7 +509,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 //Log the approval
-                if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+                if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
                     await _adminService.RegistrationLog.WriteAsync(
                         new RegisterLogModel
                         {
@@ -534,7 +534,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         });
 
                 //Show confirmation
-                if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+                if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
                     TempData["TestUrl"] = Url.Action("Impersonate", "Admin",
                         new {emailAddress = userOrg.User.EmailAddress});
 
@@ -617,7 +617,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (result != null) return result;
 
             //Log the rejection
-            if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+            if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
                 await _adminService.RegistrationLog.WriteAsync(
                     new RegisterLogModel
                     {
@@ -718,7 +718,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             //Clear the stash
             ClearStash();
 
-            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) &&
+            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix) &&
                 TempData.ContainsKey("TestUrl")) ViewBag.TestUrl = TempData["TestUrl"];
 
             return View("RequestAccepted", model);
@@ -741,7 +741,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             //Clear the stash
             ClearStash();
 
-            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
             {
                 UserOrganisation userOrg;
                 var result = UnwrapRegistrationRequest(model, out userOrg, true);

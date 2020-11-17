@@ -6,6 +6,7 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.Core.Options;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
 using Newtonsoft.Json;
 
@@ -15,8 +16,9 @@ namespace ModernSlavery.Infrastructure.Logging
     {
         public UserAuditLogger(
             SharedOptions sharedOptions,
+            TestOptions testOptions,
             LogRecordQueue queue)
-            : base(sharedOptions, queue, Filenames.UserLog)
+            : base(sharedOptions, testOptions, queue, Filenames.UserLog)
         {
         }
 
@@ -25,7 +27,7 @@ namespace ModernSlavery.Infrastructure.Logging
             User userToUpdate,
             string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(SharedOptions.TestPrefix)) return;
+            if (userToUpdate.EmailAddress.StartsWithI(TestOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new UserLogModel(
@@ -40,7 +42,7 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task LogPasswordChangedAsync(User userToUpdate, string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(SharedOptions.TestPrefix)) return;
+            if (userToUpdate.EmailAddress.StartsWithI(TestOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new UserLogModel(
@@ -58,7 +60,7 @@ namespace ModernSlavery.Infrastructure.Logging
             User userToUpdate,
             string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(SharedOptions.TestPrefix)) return;
+            if (userToUpdate.EmailAddress.StartsWithI(TestOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new UserLogModel(
@@ -73,7 +75,7 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task LogUserRetiredAsync(User retiredUser, string actionByEmailAddress)
         {
-            if (retiredUser.EmailAddress.StartsWithI(SharedOptions.TestPrefix)) return;
+            if (retiredUser.EmailAddress.StartsWithI(TestOptions.TestPrefix)) return;
 
             await WriteAsync(
                 new UserLogModel(

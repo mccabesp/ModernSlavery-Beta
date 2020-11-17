@@ -27,6 +27,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private readonly IAuditLogger _manualChangeLog;
         private readonly IMessenger _messenger;
         private readonly SharedOptions _sharedOptions;
+        private readonly TestOptions _testOptions;
         private readonly IFileRepository _fileRepository;
         private readonly IDataRepository _dataRepository;
         private readonly ISearchRepository<OrganisationSearchModel> _organisationSearchRepository;
@@ -48,6 +49,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             [KeyFilter(Filenames.ManualChangeLog)] IAuditLogger manualChangeLog,
             IMessenger messenger,
             SharedOptions sharedOptions,
+            TestOptions testOptions,
             IFileRepository fileRepository,
             IDataRepository dataRepository,
             IReportingDeadlineHelper reportingDeadlineHelper,
@@ -68,6 +70,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             _manualChangeLog = manualChangeLog;
             _messenger = messenger;
             _sharedOptions = sharedOptions;
+            _testOptions = testOptions;
             _fileRepository = fileRepository;
             _dataRepository = dataRepository;
             _reportingDeadlineHelper = reportingDeadlineHelper;

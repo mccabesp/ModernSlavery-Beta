@@ -14,6 +14,7 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Database
 {
@@ -24,13 +25,15 @@ namespace ModernSlavery.Infrastructure.Database
 
         private readonly DatabaseOptions _databaseOptions;
         private readonly SharedOptions _sharedOptions;
+        private readonly TestOptions _testOptions;
         private static bool _migrationEnsured;
         public bool MigrationsApplied { get; }
 
-        public DatabaseContext(SharedOptions sharedOptions, DatabaseOptions databaseOptions)
+        public DatabaseContext(SharedOptions sharedOptions, TestOptions testOptions, DatabaseOptions databaseOptions)
         {
-            _sharedOptions = sharedOptions;
-            _databaseOptions = databaseOptions;
+            _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
+            _testOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions));
+            _databaseOptions = databaseOptions ?? throw new ArgumentNullException(nameof(databaseOptions));
 
             if (!string.IsNullOrWhiteSpace(_databaseOptions.ConnectionString))
                 ConnectionString = _databaseOptions.ConnectionString;

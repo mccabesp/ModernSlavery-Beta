@@ -85,7 +85,7 @@ namespace ModernSlavery.WebUI.Account.ViewServices
                     }
                 });
 
-            if (!userToRetire.EmailAddress.StartsWithI(_sharedBusinessLogic.SharedOptions.TestPrefix))
+            if (!userToRetire.EmailAddress.StartsWithI(_sharedBusinessLogic.TestOptions.TestPrefix))
             {
                 // Create the close account notification to user
                 var sendEmails = new List<Task>();

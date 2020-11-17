@@ -58,7 +58,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             var remainingTime = lastSignupDate == DateTime.MinValue
                 ? TimeSpan.Zero
                 : lastSignupDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinSignupMinutes) - VirtualDateTime.Now;
-            if (!SharedBusinessLogic.SharedOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
+            if (!SharedBusinessLogic.TestOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
                 return View("CustomError",
                     WebService.ErrorViewModelFactory.Create(1125,
                         new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
@@ -101,7 +101,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             var remainingTime = lastSignupDate == DateTime.MinValue
                 ? TimeSpan.Zero
                 : lastSignupDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinSignupMinutes) - VirtualDateTime.Now;
-            if (!SharedBusinessLogic.SharedOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
+            if (!SharedBusinessLogic.TestOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
                 ModelState.AddModelError(3024, null, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) });
 
             if (!ModelState.IsValid)
@@ -168,7 +168,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             virtualUser.Firstname = model.FirstName;
             virtualUser.Lastname = model.LastName;
             virtualUser.JobTitle = model.JobTitle;
-            if (model.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix))
+            if (model.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
                 virtualUser._EmailAddress = model.EmailAddress;
             else
                 virtualUser.EmailAddress = model.EmailAddress;
@@ -207,7 +207,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             StashModel(model);
 
             //Ensure signup is restricted to every 10 min
-            await SetLastSignupDateAsync(model.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix)
+            await SetLastSignupDateAsync(model.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix)
                 ? DateTime.MinValue
                 : VirtualDateTime.Now);
 
@@ -306,8 +306,8 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
                 //If the email address is a test email then add to viewbag
 
-                if (virtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.SharedOptions.TestPrefix) ||
-                    SharedBusinessLogic.SharedOptions.ShowEmailVerifyLink) ViewBag.VerifyCode = verifyCode;
+                if (virtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix) ||
+                    SharedBusinessLogic.TestOptions.ShowEmailVerifyLink) ViewBag.VerifyCode = verifyCode;
 
                 //Tell them to verify email
 
