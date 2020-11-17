@@ -353,6 +353,9 @@ namespace ModernSlavery.WebUI.Account.Controllers
             }
             #endregion
 
+            //Always ensure user is signed in
+            if (VirtualUser == null) return new ChallengeResult();
+
             #region Check the verification code is correct
             //If too many wrong attempts
             if (virtualUser.VerifyAttempts >= SharedBusinessLogic.SharedOptions.MaxEmailVerifyAttempts &&
