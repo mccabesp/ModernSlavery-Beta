@@ -15,12 +15,13 @@
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
+            @Html.HiddenFor(m => m.TotalRisks);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
             </h1>
             <div class="govuk-details__text">
-                @Model.Risk.Description
+                @Model.Description
                 <a href="@Model.BackUrl">Edit</a>
             </div>
 
@@ -32,16 +33,16 @@
                         </h2>
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                        @foreach (var item in Enums.GetValuesExcept<RiskSourceTypes>(RiskSourceTypes.Unknown))
+                        @foreach (var riskSource in Enums.GetValuesExcept<RiskSourceTypes>(RiskSourceTypes.Unknown))
                         {
-                            var value = (int)item;
-                            var isOther = item == RiskSourceTypes.Other;
-                            var isSupplyChain = item == RiskSourceTypes.SupplyChains;
+                            var value = (int)riskSource;
+                            var isOther = riskSource == RiskSourceTypes.Other;
+                            var isSupplyChain = riskSource == RiskSourceTypes.SupplyChains;
 
                             <div class="govuk-radios__item">
-                                <input name="RiskType" class="govuk-radios__input" id="source-@value" type="radio" data-aria-controls="@(isOther || isSupplyChain ? $"conditional-source-{value}" : "")">
+                                <input name="LikelySource" class="govuk-radios__input" id="source-@value" value="@value" type="radio" checked=@(Model.LikelySource == riskSource) data-aria-controls="@(isOther || isSupplyChain ? $"conditional-source-{value}" : "")">
                                 <label class="govuk-label govuk-radios__label" for="source-@value">
-                                    @item.GetEnumDescription()
+                                    @riskSource.GetEnumDescription()
                                 </label>
                             </div>
 
@@ -63,7 +64,7 @@
                                                 </div>
                                             }
                                             <div class="govuk-checkboxes__item">
-                                                <input name="SupplyChainTiers" class="govuk-checkboxes__input" id="tier-@tierValue" type="checkbox" checked="@(Model.SupplyChainTiers.Contains(tier))">
+                                                <input name="SupplyChainTiers" class="govuk-checkboxes__input" id="tier-@tierValue" value="@tierValue" type="checkbox" checked="@(Model.SupplyChainTiers.Contains(tier))">
                                                 <label class="govuk-label govuk-checkboxes__label" for="tier-@tierValue">
                                                     @tier.GetEnumDescription()
                                                 </label>
@@ -80,8 +81,8 @@
                                         <label class="govuk-label" for="OtherLikelySource">
                                             Please specify
                                         </label>
-                                        <textarea class="govuk-textarea" id="OtherLikelySource" spellcheck="false" rows="5">@Model.Risk.OtherLikelySource</textarea>
-                                        <span asp-validation-for="Risk.OtherLikelySource" class="govuk-error-message"></span>
+                                        <textarea class="govuk-textarea" id="OtherLikelySource" spellcheck="false" rows="5">@Model.OtherLikelySource</textarea>
+                                        <span asp-validation-for="OtherLikelySource" class="govuk-error-message"></span>
                                     </div>
                                 </div>
                             }
@@ -101,20 +102,20 @@
                         @foreach (var targetType in Enums.GetValuesExcept<RiskTargetTypes>(RiskTargetTypes.Unknown))
                         {
                             <div class="govuk-checkboxes__item">
-                                <input name="Targets" value="@((int)targetType)" id="@($"target{(int)targetType}")" checked=@(Model.Risk.Targets.Contains(targetType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="targets-conditional-@((int)targetType)">
+                                <input name="Targets" value="@((int)targetType)" id="@($"target{(int)targetType}")" checked=@(Model.Targets.Contains(targetType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="targets-conditional-@((int)targetType)">
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"target{(int)targetType}")">
                                     @targetType.GetEnumDescription()
                                 </label>
                             </div>
                             @if (targetType == RiskTargetTypes.Other)
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.Risk.OtherTargets, "govuk-form-group--error")" id="targets-conditional-@((int)targetType)">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTargets, "govuk-form-group--error")" id="targets-conditional-@((int)targetType)">
                                     <div class="govuk-form-group">
                                         <label class="govuk-label" for="OtherTargets">
                                             Please specify
                                         </label>
-                                        <input asp-for="Risk.OtherTargets" class="govuk-input" spellcheck="false">
-                                        <span asp-validation-for="Risk.OtherTargets" class="govuk-error-message"></span>
+                                        <input asp-for="OtherTargets" class="govuk-input" spellcheck="false">
+                                        <span asp-validation-for="OtherTargets" class="govuk-error-message"></span>
                                     </div>
                                 </div>
                             }

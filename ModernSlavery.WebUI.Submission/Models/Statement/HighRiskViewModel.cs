@@ -21,54 +21,80 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             CreateMap<StatementModel, HighRiskViewModel>()
                 .ForMember(d => d.Index, opt => opt.Ignore())
                 .ForMember(d => d.TotalRisks, opt => opt.MapFrom(s => s.Summary.Risks.Count))
-                .ForMember(d => d.Risk, opt => opt.MapFrom((s, d) => s.Summary.Risks.Count > d.Index ? s.Summary.Risks[d.Index] : new StatementRisk()))
-                .ForMember(d => d.SupplyChainTiers, opt => opt.MapFrom((s, d) => s.Summary.Risks.Count > d.Index ? new List<SupplyChainTierTypes>(s.Summary.Risks[d.Index].SupplyChainTiers) : new List<SupplyChainTierTypes>()));
+                .ForMember(d => d.Description, opt => opt.MapFrom((s, d) => s.Summary.Risks[d.Index].Description))
+                .ForMember(d => d.Targets, opt => opt.MapFrom((s, d) => new List<RiskTargetTypes>(s.Summary.Risks[d.Index].Targets)))
+                .ForMember(d => d.OtherTargets, opt => opt.MapFrom((s, d) => s.Summary.Risks[d.Index].OtherTargets))
+                .ForMember(d => d.LikelySource, opt => opt.MapFrom((s, d) => s.Summary.Risks[d.Index].LikelySource))
+                .ForMember(d => d.OtherLikelySource, opt => opt.MapFrom((s, d) => s.Summary.Risks[d.Index].OtherLikelySource))
+                .ForMember(d => d.SupplyChainTiers, opt => opt.MapFrom((s, d) => new List<SupplyChainTierTypes>(s.Summary.Risks[d.Index].SupplyChainTiers)))
+                .ForMember(d => d.Countries, opt => opt.MapFrom((s, d) => new List<CountryTypes>(s.Summary.Risks[d.Index].Countries)));
 
             CreateMap<HighRiskViewModel, StatementModel>(MemberList.None)
                 .ForMember(d => d.OrganisationId, opt => opt.Ignore())
                 .ForMember(d => d.OrganisationName, opt => opt.Ignore())
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
-                .BeforeMap((s, d) => s.Risk.Description = d.Summary.Risks[s.Index].Description)
-                .AfterMap((s, d) => d.Summary.Risks[s.Index] = s.Risk);
+                .AfterMap((s, d) =>
+                {
+                    d.Summary.Risks[s.Index].Targets = new SortedSet<RiskTargetTypes>(s.Targets);
+                    d.Summary.Risks[s.Index].OtherTargets = s.OtherTargets;
+                    d.Summary.Risks[s.Index].LikelySource = s.LikelySource;
+                    d.Summary.Risks[s.Index].OtherLikelySource = s.OtherLikelySource;
+                    d.Summary.Risks[s.Index].SupplyChainTiers = s.SupplyChainTiers.ToList();
+                    d.Summary.Risks[s.Index].Countries = new SortedSet<CountryTypes>(s.Countries);
+                });
         }
     }
 
     public class HighRiskViewModel : BaseViewModel
     {
-        public HighRiskViewModel(int index = 0)
+        public HighRiskViewModel()
+        {
+        }
+
+        public HighRiskViewModel(int index)
         {
             Index = index;
         }
 
         public override string PageTitle => "About this risk";
 
-        [BindNever]
-        public int Index { get; } = -1;
+        public int Index { get; set; } = -1;
 
-        [BindNever]
         public int TotalRisks { get; set; }
 
-        public StatementRisk Risk { get; set; }
+        //public StatementRisk Risk { get; set; }
+
+        public string Description { get; set; }
+
+        public List<RiskTargetTypes> Targets { get; set; } = new List<RiskTargetTypes>();
+
+        public string OtherTargets { get; set; }
+
+        public RiskSourceTypes LikelySource { get; set; }
+
+        public string OtherLikelySource { get; set; }
 
         public List<SupplyChainTierTypes> SupplyChainTiers { get; set; } = new List<SupplyChainTierTypes>();
+
+        public List<CountryTypes> Countries { get; set; } = new List<CountryTypes>();
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
 
             //TODO: Double check error numbers are all correct - I just copied and pasted for now
-            if (Risk.LikelySource == RiskSourceTypes.Other && string.IsNullOrWhiteSpace(Risk.OtherLikelySource))
-                validationResults.AddValidationError(4700, nameof(Risk.OtherLikelySource));
+            if (LikelySource == RiskSourceTypes.Other && string.IsNullOrWhiteSpace(OtherLikelySource))
+                validationResults.AddValidationError(4700, nameof(OtherLikelySource));
 
-            if (Risk.LikelySource == RiskSourceTypes.SupplyChains && !Risk.SupplyChainTiers.Any(sct=> sct!= SupplyChainTierTypes.Unknown))
-                validationResults.AddValidationError(4700, nameof(Risk.LikelySource));
+            if (LikelySource == RiskSourceTypes.SupplyChains && !SupplyChainTiers.Any(sct => sct != SupplyChainTierTypes.Unknown))
+                validationResults.AddValidationError(4700, nameof(LikelySource));
 
             //Clear SupplyChainTiers when LikelySource not SupplyChains
-            if (Risk.LikelySource != RiskSourceTypes.SupplyChains)
-                Risk.SupplyChainTiers.Clear();
+            if (LikelySource != RiskSourceTypes.SupplyChains)
+                SupplyChainTiers.Clear();
 
-            if (Risk.Targets.Contains(RiskTargetTypes.Other) && string.IsNullOrWhiteSpace(Risk.OtherTargets))
-                validationResults.AddValidationError(4700, nameof(Risk.OtherTargets));
+            if (Targets.Contains(RiskTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTargets))
+                validationResults.AddValidationError(4700, nameof(OtherTargets));
 
             if (SupplyChainTiers.Contains(SupplyChainTierTypes.None) && SupplyChainTiers.Count > 1)
                 validationResults.AddValidationError(0, nameof(SupplyChainTiers));
@@ -78,10 +104,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override Status GetStatus()
         {
-            if (Risk.LikelySource == RiskSourceTypes.Other && string.IsNullOrWhiteSpace(Risk.OtherLikelySource)) return Status.InProgress;
-            if (Risk.LikelySource == RiskSourceTypes.SupplyChains && !Risk.SupplyChainTiers.Any(sct => sct != SupplyChainTierTypes.Unknown)) return Status.InProgress;
-            if (Risk.Targets.Contains(RiskTargetTypes.Other) && string.IsNullOrWhiteSpace(Risk.OtherTargets)) return Status.InProgress;
-            if (Risk.LikelySource != RiskSourceTypes.Unknown && Risk.Targets.Any()) return Status.Complete;
+            if (LikelySource == RiskSourceTypes.Other && string.IsNullOrWhiteSpace(OtherLikelySource)) return Status.InProgress;
+            if (LikelySource == RiskSourceTypes.SupplyChains && !SupplyChainTiers.Any(sct => sct != SupplyChainTierTypes.Unknown)) return Status.InProgress;
+            if (Targets.Contains(RiskTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTargets)) return Status.InProgress;
+            if (LikelySource != RiskSourceTypes.Unknown && Targets.Any()) return Status.Complete;
 
             return Status.Incomplete;
         }

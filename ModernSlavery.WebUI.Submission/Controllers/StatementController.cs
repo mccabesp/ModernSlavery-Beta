@@ -1025,6 +1025,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> HighRisk(HighRiskViewModel viewModel, string organisationIdentifier, int year, int index, BaseViewModel.CommandType command)
         {
+            viewModel.Index = index;
             return await PostAsync(viewModel, organisationIdentifier, year, command, index);
         }
 
