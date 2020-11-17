@@ -25,9 +25,12 @@ namespace ModernSlavery.WebTestPlugins
                 queryParameter.Value = ResolveParameter(queryParameter.Value);
 
             //Resolve the form post parameters
-            FormPostHttpBody formParameters = (FormPostHttpBody)e.Request.Body;
-            foreach (var formParameter in formParameters.FormPostParameters)
-                formParameter.Value = ResolveParameter(formParameter.Value);
+            if (e.Request.Method == "POST")
+            {
+                FormPostHttpBody formParameters = (FormPostHttpBody)e.Request.Body;
+                foreach (var formParameter in formParameters.FormPostParameters)
+                    formParameter.Value = ResolveParameter(formParameter.Value);
+            }
         }
 
         private void ResetContextParameters(PreRequestEventArgs e)
