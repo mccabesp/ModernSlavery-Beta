@@ -1,11 +1,25 @@
 ﻿//Author Charlotte W
 //custom styling for pages in the submission journey
 
-.grey-details{
+.grey-details {
     color: #333333; //colour provided in prototype
 }
 
-.skip-link{
-    display:inline-block;
-    padding:8px 10px 7px; //matches padding of govuk-botton
+.skip-link {
+    display: inline-block;
+    padding: 8px 10px 7px; //matches padding of govuk-botton
+}
+
+.app-high-risk {
+    .risk-description-edit {
+        float: right;
+    }
+
+    .risk-description {
+        display: inline;
+    }
+
+    .buttons button.link-button {
+        float: right;
+    }
 }
