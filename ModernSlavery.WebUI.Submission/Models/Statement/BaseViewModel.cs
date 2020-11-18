@@ -23,7 +23,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             SearchNext = 8,
             SearchPrevious = 9,
             IncludeOrganisation = 10,
-            RemoveOrganisation = 11
+            RemoveOrganisation = 11,
+            AddCountry = 12,
+            RemoveCountry = 13
         }
 
         public enum Status

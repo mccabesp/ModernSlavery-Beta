@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities.StatementSummary;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using System;
 using System.Collections.Generic;
@@ -74,7 +75,33 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public List<SupplyChainTierTypes> SupplyChainTiers { get; set; } = new List<SupplyChainTierTypes>();
 
+        [IgnoreMap]
+        public string SelectedCountry { get; set; }
+
         public List<CountryTypes> Countries { get; set; } = new List<CountryTypes>();
+
+        public bool TryAddSelectedCountry()
+        {
+            if (string.IsNullOrWhiteSpace(SelectedCountry))
+                return false;
+
+            var countries = Enums.GetValuesExcept<CountryTypes>(CountryTypes.Unknown)
+                .Select(c => new { value = c, description = c.GetEnumDescription() });
+
+            var options = countries.Where(c => c.description.Equals(SelectedCountry, StringComparison.OrdinalIgnoreCase));
+
+            if (options.Count() != 1)
+                return false;
+
+            var option = options.Single();
+
+            if (Countries.Contains(option.value))
+                return false;
+
+            Countries.Add(option.value);
+            SelectedCountry = null;
+            return true;
+        }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

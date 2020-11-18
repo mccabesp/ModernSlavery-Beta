@@ -17,6 +17,10 @@
             @Html.HiddenFor(m => m.Submitted);
             @Html.HiddenFor(m => m.TotalRisks);
             @Html.HiddenFor(m => m.Description);
+            @for (int i = 0; i < Model.Countries.Count; i++)
+            {
+                @Html.HiddenFor(model => Model.Countries[i])
+            }
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
@@ -137,7 +141,34 @@
                             In which country?
                         </h2>
                     </legend>
-                    @* TODO - countries are multiple inputs, but what pattern will it follow *@
+                    <div>
+                        @if (Model.Countries.Any())
+                        {
+                            <table class="govuk-table">
+                                <caption class="govuk-table__caption">Countries indentified in this risk</caption>
+                                <thead class="govuk-table__head">
+                                    <tr class="govuk-table__row">
+                                        <th scope="col" class="govuk-table__header">Country</th>
+                                        <th scope="col" class="govuk-table__header">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="govuk-table__body">
+                                    @foreach (var item in Model.Countries)
+                                    {
+                                        <tr class="govuk-table__row">
+                                            <th scope="row" class="govuk-table__header">@item.GetEnumDescription()</th>
+                                            <td class="govuk-table__cell">
+                                                @* How am i able to tell the server which one to remove? *@
+                                                <button class="govuk-button govuk-button--secondary" type="submit" name="toRemove" value="@BaseViewModel.CommandType.RemoveCountry">Remove</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                    <input asp-for="SelectedCountry" class="govuk-input" type="text">
+                    <button class="govuk-button govuk-button--secondary" type="submit" name="command" value="@BaseViewModel.CommandType.AddCountry">Add</button>
                 </fieldset>
             </div>
 

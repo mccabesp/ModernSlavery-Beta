@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1.StatementRisk;
 
 //TODO: Ensure we use PRG model on all POST actions so the 'Browser' back button will work correctly on all pages in this journey.
 
@@ -384,7 +385,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         private async Task<IActionResult> PostAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, params object[] arguments) where TViewModel : BaseViewModel
         {
             SetNavigationUrl(viewModel);
- 
+
             switch (command)
             {
                 case BaseViewModel.CommandType.Continue:
@@ -1026,7 +1027,20 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         public async Task<IActionResult> HighRisk(HighRiskViewModel viewModel, string organisationIdentifier, int year, int index, BaseViewModel.CommandType command)
         {
             viewModel.Index = index;
-            return await PostAsync(viewModel, organisationIdentifier, year, command, index);
+
+            switch (command)
+            {
+                case BaseViewModel.CommandType.AddCountry:
+                    if (!viewModel.TryAddSelectedCountry())
+                        ModelState.AddModelError(0, nameof(HighRiskViewModel.SelectedCountry));
+                    return View(viewModel);
+
+                case BaseViewModel.CommandType.RemoveCountry:
+                    return View(viewModel);
+
+                default:
+                    return await PostAsync(viewModel, organisationIdentifier, year, command, index);
+            }
         }
 
         #endregion
