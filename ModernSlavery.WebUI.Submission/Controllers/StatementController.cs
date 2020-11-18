@@ -1024,23 +1024,26 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/highest-risk/{index}")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> HighRisk(HighRiskViewModel viewModel, string organisationIdentifier, int year, int index, BaseViewModel.CommandType command)
+        public async Task<IActionResult> HighRisk(HighRiskViewModel viewModel, string organisationIdentifier, int year, int index, BaseViewModel.CommandType command, CountryTypes toRemove)
         {
             viewModel.Index = index;
 
-            switch (command)
+            if (toRemove != CountryTypes.Unknown)
             {
-                case BaseViewModel.CommandType.AddCountry:
-                    if (!viewModel.TryAddSelectedCountry())
-                        ModelState.AddModelError(0, nameof(HighRiskViewModel.SelectedCountry));
-                    return View(viewModel);
-
-                case BaseViewModel.CommandType.RemoveCountry:
-                    return View(viewModel);
-
-                default:
-                    return await PostAsync(viewModel, organisationIdentifier, year, command, index);
+                SetNavigationUrl(viewModel);
+                if (!viewModel.TryRemoveCountry(toRemove))
+                    ModelState.AddModelError(0);
+                return View(viewModel);
             }
+            else if (command == BaseViewModel.CommandType.AddCountry)
+            {
+                SetNavigationUrl(viewModel);
+                if (!viewModel.TryAddSelectedCountry())
+                    ModelState.AddModelError(0, nameof(HighRiskViewModel.SelectedCountry));
+                return View(viewModel);
+            }
+            else
+                return await PostAsync(viewModel, organisationIdentifier, year, command, index);
         }
 
         #endregion

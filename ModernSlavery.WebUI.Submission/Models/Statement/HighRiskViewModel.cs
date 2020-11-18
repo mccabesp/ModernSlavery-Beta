@@ -103,6 +103,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             return true;
         }
 
+        public bool TryRemoveCountry(CountryTypes countryType)
+        {
+            if (Countries.Contains(countryType))
+            {
+                Countries.Remove(countryType);
+                return true;
+            }
+
+            return false;
+        }
+
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();

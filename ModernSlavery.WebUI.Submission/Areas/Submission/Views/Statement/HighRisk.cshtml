@@ -89,7 +89,7 @@
                                         <label class="govuk-label" for="OtherLikelySource">
                                             Please specify
                                         </label>
-                                        <textarea class="govuk-textarea" id="OtherLikelySource" spellcheck="false" rows="5">@Model.OtherLikelySource</textarea>
+                                        <textarea asp-for="OtherLikelySource" class="govuk-textarea" spellcheck="false" rows="5"></textarea>
                                         <span asp-validation-for="OtherLikelySource" class="govuk-error-message"></span>
                                     </div>
                                 </div>
@@ -158,8 +158,7 @@
                                         <tr class="govuk-table__row">
                                             <th scope="row" class="govuk-table__header">@item.GetEnumDescription()</th>
                                             <td class="govuk-table__cell">
-                                                @* How am i able to tell the server which one to remove? *@
-                                                <button class="govuk-button govuk-button--secondary" type="submit" name="toRemove" value="@BaseViewModel.CommandType.RemoveCountry">Remove</button>
+                                                <button class="govuk-button govuk-button--secondary" type="submit" name="toRemove" value="@((int)item)">Remove</button>
                                             </td>
                                         </tr>
                                     }
@@ -167,8 +166,15 @@
                             </table>
                         }
                     </div>
-                    <input asp-for="SelectedCountry" class="govuk-input" type="text">
-                    <button class="govuk-button govuk-button--secondary" type="submit" name="command" value="@BaseViewModel.CommandType.AddCountry">Add</button>
+                    <div class="govuk-grid-row">
+                        @* this input should have an associated label *@
+                        <div class="govuk-grid-column-one-half">
+                            <input asp-for="SelectedCountry" class="govuk-input" type="text">
+                        </div>
+                        <div class="govuk-grid-column-one-half">
+                            <button class="govuk-button govuk-button--secondary" type="submit" name="command" value="@BaseViewModel.CommandType.AddCountry">Add</button>
+                        </div>
+                    </div>
                 </fieldset>
             </div>
 
