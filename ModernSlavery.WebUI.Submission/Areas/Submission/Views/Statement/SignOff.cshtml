@@ -17,6 +17,7 @@
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
             @Html.HiddenFor(m => m.StatementEndDate);
+            @Html.HiddenFor(m => m.SubmissionDeadline);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle

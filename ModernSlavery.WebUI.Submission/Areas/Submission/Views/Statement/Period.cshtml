@@ -16,6 +16,7 @@
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
+            @Html.HiddenFor(m => m.SubmissionDeadline);
          
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset" role="group" aria-describedby="reporting-start-hint">

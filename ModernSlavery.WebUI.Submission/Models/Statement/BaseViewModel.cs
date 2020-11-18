@@ -59,7 +59,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [IgnoreMap]
         public virtual string SubTitle { get; }
 
-        [BindNever]
         public DateTime SubmissionDeadline { get; set; }
 
         [IgnoreMap]

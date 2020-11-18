@@ -150,7 +150,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 if (StatementStartDate.Value >= StatementEndDate.Value)
                     validationResults.AddValidationError(3216, nameof(StatementStartDate));
 
-                //The period between from and to dates must be a minimum of 12 months and a max of 24 months
+                //The period between from and to dates must be a minimum of 12 months and a max of 18 months 
                 var monthsDiff = ((StatementEndDate.Value.Year - StatementStartDate.Value.Year) * 12)
                     + StatementEndDate.Value.Month - StatementStartDate.Value.Month;
 
