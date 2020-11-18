@@ -80,7 +80,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             [Description("Announced social audits")] Announced,
             [Description("Unannounced social audits")] Unannounced,
             [Description("Other type of social audit")] Other,
-            [Description("Your organisation did not carry out any social audits")] None,
+            [Description("Your organisation did not carry out any social audits during the period of the statement")] None,
         }
 
         SortedSet<SocialAuditTypes> SocialAudits { get; set; }
@@ -94,7 +94,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             Unknown,
             [Description("Whistleblowing services")] WhistleblowingServices,
             [Description("Worker voice platforms")] WorkerVoicePlatforms,
-            [Description("Your organisation does not have any anonymous grievance mechanisms in place")] None,
+            [Description("Your organisation did not have anonymous grievance mechanisms in place during the period of the statement")] None,
             [Description("Other grievance mechanism")] Other,
         }
 
@@ -415,7 +415,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             #endregion
 
             #region Methods
-            public bool IsEmpty(bool ignoreDescription=false)
+            public bool IsEmpty(bool ignoreDescription = false)
             {
                 return (ignoreDescription || string.IsNullOrWhiteSpace(Description))
                     && LikelySource == RiskSourceTypes.Unknown && string.IsNullOrWhiteSpace(OtherLikelySource)
@@ -435,7 +435,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             Unknown,
             [Description("Abuse of vulnerability")] VulnerabilityAbuse,
             [Description("Deception")] Deception,
-            [Description("Restriction of Movement")] MovementRestriction,
+            [Description("Restriction of movement")] MovementRestriction,
             [Description("Isolation")] Isolation,
             [Description("Physical and sexual violence")] Violence,
             [Description("Intimidation and threats")] ThreatIntimidation,
@@ -445,7 +445,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             [Description("Abusive working and living conditions")] WorkLiveConditions,
             [Description("Excessive overtime")] ExcessiveOvertime,
             [Description("Other")] Other,
-            [Description("My statement does not refer to any indicators of forced labour")] None,
+            [Description("My statement does not refer to finding any ILO indicators of forced labour")] None,
         }
 
         SortedSet<IndicatorTypes> Indicators { get; set; }
