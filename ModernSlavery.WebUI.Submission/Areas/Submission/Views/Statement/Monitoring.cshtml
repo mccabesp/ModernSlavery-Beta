@@ -9,7 +9,7 @@
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @using (Html.BeginForm())
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @await Html.GovUkValidationSummaryAsync();
             @Html.AntiForgeryToken();
@@ -24,13 +24,16 @@
                     </legend>
 
                     <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
-                        <div class="govuk-form-group">
-                            <label asp-for="OtherWorkConditionsMonitoring" class="govuk-label">
+                        <div class="govuk-form-group @Html.SetErrorClass(model => model.OtherWorkConditionsMonitoring, "govuk-form-group--error")">
+                            <label for="other-work-conditions-monitoring" class="govuk-label">
                                 Tell us briefly what you did
                             </label>
-                            <textarea asp-for="OtherWorkConditionsMonitoring" class="govuk-textarea govuk-js-character-count" rows="5" ></textarea>
+                            <textarea name="OtherWorkConditionsMonitoring" id="other-work-conditions-monitoring" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="other-work-conditions-monitoring-info">@(Model.OtherWorkConditionsMonitoring)</textarea>
                         </div>
-
+                        <div id="other-work-conditions-monitoring-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                            You can enter up to 200 characters
+                        </div>
+                        <span asp-validation-for="OtherWorkConditionsMonitoring" class="govuk-error-message"></span>
                     </div>
                 </fieldset>
             </div>
@@ -39,12 +42,9 @@
                 Save and continue
             </button>
 
-            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
-            {
-                <div class="skip-link">
-                    <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
-                </div>
-            }
+            <div class="skip-link">
+                <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+            </div>
         }
     </div>
 </div>

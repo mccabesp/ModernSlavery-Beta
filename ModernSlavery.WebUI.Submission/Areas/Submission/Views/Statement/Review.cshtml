@@ -25,7 +25,7 @@
                 @Model.SubTitle
             </p>
 
-            <p class="govuk-body">
+            <p class="govuk-body govuk-!-margin-bottom-8 ">
                 @Model.SectionCountTitle
             </p>
 
@@ -151,26 +151,28 @@
                     <div class="govuk-details__text">
                         <p class="govuk-body govuk-!-font-weight-bold">I confirm that:</p>
                         <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
-                            <li>the information I have supplied is complete and true to the best of my knowledge</li>
-                            <li>I am authorised to supply this information on behalf of the organisation(s) the modern slavery statement is for</li>
-                            <li>if the statement is for a group, all organisations in the group know that this statement is being submitted to the service on their behalf</li>
+                            <li class="govuk-!-margin-bottom-3">the information I have supplied is complete and true to the best of my knowledge</li>
+                            <li class="govuk-!-margin-bottom-3">I am authorised to supply this information on behalf of the organisation(s) the modern slavery statement is for</li>
+                            <li class="govuk-!-margin-bottom-3">if the statement is for a group, all organisations in the group know that this statement is being submitted to the service on their behalf</li>
                         </ul>
                         <p class="govuk-body govuk-!-font-weight-bold">I understand that:</p>
                         <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
-                            <li>the answers I submit will be published on GOV.UK</li>
-                            <li>my statement will be removed from the service if it is found to contain inaccuracies</li>
+                            <li class="govuk-!-margin-bottom-3">the answers I submit will be published on GOV.UK</li>
+                            <li class="govuk-!-margin-bottom-3">my statement will be removed from the service if it is found to contain inaccuracies</li>
                         </ul>
                     </div>
                 </details>
 
-                <div class="govuk-checkboxes @Html.SetErrorClass("AcceptedDeclaration", "govuk-form-group--error")">
-                    <div class="govuk-checkboxes__item">
-                        <input name="AcceptedDeclaration" id="AcceptedDeclaration" class="govuk-checkboxes__input" type="checkbox" value="true">
-                        <label class="govuk-label govuk-checkboxes__label" for="AcceptedDeclaration">
-                            I understand and agree with the above declaration
-                        </label>
+                <div class="govuk-form-group">
+                    <div class="govuk-checkboxes @Html.SetErrorClass("AcceptedDeclaration", "govuk-form-group--error")">
+                        <div class="govuk-checkboxes__item">
+                            <input name="AcceptedDeclaration" id="AcceptedDeclaration" class="govuk-checkboxes__input" type="checkbox" value="true">
+                            <label class="govuk-label govuk-checkboxes__label" for="AcceptedDeclaration">
+                                I understand and agree with the above declaration
+                            </label>
+                        </div>
+                        @Html.ValidationMessage("AcceptedDeclaration", new { @class = "govuk-error-message" })
                     </div>
-                    @Html.ValidationMessage("AcceptedDeclaration", new { @class = "govuk-error-message" })
                 </div>
 
                 <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled="@(!Model.CanSubmit())" name="command" value="@BaseViewModel.CommandType.Submit">

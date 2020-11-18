@@ -26,7 +26,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public override string PageTitle => "How does your statement demonstrate your progress over time in addressing modern slavery risks?";
 
-        [MaxLength(1024)]
+        [MaxLength(500)]
         public string ProgressMeasures { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

@@ -27,9 +27,9 @@
                         Does your statement refer to any actions your organisation took after finding indicators of forced labour?
                     </p>
 
-                    <span id="remediations-hint" class="govuk-hint">
+                    <div id="remediations-hint" class="govuk-hint">
                         Select all that apply
-                    </span>
+                    </div>
 
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                         @foreach (var remediationType in Enums.GetValuesExcept<RemediationTypes>(RemediationTypes.Unknown))
@@ -81,12 +81,9 @@
                 Save and continue
             </button>
 
-            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
-            {
-                <div class="skip-link">
-                    <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
-                </div>
-            }
+            <div class="skip-link">
+                <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+            </div>
         }
     </div>
 

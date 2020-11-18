@@ -10,38 +10,39 @@
     <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
-            @await Html.GovUkValidationSummaryAsync();
-            @Html.AntiForgeryToken();
-            @Html.HiddenFor(m => m.Submitted);
+        @await Html.GovUkValidationSummaryAsync();
+        @Html.AntiForgeryToken();
+        @Html.HiddenFor(m => m.Submitted);
 
-            <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset" aria-describedby="progress-hint">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-                        <h1 class="govuk-fieldset__heading">
-                            @Model.PageTitle
-                        </h1>
-                    </legend>
-
-                    <div id="progress-hint" class="govuk-hint">
-                        For example, do you use KPIs or goals to monitor progress, or does your statement provide updates on how you've addressed risks identified in past statements?
+        <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset" aria-describedby="progress-hint">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h1 class="govuk-fieldset__heading">
+                        @Model.PageTitle
+                    </h1>
+                </legend>
+                <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="500">
+                    <div class="govuk-form-group @Html.SetErrorClass(model => model.ProgressMeasures, "govuk-form-group--error")">
+                        <div id="progress-measures-hint" class="govuk-hint govuk-body govuk-!-margin-bottom-5">
+                            For example, do you use KPIs or goals to monitor progress, or does your statement provide updates on how you've addressed risks identified in past statements?
+                        </div>
+                        <textarea name="ProgressMeasures" id="progress-measures" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="progress-measures-info">@(Model.ProgressMeasures)</textarea>
                     </div>
-
-                    <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="500">
-                        <textarea asp-for="ProgressMeasures" class="govuk-textarea govuk-js-character-count" rows="5"></textarea>
+                    <div id="progress-measures-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                        You can enter up to 500 characters
                     </div>
-                </fieldset>
-            </div>
+                    <span asp-validation-for="ProgressMeasures" class="govuk-error-message"></span>
+                </div>              
+            </fieldset>
+        </div>
 
-            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
-                Save and continue
-            </button>
+        <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+            Save and continue
+        </button>
 
-            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
-            {
-                <div class="skip-link">
-                    <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
-                </div>
-            }
+        <div class="skip-link">
+            <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+        </div>
         }
     </div>
 </div>

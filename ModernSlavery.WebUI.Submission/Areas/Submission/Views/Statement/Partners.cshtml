@@ -17,15 +17,15 @@
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="conditions-hint">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-5">
                         <h1 class="govuk-fieldset__heading">
                             @Model.PageTitle
                         </h1>
                     </legend>
 
-                    <span id="conditions-hint" class="govuk-hint">
+                    <div id="conditions-hint" class="govuk-hint">
                         Select all that apply
-                    </span>
+                    </div>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                         @foreach (var partnerType in Enums.GetValuesExcept<PartnerTypes>(PartnerTypes.Unknown))
                         {
@@ -51,17 +51,17 @@
                                 </label>
                             </div>
                             @*@if (partnerType == IStatementSummary1.PartnerTypes.Other)
-                                {
-                                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPartners, "govuk-form-group--error")" id="partners-conditional-@((int)partnerType)">
-                                        <div class="govuk-form-group">
-                                            <label class="govuk-label" for="other">
-                                                Please specify
-                                            </label>
-                                            <input asp-for="OtherPartners" class="govuk-input" spellcheck="false">
-                                            <span asp-validation-for="OtherPartners" class="govuk-error-message"></span>
-                                        </div>
+                            {
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPartners, "govuk-form-group--error")" id="partners-conditional-@((int)partnerType)">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="other">
+                                            Please specify
+                                        </label>
+                                        <input asp-for="OtherPartners" class="govuk-input" spellcheck="false">
+                                        <span asp-validation-for="OtherPartners" class="govuk-error-message"></span>
                                     </div>
-                                }*@
+                                </div>
+                            }*@
                         }
                     </div>
                 </fieldset>
@@ -71,12 +71,9 @@
                 Save and continue
             </button>
 
-            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
-            {
-                <span class="skip-link">
-                    <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
-                </span>
-            }
+            <div class="skip-link">
+                <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+            </div>
         }
     </div>
 

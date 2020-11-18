@@ -44,7 +44,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             //    validationResults.AddValidationError(4200, nameof(OtherGrievanceMechanisms));
 
             if (GrievanceMechanisms.Contains(GrievanceMechanismTypes.None) && GrievanceMechanisms.Count() > 1)
-                validationResults.AddValidationError(4201, nameof(GrievanceMechanisms));
+                validationResults.AddValidationError(4201);
 
             return validationResults;
         }

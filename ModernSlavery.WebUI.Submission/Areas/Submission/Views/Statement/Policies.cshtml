@@ -17,15 +17,15 @@
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="organisation-hint">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-5">
                         <h1 class="govuk-fieldset__heading">
                             @Model.PageTitle
                         </h1>
                     </legend>
 
-                    <span id="organisation-hint" class="govuk-hint">
+                    <div id="organisation-hint" class="govuk-hint">
                         Select all that apply
-                    </span>
+                    </div>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                         @foreach (var policyType in Enums.GetValuesExcept<PolicyTypes>(IStatementSummary1.PolicyTypes.Unknown))
                         {
@@ -35,7 +35,7 @@
 
                             if (isNone)
                             {
-                                <div class="govuk-!-margin-bottom-2">
+                                <div class="govuk-!-margin-bottom-2 govuk-!-margin-top-5">
                                     or
                                 </div>
                             }
@@ -68,12 +68,9 @@
                 Save and continue
             </button>
 
-            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
-            {
-                <div class="skip-link">
-                    <a class="govuk-link govuk-!-padding-top-2" href="@(Model.SkipUrl)">Skip this question</a>
-                </div>
-            }
+            <div class="skip-link">
+                <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+            </div>
         }
 
     </div>

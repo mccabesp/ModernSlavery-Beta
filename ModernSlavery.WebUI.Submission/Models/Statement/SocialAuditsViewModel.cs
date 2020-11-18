@@ -16,14 +16,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<StatementModel, SocialAuditsViewModel>()
                 .ForMember(d => d.SocialAudits, opt => opt.MapFrom(s => s.Summary.SocialAudits));
-                //.ForMember(d => d.OtherSocialAudits, opt => opt.MapFrom(s => s.Summary.OtherSocialAudits));
+            //.ForMember(d => d.OtherSocialAudits, opt => opt.MapFrom(s => s.Summary.OtherSocialAudits));
 
             CreateMap<SocialAuditsViewModel, StatementModel>(MemberList.None)
                 .ForMember(d => d.OrganisationId, opt => opt.Ignore())
                 .ForMember(d => d.OrganisationName, opt => opt.Ignore())
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForPath(d => d.Summary.SocialAudits, opt => opt.MapFrom(s => s.SocialAudits));
-                //.ForPath(d => d.Summary.OtherSocialAudits, opt => opt.MapFrom(s => s.OtherSocialAudits));
+            //.ForPath(d => d.Summary.OtherSocialAudits, opt => opt.MapFrom(s => s.OtherSocialAudits));
         }
     }
 
@@ -44,7 +44,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             //    validationResults.AddValidationError(4100, nameof(OtherSocialAudits));
 
             if (SocialAudits.Contains(SocialAuditTypes.None) && SocialAudits.Count() > 1)
-                validationResults.AddValidationError(4101, nameof(SocialAudits));
+                validationResults.AddValidationError(4101);
 
             return validationResults;
         }

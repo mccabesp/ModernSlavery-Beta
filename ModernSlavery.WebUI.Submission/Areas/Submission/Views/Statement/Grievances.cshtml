@@ -18,15 +18,15 @@
 
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset" aria-describedby="conditions-hint">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-5">
                         <h1 class="govuk-fieldset__heading">
                             @Model.PageTitle
                         </h1>
                     </legend>
 
-                    <span id="conditions-hint" class="govuk-hint">
+                    <div id="conditions-hint" class="govuk-hint">
                         Select all that apply
-                    </span>
+                    </div>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                         @foreach (var grievanceType in Enums.GetValuesExcept<GrievanceMechanismTypes>(GrievanceMechanismTypes.Unknown, GrievanceMechanismTypes.Other))
                         {
@@ -48,17 +48,17 @@
                                 </label>
                             </div>
                             @*@if (grievanceType == IStatementSummary1.GrievanceMechanismTypes.Other)
-                                {
-                                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherGrievanceMechanisms, "govuk-form-group--error")" id="grievance-conditional-@((int)grievanceType)">
-                                        <div class="govuk-form-group">
-                                            <label class="govuk-label" for="other">
-                                                Please specify
-                                            </label>
-                                            <input asp-for="OtherGrievanceMechanisms" class="govuk-input" spellcheck="false">
-                                            <span asp-validation-for="OtherGrievanceMechanisms" class="govuk-error-message"></span>
-                                        </div>
+                            {
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherGrievanceMechanisms, "govuk-form-group--error")" id="grievance-conditional-@((int)grievanceType)">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="other">
+                                            Please specify
+                                        </label>
+                                        <input asp-for="OtherGrievanceMechanisms" class="govuk-input" spellcheck="false">
+                                        <span asp-validation-for="OtherGrievanceMechanisms" class="govuk-error-message"></span>
                                     </div>
-                                }*@
+                                </div>
+                            }*@
                         }
                     </div>
                 </fieldset>
@@ -68,12 +68,9 @@
                 Save and continue
             </button>
 
-            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
-            {
-                <div class="skip-link">
-                    <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
-                </div>
-            }
+            <div class="skip-link">
+                <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+            </div>
         }
     </div>
 
