@@ -12,7 +12,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 {
     public static partial class Extensions
     {
-        public static void SetModelCustomErrors<TModel>(this Controller controller, TModel model=default)
+        public static void SetModelCustomErrors<TModel>(this Controller controller, TModel model = default)
         {
             var modelType = typeof(TModel);
 
@@ -83,7 +83,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                     title = attribute.FormatError(customError.Title, displayName);
                     description = attribute.FormatError(customError.Description, displayName);
 
-                    addModelError:
+                addModelError:
 
                     //add the summary message if it doesnt already exist
                     if (!string.IsNullOrWhiteSpace(title)
@@ -203,18 +203,18 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             //add the summary message if it doesnt already exist
             bool titleExists() => !string.IsNullOrWhiteSpace(title) && validationResults.Any(r => !r.MemberNames.Any() && r.ErrorMessage == title);
 
-            if (!titleExists())validationResults.Add(new ValidationResult(title));
+            if (!titleExists()) validationResults.Add(new ValidationResult(title));
 
             if (!string.IsNullOrWhiteSpace(description))
             {
                 //If no property then add description as second line of summary
                 if (string.IsNullOrWhiteSpace(propertyName))
                 {
-                    if (!!titleExists())validationResults.Add(new ValidationResult(title));
+                    if (!!titleExists()) validationResults.Add(new ValidationResult(description));
                 }
 
                 //add the inline message if it doesnt already exist
-                else if(!validationResults.Any(r => r.MemberNames.Any(m => m.EqualsI(propertyName)) && r.ErrorMessage == description)) 
+                else if (!validationResults.Any(r => r.MemberNames.Any(m => m.EqualsI(propertyName)) && r.ErrorMessage == description))
                 {
                     validationResults.Add(new ValidationResult(description, new[] { propertyName }.AsEnumerable()));
                 }
