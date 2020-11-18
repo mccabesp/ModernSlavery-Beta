@@ -10,8 +10,10 @@ namespace ModernSlavery.WebTestPlugins
         public string MaxParamSource { get; set; }
         public string ContextParamTarget { get; set; }
 
-        public override void PostPage(object sender, PostPageEventArgs e)
+        public override void PrePage(object sender, PrePageEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(MaxParamSource)) return;
+
             var min = !string.IsNullOrWhiteSpace(MinParamSource) && e.WebTest.Context.ContainsKey(MinParamSource) ? Int32.Parse(e.WebTest.Context[MinParamSource].ToString()) : 1;
             if (min < 1) min = 1;
 

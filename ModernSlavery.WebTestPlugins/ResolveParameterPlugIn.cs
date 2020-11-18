@@ -9,8 +9,6 @@ namespace ModernSlavery.WebTestPlugins
     public class ResolveParameterPlugIn : WebTestPlugin
     {
         // Properties for the plugin.  
-        public string ContextParamTarget { get; set; }
-
         private Dictionary<string, string> dictionary = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private const string variablePattern = @"\{\{(.*?)\}\}";
         private readonly Regex VariableRegex = new Regex(variablePattern, RegexOptions.IgnoreCase);
