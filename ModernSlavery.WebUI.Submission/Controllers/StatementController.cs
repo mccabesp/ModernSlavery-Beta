@@ -1032,14 +1032,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             {
                 SetNavigationUrl(viewModel);
                 if (!viewModel.TryRemoveCountry(toRemove))
-                    ModelState.AddModelError(0);
+                    ModelState.AddModelError(4702);
                 return View(viewModel);
             }
             else if (command == BaseViewModel.CommandType.AddCountry)
             {
                 SetNavigationUrl(viewModel);
                 if (!viewModel.TryAddSelectedCountry())
-                    ModelState.AddModelError(0, nameof(HighRiskViewModel.SelectedCountry));
+                    ModelState.AddModelError(4701, nameof(HighRiskViewModel.SelectedCountry));
                 return View(viewModel);
             }
             else
