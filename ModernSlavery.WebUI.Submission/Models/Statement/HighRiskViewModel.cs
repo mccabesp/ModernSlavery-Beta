@@ -39,7 +39,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                     d.Summary.Risks[s.Index].OtherTargets = s.Targets.Contains(RiskTargetTypes.Other) ? s.OtherTargets : null;
                     d.Summary.Risks[s.Index].LikelySource = s.LikelySource;
                     d.Summary.Risks[s.Index].OtherLikelySource = s.LikelySource == RiskSourceTypes.Other ? s.OtherLikelySource : null;
-                    d.Summary.Risks[s.Index].SupplyChainTiers = s.SupplyChainTiers.ToList();
+                    d.Summary.Risks[s.Index].SupplyChainTiers = s.LikelySource == RiskSourceTypes.SupplyChains ? s.SupplyChainTiers.ToList() : null;
                     d.Summary.Risks[s.Index].Countries = new SortedSet<CountryTypes>(s.Countries);
                 });
         }
@@ -61,8 +61,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public int Index { get; set; } = -1;
 
         public int TotalRisks { get; set; }
-
-        //public StatementRisk Risk { get; set; }
 
         public string Description { get; set; }
 
@@ -86,18 +84,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (LikelySource == RiskSourceTypes.Other && string.IsNullOrWhiteSpace(OtherLikelySource))
                 validationResults.AddValidationError(4700, nameof(OtherLikelySource));
 
-            if (LikelySource == RiskSourceTypes.SupplyChains && !SupplyChainTiers.Any(sct => sct != SupplyChainTierTypes.Unknown))
-                validationResults.AddValidationError(4700, nameof(LikelySource));
-
-            //Clear SupplyChainTiers when LikelySource not SupplyChains
-            if (LikelySource != RiskSourceTypes.SupplyChains)
-                SupplyChainTiers.Clear();
-
             if (Targets.Contains(RiskTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTargets))
                 validationResults.AddValidationError(4700, nameof(OtherTargets));
 
-            if (SupplyChainTiers.Contains(SupplyChainTierTypes.None) && SupplyChainTiers.Count > 1)
-                validationResults.AddValidationError(0, nameof(SupplyChainTiers));
+            if (LikelySource == RiskSourceTypes.SupplyChains)
+            {
+                if (!SupplyChainTiers.Any())
+                    validationResults.AddValidationError(4700, nameof(SupplyChainTiers));
+
+                else if (SupplyChainTiers.Contains(SupplyChainTierTypes.None) && SupplyChainTiers.Count > 1)
+                    validationResults.AddValidationError(4701, nameof(SupplyChainTiers));
+            }
 
             return validationResults;
         }
@@ -105,7 +102,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override Status GetStatus()
         {
             if (LikelySource == RiskSourceTypes.Other && string.IsNullOrWhiteSpace(OtherLikelySource)) return Status.InProgress;
-            if (LikelySource == RiskSourceTypes.SupplyChains && !SupplyChainTiers.Any(sct => sct != SupplyChainTierTypes.Unknown)) return Status.InProgress;
+            if (LikelySource == RiskSourceTypes.SupplyChains && !SupplyChainTiers.Any()) return Status.InProgress;
             if (Targets.Contains(RiskTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTargets)) return Status.InProgress;
             if (LikelySource != RiskSourceTypes.Unknown && Targets.Any()) return Status.Complete;
 

@@ -16,6 +16,7 @@
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
             @Html.HiddenFor(m => m.TotalRisks);
+            @Html.HiddenFor(m => m.Description);
 
             <h1 class="govuk-heading-l">
                 @Model.PageTitle
@@ -49,27 +50,30 @@
                             if (isSupplyChain)
                             {
                                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-source-@value">
-                                    <span id="supply-chains-hint" class="govuk-hint">
-                                        Select all that apply
-                                    </span>
+                                    <div class="govuk-form-group @Html.SetErrorClass(model => model.SupplyChainTiers, "govuk-form-group--error")">
+                                        <span id="supply-chains-hint" class="govuk-hint">
+                                            Select all that apply
+                                        </span>
 
-                                    <div class="govuk-checkboxes">
-                                        @foreach (var tier in Enums.GetValuesExcept<SupplyChainTierTypes>(SupplyChainTierTypes.Unknown))
-                                        {
-                                            var tierValue = (int)tier;
-                                            if (tier == SupplyChainTierTypes.None)
+                                        <div class="govuk-checkboxes">
+                                            @foreach (var tier in Enums.GetValuesExcept<SupplyChainTierTypes>(SupplyChainTierTypes.Unknown))
                                             {
-                                                <div>
-                                                    or
+                                                var tierValue = (int)tier;
+                                                if (tier == SupplyChainTierTypes.None)
+                                                {
+                                                    <div>
+                                                        or
+                                                    </div>
+                                                }
+                                                <div class="govuk-checkboxes__item">
+                                                    <input name="SupplyChainTiers" class="govuk-checkboxes__input" id="tier-@tierValue" value="@tierValue" type="checkbox" checked="@(Model.SupplyChainTiers.Contains(tier))">
+                                                    <label class="govuk-label govuk-checkboxes__label" for="tier-@tierValue">
+                                                        @tier.GetEnumDescription()
+                                                    </label>
                                                 </div>
                                             }
-                                            <div class="govuk-checkboxes__item">
-                                                <input name="SupplyChainTiers" class="govuk-checkboxes__input" id="tier-@tierValue" value="@tierValue" type="checkbox" checked="@(Model.SupplyChainTiers.Contains(tier))">
-                                                <label class="govuk-label govuk-checkboxes__label" for="tier-@tierValue">
-                                                    @tier.GetEnumDescription()
-                                                </label>
-                                            </div>
-                                        }
+                                        </div>
+                                        <span asp-validation-for="SupplyChainTiers" class="govuk-error-message"></span>
                                     </div>
                                 </div>
                             }
@@ -77,7 +81,7 @@
                             if (isOther)
                             {
                                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-source-@value">
-                                    <div class="govuk-form-group">
+                                    <div class="govuk-form-group @Html.SetErrorClass(model => model.OtherLikelySource, "govuk-form-group--error")">
                                         <label class="govuk-label" for="OtherLikelySource">
                                             Please specify
                                         </label>
@@ -101,16 +105,18 @@
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                         @foreach (var targetType in Enums.GetValuesExcept<RiskTargetTypes>(RiskTargetTypes.Unknown))
                         {
+                            var value = (int)targetType;
+                            var isOther = targetType == RiskTargetTypes.Other;
                             <div class="govuk-checkboxes__item">
-                                <input name="Targets" value="@((int)targetType)" id="@($"target{(int)targetType}")" checked=@(Model.Targets.Contains(targetType)) class="govuk-checkboxes__input" type="checkbox" data-aria-controls="targets-conditional-@((int)targetType)">
-                                <label class="govuk-label govuk-checkboxes__label" for="@($"target{(int)targetType}")">
+                                <input name="Targets" value="@value" id="@($"target{value}")" checked=@(Model.Targets.Contains(targetType)) class="govuk-checkboxes__input" type="checkbox" @(isOther ? $"data-aria-controls=targets-conditional-{value}" : "")>
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"target{value}")">
                                     @targetType.GetEnumDescription()
                                 </label>
                             </div>
-                            @if (targetType == RiskTargetTypes.Other)
+                            @if (isOther)
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTargets, "govuk-form-group--error")" id="targets-conditional-@((int)targetType)">
-                                    <div class="govuk-form-group">
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden" id="targets-conditional-@value">
+                                    <div class="govuk-form-group @Html.SetErrorClass(model => model.OtherTargets, "govuk-form-group--error")">
                                         <label class="govuk-label" for="OtherTargets">
                                             Please specify
                                         </label>
