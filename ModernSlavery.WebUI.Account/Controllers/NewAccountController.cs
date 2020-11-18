@@ -224,10 +224,6 @@ namespace ModernSlavery.WebUI.Account.Controllers
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            //If its an administrator go to admin home
-            if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
-                return RedirectToActionArea("Home", "Admin", "Admin");
-
             return View("EmailConfirmed");
         }
 
