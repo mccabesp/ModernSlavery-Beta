@@ -5,39 +5,39 @@
     Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = $"PIN confirmation - {sharedOptions.ServiceName}";
 }
-     <div class="govuk-grid-row">
-         <div class="govuk-grid-column-two-thirds">
-             @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
-             {
-                 @Html.AntiForgeryToken()
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+        {
+            @Html.AntiForgeryToken()
 
-                 <div class="govuk-panel govuk-panel--confirmation">
-                     <h1 class="govuk-panel__title govuk-!-font-size-24">We're sending a PIN by post to the following name and address:</h1>
-                 </div>
+            <div class="govuk-panel govuk-panel--confirmation">
+                <h1 class="govuk-panel__title govuk-!-font-size-24">We're sending a PIN by post to the following name and address:</h1>
+            </div>
 
-                 <div id="default-content">
-                     <p>@ViewBag.UserFullName (@ViewBag.UserJobTitle),<br> @ViewBag.Organisation, <br />@Html.Raw(ViewBag.Address)</p>
+            <div id="default-content">
+                <p>@ViewBag.UserFullName (@ViewBag.UserJobTitle),<br> @ViewBag.Organisation, <br />@Html.Raw(ViewBag.Address)</p>
 
-                 </div>
-                 @if (!string.IsNullOrWhiteSpace(ViewBag.PinCode))
-                 {
-                     <p style="color:#d4351c;">Your test pin code is <b>@ViewBag.PinCode</b></p>
-                 }
-                 <span class="govuk-!-font-weight-bold">What happens next.</span>
-                 <p class="govuk-body">Your PIN should arrive within 7 days.</p>
-                 <p class="govuk-body">
-                     When you get it, sign in to the&nbsp;<a href="@Url.Action("ActivateService", new {id = Model})">@sharedOptions.ServiceName</a> and use the PIN to activate the service.
-                 </p>
-                 <span class="govuk-!-font-weight-bold">
-                     More options
-                 </span>
-                 <p class="govuk-body">
-                     <a class="govuk-link" href="@Url.Action("OrganisationType")">Add another organisation</a>
-                 </p>
-                 <p class="govuk-body">
-                     <a class="govuk-link" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Manage organisations</a>
-                 </p>
-             }
-         </div>
-        </div>
-   
+            </div>
+            @if (!string.IsNullOrWhiteSpace(ViewBag.PinCode))
+            {
+                <p style="color:#d4351c;">Your test pin code is <b id="PINCode" data-organisationidentifier="@(ViewBag.OrganisationIdentifier)">@ViewBag.PinCode</b></p>
+            }
+            <span class="govuk-!-font-weight-bold">What happens next.</span>
+            <p class="govuk-body">Your PIN should arrive within 7 days.</p>
+            <p class="govuk-body">
+                When you get it, sign in to the&nbsp;<a href="@Url.Action("ActivateService", new {id = Model})">@sharedOptions.ServiceName</a> and use the PIN to activate the service.
+            </p>
+            <span class="govuk-!-font-weight-bold">
+                More options
+            </span>
+            <p class="govuk-body">
+                <a class="govuk-link" href="@Url.Action("OrganisationType")">Add another organisation</a>
+            </p>
+            <p class="govuk-body">
+                <a class="govuk-link" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Manage organisations</a>
+            </p>
+        }
+    </div>
+</div>
+

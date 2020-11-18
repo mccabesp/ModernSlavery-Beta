@@ -1,4 +1,5 @@
 ﻿@inject IWebService WebService
+@model CompleteViewModel
 @{
     Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Service activated - Modern Slavery reporting service";
@@ -15,12 +16,12 @@
                         Organisation name
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        @ViewBag.OrganisationName
+                        @Model.OrganisationName
                     </dd>
                 </div>
             </dl>
-        </div>       
-        <br/>
+        </div>
+        <br />
         <p class="govuk-body">
             <a class="govuk-button" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Continue</a>
         </p>

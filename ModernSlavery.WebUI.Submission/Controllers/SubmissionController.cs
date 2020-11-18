@@ -50,6 +50,10 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("~/manage-organisations")]
         public async Task<IActionResult> ManageOrganisations()
         {
+            //If the impersonated user is an administrator go to admin home
+            if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
+                return RedirectToActionArea("Home", "Admin", "Admin");
+
             //Clear all the stashes
             ClearAllStashes();
 

@@ -21,7 +21,7 @@
                     @if (!string.IsNullOrWhiteSpace(ViewBag.VerifyCode))
                     {
                         <a href="@Url.Action("VerifyEmail", new {code = ViewBag.VerifyCode, login = Model.EmailAddress})">
-                            <b id="SavedEmailAddress">@Model.EmailAddress</b>
+                            <b id="SavedEmailAddress" data-verifycode="@ViewBag.VerifyCode">@Model.EmailAddress</b>
                         </a>
                     }
                     else

@@ -507,7 +507,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             {
                 if (IsAnyAction(
                     "NewAccount/VerifyEmail",
-                    "Registration/EmailConfirmed",
+                    "NewAccount/EmailConfirmed",
                     "Admin/ReviewRequest",
                     "Admin/ConfirmCancellation",
                     "Admin/RequestAccepted",
@@ -565,6 +565,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 "Submission/ManageOrganisation",
                 "Scope/ChangeOrganisationScope",
                 "Registration/ActivateService",
+                "Registration/ServiceActivated",
                 "Scope/DeclareScope"))
                 return null;
 

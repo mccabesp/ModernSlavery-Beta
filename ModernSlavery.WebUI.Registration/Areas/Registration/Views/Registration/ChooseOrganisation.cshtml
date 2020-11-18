@@ -95,7 +95,7 @@
                                             </td>
                                         }
                                         <td class="govuk-table__cell">
-                                            <button type="submit" class="link-button govuk-link govuk-!-font-size-16" name="command" value="organisation_@i">Choose&nbsp;organisation</button>
+                                            <button type="submit" class="link-button govuk-link govuk-!-font-size-16" id="btnSelect" name="command" value="organisation_@i">Choose&nbsp;organisation</button>
                                         </td>
                                     </tr>
                                 }
@@ -135,7 +135,7 @@
                                         <button type="submit" class="link-button govuk-link" name="command" value="pageNext">Next</button>
                                     }
                                 </div>
-                                <div class="pager-summary">Showing @Model.OrganisationStartIndex – @Model.OrganisationEndIndex of @Model.Organisations.VirtualRecordTotal organisations</div>
+                                <div class="pager-summary">Showing @Model.OrganisationStartIndex – @Model.OrganisationEndIndex of <span id="TotalRecords">@Model.Organisations.VirtualRecordTotal</span> organisations</div>
                             </div>
                         }
                     }

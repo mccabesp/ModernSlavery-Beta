@@ -18,26 +18,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
     public partial class RegistrationController : BaseController
     {
         [Authorize]
-        [HttpGet("service-activated")]
-        public async Task<IActionResult> ServiceActivated()
-        {
-            //Ensure user has completed the registration process
-            var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null) return checkResult;
-
-            var model = UnstashModel<CompleteViewModel>(true);
-            if (model == null) return SessionExpiredView();
-
-            //Ensure the stash is cleared
-            ClearStash();
-
-            ViewBag.OrganisationName = ReportingOrganisation.OrganisationName;
-
-            //Show the confirmation view
-            return View("ServiceActivated");
-        }
-
-        [Authorize]
         [HttpGet("activate-service/{id}")]
         public async Task<IActionResult> ActivateService(string id)
         {
@@ -175,9 +155,9 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 userOrg.Organisation.LatestAddress = userOrg.Address;
                 userOrg.ConfirmAttempts = 0;
 
-                model.AccountingDate =
-                    _registrationService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(userOrg.Organisation.SectorType);
+                model.AccountingDate = _registrationService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(userOrg.Organisation.SectorType);
                 model.OrganisationId = userOrg.OrganisationId;
+                model.OrganisationName = userOrg.Organisation.OrganisationName;
                 StashModel(model);
 
                 result1 = RedirectToAction("ServiceActivated");
@@ -225,6 +205,24 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //Prompt the user with confirmation
             return result1;
+        }
+
+        [Authorize]
+        [HttpGet("service-activated")]
+        public async Task<IActionResult> ServiceActivated()
+        {
+            //Ensure user has completed the registration process
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
+            var model = UnstashModel<CompleteViewModel>(true);
+            if (model == null) return SessionExpiredView();
+
+            //Ensure the stash is cleared
+            ClearStash();
+
+            //Show the confirmation view
+            return View("ServiceActivated",model);
         }
 
         private static bool PinMatchesPinInDatabase(UserOrganisation userOrg, string modelPin)

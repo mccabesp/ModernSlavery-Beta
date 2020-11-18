@@ -116,6 +116,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     if (SharedBusinessLogic.TestOptions.PinInPostTestMode || userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
                     {
                         ViewBag.PinCode = pin;
+                        ViewBag.OrganisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId);
                     }
                     else
                     {
