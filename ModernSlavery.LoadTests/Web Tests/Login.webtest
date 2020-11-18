@@ -1,16 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <WebTest Name="Login" Id="483ed062-6ecc-49b3-9e36-5800b8679530" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="WebTest2.714e1673-855c-426f-8d2e-8d14a0ecfe5c.rec.webtestresult" ResultsLocale="">
   <Items>
-    <Request Method="GET" Guid="497bf83d-f58b-4a9b-bec9-3a661fd301a6" Version="1.1" Url="{{WebServer}}/" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/landing" ReportingName="" IgnoreHttpStatusCode="False" />
-    <Request Method="GET" Guid="f87ef6a5-4087-4c3c-ad6d-b38b8b1bbe4e" Version="1.1" Url="{{WebServer}}/manage-organisations" ThinkTime="21" Timeout="300" ParseDependentRequests="False" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="302" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="f87ef6a5-4087-4c3c-ad6d-b38b8b1bbe4e" Version="1.1" Url="{{WebServer}}/manage-organisations" ThinkTime="5" Timeout="300" ParseDependentRequests="False" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="20" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/identity/sign-in" ReportingName="" IgnoreHttpStatusCode="False">
       <Headers>
         <Header Name="Referer" Value="{{WebServer}}/" />
       </Headers>
       <ExtractionRules>
-        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHttpHeader, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="SigninRedirect1" DisplayName="Extract HTTP Header" Description="Extract the value of an HTTP header and place it into the test context.">
+        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="SignInFields" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
-            <RuleParameter Name="Header" Value="Location" />
             <RuleParameter Name="Required" Value="True" />
+            <RuleParameter Name="HtmlDecode" Value="True" />
           </RuleParameters>
         </ExtractionRule>
       </ExtractionRules>
@@ -39,32 +38,12 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="GET" Guid="5fedf086-6b2c-44aa-8468-081bf65da054" Version="1.1" Url="{{SigninRedirect1}}" ThinkTime="0" Timeout="300" ParseDependentRequests="False" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="302" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
-      <ExtractionRules>
-        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHttpHeader, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="SigninRedirect2" DisplayName="Extract HTTP Header" Description="Extract the value of an HTTP header and place it into the test context.">
-          <RuleParameters>
-            <RuleParameter Name="Header" Value="Location" />
-            <RuleParameter Name="Required" Value="True" />
-          </RuleParameters>
-        </ExtractionRule>
-      </ExtractionRules>
-    </Request>
-    <Request Method="GET" Guid="163ae51b-f90f-4f76-8a74-e68f33844bc0" Version="1.1" Url="{{SigninRedirect2}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
-      <ExtractionRules>
-        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="SignInFields" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
-          <RuleParameters>
-            <RuleParameter Name="Required" Value="True" />
-            <RuleParameter Name="HtmlDecode" Value="True" />
-          </RuleParameters>
-        </ExtractionRule>
-      </ExtractionRules>
-    </Request>
-    <Request Method="POST" Guid="bbc52f83-faad-401a-9b22-8bbb7dd250bc" Version="1.1" Url="{{SigninRedirect2}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="302" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="bbc52f83-faad-401a-9b22-8bbb7dd250bc" Version="1.1" Url="{{WebServer}}/identity/sign-in" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="302" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <Headers>
         <Header Name="Referer" Value="{{WebServer}}/sign-in" />
       </Headers>
       <ExtractionRules>
-        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHttpHeader, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="SigninRedirect3" DisplayName="Extract HTTP Header" Description="Extract the value of an HTTP header and place it into the test context.">
+        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHttpHeader, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="AuthorizeUrl" DisplayName="Extract HTTP Header" Description="Extract the value of an HTTP header and place it into the test context.">
           <RuleParameters>
             <RuleParameter Name="Header" Value="Location" />
             <RuleParameter Name="Required" Value="True" />
@@ -73,13 +52,13 @@
       </ExtractionRules>
       <FormPostHttpBody>
         <FormPostParameter Name="ReturnUrl" Value="{{$HIDDENSignInFields.ReturnUrl}}" RecordedValue="/connect/authorize/callback?client_id=msuWeb&amp;redirect_uri=https%3A%2F%2Flocalhost%3A44371%2Fsignin-oidc&amp;response_type=id_token&amp;scope=openid%20profile%20roles&amp;response_mode=form_post&amp;nonce=636850624370744949.ODM2ZmQ3MWEtYjBhMy00MGJmLTlkN2UtMDU2MjBmODhmNzdmYWIzZGIxODYtZDE0ZS00NDk4LTllNWUtZWJkY2UwNjg2MmQy&amp;state=CfDJ8KbuRtK71uJGg1jdAe26CefDZeFAzNfqDmzWp0Bzbk-DNVpC8-JzJ3KY7J_Kawu-frKxuwXiNjCncCgUCiJNURhS3y2xVdb8M1gqILUkeArncTO7EEpw4qX-KZSTgsT1E2FNfVC35aLESwmCt6c5FrWijZ0Xu0OEX1nzNn2RoPq5xI92wV2dMxHk0JIGSnIocRRX2aK2I6BIkyigguuAeYZMH4_bgLq1dogY-vYWWifXXCfSo6dVZnE6qnyOaP3yiI684fRgvztxYwnnMWGagz0xh5qM-fU_f0ZzSoZfA3lP09KkpnjucFu4X1ryuQSvXXDFFZulJf9qiZPXckaeANYWT8ohqfcpi_6HU5iLO5cq&amp;x-client-SKU=ID_NETSTANDARD2_0&amp;x-client-ver=5.3.0.0" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="RandomEmail" Value="{{RandomEmail}}" RecordedValue="mccabesp@hotmail.com" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Username" Value="{{RandomEmail}}" RecordedValue="mccabesp@hotmail.com" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="Password" Value="{{Password}}" RecordedValue="Shelagh1!" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="button" Value="login" RecordedValue="login" CorrelationBinding="{{FormPostParam2.button}}" UrlEncode="True" />
         <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDENSignInFields.__RequestVerificationToken}}" RecordedValue="CfDJ8KbuRtK71uJGg1jdAe26CecNFUVoxRN65ug35JyTHe5P-62VxbagjSkMXMqzWnS_38NYGe-xAOSJ-3xoI5ayzS9eeMu_3mnp2XKOv9bPQLQ16Fy5pEyebhhYQzUv0iutQKKz61r67qmnl35AaEIKvFo" CorrelationBinding="{{FormPostParam3.__RequestVerificationToken}}" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="5fedf086-6b2c-44aa-8468-081bf65da054" Version="1.1" Url="{{SigninRedirect3}}" ThinkTime="0" Timeout="300" ParseDependentRequests="False" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="5fedf086-6b2c-44aa-8468-081bf65da054" Version="1.1" Url="{{AuthorizeUrl}}" ThinkTime="0" Timeout="300" ParseDependentRequests="False" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -87,7 +66,7 @@
             <RuleParameter Name="HtmlDecode" Value="True" />
           </RuleParameters>
         </ExtractionRule>
-        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractAttributeValue, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="SigninRedirect4" DisplayName="Extract Attribute Value" Description="Extract the value of an attribute from a specified HTML tag.">
+        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractAttributeValue, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="SigninOidcUrl" DisplayName="Extract Attribute Value" Description="Extract the value of an attribute from a specified HTML tag.">
           <RuleParameters>
             <RuleParameter Name="TagName" Value="form" />
             <RuleParameter Name="AttributeName" Value="action" />
@@ -100,12 +79,12 @@
         </ExtractionRule>
       </ExtractionRules>
     </Request>
-    <Request Method="POST" Guid="7ac9b66b-f6a0-4469-bf29-afb8a352e866" Version="1.1" Url="{{SigninRedirect4}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="7ac9b66b-f6a0-4469-bf29-afb8a352e866" Version="1.1" Url="{{SigninOidcUrl}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <Headers>
-        <Header Name="Referer" Value="{{WebServer}}{{SigninRedirect5}}" />
+        <Header Name="Referer" Value="{{WebServer}}{{SignedInUrl}}" />
       </Headers>
       <ExtractionRules>
-        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHttpHeader, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="SigninRedirect5" DisplayName="Extract HTTP Header" Description="Extract the value of an HTTP header and place it into the test context.">
+        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHttpHeader, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="SignedInUrl" DisplayName="Extract HTTP Header" Description="Extract the value of an HTTP header and place it into the test context.">
           <RuleParameters>
             <RuleParameter Name="Header" Value="Location" />
             <RuleParameter Name="Required" Value="True" />
@@ -119,16 +98,22 @@
         <FormPostParameter Name="session_state" Value="{{$HIDDEN1.session_state}}" RecordedValue="XQTVyE1i9vzAEQqXixFaVVG8TW6vGxYI8YUqb3H95zY.50912e0a4c1d467fca9c0c7527e88ed4" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="5fedf086-6b2c-44aa-8468-081bf65da054" Version="1.1" Url="{{SigninRedirect5}}" ThinkTime="0" Timeout="300" ParseDependentRequests="False" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False" />
+    <Request Method="GET" Guid="5fedf086-6b2c-44aa-8468-081bf65da054" Version="1.1" Url="{{SignedInUrl}}" ThinkTime="0" Timeout="300" ParseDependentRequests="False" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False" />
   </Items>
   <ContextParameters>
     <ContextParameter Name="WebServer" Value="https://localhost:44371" />
-    <ContextParameter Name="SigninRedirect1" Value="" />
-    <ContextParameter Name="SigninRedirect2" Value="" />
-    <ContextParameter Name="SigninRedirect3" Value="" />
-    <ContextParameter Name="SigninRedirect4" Value="" />
-    <ContextParameter Name="SigninRedirect5" Value="" />
+    <ContextParameter Name="AuthorizeUrl" Value="" />
+    <ContextParameter Name="SigninOidcUrl" Value="" />
+    <ContextParameter Name="SignedInUrl" Value="" />
     <ContextParameter Name="RandomEmail" Value="stephen@coolcorner.com" />
     <ContextParameter Name="Password" Value="Cadence2007" />
   </ContextParameters>
+  <WebTestPlugins>
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.RelativePathPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="RelativePathPlugIn" Description="" />
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.CookieManagerPlugin, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="CookieManagerPlugin" Description="">
+      <RuleParameters>
+        <RuleParameter Name="ContextParamTarget" Value="" />
+      </RuleParameters>
+    </WebTestPlugin>
+  </WebTestPlugins>
 </WebTest>
