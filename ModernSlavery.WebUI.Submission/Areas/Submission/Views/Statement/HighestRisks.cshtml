@@ -35,9 +35,12 @@
                             <label class="govuk-label" for="high-risk-detail-1">
                                 Risk
                             </label>
-                            <textarea asp-for="HighRisk1" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="high-risk-detail-1-info high-risk-detail-1-hint">@(Model.HighRisk1)</textarea>
-                            <span asp-validation-for="HighRisk1" class="govuk-error-message"></span>
+                            <textarea name="HighRisk1" class="govuk-textarea govuk-js-character-count" id="high-risk-detail-1" rows="5" aria-describedby="high-risk-detail-1-info">@(Model.HighRisk1)</textarea>
                         </div>
+                        <div id="high-risk-detail-1-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                            You can enter up to 200 characters
+                        </div>
+                        <span asp-validation-for="HighRisk1" class="govuk-error-message"></span>
                     </div>
 
                     <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
@@ -45,9 +48,12 @@
                             <label class="govuk-label" for="high-risk-detail-2">
                                 Risk
                             </label>
-                            <textarea asp-for="HighRisk2" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="high-risk-detail-2-info high-risk-detail-2-hint">@(Model.HighRisk2)</textarea>
-                            <span asp-validation-for="HighRisk2" class="govuk-error-message"></span>
+                            <textarea name="HighRisk2" class="govuk-textarea govuk-js-character-count" id="high-risk-detail-2" rows="5" aria-describedby="high-risk-detail-2-info">@(Model.HighRisk2)</textarea>
                         </div>
+                        <div id="high-risk-detail-2-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                            You can enter up to 200 characters
+                        </div>
+                        <span asp-validation-for="HighRisk2" class="govuk-error-message"></span>
                     </div>
 
                     <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
@@ -55,9 +61,12 @@
                             <label class="govuk-label" for="high-risk-detail-3">
                                 Risk
                             </label>
-                            <textarea asp-for="HighRisk3" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="high-risk-detail-3-info high-risk-detail-3-hint">@(Model.HighRisk3)</textarea>
-                            <span asp-validation-for="HighRisk3" class="govuk-error-message"></span>
+                            <textarea name="HighRisk3" class="govuk-textarea govuk-js-character-count" id="high-risk-detail-3" rows="5" aria-describedby="high-risk-detail-3-info">@(Model.HighRisk3)</textarea>
                         </div>
+                        <div id="high-risk-detail-3-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                            You can enter up to 200 characters
+                        </div>
+                        <span asp-validation-for="HighRisk3" class="govuk-error-message"></span>
                     </div>
 
                     <div class="govuk-!-margin-bottom-2">
@@ -76,12 +85,9 @@
                 Save and continue
             </button>
 
-            @if (Model.GetStatus() == BaseViewModel.Status.Incomplete)
-            {
-                <div class="skip-link">
-                    <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
-                </div>
-            }
+            <div class="skip-link">
+                <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+            </div>
         }
     </div>
 
