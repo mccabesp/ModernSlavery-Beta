@@ -1,2 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<WebTest Name="Public Organisation User Journey" Id="82f63e4a-ec27-4088-805f-601ff4a868f8" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="False" RecordedResultFile="" ResultsLocale="" />
+<WebTest Name="Public Organisation User Journey" Id="82f63e4a-ec27-4088-805f-601ff4a868f8" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="False" RecordedResultFile="" ResultsLocale="">
+  <Items>
+    <IncludedWebTest Name="Create Admin Account" Path="..\web tests\create admin account.webtest" Id="c5bbf985-f3fb-4843-a6f0-32296101d04e" IsCodedWebTest="False" InheritWebTestSettings="True" />
+    <IncludedWebTest Name="Register Public Organisation" Path="..\web tests\register public organisation.webtest" Id="7452106f-b520-4696-aa92-2f83a35c543d" IsCodedWebTest="False" InheritWebTestSettings="False" />
+    <IncludedWebTest Name="Logout" Path="..\web tests\logout.webtest" Id="ad2a6722-4678-41fc-848f-18dc51ef1346" IsCodedWebTest="False" InheritWebTestSettings="True" />
+  </Items>
+  <ContextParameters>
+    <ContextParameter Name="DeleteAccount" Value="1" />
+    <ContextParameter Name="Password" Value="Cadence2007" />
+    <ContextParameter Name="WebServer" Value="https://localhost:44371" />
+    <ContextParameter Name="WebLink" Value="https://www.gov.uk/government/publications/uk-government-modern-slavery-statement" />
+    <ContextParameter Name="RandomGuid" Value="" />
+    <ContextParameter Name="RandomEmail" Value="TISCTEST-{{RandomGuid}}@domain.co.uk" />
+    <ContextParameter Name="RandomFirstName" Value="TISCTEST-{{RandomGuid}}_First" />
+    <ContextParameter Name="RandomLastName" Value="TISCTEST-{{RandomGuid}}_Last" />
+    <ContextParameter Name="RandomJobTitle" Value="TISCTEST-{{RandomGuid}}_Title" />
+    <ContextParameter Name="RandomOrganisation" Value="TISCTEST-{{RandomGuid}}_Org" />
+  </ContextParameters>
+  <WebTestPlugins>
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.RandomGuidPlugin, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="RandomGuidPlugin" Description="">
+      <RuleParameters>
+        <RuleParameter Name="ContextParamTarget" Value="RandomGuid" />
+        <RuleParameter Name="PerContext" Value="True" />
+      </RuleParameters>
+    </WebTestPlugin>
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.ResolveParameterPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="ResolveParameterPlugIn" Description="" />
+  </WebTestPlugins>
+</WebTest>

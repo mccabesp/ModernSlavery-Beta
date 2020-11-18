@@ -2,6 +2,7 @@
 <WebTest Name="Private Organisation User Journey" Id="8623a495-f498-4802-a3cf-07f1e857c355" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="False" RecordedResultFile="" ResultsLocale="">
   <Items>
     <IncludedWebTest Name="Create User Account" Path="..\web tests\create user account.webtest" Id="4023c953-f79e-46ed-8182-ce311bb60956" IsCodedWebTest="False" InheritWebTestSettings="True" />
+    <IncludedWebTest Name="Register Private Organisation" Path="..\web tests\register private organisation.webtest" Id="837d5c0b-9a6f-42e0-8cad-745e7b5b2f10" IsCodedWebTest="False" InheritWebTestSettings="False" />
     <IncludedWebTest Name="Logout" Path="..\web tests\logout.webtest" Id="ad2a6722-4678-41fc-848f-18dc51ef1346" IsCodedWebTest="False" InheritWebTestSettings="True" />
   </Items>
   <ContextParameters>
@@ -9,7 +10,6 @@
     <ContextParameter Name="Password" Value="Cadence2007" />
     <ContextParameter Name="WebServer" Value="https://localhost:44371" />
     <ContextParameter Name="WebLink" Value="https://www.gov.uk/government/publications/uk-government-modern-slavery-statement" />
-    <ContextParameter Name="btnViewData" Value="" />
     <ContextParameter Name="ResponseTime" Value="5" />
     <ContextParameter Name="RandomGuid" Value="" />
     <ContextParameter Name="RandomEmail" Value="TISCTEST-{{RandomGuid}}@domain.co.uk" />

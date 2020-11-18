@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<WebTest Name="Register Private Organisation" Id="837d5c0b-9a6f-42e0-8cad-745e7b5b2f10" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="False" RecordedResultFile="RegisterPrivateOrganisation.9d7c59df-e07f-40ef-81d5-6bbcb2ba5ff2.rec.webtestresult" ResultsLocale="">
+<WebTest Name="Register Public Organisation" Id="7452106f-b520-4696-aa92-2f83a35c543d" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="False" RecordedResultFile="RegisterPrivateOrganisation.9d7c59df-e07f-40ef-81d5-6bbcb2ba5ff2.rec.webtestresult" ResultsLocale="">
   <Items>
     <IncludedWebTest Name="Login" Path="login.webtest" Id="483ed062-6ecc-49b3-9e36-5800b8679530" IsCodedWebTest="False" InheritWebTestSettings="False" />
     <Request Method="GET" Guid="8357ee8c-1f06-4f36-a04b-cfc334ea17d9" Version="1.1" Url="{{WebServer}}/manage-organisations" ThinkTime="5" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="20" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
@@ -67,7 +67,7 @@
       <FormPostHttpBody>
         <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="SearchText" Value="{{$HIDDEN1.SearchText}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="RegistrationType" Value="private" RecordedValue="" CorrelationBinding="{{FormPostParam9.RegistrationType}}" UrlEncode="True" />
+        <FormPostParameter Name="RegistrationType" Value="public" RecordedValue="" CorrelationBinding="{{FormPostParam9.RegistrationType}}" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
     <Request Method="POST" Guid="ea17c153-baa9-43d1-893c-6a4b9c8a1622" Version="1.1" Url="{{WebServer}}/register/organisation-search" ThinkTime="5" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="120" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/register/choose-organisation" ReportingName="" IgnoreHttpStatusCode="False">
@@ -134,7 +134,6 @@
             <RuleParameter Name="AttributeName" Value="value" />
             <RuleParameter Name="MatchAttributeName" Value="id" />
             <RuleParameter Name="MatchAttributeValue" Value="btnSelect" />
-            <RuleParameter Name="Required" Value="True" />
           </RuleParameters>
         </ExtractionRule>
       </ExtractionRules>
@@ -163,7 +162,7 @@
         <FormPostParameter Name="command" Value="{{RandomOrganisationCommand}}" RecordedValue="" CorrelationBinding="{{FormPostParam7.command}}" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="POST" Guid="bf93965d-3896-4cc1-b177-267ad52dd8a6" Version="1.1" Url="{{WebServer}}/register/confirm-organisation" ThinkTime="5" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="20" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/register/pin-sent" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="bf93965d-3896-4cc1-b177-267ad52dd8a6" Version="1.1" Url="{{WebServer}}/register/confirm-organisation" ThinkTime="5" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="20" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/register/request-received" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.ExtractHtmlTagInnerText, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="PINCode" DisplayName="Tag Inner Text" Description="Extracts the inner text from the specified HTML tag.">
           <RuleParameters>
@@ -213,49 +212,20 @@
         <FormPostParameter Name="command" Value="confirm" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
+    <IncludedWebTest Name="Logout" Path="logout.webtest" Id="ad2a6722-4678-41fc-848f-18dc51ef1346" IsCodedWebTest="False" InheritWebTestSettings="False" />
+    <IncludedWebTest Name="ApproveOrganisation" Path="approveorganisation.webtest" Id="96edfbeb-5095-4988-8dc8-6a97f84645d9" IsCodedWebTest="False" InheritWebTestSettings="False" />
+    <IncludedWebTest Name="Login" Path="login.webtest" Id="483ed062-6ecc-49b3-9e36-5800b8679530" IsCodedWebTest="False" InheritWebTestSettings="False" />
     <Request Method="GET" Guid="8357ee8c-1f06-4f36-a04b-cfc334ea17d9" Version="1.1" Url="{{WebServer}}/manage-organisations" ThinkTime="5" Timeout="300" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="20" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
-        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
+        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractAttributeValue, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="ManageOrgLink" DisplayName="Extract Attribute Value" Description="Extract the value of an attribute from a specified HTML tag.">
           <RuleParameters>
+            <RuleParameter Name="TagName" Value="a" />
+            <RuleParameter Name="AttributeName" Value="href" />
+            <RuleParameter Name="MatchAttributeName" Value="id" />
+            <RuleParameter Name="MatchAttributeValue" Value="ManageOrg-@({{OrganisationIdentifier}})" />
+            <RuleParameter Name="HtmlDecode" Value="True" />
             <RuleParameter Name="Required" Value="True" />
-            <RuleParameter Name="HtmlDecode" Value="True" />
-          </RuleParameters>
-        </ExtractionRule>
-      </ExtractionRules>
-      <CorrelationExtractionRules>
-        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractFormField, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="FormPostParam9.RegistrationType" DisplayName="" Description="">
-          <RuleParameters>
-            <RuleParameter Name="Name" Value="radio-1" />
-            <RuleParameter Name="HtmlDecode" Value="True" />
-            <RuleParameter Name="Required" Value="False" />
             <RuleParameter Name="Index" Value="0" />
-          </RuleParameters>
-        </ExtractionRule>
-      </CorrelationExtractionRules>
-    </Request>
-    <Request Method="GET" Guid="409ab8fb-a571-4c18-85c9-11b0f03528cf" Version="1.1" Url="{{WebServer}}/register/activate-service/{{OrganisationIdentifier}}" ThinkTime="5" Timeout="300" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="20" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
-      <ExtractionRules>
-        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
-          <RuleParameters>
-            <RuleParameter Name="Required" Value="True" />
-            <RuleParameter Name="HtmlDecode" Value="True" />
-          </RuleParameters>
-        </ExtractionRule>
-      </ExtractionRules>
-    </Request>
-    <Request Method="POST" Guid="409ab8fb-a571-4c18-85c9-11b0f03528cf" Version="1.1" Url="{{WebServer}}/register/activate-service/{{OrganisationIdentifier}}" ThinkTime="5" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="20" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/register/service-activated" ReportingName="" IgnoreHttpStatusCode="False">
-      <FormPostHttpBody>
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="PIN" Value="{{PINCode}}" RecordedValue="" CorrelationBinding="{{FormPostParam5.PIN}}" UrlEncode="False" />
-        <FormPostParameter Name="command" Value="Activate &amp; continue" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
-      </FormPostHttpBody>
-    </Request>
-    <Request Method="GET" Guid="8357ee8c-1f06-4f36-a04b-cfc334ea17d9" Version="1.1" Url="{{WebServer}}/manage-organisations" ThinkTime="5" Timeout="300" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="20" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
-      <ExtractionRules>
-        <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
-          <RuleParameters>
-            <RuleParameter Name="Required" Value="True" />
-            <RuleParameter Name="HtmlDecode" Value="True" />
           </RuleParameters>
         </ExtractionRule>
       </ExtractionRules>
@@ -274,11 +244,12 @@
   <ContextParameters>
     <ContextParameter Name="OrgCount" Value="" />
     <ContextParameter Name="RandomPage" Value="" />
-    <ContextParameter Name="SearchText" Value="Ltd" />
+    <ContextParameter Name="SearchText" Value="Council" />
     <ContextParameter Name="RandomOrganisationCommand" Value="" />
     <ContextParameter Name="PINCode" Value="" />
     <ContextParameter Name="RandomPageCommand" Value="page_{{RandomPage}}" />
     <ContextParameter Name="OrganisationIdentifier" Value="" />
+    <ContextParameter Name="ManageOrgLink" Value="" />
   </ContextParameters>
   <WebTestPlugins>
     <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.RandomPagePlugin, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="RandomPagePlugin" Description="">

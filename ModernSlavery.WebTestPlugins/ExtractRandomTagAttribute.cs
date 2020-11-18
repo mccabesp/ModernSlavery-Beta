@@ -19,6 +19,7 @@ namespace ModernSlavery.WebTestPlugins
         public string AttributeName { get; set; }
         public string MatchAttributeName { get; set; }
         public string MatchAttributeValue { get; set; }
+        public bool Required { get; set; }
 
         private static Random _rand = new Random();
 
@@ -40,9 +41,18 @@ namespace ModernSlavery.WebTestPlugins
                     return;
                 }
             }
-            // If the extraction fails, set the error text that the user sees
-            e.Success = false;
-            e.Message = $"No tag '{TagName}' with attribute '{MatchAttributeName}={MatchAttributeValue}'";
+
+            if (Required)
+            {
+                // If the extraction fails, set the error text that the user sees
+                e.Success = false;
+                e.Message = $"No tag '{TagName}' with attribute '{MatchAttributeName}={MatchAttributeValue}'";
+            }
+            else
+            {
+                e.WebTest.Context.Remove(ContextParameterName);
+                e.Success = true;
+            }
         }
     }
 }

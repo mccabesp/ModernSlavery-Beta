@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WebTest Name="ApproveOrganisation" Id="96edfbeb-5095-4988-8dc8-6a97f84645d9" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="False" RecordedResultFile="ApproveOrganisation.9361f90e-f980-406d-ab94-9ec8272963df.rec.webtestresult" ResultsLocale="">
+  <Items>
+    <IncludedWebTest Name="Login Admin Account" Path="login admin account.webtest" Id="835c8061-0878-4427-ba1f-deadd395ba75" IsCodedWebTest="False" InheritWebTestSettings="False" />
+    <Request Method="GET" Guid="aa341fe0-0e9f-49e5-aeb9-5194f4c46e3e" Version="1.1" Url="{{WebServer}}/admin/pending-registrations" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+      <ExtractionRules>
+        <ExtractionRule Classname="ModernSlavery.WebTestPlugins.ExtractRandomAttributeValue, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" VariableName="ReviewLink" DisplayName="Extract Random Attribute Value" Description="Extract the value of an attribute from a random specified HTML tag.">
+          <RuleParameters>
+            <RuleParameter Name="TagName" Value="a" />
+            <RuleParameter Name="AttributeName" Value="href" />
+            <RuleParameter Name="MatchAttributeName" Value="name" />
+            <RuleParameter Name="MatchAttributeValue" Value="ReviewLink" />
+            <RuleParameter Name="Required" Value="False" />
+          </RuleParameters>
+        </ExtractionRule>
+      </ExtractionRules>
+    </Request>
+    <Request Method="GET" Guid="2f9ac673-676b-47a2-a867-ab75ffb259ed" Version="1.1" Url="http://localhost/" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False" />
+    <Loop UniqueStringId="be19ab27-3438-47ed-a178-131cefc862e1">
+      <ConditionalRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ContextParameterExistenceRule, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" DisplayName="Context Parameter Exists" Description="Test whether or not the specified context parameter exists in the current context." MaxIterations="-1" AdvanceDataCursors="False">
+        <RuleParameters>
+          <RuleParameter Name="ContextParameterName" Value="ReviewLink" />
+          <RuleParameter Name="CheckForExistence" Value="True" />
+        </RuleParameters>
+      </ConditionalRule>
+      <Items>
+        <Request Method="GET" Guid="d090871c-76ee-40b3-90e1-23a2410cf6f9" Version="1.1" Url="{{WebServer}}{{ReviewLink}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+          <ExtractionRules>
+            <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
+              <RuleParameters>
+                <RuleParameter Name="Required" Value="True" />
+                <RuleParameter Name="HtmlDecode" Value="True" />
+              </RuleParameters>
+            </ExtractionRule>
+          </ExtractionRules>
+          <CorrelationExtractionRules>
+            <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractText, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="FormPostParam1.command" DisplayName="" Description="">
+              <RuleParameters>
+                <RuleParameter Name="StartsWith" Value="lue=&quot;" />
+                <RuleParameter Name="EndsWith" Value="&quot;&gt;Con" />
+                <RuleParameter Name="Index" Value="11" />
+                <RuleParameter Name="IgnoreCase" Value="False" />
+                <RuleParameter Name="UseRegularExpression" Value="False" />
+                <RuleParameter Name="HtmlDecode" Value="True" />
+                <RuleParameter Name="Required" Value="False" />
+              </RuleParameters>
+            </ExtractionRule>
+            <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractText, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="FormPostParam5.command" DisplayName="" Description="">
+              <RuleParameters>
+                <RuleParameter Name="StartsWith" Value="lue=&quot;" />
+                <RuleParameter Name="EndsWith" Value="&quot;&gt;Con" />
+                <RuleParameter Name="Index" Value="11" />
+                <RuleParameter Name="IgnoreCase" Value="False" />
+                <RuleParameter Name="UseRegularExpression" Value="False" />
+                <RuleParameter Name="HtmlDecode" Value="True" />
+                <RuleParameter Name="Required" Value="False" />
+              </RuleParameters>
+            </ExtractionRule>
+          </CorrelationExtractionRules>
+        </Request>
+        <Request Method="POST" Guid="0c42bd41-e27e-4906-9a80-f638b94eaee8" Version="1.1" Url="{{WebServer}}{{ReviewLink}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+          <FormPostHttpBody>
+            <FormPostParameter Name="SectorType" Value="{{$HIDDEN1.SectorType}}" RecordedValue="Private" CorrelationBinding="" UrlEncode="True" />
+            <FormPostParameter Name="CompanyNumber" Value="{{$HIDDEN1.CompanyNumber}}" RecordedValue="12441584" CorrelationBinding="" UrlEncode="True" />
+            <FormPostParameter Name="CharityNumber" Value="{{$HIDDEN1.CharityNumber}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+            <FormPostParameter Name="MutualNumber" Value="{{$HIDDEN1.MutualNumber}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+            <FormPostParameter Name="OtherName" Value="{{$HIDDEN1.OtherName}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+            <FormPostParameter Name="OtherValue" Value="{{$HIDDEN1.OtherValue}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+            <FormPostParameter Name="ReviewCode" Value="{{$HIDDEN1.ReviewCode}}" RecordedValue=",MyBrVop5aX8nZdpIDaLPxpLi7nfyA5sR-hxy2h8HqV8!" CorrelationBinding="" UrlEncode="True" />
+            <FormPostParameter Name="ManualAddress" Value="{{$HIDDEN1.ManualAddress}}" RecordedValue="False" CorrelationBinding="" UrlEncode="True" />
+            <FormPostParameter Name="DUNSNumber" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+            <FormPostParameter Name="command" Value="approve" RecordedValue="approve" CorrelationBinding="{{FormPostParam5.command}}" UrlEncode="True" />
+            <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="CfDJ8O2IvFhSNl5DtKG_TQqS_TokuEiGrI4rDNk6iD4tQ2g7gCGAPD-GgAox2J-KrE6mr3mWNJnPqkIxucpPssVGIFGn6EjPdnd9ICAttreHRHUF3B57Qz4QTh-AOJDHVjI0lPr1wzhO4LJhY2AjBXnUvh4wS6SQ_Ol6IX-XN64HACdYPje8Bn-gz7de7rOIgaTONg" CorrelationBinding="" UrlEncode="True" />
+          </FormPostHttpBody>
+        </Request>
+        <Request Method="GET" Guid="aa341fe0-0e9f-49e5-aeb9-5194f4c46e3e" Version="1.1" Url="{{WebServer}}/admin/pending-registrations" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+          <ExtractionRules>
+            <ExtractionRule Classname="ModernSlavery.WebTestPlugins.ExtractRandomAttributeValue, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" VariableName="ReviewLink" DisplayName="Extract Random Attribute Value" Description="Extract the value of an attribute from a random specified HTML tag.">
+              <RuleParameters>
+                <RuleParameter Name="TagName" Value="a" />
+                <RuleParameter Name="AttributeName" Value="href" />
+                <RuleParameter Name="MatchAttributeName" Value="name" />
+                <RuleParameter Name="MatchAttributeValue" Value="ReviewLink" />
+                <RuleParameter Name="Required" Value="False" />
+              </RuleParameters>
+            </ExtractionRule>
+          </ExtractionRules>
+        </Request>
+      </Items>
+    </Loop>
+    <IncludedWebTest Name="Logout" Path="logout.webtest" Id="ad2a6722-4678-41fc-848f-18dc51ef1346" IsCodedWebTest="False" InheritWebTestSettings="False" />
+  </Items>
+  <ContextParameters>
+    <ContextParameter Name="WebServer" Value="https://localhost:44371" />
+    <ContextParameter Name="ReviewLink" Value="" />
+  </ContextParameters>
+  <ValidationRules>
+    <ValidationRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ValidateResponseUrl, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" DisplayName="Response URL" Description="Validates that the response URL after redirects are followed is the same as the recorded response URL.  QueryString parameters are ignored." Level="Low" ExectuionOrder="BeforeDependents" />
+    <ValidationRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ValidationRuleResponseTimeGoal, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" DisplayName="Response Time Goal" Description="Validates that the response time for the request is less than or equal to the response time goal as specified on the request.  Response time goals of zero will be ignored." Level="Low" ExectuionOrder="AfterDependents">
+      <RuleParameters>
+        <RuleParameter Name="Tolerance" Value="0" />
+      </RuleParameters>
+    </ValidationRule>
+  </ValidationRules>
+  <WebTestPlugins>
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.ResolveParameterPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="ResolveParameterPlugIn" Description="" />
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.CookieManagerPlugin, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="CookieManagerPlugin" Description="">
+      <RuleParameters>
+        <RuleParameter Name="ContextParamTarget" Value="" />
+      </RuleParameters>
+    </WebTestPlugin>
+  </WebTestPlugins>
+</WebTest>

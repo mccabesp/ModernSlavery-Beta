@@ -77,6 +77,18 @@
     <None Include="Scenarios\Anonymous User Journey.webtest" />
     <None Include="Scenarios\Private Organisation User Journey.webtest" />
     <None Include="Scenarios\Public Organisation User Journey.webtest" />
+    <None Include="Web Tests\ApproveOrganisation.webtest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Web Tests\Login Admin Account.webtest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Web Tests\Create Admin Account.webtest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Web Tests\Register Public Organisation.webtest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Web Tests\Reset Password.webtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
