@@ -55,81 +55,75 @@ namespace ModernSlavery.WebUI.Registration.Classes
         {
             if (searchText.IsNumber()) searchText = searchText.PadLeft(8, '0');
 
-
             var remoteTotal = 0;
-            var searchResults = test ? null : LoadSearch(searchText);
+            var searchResults = LoadSearch(searchText);
 
             if (searchResults == null)
             {
-                var orgs = new List<Organisation>();
                 var localResults = new List<Organisation>();
 
-                if (!test)
+                if (test)
                 {
-                    orgs = _DataRepository.GetAll<Organisation>()
-                        .Where(
-                            o => o.SectorType == SectorTypes.Private && o.Status == OrganisationStatuses.Active &&
-                                 o.LatestAddress != null)
-                        .ToList();
+                    searchResults = new PagedResult<OrganisationRecord>();
+                    localResults = _DataRepository.GetAll<Organisation>().Where(o => o.SectorType == SectorTypes.Private && o.Status == OrganisationStatuses.Active).OrderBy(o => Guid.NewGuid()).Take(_companiesHouseOptions.MaxResponseCompanies).ToList();
+                    searchResults.Results=localResults.Select(o => _organisationBusinessLogic.CreateOrganisationRecord(o)).ToList();
+                    searchResults.PageSize = _companiesHouseOptions.MaxResponseCompanies;
+                    searchResults.VirtualRecordTotal = searchResults.Results.Count;
+                    searchResults.ActualRecordTotal = searchResults.VirtualRecordTotal;
+                }
+                else
+                {
+                    var orgs = _DataRepository.GetAll<Organisation>().Where(o => o.SectorType == SectorTypes.Private && o.Status == OrganisationStatuses.Active).OrderBy(o => o.OrganisationName).ToList();
 
                     if (searchText.IsCompanyNumber())
-                        localResults = orgs.Where(o => o.CompanyNumber.EqualsI(searchText))
-                            .OrderBy(o => o.OrganisationName).ToList();
+                        localResults = orgs.Where(o => o.CompanyNumber.EqualsI(searchText)).Take(_companiesHouseOptions.MaxResponseCompanies).ToList();
                     else
-                        localResults = orgs.Where(o => o.OrganisationName.ContainsI(searchText))
-                            .OrderBy(o => o.OrganisationName).ToList();
-                }
+                        localResults = orgs.Where(o => o.OrganisationName.ContainsI(searchText)).Take(_companiesHouseOptions.MaxResponseCompanies).OrderBy(o => o.OrganisationName).ToList();
 
-                try
-                {
-                    searchResults =
-                        await _CompaniesHouseAPI.SearchOrganisationsAsync(searchText, 1, _companiesHouseOptions.MaxResponseCompanies,
-                            test);
-                    remoteTotal = searchResults.Results.Count;
-                }
-                catch (Exception ex)
-                {
-                    remoteTotal = -1;
-                    if ((ex.InnerException ?? ex).Message.ContainsI(
-                            "502",
-                            "Bad Gateway",
-                            "the connected party did not properly respond after a period of time")
-                        && localResults.Count > 0)
-                        searchResults = new PagedResult<OrganisationRecord>();
-                    else
-                        throw;
-                }
+                    var maxCoHoResults = _companiesHouseOptions.MaxResponseCompanies - localResults.Count;
 
-                if (!searchText.IsCompanyNumber() && remoteTotal > 0)
-                {
-                    //Replace CoHo orgs with db orgs with same company number
-                    var companyNumbers = new SortedSet<string>(
-                        searchResults.Results.Select(s => s.CompanyNumber),
-                        StringComparer.OrdinalIgnoreCase);
-                    var existingResults = orgs.Where(o => companyNumbers.Contains(o.CompanyNumber)).ToList();
-                    localResults = localResults.Union(existingResults).ToList();
-                }
-
-                var localTotal = localResults.Count;
-
-                //Remove any coho results found in DB
-                if (localTotal > 0)
-                {
-                    localTotal -=
-                        searchResults.Results.RemoveAll(r => localResults.Any(l => l.CompanyNumber == r.CompanyNumber));
-
-                    if (localResults.Count > 0)
+                    try
                     {
-                        if (test) //Make sure test organisation is first
-                            searchResults.Results.AddRange(localResults.Select(o => _organisationBusinessLogic.CreateOrganisationRecord(o)));
+                        searchResults = await _CompaniesHouseAPI.SearchOrganisationsAsync(searchText, 1, _companiesHouseOptions.MaxResponseCompanies, maxCoHoResults);
+                        remoteTotal = searchResults.Results.Count;
+                    }
+                    catch (Exception ex)
+                    {
+                        remoteTotal = -1;
+                        if ((ex.InnerException ?? ex).Message.ContainsI(
+                                "502",
+                                "Bad Gateway",
+                                "the connected party did not properly respond after a period of time")
+                            && localResults.Count > 0)
+                            searchResults = new PagedResult<OrganisationRecord>();
                         else
-                            searchResults.Results.InsertRange(0, localResults.Select(o => _organisationBusinessLogic.CreateOrganisationRecord(o)));
+                            throw;
+                    }
 
-                        searchResults.ActualRecordTotal += localTotal;
+                    if (!searchText.IsCompanyNumber() && remoteTotal > 0)
+                    {
+                        //Replace CoHo orgs with db orgs with same company number
+                        var companyNumbers = new SortedSet<string>(searchResults.Results.Select(s => s.CompanyNumber),StringComparer.OrdinalIgnoreCase);
+                        var existingResults = orgs.Where(o => companyNumbers.Contains(o.CompanyNumber)).ToList();
+                        localResults = localResults.Union(existingResults).ToList();
+                    }
+
+                    var localTotal = localResults.Count;
+
+                    //Remove any coho results found in DB
+                    if (localTotal > 0)
+                    {
+                        localTotal -= searchResults.Results.RemoveAll(r => localResults.Any(l => l.CompanyNumber == r.CompanyNumber));
+
+                        if (localResults.Count > 0)
+                        {
+                            searchResults.Results.InsertRange(0, localResults.Select(o => _organisationBusinessLogic.CreateOrganisationRecord(o)));
+                            searchResults.ActualRecordTotal += localTotal;
+                        }
                     }
                 }
 
-                if (!test) SaveSearch(searchText, searchResults, remoteTotal);
+                SaveSearch(searchText, searchResults, remoteTotal);
             }
 
             var result = new PagedResult<OrganisationRecord>();

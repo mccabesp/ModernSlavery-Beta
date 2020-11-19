@@ -530,7 +530,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             OrganisationAddress address = null;
             if (userId > 0) address = org.UserOrganisations.FirstOrDefault(uo => uo.UserId == userId)?.Address;
 
-            if (address == null) address = org.LatestAddress;
+            if (address == null) address = org.LatestAddress ?? org.GetLatestAddress();
 
             if (address == null)
                 return new OrganisationRecord

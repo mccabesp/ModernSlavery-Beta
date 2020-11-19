@@ -13,6 +13,7 @@ namespace ModernSlavery.Core.Options
         public string ApiKey { get; set; }
         public string ApiServer { get; set; }
         public string CompanyNumberRegexError { get; set; } = "Company number must contain 8 characters only";
+        public int MaxPageSize { get; set; } = 100;
         public int MaxResponseCompanies { get; set; } = 400;
         public int MaxApiCallsPerFiveMins { get; set; } = 600;//The maximum allowed updates in a 5 min interval per ApiKey
         public int UpdateHours { get; set; } = 24;//How often to check for updates

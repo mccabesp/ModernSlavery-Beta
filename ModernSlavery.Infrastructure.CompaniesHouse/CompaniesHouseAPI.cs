@@ -35,57 +35,37 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             if (_apiKeys.Length==0)throw new ArgumentNullException(nameof(companiesHouseOptions.ApiKey));
         }
 
-        public async Task<PagedResult<OrganisationRecord>> SearchOrganisationsAsync(string searchText, int page, int pageSize,
-            bool test = false)
+        public async Task<PagedResult<OrganisationRecord>> SearchOrganisationsAsync(string searchText, int page, int pageSize, int maxRecords)
         {
             if (searchText.IsNumber()) searchText = searchText.PadLeft(8, '0');
-
-            var organisationsPage = new PagedResult<OrganisationRecord>
-            {
-                PageSize = pageSize, CurrentPage = page, Results = new List<OrganisationRecord>()
-            };
-
-            if (test)
-            {
-                organisationsPage.ActualRecordTotal = 1;
-                organisationsPage.VirtualRecordTotal = 1;
-
-                var id = Numeric.Rand(100000, int.MaxValue - 1);
-                var organisation = new OrganisationRecord
-                {
-                    OrganisationName = _testOptions.TestPrefix + "_Ltd_" + id,
-                    CompanyNumber = ("_" + id).Left(10),
-                    Address1 = "Test Address 1",
-                    Address2 = "Test Address 2",
-                    City = "Test Address 3",
-                    Country = "Test Country",
-                    PostCode = "Test Post Code",
-                    PoBox = null
-                };
-                organisationsPage.Results.Add(organisation);
-                return organisationsPage;
-            }
 
             SetApiKey();
 
             //Get the first page of results and the total records, number of pages, and page size
-            var tasks = new List<Task<PagedResult<OrganisationRecord>>>();
-            var page1task = SearchOrganisationsAsync(searchText, 1, pageSize);
+            var page1task = SearchCompaniesAsync(searchText, 1, pageSize);
             await page1task;
 
             //Calculate the maximum page size
-            var maxPages = (int) Math.Ceiling((double)_companiesHouseOptions.MaxResponseCompanies / page1task.Result.PageSize);
+            int maxPages = (int) Math.Ceiling((double)maxRecords / page1task.Result.PageSize);
             maxPages = page1task.Result.PageCount > maxPages ? maxPages : page1task.Result.PageCount;
 
             //Add a task for ll pages from 2 upwards to maxpages
+            var tasks = new List<Task<PagedResult<OrganisationRecord>>>();
             for (var subPage = 2; subPage <= maxPages; subPage++)
-                tasks.Add(SearchOrganisationsAsync(searchText, subPage, page1task.Result.PageSize));
+                tasks.Add(SearchCompaniesAsync(searchText, subPage, page1task.Result.PageSize));
 
             //Wait for all the tasks to complete
-            await Task.WhenAll(tasks);
+            if (tasks.Count > 0)await Task.WhenAll(tasks);
 
             //Add page 1 to the list of completed tasks
             tasks.Insert(0, page1task);
+
+            var organisationsPage = new PagedResult<OrganisationRecord>
+            {
+                PageSize = pageSize,
+                CurrentPage = page,
+                Results = new List<OrganisationRecord>()
+            };
 
             //Merge the results from each page into a single page of results
             foreach (var task in tasks) organisationsPage.Results.AddRange(task.Result.Results);
@@ -145,7 +125,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             }
         }
 
-        private async Task<PagedResult<OrganisationRecord>> SearchOrganisationsAsync(string searchText, int page, int pageSize)
+        private async Task<PagedResult<OrganisationRecord>> SearchCompaniesAsync(string searchText, int page, int pageSize)
         {
             var organisationsPage = new PagedResult<OrganisationRecord>
             {

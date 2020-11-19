@@ -176,19 +176,15 @@
                     @if (!string.IsNullOrWhiteSpace(Model.ContactFirstName) || !string.IsNullOrWhiteSpace(Model.ContactFirstName))
                     {
                         <tr class="govuk-table__row ">
-                            <th scope="row" class="govuk-table__header">
+                            <th scope="row" class="govuk-table__header" colspan="2">
                                 <br>Your contact details
                             </th>
-                            <td class="govuk-table__cell">
-                                <!-- Default Dynamic Section -->
-                            </td>
                         </tr>
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">
                                 Your name
                             </th>
                             <td class="govuk-table__cell">
-                                <!-- Default Dynamic Section -->
                                 @Model.ContactFirstName @Model.ContactLastName (@Model.ContactJobTitle)
                             </td>
                         </tr>
@@ -198,7 +194,6 @@
                                 Email
                             </th>
                             <td class="govuk-table__cell">
-                                <!-- Default Dynamic Section -->
                                 @Model.ContactEmailAddress
                             </td>
                         </tr>
@@ -207,7 +202,6 @@
                                 Telephone
                             </th>
                             <td class="govuk-table__cell">
-                                <!-- Default Dynamic Section -->
                                 @Model.ContactPhoneNumber
                             </td>
                         </tr>

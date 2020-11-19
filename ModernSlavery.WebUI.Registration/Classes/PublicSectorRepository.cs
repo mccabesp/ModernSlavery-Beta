@@ -32,46 +32,16 @@ namespace ModernSlavery.WebUI.Registration.Classes
             _organisationBusinessLogic = organisationBusinessLogic;
         }
 
-        public async Task<PagedResult<OrganisationRecord>> SearchAsync(string searchText, int page, int pageSize,
-            bool test = false)
+        public async Task<PagedResult<OrganisationRecord>> SearchAsync(string searchText, int page, int pageSize,bool test = false)
         {
             var result = new PagedResult<OrganisationRecord>();
+
+            List<Organisation> searchResultsList;
             if (test)
-            {
-                var organisations = new List<OrganisationRecord>();
+                searchResultsList = _DataRepository.GetAll<Organisation>().Where(o => o.SectorType == SectorTypes.Public && o.Status == OrganisationStatuses.Active).OrderBy(o => Guid.NewGuid()).ToList();
+            else
+                searchResultsList = _DataRepository.GetAll<Organisation>().Where(o => o.SectorType == SectorTypes.Public && o.Status == OrganisationStatuses.Active).OrderBy(o => o.OrganisationName).ToList().Where(o => o.OrganisationName.ContainsI(searchText)).ToList();
 
-                var min = await _DataRepository.CountAsync<Organisation>();
-
-                var id = Numeric.Rand(min, int.MaxValue - 1);
-                var organisation = new OrganisationRecord
-                {
-                    OrganisationName = _testOptions.TestPrefix + "_GovDept_" + id,
-                    CompanyNumber = ("_" + id).Left(10),
-                    Address1 = "Test Address 1",
-                    Address2 = "Test Address 2",
-                    City = "Test Address 3",
-                    Country = "Test Country",
-                    PostCode = "Test Post Code",
-                    EmailDomains = "*@*",
-                    PoBox = null,
-                    SicCodeIds = "1"
-                };
-                organisations.Add(organisation);
-
-                result.ActualRecordTotal = organisations.Count;
-                result.VirtualRecordTotal = organisations.Count;
-                result.CurrentPage = page;
-                result.PageSize = pageSize;
-                result.Results = organisations;
-                return result;
-            }
-
-            var searchResults = await _DataRepository.ToListAsync<Organisation>(o =>
-                o.SectorType == SectorTypes.Public && o.Status == OrganisationStatuses.Active);
-            var searchResultsList = searchResults.Where(o => o.OrganisationName.ContainsI(searchText))
-                .OrderBy(o => o.OrganisationName)
-                .ThenBy(o => o.OrganisationName)
-                .ToList();
             result.ActualRecordTotal = searchResultsList.Count;
             result.VirtualRecordTotal = searchResultsList.Count;
             result.CurrentPage = page;

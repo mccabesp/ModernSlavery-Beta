@@ -1087,11 +1087,19 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     model.PoBox = organisation.PoBox;
                     if (organisation.IsUkAddress.HasValue)
                         model.IsUkAddress = organisation.IsUkAddress;
-                    else
+                    else if (!string.IsNullOrWhiteSpace(organisation.PostCode))
                         model.IsUkAddress = await _postcodeChecker.IsValidPostcode(organisation.PostCode)
                             ? true
                             : (bool?)null;
                 }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(model.Postcode))
+                        model.IsUkAddress = await _postcodeChecker.IsValidPostcode(model.Postcode)
+                            ? true
+                            : (bool?)null;
+                }
+
 
                 model.SicCodeIds = organisation.SicCodeIds;
                 model.SicSource = organisation.SicSource;
