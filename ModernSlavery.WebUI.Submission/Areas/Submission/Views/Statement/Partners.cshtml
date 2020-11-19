@@ -41,7 +41,7 @@
                             }
 
                             <div class="govuk-checkboxes__item">
-                                <input name="Partners" value="@value" id="@($"partner{value}")" checked=@(Model.Partners.Contains(partnerType)) class="govuk-checkboxes__input" type="checkbox" @*data-aria-controls="partners-conditional-@value"*@>
+                                <input name="Partners" value="@value" id="@($"partner{value}")" checked=@(Model.Partners.Contains(partnerType)) class="govuk-checkboxes__input" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()" @*data-aria-controls="partners-conditional-@value"*@>
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"partner{value}")">
                                     @partnerType.GetEnumDescription()
                                     @if (partnerType == IStatementSummary1.PartnerTypes.Other)

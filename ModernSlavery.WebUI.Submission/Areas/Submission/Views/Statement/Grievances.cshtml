@@ -42,7 +42,7 @@
                             }
 
                             <div class="govuk-checkboxes__item">
-                                <input name="GrievanceMechanisms" value="@value" id="@($"grievance{value}")" checked=@(Model.GrievanceMechanisms.Contains(grievanceType)) class="govuk-checkboxes__input" type="checkbox">
+                                <input name="GrievanceMechanisms" value="@value" id="@($"grievance{value}")" checked=@(Model.GrievanceMechanisms.Contains(grievanceType)) class="govuk-checkboxes__input" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()">
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"grievance{value}")">
                                     @grievanceType.GetEnumDescription()
                                 </label>

@@ -41,7 +41,7 @@
                             }
 
                             <div class="govuk-checkboxes__item">
-                                <input name="Policies" value="@(value)" id="@($"policy{value}")" checked=@(Model.Policies.Contains(policyType)) class="govuk-checkboxes__input" type="checkbox" @(isOther ? $"data-aria-controls=policies-conditional-{value}" : "")>
+                                <input name="Policies" value="@(value)" id="@($"policy{value}")" checked=@(Model.Policies.Contains(policyType)) class="govuk-checkboxes__input" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()" @(isOther ? $"data-aria-controls=policies-conditional-{value}" : "")>
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"policy{value}")">
                                     @policyType.GetEnumDescription()
                                 </label>

@@ -41,7 +41,7 @@
                             }
 
                             <div class="govuk-checkboxes__item">
-                                <input name="SocialAudits" value="@value" id="@($"audit{value}")" checked=@(Model.SocialAudits.Contains(auditType)) class="govuk-checkboxes__input" type="checkbox" @*data-aria-controls="audits-conditional"*@>
+                                <input name="SocialAudits" value="@value" id="@($"audit{value}")" checked=@(Model.SocialAudits.Contains(auditType)) class="govuk-checkboxes__input" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()" @*data-aria-controls="audits-conditional"*@>
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"audit{value}")">
                                     @auditType.GetEnumDescription()
                                 </label>

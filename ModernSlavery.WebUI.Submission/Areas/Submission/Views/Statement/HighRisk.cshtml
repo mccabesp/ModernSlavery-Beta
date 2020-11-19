@@ -67,14 +67,15 @@
                                             @foreach (var tier in Enums.GetValuesExcept<SupplyChainTierTypes>(SupplyChainTierTypes.Unknown))
                                             {
                                                 var tierValue = (int)tier;
-                                                if (tier == SupplyChainTierTypes.None)
+                                                var isNone = tier == SupplyChainTierTypes.None;
+                                                if (isNone)
                                                 {
                                                     <div>
                                                         or
                                                     </div>
                                                 }
                                                 <div class="govuk-checkboxes__item">
-                                                    <input name="SupplyChainTiers" class="govuk-checkboxes__input" id="tier-@tierValue" value="@tierValue" type="checkbox" checked="@(Model.SupplyChainTiers.Contains(tier))">
+                                                    <input name="SupplyChainTiers" class="govuk-checkboxes__input" id="tier-@tierValue" value="@tierValue" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()" checked="@(Model.SupplyChainTiers.Contains(tier))">
                                                     <label class="govuk-label govuk-checkboxes__label" for="tier-@tierValue">
                                                         @tier.GetEnumDescription()
                                                     </label>

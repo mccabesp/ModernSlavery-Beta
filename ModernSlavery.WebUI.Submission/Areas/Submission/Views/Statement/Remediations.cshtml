@@ -46,7 +46,7 @@
                             }
 
                             <div class="govuk-checkboxes__item">
-                                <input name="Remediations" value="@value" id="@($"remediation{value}")" checked=@(Model.Remediations.Contains(remediationType)) class="govuk-checkboxes__input" type="checkbox" @(isOther ? "data-aria-controls=remediation-conditional" : "")>
+                                <input name="Remediations" value="@value" id="@($"remediation{value}")" checked=@(Model.Remediations.Contains(remediationType)) class="govuk-checkboxes__input" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()" @(isOther ? "data-aria-controls=remediation-conditional" : "")>
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"remediation{value}")">
                                     @remediationType.GetEnumDescription()
                                 </label>

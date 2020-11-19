@@ -53,7 +53,7 @@
                             }
 
                             <div class="govuk-checkboxes__item">
-                                <input name="Indicators" value="@value" id="@($"indicator{value}")" checked=@(Model.Indicators.Contains(indicatorType)) class="govuk-checkboxes__input" type="checkbox">
+                                <input name="Indicators" value="@value" id="@($"indicator{value}")" checked=@(Model.Indicators.Contains(indicatorType)) class="govuk-checkboxes__input" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()">
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"indicator{value}")">
                                     @indicatorType.GetEnumDescription()
                                 </label>

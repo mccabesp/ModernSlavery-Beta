@@ -40,7 +40,7 @@
                             }
 
                     <div class="govuk-checkboxes__item">
-                        <input name="TrainingTargets" value="@(value)" id="@($"trainingtarget{value}")" checked=@(Model.TrainingTargets.Contains(trainingType)) class="govuk-checkboxes__input" type="checkbox" @(isOther ? $"data-aria-controls=training-conditional-{value}" : "")>
+                        <input name="TrainingTargets" value="@(value)" id="@($"trainingtarget{value}")" checked=@(Model.TrainingTargets.Contains(trainingType)) class="govuk-checkboxes__input" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()" @(isOther ? $"data-aria-controls=training-conditional-{value}" : "")>
                         <label class="govuk-label govuk-checkboxes__label" for="@($"trainingtarget{value}")">
                             @trainingType.GetEnumDescription()
                         </label>
