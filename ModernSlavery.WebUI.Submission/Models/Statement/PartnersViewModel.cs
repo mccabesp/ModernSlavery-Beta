@@ -44,7 +44,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             //    validationResults.AddValidationError(4000, nameof(OtherPartners));
 
             if (Partners.Contains(PartnerTypes.None) && Partners.Count() > 1)
-                validationResults.AddValidationError(3801);
+                validationResults.AddValidationError(3803);
 
             return validationResults;
         }
