@@ -43,6 +43,8 @@
     padding: 0;
     cursor: pointer;
     color: $govuk-link-colour;
+    vertical-align:middle;
+    margin-bottom:10px;
 
     &:hover {
         text-decoration: underline;
@@ -220,7 +222,9 @@
     {
         display:none;
     }
-
+    .app-c-option-select__button{
+        margin-bottom:2px;
+    }
     
 }
 
