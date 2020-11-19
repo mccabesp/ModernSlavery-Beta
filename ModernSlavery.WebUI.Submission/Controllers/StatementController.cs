@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1.StatementRisk;
 
 //TODO: Ensure we use PRG model on all POST actions so the 'Browser' back button will work correctly on all pages in this journey.
@@ -219,7 +220,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     break;
                 case IndicatorsViewModel vm:
                     vm.BackUrl = GetReviewUrl();
-                    vm.ContinueUrl = vm.SkipUrl = GetRemediationsUrl();
+                    vm.ContinueUrl = vm.SkipUrl = (vm.Indicators.Any() && !vm.Indicators.Contains(IndicatorTypes.None)) ? GetRemediationsUrl() : GetReviewUrl();
                     break;
                 case RemediationsViewModel vm:
                     vm.BackUrl = GetIndicatorsUrl();
