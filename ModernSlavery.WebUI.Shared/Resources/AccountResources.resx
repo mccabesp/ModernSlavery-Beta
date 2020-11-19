@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AllowContact" xml:space="preserve">
-    <value>I'm happy to be contacted for feedback on this service and take part in surveys about modern slavery</value>
+    <value>I am happy to be contacted for feedback on this service</value>
   </data>
   <data name="ChangeDetailsSuccessAlert" xml:space="preserve">
     <value>Your details have been updated successfully</value>
@@ -211,6 +211,6 @@
     <value>The {0} must be at least {2} characters long.</value>
   </data>
   <data name="SendUpdates" xml:space="preserve">
-    <value>I would like to receive information about webinars, events and new guidance</value>
+    <value>I would like to receive information on resources and guidance relating to modern slavery</value>
   </data>
 </root>

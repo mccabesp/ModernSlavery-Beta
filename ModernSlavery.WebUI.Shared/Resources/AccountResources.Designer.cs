@@ -61,7 +61,7 @@ namespace ModernSlavery.WebUI.Shared.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I&apos;m happy to be contacted for feedback on this service and take part in Modern Slavery surveys.
+        ///   Looks up a localized string similar to I am happy to be contacted for feedback on this service.
         /// </summary>
         public static string AllowContact {
             get {
@@ -340,7 +340,7 @@ namespace ModernSlavery.WebUI.Shared.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to I would like to receive information about webinars, events and new guidance.
+        ///   Looks up a localized string similar to I would like to receive information on resources and guidance relating to modern slavery.
         /// </summary>
         public static string SendUpdates {
             get {
