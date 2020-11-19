@@ -26,7 +26,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
         {
             Id = "SectorFilter",
             Group = "s",
-            Label = "Industry sector",
+            Label = "Sector(s)",
             Expanded = false,
             Metadata = SectorOptions,
             MaxHeight = "300px"

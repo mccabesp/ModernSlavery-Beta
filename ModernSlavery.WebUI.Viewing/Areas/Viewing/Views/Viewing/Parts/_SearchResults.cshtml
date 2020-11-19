@@ -4,7 +4,7 @@
 <div class="search-results-list">
     <div class="govuk-grid-row header-row">
         <div class="govuk-grid-column-two-thirds">
-            <p class="govuk-body govuk-!-font-weight-bold">Organisation’s modern slavery statement</p>
+            <p class="govuk-body govuk-!-font-weight-bold">Modern slavery statements</p>
         </div>
         <div class="govuk-grid-column-one-third">
             <p class="govuk-body govuk-!-font-weight-bold"> Statement year</p>
@@ -24,7 +24,7 @@
                                 @organisation.OrganisationName
                             </p>
                             <p class="govuk-body govuk-!-margin-bottom-2">
-                                <span class="grey-text">Submitted under </span>
+                                <span class="grey-text">Included in group statement for</span>
                                 <span class="blue-header govuk-!-font-weight-bold address">@Html.ActionLink(organisation.ParentName, "StatementSummary", "Viewing", new { organisationIdentifier, year = organisation.SubmissionDeadlineYear })</span>
                                 <span class="blue-header govuk-!-font-weight-bold small"> (@(organisation.SubmissionDeadlineYear-1) to @(organisation.SubmissionDeadlineYear))</span>
                             </p>
@@ -38,7 +38,7 @@
                             </p>
                             @if (organisation.GroupSubmission == true)
                             {
-                                <p class="govuk-body govuk-!-margin-bottom-2 grey-text">Reported as group</p>
+                                <p class="govuk-body govuk-!-margin-bottom-2 grey-text">Group statement</p>
                             }
                         }
                         <p class="govuk-body govuk-!-margin-bottom-2 address">@organisation.Address.GetFullAddress()</p>
