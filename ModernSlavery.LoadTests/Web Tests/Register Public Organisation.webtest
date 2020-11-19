@@ -128,7 +128,7 @@
             <RuleParameter Name="HtmlDecode" Value="True" />
           </RuleParameters>
         </ExtractionRule>
-        <ExtractionRule Classname="ModernSlavery.WebTestPlugins.ExtractRandomAttributeValue, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" VariableName="RandomOrganisationCommand" DisplayName="Extract Random Attribute Value" Description="Extract the value of an attribute from a random specified HTML tag.">
+        <ExtractionRule Classname="ModernSlavery.WebTestPlugins.ExtractRandomAttribute, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" VariableName="RandomOrganisationCommand" DisplayName="Extract Random Attribute Value" Description="Extract the value of an attribute from a random specified HTML tag.">
           <RuleParameters>
             <RuleParameter Name="TagName" Value="button" />
             <RuleParameter Name="AttributeName" Value="value" />

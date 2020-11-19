@@ -148,11 +148,5 @@
         <RuleParameter Name="MaxParamSource" Value="TotalPages" />
       </RuleParameters>
     </WebTestPlugin>
-    <WebTestPlugin Classname="WebPlugins.HtmlDecodePlugin, ModernSlavery.LoadTests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="HtmlDecodePlugin" Description="">
-      <RuleParameters>
-        <RuleParameter Name="ContextParamSource" Value="EmployerName" />
-        <RuleParameter Name="ContextParamTarget" Value="EmployerNameDecoded" />
-      </RuleParameters>
-    </WebTestPlugin>
   </WebTestPlugins>
 </WebTest>

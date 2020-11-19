@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.WebTestPlugins
 {
-    [DisplayName("Extract Random Attribute Value")]
-    [Description("Extract the value of an attribute from a random specified HTML tag.")]
-    public class ExtractRandomAttributeValue : ExtractionRule
+    [DisplayName("Extract Attribute by random match of attribute")]
+    [Description("Extract the inner text of a random tag which matches an attribute value.")]
+    public class ExtractRandomAttribute : ExtractionRule
     {
         DisplayNameAttribute x;
         public string TagName { get; set; }
