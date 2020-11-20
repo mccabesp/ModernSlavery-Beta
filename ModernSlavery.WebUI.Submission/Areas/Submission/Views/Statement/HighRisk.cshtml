@@ -79,6 +79,25 @@
                                                     <label class="govuk-label govuk-checkboxes__label" for="tier-@tierValue">
                                                         @tier.GetEnumDescription()
                                                     </label>
+                                                    @if (!isNone)
+                                                    {
+                                                        <div id="tier-hint-@tierValue" class="govuk-hint govuk-!-margin-left-3">
+                                                            @switch (tier)
+                                                            {
+                                                                case SupplyChainTierTypes.Tier1:
+                                                                    <text>Provide their products and services directly to your organisation.</text>
+                                                                    break;
+                                                                case SupplyChainTierTypes.Tier2:
+                                                                    <text>Provide products and services to your organisation via your Tier 1 suppliers.</text>
+                                                                    break;
+                                                                case SupplyChainTierTypes.Tier3:
+                                                                    <text>Provide products and services to your organisation via your Tier 2 suppliers or the next higher level in the chain.</text>
+                                                                    break;
+                                                                default:
+                                                                    break;
+                                                            }
+                                                        </div>
+                                                    }
                                                 </div>
                                             }
                                         </div>

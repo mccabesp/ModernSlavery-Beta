@@ -126,9 +126,9 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             public enum SupplyChainTierTypes
             {
                 Unknown,
-                [Description("Tier 1")] Tier1,
-                [Description("Tier 2")] Tier2,
-                [Description("Tier 3 and below")] Tier3,
+                [Description("Tier 1 suppliers")] Tier1,
+                [Description("Tier 2 suppliers")] Tier2,
+                [Description("Tier 3 suppliers and below")] Tier3,
                 [Description("Don't know")] None,
             }
 
