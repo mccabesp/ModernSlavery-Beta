@@ -30,7 +30,6 @@
                         @foreach (var partnerType in Enums.GetValuesExcept<PartnerTypes>(PartnerTypes.Unknown))
                         {
                             var value = (int)partnerType;
-                            var isOther = partnerType == PartnerTypes.Other;
                             var isNone = partnerType == PartnerTypes.None;
 
                             if (isNone)
@@ -44,24 +43,8 @@
                                 <input name="Partners" value="@value" id="@($"partner{value}")" checked=@(Model.Partners.Contains(partnerType)) class="govuk-checkboxes__input" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()" @*data-aria-controls="partners-conditional-@value"*@>
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"partner{value}")">
                                     @partnerType.GetEnumDescription()
-                                    @if (partnerType == IStatementSummary1.PartnerTypes.Other)
-                                    {
-                                        <span class="govuk-hint">For example, within the same industry</span>
-                                    }
                                 </label>
                             </div>
-                            @*@if (partnerType == IStatementSummary1.PartnerTypes.Other)
-                            {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPartners, "govuk-form-group--error")" id="partners-conditional-@((int)partnerType)">
-                                    <div class="govuk-form-group">
-                                        <label class="govuk-label" for="other">
-                                            Please specify
-                                        </label>
-                                        <input asp-for="OtherPartners" class="govuk-input" spellcheck="false">
-                                        <span asp-validation-for="OtherPartners" class="govuk-error-message"></span>
-                                    </div>
-                                </div>
-                            }*@
                         }
                     </div>
                 </fieldset>

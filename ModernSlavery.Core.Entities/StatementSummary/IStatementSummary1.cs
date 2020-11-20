@@ -57,11 +57,12 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             [Description("Your suppliers")] OwnSuppliers,
             [Description("Trade unions or worker representative groups")] TradeUnions,
             [Description("Civil society organisations")] CivilSocietyOrganisations,
+            [Description("Professional auditors")] ProfessionalAuditors,
             [Description("Workers within your organisation")] OwnWorkers,
             [Description("Workers within your supply chain")] SupplierWorkers,
             [Description("Central or local government")] Government,
             [Description("Law enforcement, such as police, GLAA and other local labour market inspectorates")] LawEnforcement,
-            [Description("Other businesses")] Other,
+            [Description("Businesses in your industry or sector")] Businesses,
             [Description("Your organisation did not engage with others to help monitor working conditions across your organisation and supply chain")] None,
         }
 
