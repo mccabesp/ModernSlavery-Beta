@@ -78,8 +78,8 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             [Description("Third party audit arranged by your organisation")] ThirdPartyOrganisation,
             [Description("Audit conducted by your supplier’s staff")] SupplierStaff,
             [Description("Third party audit arranged by your supplier")] ThirdPartySupplier,
-            [Description("Announced social audits")] Announced,
-            [Description("Unannounced social audits")] Unannounced,
+            [Description("Announced audits")] Announced,
+            [Description("Unannounced audits")] Unannounced,
             [Description("Your organisation did not carry out any social audits during the period of the statement")] None,
         }
 

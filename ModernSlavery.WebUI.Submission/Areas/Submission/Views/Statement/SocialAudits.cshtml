@@ -23,9 +23,26 @@
                         </h1>
                     </legend>
 
+                    <div class="govuk-body">
+                        If so, which of the following categories apply?
+                    </div>
+
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                What are social audits?
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            A social audit is a review of an organisation’s working practices from the point of view of social responsibility, and should include an evaluation of working conditions in the organisation’s operations and supply chains.
+                            By their nature, audits of supplier workplaces represent a snapshot in time.
+                        </div>
+                    </details>
+
                     <div id="conditions-hint" class="govuk-hint">
                         Select all that apply
                     </div>
+
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                         @foreach (var auditType in Enums.GetValuesExcept<SocialAuditTypes>(SocialAuditTypes.Unknown))
                         {
