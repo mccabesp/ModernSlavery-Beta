@@ -461,12 +461,12 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         public enum RemediationTypes
         {
             Unknown,
-            [Description("Repayment of recruitment fees")] FeeRepayment,
+            [Description("Financial remediation, including repayment of recruitment fees")] FeeRepayment,
             [Description("Change in policy")] PolicyChange,
             [Description("Change in training")] TrainingChange,
             [Description("Referring victims to government service")] VictimReferral,
             [Description("Supporting victims via NGO")] NGOSupport,
-            [Description("Supporting criminal justice against perpetrator")] CriminalJustice,
+            [Description("Supporting investigations by relevant authorities")] CriminalJustice,
             [Description("Other")] Other,
             [Description("My statement does not refer to actions taken in response to finding indicators of forced labour")] None,
         }
