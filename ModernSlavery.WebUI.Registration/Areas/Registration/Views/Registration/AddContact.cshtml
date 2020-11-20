@@ -38,16 +38,15 @@
             @Html.HiddenFor(model => model.Postcode)
             @Html.HiddenFor(model => model.PoBox)
 
-            @Html.HiddenFor(model => model.ManualAddress)
+            @Html.HiddenFor(model => model.IsManualAddress)
             @Html.HiddenFor(model => model.ManualOrganisationIndex)
             @Html.HiddenFor(model => model.MatchedReferenceCount)
 
             @Html.HiddenFor(model => model.ManualRegistration)
-            @Html.HiddenFor(model => model.WrongAddress)
+            @Html.HiddenFor(model => model.IsWrongAddress)
 
-            @Html.HiddenFor(model => model.ManualAuthorised)
-            @Html.HiddenFor(model => model.SelectedAuthorised)
-
+            @Html.HiddenSecuredFor(model => model.IsManualAuthorised)
+            @Html.HiddenSecuredFor(model => model.IsSelectedAuthorised)
 
             @await Html.GovUkValidationSummaryAsync()
 

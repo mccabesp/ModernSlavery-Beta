@@ -5,16 +5,23 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.Middleware.SecureModelBinder;
+using ModernSlavery.WebUI.Shared.Classes.Middleware.ViewModelBinder;
 using CompareAttribute = System.ComponentModel.DataAnnotations.CompareAttribute;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Extensions
@@ -91,18 +98,37 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             return string.IsNullOrWhiteSpace(noErrorClassName) ? HtmlString.Empty : new HtmlString(noErrorClassName);
         }
 
+        private static IObfuscator _obfuscator;
+        private static IModelExpressionProvider _modelExpressionProvider;
 
-        public static HtmlString HiddenFor<TModel>(this IHtmlHelper<TModel> helper, params string[] propertyNames)
+        public static IHtmlContent HiddenSecuredFor<TModel, TResult>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TResult>> expression)
         {
-            var hidden = new List<string>();
-            var model = helper.ViewData.Model;
-            foreach (var propertyName in propertyNames)
-            {
-                var propertyValue = model.GetProperty<string>(propertyName);
-                hidden.Add(helper.Hidden(propertyName, propertyValue).ToString());
-            }
+            _modelExpressionProvider = _modelExpressionProvider ?? htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IModelExpressionProvider>();
+            var modelExpression = _modelExpressionProvider.CreateModelExpression(htmlHelper.ViewData, expression);
 
-            return new HtmlString(string.Join("\r\n", hidden));
+            if (!modelExpression.Metadata.ModelType.IsSimpleType()) throw new ArgumentException($"Cannot add hidden secured form field for non-simple type '{modelExpression.Metadata.ContainerType.Name}.{modelExpression.Metadata.Name}'", modelExpression.Metadata.Name);
+            if (modelExpression.Metadata.ContainerType.GetCustomAttribute<ViewModelAttribute>()==null) throw new ArgumentException($"[{nameof(ViewModelAttribute)}] required on class '{modelExpression.Metadata.ContainerType.Name}' for hidden secured form fields", modelExpression.Metadata.Name);
+            
+            var propertyInfo = modelExpression.Metadata.ContainerType.GetProperty(modelExpression.Metadata.Name);
+            var secureAttribute = propertyInfo.GetCustomAttributes().FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
+            if (secureAttribute == null) throw new ArgumentException($"[{nameof(SecuredAttribute)}], [{nameof(EncryptedAttribute)}] or [{nameof(ObfuscatedAttribute)}] required on property '{modelExpression.Metadata.ContainerType.Name}.{modelExpression.Metadata.Name}' for hidden secured form field", modelExpression.Metadata.Name);
+
+            var propertyValue = propertyInfo.GetValue(htmlHelper.ViewData.Model)?.ToString();
+
+            if (!string.IsNullOrWhiteSpace(propertyValue))
+            {
+                if (secureAttribute.SecureMethod == SecuredAttribute.SecureMethods.Obfuscate)
+                {
+                    if (!modelExpression.Metadata.ModelType.IsIntegerType()) throw new ArgumentException($"Cannot use obfuscation on non-integer type {modelExpression.Metadata.ModelType.Name} property '{modelExpression.Metadata.ContainerType.Name}.{modelExpression.Metadata.Name}' for hidden secured form field", modelExpression.Metadata.Name);
+                    _obfuscator = _obfuscator ?? htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IObfuscator>();
+                    propertyValue = _obfuscator.Obfuscate(propertyValue);
+                }
+                else
+                {
+                    propertyValue = Encryption.Encrypt(propertyValue);
+                }
+            }
+            return htmlHelper.Hidden(modelExpression.Metadata.Name, propertyValue);
         }
 
         public static HtmlString EnumDisplayNameFor<T>(this T item)

@@ -15,6 +15,7 @@ namespace ModernSlavery.WebUI.Registration.Models
         public bool AllowResend { get; set; }
         public string Remaining { get; set; }
         public DateTime AccountingDate { get; set; }
+
         public long OrganisationId { get; set; }
         public string OrganisationName { get; set; }
     }

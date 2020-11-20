@@ -27,6 +27,13 @@ namespace ModernSlavery.Core.Extensions
             return (R) value.GetValue(obj);
         }
 
+        public static object GetProperty(this object obj, string property)
+        {
+            var value = obj.GetType().GetProperty(property);
+            if (value == null) return null;
+            return value.GetValue(obj);
+        }
+
         public static bool IsAsyncMethod(this MethodInfo method)
         {
             // Obtain the custom attribute for the method. 

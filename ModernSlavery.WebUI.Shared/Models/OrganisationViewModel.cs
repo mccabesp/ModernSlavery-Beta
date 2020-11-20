@@ -7,10 +7,13 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.Middleware.SecureModelBinder;
+using ModernSlavery.WebUI.Shared.Classes.Middleware.ViewModelBinder;
 
 namespace ModernSlavery.WebUI.Shared.Models
 {
     [Serializable]
+    [ViewModel]
     public class OrganisationViewModel
     {
         public bool PINExpired;
@@ -20,20 +23,20 @@ namespace ModernSlavery.WebUI.Shared.Models
         public string AddressReturnAction { get; set; }
 
         public bool ManualRegistration { get; set; }
-        public bool ManualAuthorised { get; set; }
-        public bool SelectedAuthorised { get; set; }
-        public bool ManualAddress { get; set; }
+        [Secured] public bool IsManualAuthorised { get; set; }
+        [Secured] public bool IsSelectedAuthorised { get; set; }
+        [Secured] public bool IsFastTrackAuthorised { get; set; }
+        [Secured] public bool IsSecurityCodeExpired { get; set; }
+        [Secured] public bool IsRegistered { get; set; }
+        public bool IsManualAddress { get; set; }
         public string RegisteredAddress { get; set; }
-        public bool WrongAddress { get; set; }
+        public bool IsWrongAddress { get; set; }
 
         public string BackAction { get; set; }
 
         public string ReviewCode { get; set; }
         public string CancellationReason { get; set; }
-        public bool IsSecurityCodeExpired { get; set; }
-        public bool IsFastTrackAuthorised { get; set; }
-        public bool IsRegistered { get; set; }
-
+        
         public SortedSet<int> GetSicCodeIds()
         {
             var separators = ";,: \n\r" + Environment.NewLine;
@@ -140,7 +143,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         public string Country { get; set; }
 
         [Required(AllowEmptyStrings = false)]
-        [StringLength(100, MinimumLength = 3)]
+        [StringLength(20, MinimumLength = 3)]
         public string Postcode { get; set; }
 
         public string PoBox { get; set; }

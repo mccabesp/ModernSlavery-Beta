@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Middleware.ClassModelBinder;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Extensions
@@ -13,12 +14,16 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
     {
         public static void AddStringTrimmingProvider(this MvcOptions option)
         {
-            var binderToFind =
-                option.ModelBinderProviders.FirstOrDefault(x => x.GetType() == typeof(SimpleTypeModelBinderProvider));
-            if (binderToFind == null) return;
-
-            var index = option.ModelBinderProviders.IndexOf(binderToFind);
+            var index = option.ModelBinderProviders.ToList().FindIndex(x => x.GetType() == typeof(SimpleTypeModelBinderProvider));
+            if (index < 0) index = 0;
             option.ModelBinderProviders.Insert(index, new TrimmingModelBinderProvider());
+        }
+
+        public static void AddViewModelProvider(this MvcOptions option)
+        {
+            var index = option.ModelBinderProviders.ToList().FindIndex(x => x.GetType() == typeof(ComplexTypeModelBinderProvider));
+            if (index < 0) index = 0;
+            option.ModelBinderProviders.Insert(index, new ViewModelBinderProvider());
         }
 
         #region AntiSpam

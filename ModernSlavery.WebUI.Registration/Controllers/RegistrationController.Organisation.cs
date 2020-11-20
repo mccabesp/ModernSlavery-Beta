@@ -247,8 +247,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             model.ManualRegistration = false;
             model.AddressReturnAction = null;
             model.ConfirmReturnAction = null;
-            model.ManualAuthorised = false;
-            model.ManualAddress = false;
+            model.IsManualAuthorised = false;
+            model.IsManualAddress = false;
             model.BackAction = "ChooseOrganisation";
             model.OrganisationName = null;
             model.CompanyNumber = null;
@@ -304,8 +304,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             model.Country = null;
             model.Postcode = null;
             model.PoBox = null;
-            model.ManualAuthorised = false;
-            model.ManualAddress = false;
+            model.IsManualAuthorised = false;
+            model.IsManualAddress = false;
 
             var doSearch = false;
             ModelState.Include("SearchText");
@@ -494,10 +494,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 if (organisation.SectorType == SectorTypes.Public)
                 {
                     model.ManualRegistration = false;
-                    model.SelectedAuthorised = organisation.IsAuthorised(VirtualUser.EmailAddress);
-                    if (!model.SelectedAuthorised || !organisation.HasAnyAddress())
+                    model.IsSelectedAuthorised = organisation.IsAuthorised(VirtualUser.EmailAddress);
+                    if (!model.IsSelectedAuthorised || !organisation.HasAnyAddress())
                     {
-                        model.ManualAddress = true;
+                        model.IsManualAddress = true;
                         model.AddressReturnAction = nameof(ChooseOrganisation);
                         StashModel(model);
                         return RedirectToAction("AddAddress");
@@ -507,13 +507,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 {
                     model.AddressReturnAction = nameof(ChooseOrganisation);
                     model.ManualRegistration = false;
-                    model.ManualAddress = true;
+                    model.IsManualAddress = true;
                     StashModel(model);
                     return RedirectToAction("AddAddress");
                 }
 
                 model.ManualRegistration = false;
-                model.ManualAddress = false;
+                model.IsManualAddress = false;
                 model.AddressReturnAction = null;
             }
 
@@ -551,8 +551,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 model.OrganisationName = model.SearchText;
 
             model.ManualRegistration = true;
-            model.ManualAuthorised = false;
-            model.ManualAddress = false;
+            model.IsManualAuthorised = false;
+            model.IsManualAddress = false;
             StashModel(model);
 
             return View("AddOrganisation", model);
@@ -814,9 +814,9 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var model = UnstashModel<OrganisationViewModel>();
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-            model.ManualAuthorised = false;
+            model.IsManualAuthorised = false;
             model.ManualRegistration = true;
-            model.ManualAddress = false;
+            model.IsManualAddress = false;
             StashModel(model);
             return View("SelectOrganisation", model);
         }
@@ -861,7 +861,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (organisationIndex < 0) return new HttpBadRequestResult($"Invalid organisation index {organisationIndex}");
 
             model.ManualOrganisationIndex = organisationIndex;
-            model.ManualAuthorised = false;
+            model.IsManualAuthorised = false;
 
             var organisation = model.GetManualOrganisation();
 
@@ -903,16 +903,16 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             //Make sure the organisation has an address
             if (organisation.SectorType == SectorTypes.Public)
             {
-                model.ManualAuthorised = organisation.IsAuthorised(VirtualUser.EmailAddress);
-                if (!model.ManualAuthorised || !organisation.HasAnyAddress()) model.ManualAddress = true;
+                model.IsManualAuthorised = organisation.IsAuthorised(VirtualUser.EmailAddress);
+                if (!model.IsManualAuthorised || !organisation.HasAnyAddress()) model.IsManualAddress = true;
             }
             else if (organisation.SectorType == SectorTypes.Private && !organisation.HasAnyAddress())
             {
-                model.ManualAddress = true;
+                model.IsManualAddress = true;
             }
 
             model.ManualRegistration = false;
-            if (model.ManualAddress)
+            if (model.IsManualAddress)
             {
                 model.AddressReturnAction = returnAction;
                 StashModel(model);
@@ -1074,7 +1074,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                                    organisation.References.ContainsKey(model.OtherName)
                     ? organisation.References[model.OtherName]
                     : null;
-                if (!model.ManualAddress)
+                if (!model.IsManualAddress)
                 {
                     model.AddressSource = organisation.AddressSource;
                     model.Address1 = organisation.Address1;
@@ -1144,7 +1144,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (!command.EqualsI("confirm"))
             {
                 m.AddressReturnAction = nameof(ConfirmOrganisation);
-                m.WrongAddress = true;
+                m.IsWrongAddress = true;
                 m.ManualRegistration = false;
                 m.AddressSource = null;
                 m.Address1 = null;
@@ -1195,13 +1195,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 organisation = model.GetManualOrganisation();
                 if (organisation != null)
                 {
-                    authorised = model.ManualAuthorised;
+                    authorised = model.IsManualAuthorised;
                     hasAddress = organisation.HasAnyAddress();
                 }
                 else
                 {
                     organisation = model.GetSelectedOrganisation();
-                    authorised = model.SelectedAuthorised;
+                    authorised = model.IsSelectedAuthorised;
                     if (organisation != null) hasAddress = organisation.HasAnyAddress();
                 }
             }
@@ -1210,7 +1210,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //If manual registration then show confirm receipt
             if (model.ManualRegistration ||
-                model.ManualAddress && (sector == SectorTypes.Private || !authorised || hasAddress))
+                model.IsManualAddress && (sector == SectorTypes.Private || !authorised || hasAddress))
             {
                 var reviewCode = Encryption.EncryptQuerystring(
                     userOrg.UserId + ":" + userOrg.OrganisationId + ":" + VirtualDateTime.Now.ToSmallDateTime());
@@ -1287,13 +1287,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
                 if (organisationRecord != null)
                 {
-                    authorised = model.ManualAuthorised;
+                    authorised = model.IsManualAuthorised;
                     hasAddress = organisationRecord.HasAnyAddress();
                 }
                 else
                 {
                     organisationRecord = model.GetSelectedOrganisation();
-                    authorised = model.SelectedAuthorised;
+                    authorised = model.IsSelectedAuthorised;
                     if (organisationRecord != null) hasAddress = organisationRecord.HasAnyAddress();
                 }
             }
@@ -1474,7 +1474,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var oldAddressSource = oldAddress?.Source;
             string newAddressSource = null;
 
-            if (model.ManualRegistration || model.ManualAddress)
+            if (model.ManualRegistration || model.IsManualAddress)
             {
                 newAddressModel = model.GetAddressModel();
                 newAddressSource = model.AddressSource;
@@ -1564,7 +1564,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             var sendRequest = false;
             if (model.ManualRegistration
-                || model.ManualAddress && (org.SectorType == SectorTypes.Private || !authorised || hasAddress)
+                || model.IsManualAddress && (org.SectorType == SectorTypes.Private || !authorised || hasAddress)
                 || !model.IsUkAddress.HasValue
                 || !model.IsUkAddress.Value)
             {
@@ -1583,7 +1583,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             #region Activate organisation and address if the user is authorised
 
-            if (authorised && !model.ManualRegistration && (!model.ManualAddress || !hasAddress))
+            if (authorised && !model.ManualRegistration && (!model.IsManualAddress || !hasAddress))
             {
                 //Set the user org as confirmed
                 userOrg.Method = model.IsFastTrackAuthorised

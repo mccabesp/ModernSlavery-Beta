@@ -284,6 +284,11 @@ namespace ModernSlavery.Core.Extensions
                 || Convert.GetTypeCode(type) != TypeCode.Object;
         }
 
+        public static bool IsIntegerType(this Type type)
+        {
+            return new[]{ typeof(byte), typeof(sbyte), typeof(short), typeof(ushort), typeof(int), typeof(uint), typeof(long),typeof(ulong)}.Contains(type);
+        }
+
         public static object CopyProperties(this object source, object target)
         {
             var targetType = target.GetType();

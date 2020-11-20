@@ -67,14 +67,14 @@
             @Html.HiddenFor(model => model.ContactEmailAddress)
             @Html.HiddenFor(model => model.ContactPhoneNumber)
 
-            @Html.HiddenFor(model => model.ManualAddress)
+            @Html.HiddenFor(model => model.IsManualAddress)
             @Html.HiddenFor(model => model.ManualOrganisationIndex)
             @Html.HiddenFor(model => model.MatchedReferenceCount)
 
             @Html.HiddenFor(model => model.ManualRegistration)
-            @Html.HiddenFor(model => model.ManualAuthorised)
-            @Html.HiddenFor(model => model.SelectedAuthorised)
-            @Html.HiddenFor(model => model.IsFastTrackAuthorised)
+            @Html.HiddenSecuredFor(model => model.IsManualAuthorised)
+            @Html.HiddenSecuredFor(model => model.IsSelectedAuthorised)
+            @Html.HiddenSecuredFor(model => model.IsFastTrackAuthorised)
 
             @await Html.GovUkValidationSummaryAsync()
             <h1 class="govuk-heading-l">

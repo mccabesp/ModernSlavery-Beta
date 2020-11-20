@@ -13,8 +13,6 @@ using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.WebUI.Shared.Classes.Attributes;
-using ModernSlavery.WebUI.Shared.Classes.Cookies;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Interfaces;
@@ -747,7 +745,6 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             var json = Session[keyName].ToStringOrNull();
             var result = string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<TModel>(json);
             if (delete) Session.Remove(keyName);
-
             return result;
         }
 

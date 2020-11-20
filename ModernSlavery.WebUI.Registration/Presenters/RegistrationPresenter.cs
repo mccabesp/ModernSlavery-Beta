@@ -50,7 +50,7 @@ namespace ModernSlavery.WebUI.Registration.Presenters
             model.SelectedOrganisationIndex = 0;
 
             //Mark the organisation as authorised
-            model.SelectedAuthorised = true;
+            model.IsSelectedAuthorised = true;
             model.IsFastTrackAuthorised = true;
 
             return model;
