@@ -3,6 +3,7 @@
 }
 @model TrainingViewModel
 @using ModernSlavery.Core.Entities.StatementSummary;
+@using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
@@ -10,66 +11,78 @@
     <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
-        @await Html.GovUkValidationSummaryAsync();
-        @Html.AntiForgeryToken();
-        @Html.HiddenFor(m => m.Submitted);
+            @await Html.GovUkValidationSummaryAsync();
+            @Html.AntiForgeryToken();
+            @Html.HiddenFor(m => m.Submitted);
 
-        <div class="govuk-form-group">
-            <fieldset class="govuk-fieldset" aria-describedby="training-hint">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-3">
-                    <h1 class="govuk-fieldset__heading">
-                        @Model.PageTitle
-                    </h1>
-                </legend>
-                <div class="govuk-body">Who was this for?</div>
-                <div id="training-hint" class="govuk-hint">
-                    Select all that apply
-                </div>
-                <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                    @foreach (var trainingType in Enums.GetValues<IStatementSummary1.TrainingTargetTypes>().Where(t => t != IStatementSummary1.TrainingTargetTypes.Unknown))
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-describedby="training-hint">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-3">
+                        <h1 class="govuk-fieldset__heading">
+                            @Model.PageTitle
+                        </h1>
+                    </legend>
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                What kind of training is relevant
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            Anything designed to increase knowledge and skills around identifying, addressing or preventing modern slavery risks is relevant.
+                            Training can take a range of forms, from formal training courses to broader awareness-raising activities such as workshops or webinars.
+                            <br><br>
+                            You can read more about training in the <a class="govuk-link" href="https://www.gov.uk/government/publications/transparency-in-supply-chains-a-practical-guide/transparency-in-supply-chains-a-practical-guide" target="_blank">statutory guidance (opens in new window)</a>.
+                        </div>
+                    </details>
+                    <div id="training-hint" class="govuk-hint">
+                        Select all that apply
+                    </div>
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        @foreach (var trainingType in Enums.GetValuesExcept<TrainingTargetTypes>(TrainingTargetTypes.Unknown))
                         {
                             var value = (int)trainingType;
-                            var isOther = trainingType == IStatementSummary1.TrainingTargetTypes.Other;
-                            var isNone = trainingType == IStatementSummary1.TrainingTargetTypes.None;
+                            var isOther = trainingType == TrainingTargetTypes.Other;
+                            var isNone = trainingType == TrainingTargetTypes.None;
 
                             if (isNone)
                             {
-                    <div class="govuk-!-margin-bottom-2 govuk-!-margin-top-5">
-                        or
-                    </div>
+                                <div class="govuk-!-margin-bottom-2 govuk-!-margin-top-5">
+                                    or
+                                </div>
                             }
 
-                    <div class="govuk-checkboxes__item">
-                        <input name="TrainingTargets" value="@(value)" id="@($"trainingtarget{value}")" checked=@(Model.TrainingTargets.Contains(trainingType)) class="govuk-checkboxes__input" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()" @(isOther ? $"data-aria-controls=training-conditional-{value}" : "")>
-                        <label class="govuk-label govuk-checkboxes__label" for="@($"trainingtarget{value}")">
-                            @trainingType.GetEnumDescription()
-                        </label>
-                    </div>
+                            <div class="govuk-checkboxes__item">
+                                <input name="TrainingTargets" value="@(value)" id="@($"trainingtarget{value}")" checked=@(Model.TrainingTargets.Contains(trainingType)) class="govuk-checkboxes__input" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()" @(isOther ? $"data-aria-controls=training-conditional-{value}" : "")>
+                                <label class="govuk-label govuk-checkboxes__label" for="@($"trainingtarget{value}")">
+                                    @trainingType.GetEnumDescription()
+                                </label>
+                            </div>
 
-                    @if (isOther)
+                            @if (isOther)
                             {
-                    <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTrainingTargets, "govuk-form-group--error")" id="training-conditional-@value">
-                        <div class="govuk-form-group">
-                            <label class="govuk-label" asp-for="OtherTrainingTargets">
-                                Please specify
-                            </label>
-                            <input asp-for="OtherTrainingTargets" class="govuk-input" spellcheck="false">
-                            <span asp-validation-for="OtherTrainingTargets" class="govuk-error-message"></span>
-                        </div>
-                    </div>
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherTrainingTargets, "govuk-form-group--error")" id="training-conditional-@value">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" asp-for="OtherTrainingTargets">
+                                            Please specify
+                                        </label>
+                                        <input asp-for="OtherTrainingTargets" class="govuk-input" spellcheck="false">
+                                        <span asp-validation-for="OtherTrainingTargets" class="govuk-error-message"></span>
+                                    </div>
+                                </div>
                             }
                         }
-                </div>
-            </fieldset>
-        </div>
+                    </div>
+                </fieldset>
+            </div>
 
-        <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
-            Save and continue
-        </button>
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+                Save and continue
+            </button>
 
-        <div class="skip-link">
-            <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
-        </div>
+            <div class="skip-link">
+                <a class="govuk-link" href="@(Model.SkipUrl)">Skip this question</a>
+            </div>
         }
     </div>
 

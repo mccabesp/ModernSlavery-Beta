@@ -41,7 +41,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             [Description("Your suppliers")] Suppliers,
             [Description("The wider community")] WiderCommunity,
             [Description("Other")] Other,
-            [Description("Your organisation did not provide training on modern slavery, or any other activities to raise awareness during the period of the statement")] None
+            [Description("Your organisation did not provide training on modern slavery during the period of the statement")] None
         }
 
         SortedSet<TrainingTargetTypes> TrainingTargets { get; set; }

@@ -29,7 +29,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class TrainingViewModel : BaseViewModel
     {
-        public override string PageTitle => "During the period of the statement, did you provide training on modern slavery, or any other activities to raise awareness?";
+        public override string PageTitle => "If you provided training on modern slavery during the period of the statement, who was it for?";
 
         public List<TrainingTargetTypes> TrainingTargets { get; set; } = new List<TrainingTargetTypes>();
 
