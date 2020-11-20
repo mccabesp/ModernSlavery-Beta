@@ -176,6 +176,19 @@
                 </fieldset>
             </div>
 
+            <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="500">
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.ActionsOrPlans, "govuk-form-group--error")">
+                    <label class="govuk-label govuk-label--m" for="more-detail">
+                        Tell us about your actions or plans to address this risk
+                    </label>
+                    <textarea name="ActionsOrPlans" class="govuk-textarea" rows="5" aria-describedby="actions-info">@Model.ActionsOrPlans</textarea>
+                </div>
+                <div id="actions-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                    You can enter up to 500 characters
+                </div>
+                <span asp-validation-for="ActionsOrPlans" class="govuk-error-message"></span>
+            </div>
+
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
                 Save and continue
             </button>

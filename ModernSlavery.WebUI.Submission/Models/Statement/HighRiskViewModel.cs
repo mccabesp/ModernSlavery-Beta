@@ -27,6 +27,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.OtherTargets, opt => opt.MapFrom((s, d) => s.Summary.Risks[d.Index].OtherTargets))
                 .ForMember(d => d.LikelySource, opt => opt.MapFrom((s, d) => s.Summary.Risks[d.Index].LikelySource))
                 .ForMember(d => d.OtherLikelySource, opt => opt.MapFrom((s, d) => s.Summary.Risks[d.Index].OtherLikelySource))
+                .ForMember(d => d.ActionsOrPlans, opt => opt.MapFrom((s, d) => s.Summary.Risks[d.Index].ActionsOrPlans))
                 .ForMember(d => d.SupplyChainTiers, opt => opt.MapFrom((s, d) => new List<SupplyChainTierTypes>(s.Summary.Risks[d.Index].SupplyChainTiers)))
                 .ForMember(d => d.Countries, opt => opt.MapFrom((s, d) => new List<CountryTypes>(s.Summary.Risks[d.Index].Countries)));
 
@@ -40,6 +41,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                     d.Summary.Risks[s.Index].OtherTargets = s.Targets.Contains(RiskTargetTypes.Other) ? s.OtherTargets : null;
                     d.Summary.Risks[s.Index].LikelySource = s.LikelySource;
                     d.Summary.Risks[s.Index].OtherLikelySource = s.LikelySource == RiskSourceTypes.Other ? s.OtherLikelySource : null;
+                    d.Summary.Risks[s.Index].ActionsOrPlans = s.ActionsOrPlans;
                     d.Summary.Risks[s.Index].SupplyChainTiers = s.LikelySource == RiskSourceTypes.SupplyChains ? s.SupplyChainTiers.ToList() : null;
                     d.Summary.Risks[s.Index].Countries = new SortedSet<CountryTypes>(s.Countries);
                 });
@@ -74,6 +76,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public string OtherLikelySource { get; set; }
 
         public List<SupplyChainTierTypes> SupplyChainTiers { get; set; } = new List<SupplyChainTierTypes>();
+
+        [MaxLength(200)]
+        public string ActionsOrPlans { get; set; }
 
         [IgnoreMap]
         public string SelectedCountry { get; set; }

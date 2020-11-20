@@ -91,6 +91,10 @@ namespace ModernSlavery.Core.Models
                 public string OtherTargets { get; set; }
                 #endregion
 
+                #region Actions or plans field
+                public string ActionsOrPlans { get; set; }
+                #endregion
+
                 #region Risk Location Fields
 
                 public List<KeyName> Countries { get; set; } = new List<KeyName>();

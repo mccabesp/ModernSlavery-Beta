@@ -153,6 +153,10 @@ namespace ModernSlavery.Core.Entities.StatementSummary
             public string OtherTargets { get; set; }
             #endregion
 
+            #region Actions or Plans Field
+            public string ActionsOrPlans { get; set; }
+            #endregion
+
             #region Risk Location Fields
             /// <summary>
             /// ISO 3166-1 Alpha 2 Country Codes (source: https://gist.github.com/jplwood/4f77b55cfedf2820dce0dfcd3ee0c3ea)
