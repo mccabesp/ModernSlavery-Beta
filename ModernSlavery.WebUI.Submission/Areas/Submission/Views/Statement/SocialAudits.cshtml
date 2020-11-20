@@ -30,7 +30,6 @@
                         @foreach (var auditType in Enums.GetValuesExcept<SocialAuditTypes>(SocialAuditTypes.Unknown))
                         {
                             var value = (int)auditType;
-                            var isOther = auditType == SocialAuditTypes.Other;
                             var isNone = auditType == SocialAuditTypes.None;
 
                             if (isNone)
@@ -41,24 +40,11 @@
                             }
 
                             <div class="govuk-checkboxes__item">
-                                <input name="SocialAudits" value="@value" id="@($"audit{value}")" checked=@(Model.SocialAudits.Contains(auditType)) class="govuk-checkboxes__input" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()" @*data-aria-controls="audits-conditional"*@>
+                                <input name="SocialAudits" value="@value" id="@($"audit{value}")" checked=@(Model.SocialAudits.Contains(auditType)) class="govuk-checkboxes__input" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()">
                                 <label class="govuk-label govuk-checkboxes__label" for="@($"audit{value}")">
                                     @auditType.GetEnumDescription()
                                 </label>
                             </div>
-
-                            @*@if (auditType == IStatementSummary1.SocialAuditTypes.Other)
-                            {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherSocialAudits, "govuk-form-group--error")" id="audits-conditional">
-                                    <div class="govuk-form-group">
-                                        <label class="govuk-label" for="other">
-                                            Please specify
-                                        </label>
-                                        <input asp-for="OtherSocialAudits" class="govuk-input" spellcheck="false">
-                                        <span asp-validation-for="OtherSocialAudits" class="govuk-error-message"></span>
-                                    </div>
-                                </div>
-                            }*@
                         }
                     </div>
                 </fieldset>

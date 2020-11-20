@@ -74,11 +74,12 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         public enum SocialAuditTypes
         {
             Unknown = 0,
-            [Description("By your own staff")] OwnWorkers,
-            [Description("By a third party")] ThirdParty,
+            [Description("Audit conducted by your staff")] OwnStaff,
+            [Description("Third party audit arranged by your organisation")] ThirdPartyOrganisation,
+            [Description("Audit conducted by your supplier’s staff")] SupplierStaff,
+            [Description("Third party audit arranged by your supplier")] ThirdPartySupplier,
             [Description("Announced social audits")] Announced,
             [Description("Unannounced social audits")] Unannounced,
-            [Description("Other type of social audit")] Other,
             [Description("Your organisation did not carry out any social audits during the period of the statement")] None,
         }
 
