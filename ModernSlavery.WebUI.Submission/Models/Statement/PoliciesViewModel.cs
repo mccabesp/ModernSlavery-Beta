@@ -32,7 +32,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class PoliciesViewModel : BaseViewModel
     {
-        public override string PageTitle => "Do your organisation’s policies and codes include any of the following provisions in relation to modern slavery?";
+        public override string PageTitle => "Do your organisation's policies include any of the following provisions in relation to modern slavery?";
 
         public List<PolicyTypes> Policies { get; set; } = new List<PolicyTypes>();
 
