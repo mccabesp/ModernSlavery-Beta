@@ -10,7 +10,6 @@ namespace ModernSlavery.Core.Entities.StatementSummary
         public enum PolicyTypes
         {
             Unknown = 0,
-            [Description("Adherence to local and national laws")] Laws,
             [Description("Freedom of workers to terminate employment")] FreedomToTerminate,
             [Description("Freedom of movement")] FreedomOfMovement,
             [Description("Freedom of association")] FreedomOfAssociation,
