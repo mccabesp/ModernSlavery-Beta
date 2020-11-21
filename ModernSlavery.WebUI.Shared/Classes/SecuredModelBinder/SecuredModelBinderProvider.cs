@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
 using System.Linq;
 using System.Reflection;
 
@@ -17,10 +18,10 @@ namespace ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder
             var propInfo = context.Metadata.ContainerType.GetProperty(propName);
             if (propInfo == null) return null;
 
-            var secureAttribute = context.Metadata.ModelType.GetCustomAttributes().FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
-            if (secureAttribute == null) return null;
+            var viewStateAttribute = context.Metadata.ModelType.GetCustomAttributes().FirstOrDefault(attr => typeof(ViewStateAttribute).IsAssignableFrom(attr.GetType())) as ViewStateAttribute;
+            if (viewStateAttribute == null || viewStateAttribute.SecureMethod == ViewStateAttribute.SecureMethods.None) return null;
 
-            if (secureAttribute.SecureMethod == SecuredAttribute.SecureMethods.Obfuscate)
+            if (viewStateAttribute.SecureMethod == ViewStateAttribute.SecureMethods.Obfuscate)
                 return new BinderTypeModelBinder(typeof(ObfuscatedModelBinder));
 
             return new BinderTypeModelBinder(typeof(EncryptedModelBinder));

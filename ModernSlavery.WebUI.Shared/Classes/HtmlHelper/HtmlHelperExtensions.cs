@@ -122,8 +122,8 @@ namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelper
             var includeProperties = properties.Where(propertyInfo => propertyInfo.GetCustomAttributes().Where(attr => typeof(ViewStateAttribute).IsAssignableFrom(attr.GetType())).Cast<ViewStateAttribute>().Any(attr => attr.Action == ViewStateAttribute.ActionTypes.Include));
             var excludeProperties = properties.Where(propertyInfo => propertyInfo.GetCustomAttributes().Where(attr => typeof(ViewStateAttribute).IsAssignableFrom(attr.GetType())).Cast<ViewStateAttribute>().Any(attr => attr.Action == ViewStateAttribute.ActionTypes.Exclude));
 
-            if (!includeProperties.Any() && !excludeProperties.Any()) throw new Exception($"You must add at least one [{nameof(ViewStateAttribute)}], [{nameof(IncludeAttribute)}] or [{nameof(ExcludeAttribute)}] to the ViewModel '{modelType.Name}' public properties to specify which are to be included in ViewState");
-            if (includeProperties.Any() && excludeProperties.Any()) throw new Exception($"You cannot both include and exclude properties from ViewState consider using either [{nameof(IncludeAttribute)}] or [{nameof(ExcludeAttribute)}] but not both");
+            if (!includeProperties.Any() && !excludeProperties.Any()) throw new Exception($"You must add at least one [{nameof(ViewStateAttribute)}] to the ViewModel '{modelType.Name}' public properties to specify which are to be included in ViewState");
+            if (includeProperties.Any() && excludeProperties.Any()) throw new Exception($"You cannot both include and exclude properties from ViewState use either [{nameof(ViewStateAttribute)}(action:{ViewStateAttribute.ActionTypes.Include})] or [{nameof(ViewStateAttribute)}(action:{ViewStateAttribute.ActionTypes.Exclude})] but not both");
 
             if (excludeProperties.Any()) includeProperties = properties.Except(excludeProperties);
 
@@ -157,7 +157,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelper
             if (viewModelType.GetCustomAttribute<ViewModelAttribute>() == null) throw new ArgumentException($"[{nameof(ViewModelAttribute)}] required on class '{viewModelType.Name}' for hidden secured form fields", propertyName);
 
             var secureAttribute = propertyInfo.GetCustomAttributes().FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
-            if (secureAttribute == null) throw new ArgumentException($"[{nameof(SecuredAttribute)}], [{nameof(EncryptedAttribute)}] or [{nameof(ObfuscatedAttribute)}] required on property '{viewModelType.Name}.{propertyName}' for hidden secured form field", propertyName);
+            if (secureAttribute == null) throw new ArgumentException($"[{nameof(SecuredAttribute)}], or [{nameof(ViewModelAttribute)}] is required on property '{viewModelType.Name}.{propertyName}' for hidden secured form field", propertyName);
 
             var propertyModel = propertyInfo.GetValue(viewModel)?.ToString();
 
