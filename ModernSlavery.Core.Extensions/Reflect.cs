@@ -34,6 +34,11 @@ namespace ModernSlavery.Core.Extensions
             return value.GetValue(obj);
         }
 
+        public static bool IsBaseTypeOrDerived(this Type baseType, Type derivedType)
+        {
+            return baseType.IsAssignableFrom(derivedType);
+        }
+
         public static bool IsAsyncMethod(this MethodInfo method)
         {
             // Obtain the custom attribute for the method. 

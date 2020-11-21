@@ -1,12 +1,5 @@
 ﻿@page "/landing"
 
-@using ModernSlavery.Core.Models
-@using ModernSlavery.WebUI.Shared.Classes.Cookies
-@using ModernSlavery.WebUI.GDSDesignSystem
-@using ModernSlavery.WebUI.GDSDesignSystem.Models
-@using ModernSlavery.WebUI.Shared.Classes.Extensions
-@using ModernSlavery.WebUI.Shared.Options
-
 @inject SharedOptions sharedOptions
 @inject FeatureSwitchOptions featureSwitchOptions
 
@@ -14,7 +7,7 @@
 @addTagHelper "*, ModernSlavery.WebUI.Shared.Classes.TagHelpers"
 
 @{
-    ViewBag.Title = "@text";    
+    ViewBag.Title = "@text";
     var text = "Modern slavery statement registry";
 }
 
@@ -23,7 +16,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta property="og:description" content="Use this service to @text">
-    <meta property="og:title" content="@text">   
+    <meta property="og:title" content="@text">
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="GOV.UK">
     <meta name="govuk:section" content="employing people">
@@ -143,7 +136,7 @@
                         <h2 class="govuk-heading-l govuk-!-margin-bottom-3">Add a statement to the registry</h2>
                         <p class="govuk-body govuk-!-margin-bottom-7 mobile-no-margin">
                             To add your organisation’s statement to the registry, you’ll need to create an account. To get started, go to the sign-in page.
-                        </p>                        
+                        </p>
                         <p class="govuk-body"><a href="@(Url.ActionArea("Login", "Identity", "Identity"))" class="govuk-link govuk-!-font-weight-bold">Create an account or sign in</a></p>
                     </div>
                 </div>

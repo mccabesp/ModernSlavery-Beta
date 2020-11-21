@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModernSlavery.WebUI.Shared.Classes.Middleware.SecureModelBinder
+namespace ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public class SecuredAttribute : Attribute

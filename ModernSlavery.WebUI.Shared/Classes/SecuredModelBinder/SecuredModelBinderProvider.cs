@@ -1,14 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
-using Microsoft.Extensions.DependencyInjection;
-using ModernSlavery.Core.Extensions;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
-namespace ModernSlavery.WebUI.Shared.Classes.Middleware.SecureModelBinder
+namespace ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder
 {
     public class SecuredModelBinderProvider : IModelBinderProvider
     {
@@ -22,7 +17,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware.SecureModelBinder
             var propInfo = context.Metadata.ContainerType.GetProperty(propName);
             if (propInfo == null) return null;
 
-            var secureAttribute = context.Metadata.ModelType.GetCustomAttributes().FirstOrDefault(attr=> typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
+            var secureAttribute = context.Metadata.ModelType.GetCustomAttributes().FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
             if (secureAttribute == null) return null;
 
             if (secureAttribute.SecureMethod == SecuredAttribute.SecureMethods.Obfuscate)

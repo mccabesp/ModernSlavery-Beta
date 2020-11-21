@@ -2,12 +2,10 @@
 using Microsoft.AspNetCore.Mvc.Routing;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Options;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace ModernSlavery.WebUI.Shared.Classes
+namespace ModernSlavery.WebUI.Shared.Classes.UrlHelper
 {
     public class CustomUrlHelper : IUrlHelper
     {
@@ -25,7 +23,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
         public string Action(UrlActionContext urlActionContext)
         {
-            var result=_originalUrlHelper.Action(urlActionContext);
+            var result = _originalUrlHelper.Action(urlActionContext);
             if (!string.IsNullOrWhiteSpace(result)) return result;
             return FindRoute(urlActionContext);
         }
@@ -57,7 +55,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
             var keys = new List<string>();
 
             var area = urlActionContext?.Values?.GetProperty<string>("Area");
-            if (string.IsNullOrWhiteSpace(area) && _originalUrlHelper.ActionContext.RouteData.Values.ContainsKey("area")) area= _originalUrlHelper.ActionContext.RouteData.Values["area"].ToString();
+            if (string.IsNullOrWhiteSpace(area) && _originalUrlHelper.ActionContext.RouteData.Values.ContainsKey("area")) area = _originalUrlHelper.ActionContext.RouteData.Values["area"].ToString();
             if (!string.IsNullOrWhiteSpace(area)) keys.Add(area);
 
             var controller = urlActionContext.Controller;
@@ -72,31 +70,17 @@ namespace ModernSlavery.WebUI.Shared.Classes
                 if (_staticRoutesOptions.ContainsKey(key))
                 {
                     var value = _staticRoutesOptions[key];
-                    if (!string.IsNullOrWhiteSpace(value)) {
-                        if (value.StartsWith("~")) value=_originalUrlHelper.ActionContext.HttpContext.ResolveUrl(value);
-                        if (urlActionContext.Values!=null && value.Contains('{') && value.Contains('}')) value = urlActionContext.Values.Resolve(value);
-                        return value; 
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                        if (value.StartsWith("~")) value = _originalUrlHelper.ActionContext.HttpContext.ResolveUrl(value);
+                        if (urlActionContext.Values != null && value.Contains('{') && value.Contains('}')) value = urlActionContext.Values.Resolve(value);
+                        return value;
                     }
                 }
                 keys.RemoveAt(0);
             }
 
             return null;
-        }
-    }
-
-    public class CustomUrlHelperFactory : IUrlHelperFactory
-    {
-        private readonly StaticRoutesOptions _urlRoutesOptions;
-        public CustomUrlHelperFactory(StaticRoutesOptions urlRoutesOptions)
-        {
-            _urlRoutesOptions = urlRoutesOptions;
-        }
-        public IUrlHelper GetUrlHelper(ActionContext context)
-        {
-            var originalUrlHelperFactory = new UrlHelperFactory();
-            var originalUrlHelper = originalUrlHelperFactory.GetUrlHelper(context);
-            return new CustomUrlHelper(context, originalUrlHelper, _urlRoutesOptions);
         }
     }
 }

@@ -4,9 +4,8 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using ModernSlavery.WebUI.Shared.Classes.Middleware.ViewModelBinder;
 
-namespace ModernSlavery.WebUI.Shared.Classes.Middleware.ClassModelBinder
+namespace ModernSlavery.WebUI.Shared.Classes.ViewModelBinder
 {
     public class ViewModelBinderProvider : IModelBinderProvider
     {
@@ -16,7 +15,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware.ClassModelBinder
 
             if (!context.Metadata.IsComplexType) return null;
 
-            var viewModelAttribute=context.Metadata.ModelType.GetCustomAttribute<ViewModelAttribute>();
+            var viewModelAttribute = context.Metadata.ModelType.GetCustomAttribute<ViewModelAttribute>();
             if (viewModelAttribute == null) return null;
 
             var propertyBinders = new Dictionary<ModelMetadata, IModelBinder>();

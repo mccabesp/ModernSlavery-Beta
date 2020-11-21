@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.WebUI.Shared.Classes.Middleware.ClassModelBinder;
-using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 {

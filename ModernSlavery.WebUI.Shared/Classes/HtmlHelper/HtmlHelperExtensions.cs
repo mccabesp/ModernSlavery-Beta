@@ -20,13 +20,13 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
-using ModernSlavery.WebUI.Shared.Classes.Middleware.SecureModelBinder;
-using ModernSlavery.WebUI.Shared.Classes.Middleware.ViewModelBinder;
+using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
+using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
 using CompareAttribute = System.ComponentModel.DataAnnotations.CompareAttribute;
 
-namespace ModernSlavery.WebUI.Shared.Classes.Extensions
+namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelper
 {
-    public static partial class Extensions
+    public static partial class HtmlHelperExtensions
     {
         public static SharedOptions GetSharedOptions(this IHtmlHelper htmlHelper)
         {
@@ -101,34 +101,88 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
         private static IObfuscator _obfuscator;
         private static IModelExpressionProvider _modelExpressionProvider;
 
+        /// <summary>
+        /// Returns a list of <input type="hidden"> elements for each public property in the underlying view model.
+        /// The underlying view model class must have an [ViewModel(StateStores.ViewState)] attribute. 
+        /// Properties to include are specified by using the [Include] or [Exclude] attributes but not both.
+        /// </summary>
+        /// <typeparam name="TModel">The type of the underlying view model</typeparam>
+        /// <param name="htmlHelper">The Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper`1 instance this method extends.</param>
+        /// <returns>A new Microsoft.AspNetCore.Html.IHtmlContent containing the <input> element.</returns>
+        public static IHtmlContent HiddenViewModel<TModel>(this IHtmlHelper<TModel> htmlHelper)
+        {
+            var modelType = typeof(TModel);
+            var viewModelAttribute = modelType.GetCustomAttribute<ViewModelAttribute>();
+            if (viewModelAttribute==null) throw new ArgumentException($"[{nameof(ViewModelAttribute)}] required on class '{modelType.Name}'", modelType.Name);
+            if (viewModelAttribute.StateStore!=ViewModelAttribute.StateStores.ViewState) throw new Exception($"To store view model in {nameof(ViewModelAttribute.StateStores.ViewState)} you must set [{nameof(ViewModelAttribute)}({nameof(viewModelAttribute.StateStore)}={nameof(ViewModelAttribute.StateStores.ViewState)})] on class '{modelType.Name}'");
+
+            var viewModel = htmlHelper.ViewData.Model;
+
+            var properties = viewModel.GetType().GetProperties(BindingFlags.Public);
+            var includeProperties = properties.Where(propertyInfo => propertyInfo.GetCustomAttributes().Where(attr => typeof(ViewStateAttribute).IsAssignableFrom(attr.GetType())).Cast<ViewStateAttribute>().Any(attr => attr.Action == ViewStateAttribute.ActionTypes.Include));
+            var excludeProperties = properties.Where(propertyInfo => propertyInfo.GetCustomAttributes().Where(attr => typeof(ViewStateAttribute).IsAssignableFrom(attr.GetType())).Cast<ViewStateAttribute>().Any(attr => attr.Action == ViewStateAttribute.ActionTypes.Exclude));
+
+            if (!includeProperties.Any() && !excludeProperties.Any()) throw new Exception($"You must add at least one [{nameof(ViewStateAttribute)}], [{nameof(IncludeAttribute)}] or [{nameof(ExcludeAttribute)}] to the ViewModel '{modelType.Name}' public properties to specify which are to be included in ViewState");
+            if (includeProperties.Any() && excludeProperties.Any()) throw new Exception($"You cannot both include and exclude properties from ViewState consider using either [{nameof(IncludeAttribute)}] or [{nameof(ExcludeAttribute)}] but not both");
+
+            if (excludeProperties.Any()) includeProperties = properties.Except(excludeProperties);
+
+            var complexProperties = includeProperties.Where(propertyInfo => propertyInfo.PropertyType.IsSimpleType());
+            if (complexProperties.Any()) throw new Exception($"Cannot include the following complex properties in ViewState for view model '': {complexProperties.Select(p=>p.Name).ToDelimitedString()}.");
+
+            var hiddenFields = new List<IHtmlContent>();
+            foreach (var propertyInfo in includeProperties)
+            {
+                var secureAttribute = propertyInfo.GetCustomAttributes().FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
+
+                if (secureAttribute == null)
+                    hiddenFields.Add(htmlHelper.Hidden(propertyInfo.Name));
+                else
+                    hiddenFields.Add(htmlHelper.HiddenSecured(propertyInfo.Name));
+            }
+
+            return hiddenFields.Any() ? new HtmlString(string.Join(Environment.NewLine,hiddenFields)) : null;
+        }
+
+        public static IHtmlContent HiddenSecured<TModel>(this IHtmlHelper<TModel> htmlHelper, string propertyName)
+        {
+            var viewModelType = typeof(TModel);
+            var propertyInfo = viewModelType.GetProperty(propertyName);
+            if (propertyInfo == null) throw new ArgumentOutOfRangeException(nameof(propertyName), $"Type '{viewModelType.Name}' does not have property named '{propertyName}'");
+
+            var propertyModelType = propertyInfo.PropertyType;
+            var viewModel = htmlHelper.ViewData.Model;
+
+            if (!propertyInfo.PropertyType.IsSimpleType()) throw new ArgumentException($"Cannot add hidden secured form field for non-simple type '{viewModelType.Name}.{propertyName}'", propertyName);
+            if (viewModelType.GetCustomAttribute<ViewModelAttribute>() == null) throw new ArgumentException($"[{nameof(ViewModelAttribute)}] required on class '{viewModelType.Name}' for hidden secured form fields", propertyName);
+
+            var secureAttribute = propertyInfo.GetCustomAttributes().FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
+            if (secureAttribute == null) throw new ArgumentException($"[{nameof(SecuredAttribute)}], [{nameof(EncryptedAttribute)}] or [{nameof(ObfuscatedAttribute)}] required on property '{viewModelType.Name}.{propertyName}' for hidden secured form field", propertyName);
+
+            var propertyModel = propertyInfo.GetValue(viewModel)?.ToString();
+
+            if (!string.IsNullOrWhiteSpace(propertyModel))
+            {
+                if (secureAttribute.SecureMethod == SecuredAttribute.SecureMethods.Obfuscate)
+                {
+                    if (!propertyInfo.PropertyType.IsIntegerType()) throw new ArgumentException($"Cannot use obfuscation on non-integer type {propertyInfo.PropertyType.Name} property '{viewModelType.Name}.{propertyName}' for hidden secured form field", propertyName);
+                    _obfuscator = _obfuscator ?? htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IObfuscator>();
+                    propertyModel = _obfuscator.Obfuscate(propertyModel);
+                }
+                else
+                {
+                    propertyModel = Encryption.Encrypt(propertyModel);
+                }
+            }
+            return htmlHelper.Hidden(propertyName, propertyModel);
+        }
+
         public static IHtmlContent HiddenSecuredFor<TModel, TResult>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TResult>> expression)
         {
             _modelExpressionProvider = _modelExpressionProvider ?? htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IModelExpressionProvider>();
             var modelExpression = _modelExpressionProvider.CreateModelExpression(htmlHelper.ViewData, expression);
 
-            if (!modelExpression.Metadata.ModelType.IsSimpleType()) throw new ArgumentException($"Cannot add hidden secured form field for non-simple type '{modelExpression.Metadata.ContainerType.Name}.{modelExpression.Metadata.Name}'", modelExpression.Metadata.Name);
-            if (modelExpression.Metadata.ContainerType.GetCustomAttribute<ViewModelAttribute>()==null) throw new ArgumentException($"[{nameof(ViewModelAttribute)}] required on class '{modelExpression.Metadata.ContainerType.Name}' for hidden secured form fields", modelExpression.Metadata.Name);
-            
-            var propertyInfo = modelExpression.Metadata.ContainerType.GetProperty(modelExpression.Metadata.Name);
-            var secureAttribute = propertyInfo.GetCustomAttributes().FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
-            if (secureAttribute == null) throw new ArgumentException($"[{nameof(SecuredAttribute)}], [{nameof(EncryptedAttribute)}] or [{nameof(ObfuscatedAttribute)}] required on property '{modelExpression.Metadata.ContainerType.Name}.{modelExpression.Metadata.Name}' for hidden secured form field", modelExpression.Metadata.Name);
-
-            var propertyValue = propertyInfo.GetValue(htmlHelper.ViewData.Model)?.ToString();
-
-            if (!string.IsNullOrWhiteSpace(propertyValue))
-            {
-                if (secureAttribute.SecureMethod == SecuredAttribute.SecureMethods.Obfuscate)
-                {
-                    if (!modelExpression.Metadata.ModelType.IsIntegerType()) throw new ArgumentException($"Cannot use obfuscation on non-integer type {modelExpression.Metadata.ModelType.Name} property '{modelExpression.Metadata.ContainerType.Name}.{modelExpression.Metadata.Name}' for hidden secured form field", modelExpression.Metadata.Name);
-                    _obfuscator = _obfuscator ?? htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IObfuscator>();
-                    propertyValue = _obfuscator.Obfuscate(propertyValue);
-                }
-                else
-                {
-                    propertyValue = Encryption.Encrypt(propertyValue);
-                }
-            }
-            return htmlHelper.Hidden(modelExpression.Metadata.Name, propertyValue);
+            return htmlHelper.HiddenSecured(modelExpression.Metadata.Name);
         }
 
         public static HtmlString EnumDisplayNameFor<T>(this T item)

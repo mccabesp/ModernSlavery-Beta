@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.WebUI.Submission.Models

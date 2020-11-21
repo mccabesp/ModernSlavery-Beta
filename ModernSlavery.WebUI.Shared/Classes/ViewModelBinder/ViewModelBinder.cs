@@ -7,8 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.WebUI.Shared.Classes.Middleware.SecureModelBinder;
-using ModernSlavery.WebUI.Shared.Classes.Middleware.ViewModelBinder;
+using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using Newtonsoft.Json;
 using System;
@@ -17,7 +16,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace ModernSlavery.WebUI.Shared.Classes.Middleware.ClassModelBinder
+namespace ModernSlavery.WebUI.Shared.Classes.ViewModelBinder
 {
     public class ViewModelBinder : ComplexTypeModelBinder
     {
@@ -30,7 +29,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware.ClassModelBinder
 
         protected override object CreateModel(ModelBindingContext bindingContext)
         {
-            if (_viewModelAttribute.StateStore==ViewModelAttribute.StateStores.SessionStash)return UnstashModel(bindingContext);
+            if (_viewModelAttribute.StateStore == ViewModelAttribute.StateStores.SessionStash) return UnstashModel(bindingContext);
             return ActivatorUtilities.GetServiceOrCreateInstance(bindingContext.HttpContext.RequestServices, bindingContext.ModelType);
         }
 

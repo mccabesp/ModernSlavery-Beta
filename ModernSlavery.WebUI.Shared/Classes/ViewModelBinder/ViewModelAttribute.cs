@@ -1,17 +1,15 @@
 ﻿using System;
 
-namespace ModernSlavery.WebUI.Shared.Classes.Middleware.ViewModelBinder
+namespace ModernSlavery.WebUI.Shared.Classes.ViewModelBinder
 {
-    public interface IViewModelAttribute { }
-
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class ViewModelAttribute : Attribute, IViewModelAttribute
+    public class ViewModelAttribute : Attribute
     {
         public enum StateStores
         {
             None,
             SessionStash,
-            //HiddenField
+            ViewState
         }
         public readonly StateStores StateStore;
 

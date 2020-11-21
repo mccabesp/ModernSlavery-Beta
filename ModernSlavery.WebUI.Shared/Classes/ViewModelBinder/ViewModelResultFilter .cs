@@ -3,13 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.WebUI.Shared.Classes.Middleware.SecureModelBinder;
+using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using System;
 using System.Linq;
 using System.Reflection;
 
-namespace ModernSlavery.WebUI.Shared.Classes.Middleware.ViewModelBinder
+namespace ModernSlavery.WebUI.Shared.Classes.ViewModelBinder
 {
     public class ViewModelResultFilter : IResultFilter
     {

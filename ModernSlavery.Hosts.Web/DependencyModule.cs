@@ -30,8 +30,8 @@ using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Classes.Middleware.ClassModelBinder;
 using ModernSlavery.WebUI.Shared.Classes.Middleware.SecureModelBinder;
-using ModernSlavery.WebUI.Shared.Classes.Middleware.ViewModelBinder;
 using ModernSlavery.WebUI.Shared.Classes.Providers;
+using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
 using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.Hosts.Web
