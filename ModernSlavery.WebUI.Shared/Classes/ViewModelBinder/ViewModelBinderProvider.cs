@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using ModernSlavery.WebUI.Shared.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
 namespace ModernSlavery.WebUI.Shared.Classes.ViewModelBinder
 {
@@ -15,9 +17,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.ViewModelBinder
 
             if (!context.Metadata.IsComplexType) return null;
 
-            var viewModelAttribute = context.Metadata.ModelType.GetCustomAttribute<ViewModelAttribute>();
-            if (viewModelAttribute == null) return null;
-
             var propertyBinders = new Dictionary<ModelMetadata, IModelBinder>();
             for (var i = 0; i < context.Metadata.Properties.Count; i++)
             {
@@ -26,7 +25,8 @@ namespace ModernSlavery.WebUI.Shared.Classes.ViewModelBinder
             }
 
             var loggerFactory = context.Services.GetService<ILoggerFactory>();
-            return new ViewModelBinder(viewModelAttribute, propertyBinders, loggerFactory);
+            if (typeof(BaseViewModel).IsAssignableFrom(context.Metadata.ModelType)) return new ViewModelBinder(propertyBinders, loggerFactory);
+            return new ComplexTypeModelBinder(propertyBinders, loggerFactory);            
         }
     }
 }

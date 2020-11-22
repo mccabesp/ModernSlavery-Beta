@@ -42,7 +42,7 @@
                                     Organisation(s) covered by the statement
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.GroupOrganisationsPages.GetStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GroupOrganisationsPages.GetStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.GroupOrganisationsPages.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GroupOrganisationsPages.GetStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -50,7 +50,7 @@
                                     Statement URL, dates and sign-off
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.GetUrlSignOffStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetUrlSignOffStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.GetUrlSignOffStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetUrlSignOffStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -58,7 +58,7 @@
                                     Recommended areas covered by the statement
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.CompliancePage.GetStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.CompliancePage.GetStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.CompliancePage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.CompliancePage.GetStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -66,7 +66,7 @@
                                     Your organisation's sector(s) and turnover or budget
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.GetSectorTurnoverStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetSectorTurnoverStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.GetSectorTurnoverStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetSectorTurnoverStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -74,7 +74,7 @@
                                     How many years you've been producing statements
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.YearsPage.GetStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.YearsPage.GetStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.YearsPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.YearsPage.GetStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                     </ul>
                 </li>
@@ -91,7 +91,7 @@
                                     Your policies
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.PoliciesPage.GetStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.PoliciesPage.GetStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.PoliciesPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.PoliciesPage.GetStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -99,7 +99,7 @@
                                     Training and raising awareness
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.TrainingPage.GetStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.TrainingPage.GetStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.TrainingPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.TrainingPage.GetStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -107,7 +107,7 @@
                                     How you monitor working conditions
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.GetWorkingConditionsStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetWorkingConditionsStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.GetWorkingConditionsStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetWorkingConditionsStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -115,7 +115,7 @@
                                     Your highest risks of modern slavery
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.GetRisksStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetRisksStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.GetRisksStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetRisksStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
 
                         <li class="app-task-list__item">
@@ -124,7 +124,7 @@
                                     Finding indicators of modern slavery
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.GetIndicatorRemediationsStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetIndicatorRemediationsStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.GetIndicatorRemediationsStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetIndicatorRemediationsStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
 
                         <li class="app-task-list__item">
@@ -133,7 +133,7 @@
                                     Monitoring your progress
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.ProgressPage.GetStatus()== BaseViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.ProgressPage.GetStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.ProgressPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.ProgressPage.GetStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                     </ul>
                 </li>
@@ -175,12 +175,12 @@
                     </div>
                 </div>
 
-                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled="@(!Model.CanSubmit())" name="command" value="@BaseViewModel.CommandType.Submit">
+                <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" disabled="@(!Model.CanSubmit())" name="command" value="@BaseStatementViewModel.CommandType.Submit">
                     Submit for publication
                 </button>
             }
 
-            <button class="govuk-button govuk-button--secondary" name="command" value="@BaseViewModel.CommandType.Skip">
+            <button class="govuk-button govuk-button--secondary" name="command" value="@BaseStatementViewModel.CommandType.Skip">
                 Save draft
             </button>
         }

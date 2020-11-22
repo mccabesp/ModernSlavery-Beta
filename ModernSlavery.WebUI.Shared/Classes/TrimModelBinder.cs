@@ -54,6 +54,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
                 return new TrimmingModelBinder(new SimpleTypeModelBinder(context.Metadata.ModelType, loggerFactory));
             }
 
+            
             return null;
         }
     }

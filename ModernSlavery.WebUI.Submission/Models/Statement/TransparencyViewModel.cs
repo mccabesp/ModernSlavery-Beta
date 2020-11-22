@@ -1,6 +1,6 @@
 ﻿namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class TransparencyViewModel : BaseViewModel
+    public class TransparencyViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "Transparency and modern slavery";
     }

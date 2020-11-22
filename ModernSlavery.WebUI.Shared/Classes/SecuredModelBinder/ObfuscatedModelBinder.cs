@@ -21,8 +21,8 @@ namespace ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder
             var value = valueProviderResult.FirstValue;
             if (!string.IsNullOrWhiteSpace(value))
             {
-                value = _obfuscator.DeObfuscate(value).ToString();
-                bindingContext.ModelState.SetModelValue(bindingContext.ModelName, new ValueProviderResult(value, valueProviderResult.Culture));
+                var deobfuscatedValue = _obfuscator.DeObfuscate(value).ToString();
+                bindingContext.ModelState.SetModelValue(bindingContext.ModelName, value, deobfuscatedValue);
                 bindingContext.ModelState.MarkFieldValid(bindingContext.ModelName);
             }
 

@@ -29,7 +29,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class GroupOrganisationsViewModel : BaseViewModel
+    public class GroupOrganisationsViewModel : BaseStatementViewModel
     {
         public bool? GroupSubmission { get; set; }
 

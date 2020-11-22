@@ -27,7 +27,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class TrainingViewModel : BaseViewModel
+    public class TrainingViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "If you provided training on modern slavery during the period of the statement, who was it for?";
 

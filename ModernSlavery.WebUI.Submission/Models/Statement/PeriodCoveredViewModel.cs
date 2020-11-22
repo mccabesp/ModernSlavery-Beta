@@ -31,7 +31,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class PeriodCoveredViewModel : BaseViewModel
+    public class PeriodCoveredViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "What period does this statement cover?";
 

@@ -29,7 +29,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class RemediationsViewModel : BaseViewModel
+    public class RemediationsViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "What action did you take in response?";
 

@@ -22,6 +22,7 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
+using ModernSlavery.WebUI.Shared.Models;
 using CompareAttribute = System.ComponentModel.DataAnnotations.CompareAttribute;
 
 namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelper
@@ -109,26 +110,27 @@ namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelper
         /// <typeparam name="TModel">The type of the underlying view model</typeparam>
         /// <param name="htmlHelper">The Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper`1 instance this method extends.</param>
         /// <returns>A new Microsoft.AspNetCore.Html.IHtmlContent containing the <input> element.</returns>
-        public static IHtmlContent HiddenViewModel<TModel>(this IHtmlHelper<TModel> htmlHelper)
+        public static IHtmlContent AddViewState<TModel>(this IHtmlHelper<TModel> htmlHelper)
         {
             var modelType = typeof(TModel);
-            var viewModelAttribute = modelType.GetCustomAttribute<ViewModelAttribute>();
-            if (viewModelAttribute==null) throw new ArgumentException($"[{nameof(ViewModelAttribute)}] required on class '{modelType.Name}'", modelType.Name);
-            if (viewModelAttribute.StateStore!=ViewModelAttribute.StateStores.ViewState) throw new Exception($"To store view model in {nameof(ViewModelAttribute.StateStores.ViewState)} you must set [{nameof(ViewModelAttribute)}({nameof(viewModelAttribute.StateStore)}={nameof(ViewModelAttribute.StateStores.ViewState)})] on class '{modelType.Name}'");
+            var formViewStateAttribute = modelType.GetCustomAttribute<FormViewStateAttribute>();
+            if (formViewStateAttribute==null) throw new ArgumentException($"[{nameof(FormViewStateAttribute)}] required on class '{modelType.Name}'", modelType.Name);
+            if (modelType.GetCustomAttribute<SessionViewStateAttribute>() != null) throw new Exception($"Cannot have both [{nameof(FormViewStateAttribute)}] and [{nameof(SessionViewStateAttribute)}] on class '{modelType.Name}'");
 
             var viewModel = htmlHelper.ViewData.Model;
 
-            var properties = viewModel.GetType().GetProperties(BindingFlags.Public);
-            var includeProperties = properties.Where(propertyInfo => propertyInfo.GetCustomAttributes().Where(attr => typeof(ViewStateAttribute).IsAssignableFrom(attr.GetType())).Cast<ViewStateAttribute>().Any(attr => attr.Action == ViewStateAttribute.ActionTypes.Include));
-            var excludeProperties = properties.Where(propertyInfo => propertyInfo.GetCustomAttributes().Where(attr => typeof(ViewStateAttribute).IsAssignableFrom(attr.GetType())).Cast<ViewStateAttribute>().Any(attr => attr.Action == ViewStateAttribute.ActionTypes.Exclude));
+            var properties = modelType.GetProperties(BindingFlags.Public);
+            var includeProperties = properties.Where(propertyInfo => propertyInfo.GetCustomAttribute<IncludeViewStateAttribute>(false) !=null);
+            var excludeProperties = properties.Where(propertyInfo => propertyInfo.GetCustomAttribute<ExcludeViewStateAttribute>(false) != null);
+            if (!includeProperties.Any() && !excludeProperties.Any()) throw new Exception($"You must add at least one [{nameof(IncludeViewStateAttribute)}] or [{nameof(ExcludeViewStateAttribute)}] to the ViewModel '{modelType.Name}' public properties to specify which are to be included in ViewState");
+            CheckViewStateMutex(modelType);
 
-            if (!includeProperties.Any() && !excludeProperties.Any()) throw new Exception($"You must add at least one [{nameof(ViewStateAttribute)}] to the ViewModel '{modelType.Name}' public properties to specify which are to be included in ViewState");
-            if (includeProperties.Any() && excludeProperties.Any()) throw new Exception($"You cannot both include and exclude properties from ViewState use either [{nameof(ViewStateAttribute)}(action:{ViewStateAttribute.ActionTypes.Include})] or [{nameof(ViewStateAttribute)}(action:{ViewStateAttribute.ActionTypes.Exclude})] but not both");
-
+            includeProperties = properties.Where(propertyInfo => propertyInfo.GetCustomAttribute<IncludeViewStateAttribute>(true) != null);
+            excludeProperties = properties.Where(propertyInfo => propertyInfo.GetCustomAttribute<ExcludeViewStateAttribute>(true) != null);
             if (excludeProperties.Any()) includeProperties = properties.Except(excludeProperties);
 
             var complexProperties = includeProperties.Where(propertyInfo => propertyInfo.PropertyType.IsSimpleType());
-            if (complexProperties.Any()) throw new Exception($"Cannot include the following complex properties in ViewState for view model '': {complexProperties.Select(p=>p.Name).ToDelimitedString()}.");
+            if (complexProperties.Any()) throw new Exception($"You must add [{nameof(ExcludeViewStateAttribute)}] to the following complex properties : {complexProperties.Select(p=>p.Name).ToDelimitedString()} if type {modelType.Name}");
 
             var hiddenFields = new List<IHtmlContent>();
             foreach (var propertyInfo in includeProperties)
@@ -144,20 +146,33 @@ namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelper
             return hiddenFields.Any() ? new HtmlString(string.Join(Environment.NewLine,hiddenFields)) : null;
         }
 
+        private static void CheckViewStateMutex(Type type)
+        {
+            var properties = type.GetProperties(BindingFlags.Public);
+            var includeProperties = properties.Any(propertyInfo => propertyInfo.GetCustomAttribute<IncludeViewStateAttribute>(false) != null);
+            var excludeProperties = properties.Any(propertyInfo => propertyInfo.GetCustomAttribute<ExcludeViewStateAttribute>(false) != null);
+            if (includeProperties && excludeProperties) throw new Exception($"You cannot have both [{nameof(IncludeViewStateAttribute)}] and [{nameof(ExcludeViewStateAttribute)}] on the ViewModel '{type.Name}'");
+            if (type.BaseType!=null) CheckViewStateMutex(type.BaseType);
+        }
+
         public static IHtmlContent HiddenSecured<TModel>(this IHtmlHelper<TModel> htmlHelper, string propertyName)
         {
             var viewModelType = typeof(TModel);
+            if (!typeof(BaseViewModel).IsAssignableFrom(viewModelType)) throw new Exception($"Cannot add hidden secured form field for class '{viewModelType.Name}' which is not derived from class '{nameof(BaseViewModel)}'");
+            if (viewModelType.GetCustomAttribute<SessionViewStateAttribute>() != null) throw new ArgumentException($"Cannot add hidden secured form field for class '{viewModelType.Name}' which has [{nameof(SessionViewStateAttribute)}]", propertyName);
+
             var propertyInfo = viewModelType.GetProperty(propertyName);
             if (propertyInfo == null) throw new ArgumentOutOfRangeException(nameof(propertyName), $"Type '{viewModelType.Name}' does not have property named '{propertyName}'");
 
             var propertyModelType = propertyInfo.PropertyType;
             var viewModel = htmlHelper.ViewData.Model;
 
+            if (propertyInfo.PropertyType.GetCustomAttribute<ExcludeViewStateAttribute>() != null) throw new ArgumentException($"You cannot have [{nameof(ExcludeViewStateAttribute)}] on hidden secured form field", propertyName);
+
             if (!propertyInfo.PropertyType.IsSimpleType()) throw new ArgumentException($"Cannot add hidden secured form field for non-simple type '{viewModelType.Name}.{propertyName}'", propertyName);
-            if (viewModelType.GetCustomAttribute<ViewModelAttribute>() == null) throw new ArgumentException($"[{nameof(ViewModelAttribute)}] required on class '{viewModelType.Name}' for hidden secured form fields", propertyName);
 
             var secureAttribute = propertyInfo.GetCustomAttributes().FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
-            if (secureAttribute == null) throw new ArgumentException($"[{nameof(SecuredAttribute)}], or [{nameof(ViewModelAttribute)}] is required on property '{viewModelType.Name}.{propertyName}' for hidden secured form field", propertyName);
+            if (secureAttribute == null) throw new ArgumentException($"[{nameof(SecuredAttribute)}] is required in class '{viewModelType.Name}' for hidden secured form field property", propertyName);
 
             var propertyModel = propertyInfo.GetValue(viewModel)?.ToString();
 

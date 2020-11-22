@@ -26,7 +26,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class UrlEmailViewModel : BaseViewModel
+    public class UrlEmailViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "Provide a link to the modern slavery statement on your organisation's website";
 

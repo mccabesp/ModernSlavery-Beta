@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
-    public class BeforeYouStartViewModel : BaseViewModel
+    public class BeforeYouStartViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "Before you start";
     }

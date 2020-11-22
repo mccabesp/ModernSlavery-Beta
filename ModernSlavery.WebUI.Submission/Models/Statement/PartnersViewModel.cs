@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class PartnersViewModel : BaseViewModel
+    public class PartnersViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "During the period of the statement, who did you engage with to help you monitor working conditions across your operations and supply chain?";
 

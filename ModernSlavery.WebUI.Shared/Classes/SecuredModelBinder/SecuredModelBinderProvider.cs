@@ -18,10 +18,10 @@ namespace ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder
             var propInfo = context.Metadata.ContainerType.GetProperty(propName);
             if (propInfo == null) return null;
 
-            var viewStateAttribute = context.Metadata.ModelType.GetCustomAttributes().FirstOrDefault(attr => typeof(ViewStateAttribute).IsAssignableFrom(attr.GetType())) as ViewStateAttribute;
-            if (viewStateAttribute == null || viewStateAttribute.SecureMethod == ViewStateAttribute.SecureMethods.None) return null;
+            var securedAttribute = context.Metadata.ModelType.GetCustomAttributes().FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
+            if (securedAttribute == null) return null;
 
-            if (viewStateAttribute.SecureMethod == ViewStateAttribute.SecureMethods.Obfuscate)
+            if (securedAttribute.SecureMethod == SecuredAttribute.SecureMethods.Obfuscate)
                 return new BinderTypeModelBinder(typeof(ObfuscatedModelBinder));
 
             return new BinderTypeModelBinder(typeof(EncryptedModelBinder));

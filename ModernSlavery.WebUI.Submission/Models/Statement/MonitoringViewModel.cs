@@ -22,7 +22,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class MonitoringViewModel : BaseViewModel
+    public class MonitoringViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "Do you want to tell us about any other ways you monitored working conditions across your organisation and supply chain?";
 

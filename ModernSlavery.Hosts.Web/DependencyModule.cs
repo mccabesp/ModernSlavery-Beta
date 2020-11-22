@@ -29,6 +29,7 @@ using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Classes.Providers;
+using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
 using ModernSlavery.WebUI.Shared.Options;
 
@@ -84,14 +85,14 @@ namespace ModernSlavery.Hosts.Web
 
                     options.RespectBrowserAcceptHeader = true; // false by default - Any 'Accept' header gets turned into application/json. If you want to allow the clients to accept different headers, you need to switch that translation off
                     options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
-                    options.AddViewModelProvider();
-                    options.ModelBinderProviders.Insert(0, new ViewModelBinderProvider());
+                    options.AddViewModelBinderProvider();
+                    options.ModelBinderProviders.Insert(0, new SecuredModelBinderProvider());
                     options.ModelMetadataDetailsProviders.Add(new TrimModelBinder()); //Set DisplayMetadata to input empty strings as null
                     options.ModelMetadataDetailsProviders.Add(new DefaultResourceValidationMetadataProvider()); // sets default resource type to use for display text and error messages
                     if (_responseCachingOptions.Enabled)_responseCachingOptions.CacheProfiles.ForEach(p =>options.CacheProfiles.Add(p)); //Load the response cache profiles from options
                     options.Filters.Add<ErrorHandlingFilter>();
                     options.Filters.Add<HttpExceptionFilter>(); 
-                    options.Filters.Add<ViewModelResultFilter>();
+                    options.Filters.Add<ViewModelResultFilter>(); 
                 });
 
             mvcBuilder.AddApplicationPart<WebAPI.Public.DependencyModule>();

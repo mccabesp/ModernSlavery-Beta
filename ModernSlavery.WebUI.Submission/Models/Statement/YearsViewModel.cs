@@ -21,7 +21,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class YearsViewModel : BaseViewModel
+    public class YearsViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "How many years has your organisation been producing modern slavery statements?";
 

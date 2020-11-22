@@ -34,7 +34,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class SignOffViewModel : BaseViewModel
+    public class SignOffViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "What is the name of the director (or equivalent) who signed off your statement?";
 

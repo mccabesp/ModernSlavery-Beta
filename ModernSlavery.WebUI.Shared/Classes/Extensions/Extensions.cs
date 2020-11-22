@@ -18,7 +18,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             option.ModelBinderProviders.Insert(index, new TrimmingModelBinderProvider());
         }
 
-        public static void AddViewModelProvider(this MvcOptions option)
+        public static void AddViewModelBinderProvider(this MvcOptions option)
         {
             var index = option.ModelBinderProviders.ToList().FindIndex(x => x.GetType() == typeof(ComplexTypeModelBinderProvider));
             if (index < 0) index = 0;

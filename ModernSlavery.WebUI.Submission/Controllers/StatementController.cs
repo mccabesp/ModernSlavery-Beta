@@ -306,7 +306,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
         }
 
-        private async Task<IActionResult> GetAsync<TViewModel>(string organisationIdentifier, int year, params object[] arguments) where TViewModel : BaseViewModel
+        private async Task<IActionResult> GetAsync<TViewModel>(string organisationIdentifier, int year, params object[] arguments) where TViewModel : BaseStatementViewModel
         {
             //Try and get the viewmodel from session
             var viewModel = UnstashModel<TViewModel>();
@@ -383,13 +383,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             return View(viewModel);
         }
 
-        private async Task<IActionResult> PostAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, params object[] arguments) where TViewModel : BaseViewModel
+        private async Task<IActionResult> PostAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command, params object[] arguments) where TViewModel : BaseStatementViewModel
         {
             SetNavigationUrl(viewModel);
 
             switch (command)
             {
-                case BaseViewModel.CommandType.Continue:
+                case BaseStatementViewModel.CommandType.Continue:
                     //Validate the submitted ViewModel data
                     if (!ModelState.IsValid)
                     {
@@ -468,14 +468,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/review-statement")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReviewPost(string organisationIdentifier, int year, bool acceptedDeclaration, BaseViewModel.CommandType command)
+        public async Task<IActionResult> ReviewPost(string organisationIdentifier, int year, bool acceptedDeclaration, BaseStatementViewModel.CommandType command)
         {
             //Create the view model
             var viewModel = new ReviewViewModel();
 
             switch (command)
             {
-                case BaseViewModel.CommandType.Submit:
+                case BaseStatementViewModel.CommandType.Submit:
                     //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
                     var openResult = await SubmissionPresenter.OpenDraftStatementModelAsync(organisationIdentifier, year, VirtualUser.UserId);
 
@@ -511,7 +511,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
                     //Redirect to the continue url
                     return Redirect(GetCompleteUrl());
-                case BaseViewModel.CommandType.Skip:
+                case BaseStatementViewModel.CommandType.Skip:
                     //set the navigation urls
                     SetNavigationUrl(viewModel);
 
@@ -579,7 +579,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/grouping")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GroupStatus(GroupStatusViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> GroupStatus(GroupStatusViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -593,7 +593,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/group-search")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GroupSearch(GroupSearchViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, int addIndex = -1, int removeIndex = -1)
+        public async Task<IActionResult> GroupSearch(GroupSearchViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command, int addIndex = -1, int removeIndex = -1)
         {
             //Get the saved viewmodel information from session
             var stashedModel = UnstashModel<GroupSearchViewModel>();
@@ -604,7 +604,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             ModelState.Exclude(nameof(viewModel.Submitted));
 
-            if (command.IsAny(BaseViewModel.CommandType.Search, BaseViewModel.CommandType.SearchNext, BaseViewModel.CommandType.SearchPrevious))
+            if (command.IsAny(BaseStatementViewModel.CommandType.Search, BaseStatementViewModel.CommandType.SearchNext, BaseStatementViewModel.CommandType.SearchPrevious))
             {
                 //Check the search string
                 if (!ModelState.IsValid)
@@ -613,11 +613,11 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     return View(viewModel);
                 }
 
-                if (command == BaseViewModel.CommandType.Search)
+                if (command == BaseStatementViewModel.CommandType.Search)
                     viewModel.ResultsPage.CurrentPage = 1;
-                else if (command == BaseViewModel.CommandType.SearchNext)
+                else if (command == BaseStatementViewModel.CommandType.SearchNext)
                     viewModel.ResultsPage.CurrentPage++;
-                else if (command == BaseViewModel.CommandType.SearchPrevious)
+                else if (command == BaseStatementViewModel.CommandType.SearchPrevious)
                     viewModel.ResultsPage.CurrentPage--;
 
                 var outcome = await SubmissionPresenter.SearchGroupOrganisationsAsync(viewModel, VirtualUser);
@@ -674,7 +674,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/group-add")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GroupAdd(GroupAddViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, int addIndex = -1, int removeIndex = -1, params object[] arguments)
+        public async Task<IActionResult> GroupAdd(GroupAddViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command, int addIndex = -1, int removeIndex = -1, params object[] arguments)
         {
             //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
             var viewModelResult = await SubmissionPresenter.GetViewModelAsync<GroupAddViewModel>(organisationIdentifier, year, VirtualUser.UserId, arguments);
@@ -751,7 +751,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/group-review")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GroupReview(GroupReviewViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command, int removeIndex = -1, params object[] arguments)
+        public async Task<IActionResult> GroupReview(GroupReviewViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command, int removeIndex = -1, params object[] arguments)
         {
             //Get the populated ViewModel from the Draft StatementModel for this organisation, reporting year and user
             var viewModelDraft = await SubmissionPresenter.GetViewModelAsync<GroupReviewViewModel>(organisationIdentifier, year, VirtualUser.UserId, arguments);
@@ -760,7 +760,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             viewModel = viewModelDraft.Result;
 
-            if (command.IsAny(BaseViewModel.CommandType.Continue, BaseViewModel.CommandType.Skip))
+            if (command.IsAny(BaseStatementViewModel.CommandType.Continue, BaseStatementViewModel.CommandType.Skip))
             {
                 //Continue or cancel normally
                 return await PostAsync(viewModel, organisationIdentifier, year, command);
@@ -807,7 +807,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/url-email")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UrlEmail(UrlEmailViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> UrlEmail(UrlEmailViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -822,7 +822,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/period-covered")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Period(PeriodCoveredViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Period(PeriodCoveredViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -836,7 +836,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/sign-off")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SignOff(SignOffViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> SignOff(SignOffViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -854,7 +854,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/compliance")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Compliance(ComplianceViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Compliance(ComplianceViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -871,7 +871,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/sectors")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Sectors(SectorsViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Sectors(SectorsViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -885,7 +885,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/turnover")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Turnover(TurnoverViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Turnover(TurnoverViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -901,7 +901,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/years")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Years(YearsViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Years(YearsViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -921,7 +921,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/policies")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Policies(PoliciesViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Policies(PoliciesViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -937,7 +937,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/training")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Training(TrainingViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Training(TrainingViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -953,7 +953,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/partners")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Partners(PartnersViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Partners(PartnersViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -967,7 +967,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/social-audits")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SocialAudits(SocialAuditsViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> SocialAudits(SocialAuditsViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -981,7 +981,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/grievance-mechanisms")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Grievances(GrievancesViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Grievances(GrievancesViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -995,7 +995,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/other-monitoring")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Monitoring(MonitoringViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Monitoring(MonitoringViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -1011,7 +1011,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/highest-risks")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> HighestRisks(HighestRisksViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> HighestRisks(HighestRisksViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -1025,7 +1025,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/highest-risk/{index}")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> HighRisk(HighRiskViewModel viewModel, string organisationIdentifier, int year, int index, BaseViewModel.CommandType command, CountryTypes toRemove)
+        public async Task<IActionResult> HighRisk(HighRiskViewModel viewModel, string organisationIdentifier, int year, int index, BaseStatementViewModel.CommandType command, CountryTypes toRemove)
         {
             viewModel.Index = index;
 
@@ -1036,7 +1036,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     ModelState.AddModelError(4702);
                 return View(viewModel);
             }
-            else if (command == BaseViewModel.CommandType.AddCountry)
+            else if (command == BaseStatementViewModel.CommandType.AddCountry)
             {
                 SetNavigationUrl(viewModel);
                 if (!viewModel.TryAddSelectedCountry())
@@ -1059,7 +1059,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/indicators")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Indicators(IndicatorsViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Indicators(IndicatorsViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -1073,7 +1073,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/remediations")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Remediations(RemediationsViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Remediations(RemediationsViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }
@@ -1089,7 +1089,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/progress")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Progress(ProgressViewModel viewModel, string organisationIdentifier, int year, BaseViewModel.CommandType command)
+        public async Task<IActionResult> Progress(ProgressViewModel viewModel, string organisationIdentifier, int year, BaseStatementViewModel.CommandType command)
         {
             return await PostAsync(viewModel, organisationIdentifier, year, command);
         }

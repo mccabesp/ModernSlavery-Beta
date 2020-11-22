@@ -26,7 +26,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class PoliciesViewModel : BaseViewModel
+    public class PoliciesViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "Do your organisation's policies include any of the following provisions in relation to modern slavery?";
 

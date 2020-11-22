@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class SocialAuditsViewModel : BaseViewModel
+    public class SocialAuditsViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "Did you use social audits to look for signs of forced labour?";
 

@@ -25,8 +25,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    [ViewModel]
-    public class SectorsViewModel : BaseViewModel
+    public class SectorsViewModel : BaseStatementViewModel
     {
         [IgnoreMap]
         [Newtonsoft.Json.JsonIgnore]//This needs to be Newtonsoft.Json.JsonIgnore namespace not System.Text.Json.Serialization.JsonIgnore

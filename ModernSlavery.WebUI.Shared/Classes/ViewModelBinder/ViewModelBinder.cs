@@ -20,16 +20,16 @@ namespace ModernSlavery.WebUI.Shared.Classes.ViewModelBinder
 {
     public class ViewModelBinder : ComplexTypeModelBinder
     {
-        private readonly ViewModelAttribute _viewModelAttribute;
-
-        public ViewModelBinder(ViewModelAttribute viewModelAttribute, IDictionary<ModelMetadata, IModelBinder> propertyBinders, ILoggerFactory loggerFactory) : base(propertyBinders, loggerFactory)
+        public ViewModelBinder(IDictionary<ModelMetadata, IModelBinder> propertyBinders, ILoggerFactory loggerFactory) : base(propertyBinders, loggerFactory)
         {
-            _viewModelAttribute = viewModelAttribute;
+
         }
 
         protected override object CreateModel(ModelBindingContext bindingContext)
         {
-            if (_viewModelAttribute.StateStore == ViewModelAttribute.StateStores.SessionStash) return UnstashModel(bindingContext);
+            var sessionViewStateAttribute = bindingContext.ModelMetadata.ModelType.GetCustomAttribute<SessionViewStateAttribute>();
+            if (sessionViewStateAttribute != null) return UnstashModel(bindingContext);
+            
             return ActivatorUtilities.GetServiceOrCreateInstance(bindingContext.HttpContext.RequestServices, bindingContext.ModelType);
         }
 

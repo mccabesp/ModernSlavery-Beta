@@ -13,8 +13,7 @@ using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
 namespace ModernSlavery.WebUI.Shared.Models
 {
     [Serializable]
-    [ViewModel]
-    public class OrganisationViewModel
+    public class OrganisationViewModel:BaseViewModel
     {
         public bool PINExpired;
         public bool PINSent;

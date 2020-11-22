@@ -27,7 +27,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class GrievancesViewModel : BaseViewModel
+    public class GrievancesViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "What types of anonymous grievance mechanisms did you have in place?";
 

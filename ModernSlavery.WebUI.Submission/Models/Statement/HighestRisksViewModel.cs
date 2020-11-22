@@ -66,7 +66,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     }
 
-    public class HighestRisksViewModel : BaseViewModel
+    public class HighestRisksViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "Tell us about your highest risks";
 

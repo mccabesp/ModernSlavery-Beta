@@ -27,7 +27,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class IndicatorsViewModel : BaseViewModel
+    public class IndicatorsViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "Does your statement refer to finding any ILO indicators of forced labour?";
 

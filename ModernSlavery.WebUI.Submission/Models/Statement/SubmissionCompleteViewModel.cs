@@ -11,7 +11,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class SubmissionCompleteViewModel : BaseViewModel
+    public class SubmissionCompleteViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "Submission complete";
     }

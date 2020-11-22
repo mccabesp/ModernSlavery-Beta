@@ -30,7 +30,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.GoalsDetails, opt => opt.MapFrom(s => s.GoalsDetails));
         }
     }
-    public class ComplianceViewModel : BaseViewModel
+    public class ComplianceViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "Does your statement cover the following areas in relation to modern slavery?";
 

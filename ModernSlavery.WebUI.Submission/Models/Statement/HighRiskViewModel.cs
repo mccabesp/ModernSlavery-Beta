@@ -48,7 +48,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class HighRiskViewModel : BaseViewModel
+    public class HighRiskViewModel : BaseStatementViewModel
     {
         public HighRiskViewModel()
         {

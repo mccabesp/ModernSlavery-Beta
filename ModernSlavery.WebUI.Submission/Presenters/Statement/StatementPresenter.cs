@@ -35,7 +35,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="statementModel">The instance of the source StatementModel</param>
         /// <param name="Arguments">Any additional arguments required to populate the ViewModel</param>
         /// <returns>A new instance of the populated ViewModel</returns>
-        TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel, params object[] arguments) where TViewModel : BaseViewModel;
+        TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel, params object[] arguments) where TViewModel : BaseStatementViewModel;
 
         /// <summary>
         /// Copies all relevant data from a ViewModel into the specified StatementModel 
@@ -71,7 +71,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
         /// <param name="Arguments">Any additional arguments required to populate the ViewModel</param>
         /// <returns>Outcome.Success with the populated ViewModel or Outcome.Fail with a list of StatementErrors</returns>
-        Task<Outcome<StatementErrors, TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseViewModel;
+        Task<Outcome<StatementErrors, TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseStatementViewModel;
 
         /// <summary>
         /// Updates a StatementModel from a ViewModel and saves a draft copy of the StatementModel for the specified oreganisation, reporting Deadline, and user
@@ -84,7 +84,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
         /// <param name="Arguments">Any additional arguments required to update the StatementModel</param>
         /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
-        Task<Outcome<StatementErrors, TViewModel>> SaveViewModelAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseViewModel;
+        Task<Outcome<StatementErrors, TViewModel>> SaveViewModelAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseStatementViewModel;
 
         /// <summary>
         /// Returns a StatementModel populated for the specified oreganisation, reporting Deadline, and user.
@@ -206,7 +206,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         }
         private int LastOrganisationSearchRemoteTotal => _session["LastOrganisationSearchRemoteTotal"].ToInt32();
 
-        public TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel, params object[] arguments) where TViewModel : BaseViewModel
+        public TViewModel GetViewModelFromStatementModel<TViewModel>(StatementModel statementModel, params object[] arguments) where TViewModel : BaseStatementViewModel
         {
             //Instantiate the ViewModel with arguments
             var viewModel = ActivatorUtilities.CreateInstance<TViewModel>(_serviceProvider,arguments);
@@ -250,7 +250,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await _statementBusinessLogic.SubmitDraftStatementModelAsync(organisationId, reportingDeadlineYear, userId);
         }
 
-        public async Task<Outcome<StatementErrors, TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseViewModel
+        public async Task<Outcome<StatementErrors, TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseStatementViewModel
         {
             var openOutcome = await OpenDraftStatementModelAsync(organisationIdentifier, reportingDeadlineYear, userId);
             if (openOutcome.Fail) return new Outcome<StatementErrors, TViewModel>(openOutcome.Errors);
@@ -260,7 +260,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return new Outcome<StatementErrors, TViewModel>(viewModel);
         }
 
-        public async Task<Outcome<StatementErrors, TViewModel>> SaveViewModelAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseViewModel
+        public async Task<Outcome<StatementErrors, TViewModel>> SaveViewModelAsync<TViewModel>(TViewModel viewModel, string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseStatementViewModel
         {
             var openOutcome = await OpenDraftStatementModelAsync(organisationIdentifier, reportingDeadlineYear, userId);
             if (openOutcome.Fail) return new Outcome<StatementErrors, TViewModel>(openOutcome.Errors);

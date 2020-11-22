@@ -189,7 +189,7 @@
                             <input asp-for="SelectedCountry" class="govuk-input" type="text">
                         </div>
                         <div class="govuk-grid-column-one-half">
-                            <button class="govuk-button govuk-button--secondary" type="submit" name="command" value="@BaseViewModel.CommandType.AddCountry">Add</button>
+                            <button class="govuk-button govuk-button--secondary" type="submit" name="command" value="@BaseStatementViewModel.CommandType.AddCountry">Add</button>
                         </div>
                     </div>
                 </fieldset>
@@ -208,7 +208,7 @@
                 <span asp-validation-for="ActionsOrPlans" class="govuk-error-message"></span>
             </div>
 
-            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseViewModel.CommandType.Continue">
+            <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseStatementViewModel.CommandType.Continue">
                 Save and continue
             </button>
 

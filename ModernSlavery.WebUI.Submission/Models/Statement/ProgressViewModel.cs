@@ -22,7 +22,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    public class ProgressViewModel : BaseViewModel
+    public class ProgressViewModel : BaseStatementViewModel
     {
         public override string PageTitle => "How does your statement demonstrate your progress over time in addressing modern slavery risks?";
 

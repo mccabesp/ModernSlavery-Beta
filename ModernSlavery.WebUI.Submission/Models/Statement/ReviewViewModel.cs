@@ -47,7 +47,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     }
 
-    public class ReviewViewModel : BaseViewModel
+    public class ReviewViewModel : BaseStatementViewModel
     {
 
         public override string PageTitle => $"Add your {ReportingDeadlineYear} modern slavery statement to the registry";
