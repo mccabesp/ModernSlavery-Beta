@@ -319,7 +319,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
                 await _sharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
                     "GPG - COMPANIES HOUSE ERROR",
-                    $"Cant search using Companies House API for query '{groupSearchViewModel.GroupResults.SearchKeywords}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
+                    $"Cant search using Companies House API for query '{groupSearchViewModel.SearchKeywords}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
                     user.EmailAddress.StartsWithI(_sharedBusinessLogic.TestOptions.TestPrefix));
 
                 return new Outcome<StatementErrors>(StatementErrors.CoHoPermanentError);

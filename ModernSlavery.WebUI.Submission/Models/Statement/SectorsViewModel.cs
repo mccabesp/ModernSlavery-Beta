@@ -5,8 +5,8 @@ using System.ComponentModel.DataAnnotations;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using System.Linq;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
-using ModernSlavery.WebUI.Shared.Classes.Binding;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
+using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
     }
 
-    [DependencyModelBinder]
+    [ViewModel]
     public class SectorsViewModel : BaseViewModel
     {
         [IgnoreMap]

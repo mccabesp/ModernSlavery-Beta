@@ -5,11 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
-using ModernSlavery.WebUI.Shared.Classes.Binding;
-using ModernSlavery.Core.Entities.StatementSummary;
 using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
-using ModernSlavery.Core.Extensions;
-using Newtonsoft.Json;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {

@@ -9,7 +9,7 @@ using ModernSlavery.Core.Entities.StatementSummary;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.UrlHelper;
 using static ModernSlavery.Core.Entities.Statement;
 using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 
