@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 using ModernSlavery.WebUI.Shared.Interfaces;
@@ -49,7 +50,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.ViewModelBinder
             var modelType = model.GetType();
             var session = context.HttpContext.RequestServices.GetRequiredService<IHttpSession>();
             var keyName = $"{controllerType}:{modelType}:Model";
-            session[keyName] = Core.Extensions.Json.SerializeObjectDisposed(model);
+            session[keyName] = Json.SerializeObject(model);
         }
     }
 }

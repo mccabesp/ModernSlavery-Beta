@@ -73,7 +73,7 @@ namespace ModernSlavery.WebUI.Viewing.Classes
             }
             else
             {
-                var json = JsonConvert.SerializeObject(_items);
+                var json = Json.SerializeObject(_items);
 
                 _session[_sessionName] = json;
             }

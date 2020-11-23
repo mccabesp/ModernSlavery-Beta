@@ -15,7 +15,7 @@ namespace ModernSlavery.Infrastructure.Storage.MessageQueues
             if (instance == null || Equals(instance, default(TInstance)))
                 throw new ArgumentNullException(nameof(instance));
 
-            var json = JsonConvert.SerializeObject(instance);
+            var json = Core.Extensions.Json.SerializeObject(instance);
 
             await AddMessageAsync(json);
         }

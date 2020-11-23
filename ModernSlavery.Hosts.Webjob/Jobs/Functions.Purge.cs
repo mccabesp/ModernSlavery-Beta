@@ -46,7 +46,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         nameof(user.UserId),
                         user.UserId.ToString(),
                         null,
-                        JsonConvert.SerializeObject(new { user.UserId, user.EmailAddress, user.JobTitle, user.Fullname }),
+                        Json.SerializeObject(new { user.UserId, user.EmailAddress, user.JobTitle, user.Fullname }),
                         null);
                     _dataRepository.Delete(user);
                     await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
@@ -93,7 +93,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         $"{nameof(UserOrganisation.OrganisationId)}:{nameof(UserOrganisation.UserId)}",
                         $"{registration.OrganisationId}:{registration.UserId}",
                         null,
-                        JsonConvert.SerializeObject(
+                        Json.SerializeObject(
                             new
                             {
                                 registration.UserId,
@@ -166,7 +166,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             nameof(org.OrganisationId),
                             org.OrganisationId.ToString(),
                             null,
-                            JsonConvert.SerializeObject(
+                            Json.SerializeObject(
                                 new
                                 {
                                     org.OrganisationId,
@@ -260,7 +260,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         nameof(statement.StatementId),
                         statement.StatementId.ToString(),
                         null,
-                        JsonConvert.SerializeObject(DownloadModel.Create(statement)),
+                        Json.SerializeObject(DownloadModel.Create(statement)),
                         null);
                     _dataRepository.Delete(statement);
                     await _dataRepository.SaveChangesAsync().ConfigureAwait(false);

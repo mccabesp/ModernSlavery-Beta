@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
+using ModernSlavery.Core.Extensions;
 using Newtonsoft.Json;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Cookies
@@ -33,7 +34,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Cookies
 
         public static void SetCookieSettingsCookie(HttpResponse response, CookieSettings cookieSettings)
         {
-            var cookieSettingsString = JsonConvert.SerializeObject(cookieSettings);
+            var cookieSettingsString = Json.SerializeObject(cookieSettings);
 
             response.Cookies.Append(
                 CookieSettingsCookieName,
@@ -68,7 +69,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Cookies
         {
             var seenCookieMessage = new SeenCookieMessage {Version = 1};
 
-            var seenCookieMessageString = JsonConvert.SerializeObject(seenCookieMessage);
+            string seenCookieMessageString = Json.SerializeObject(seenCookieMessage);
 
             response.Cookies.Append(
                 SeenCookieMessageCookieName,

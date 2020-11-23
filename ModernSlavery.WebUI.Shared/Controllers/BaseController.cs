@@ -249,7 +249,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 if (value == null || !value.Any())
                     Session.Remove("PageHistory");
                 else
-                    Session["PageHistory"] = JsonConvert.SerializeObject(value);
+                    Session["PageHistory"] = Core.Extensions.Json.SerializeObject(value);
             }
         }
 
@@ -695,7 +695,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             var modelType = typeof(TModel);
 
             var keyName = $"{controllerType}:{modelType}:Model";
-            Session[keyName] = Core.Extensions.Json.SerializeObjectDisposed(model);
+            Session[keyName] = Core.Extensions.Json.SerializeObject(model);
         }
 
         [NonAction]
@@ -706,7 +706,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             var modelType = typeof(TModel);
 
             var keyName = $"{controllerType}:{modelType}:Model";
-            Session[keyName] = Core.Extensions.Json.SerializeObjectDisposed(model);
+            Session[keyName] = Core.Extensions.Json.SerializeObject(model);
         }
 
         [NonAction]

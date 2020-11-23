@@ -64,7 +64,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
             }
             else
             {
-                str = JsonConvert.SerializeObject(value);
+                str = Json.SerializeObject(value);
                 if (str.Length > 250) str = Encryption.Compress(str);
             }
 

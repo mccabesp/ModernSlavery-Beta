@@ -514,7 +514,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             string metaJson = null;
             if (metaData != null && metaData.Count > 0 && metaData.Values.Any(kv => !string.IsNullOrWhiteSpace(kv)))
-                metaJson = JsonConvert.SerializeObject(metaData);
+                metaJson = Json.SerializeObject(metaData);
 
             if (!string.IsNullOrWhiteSpace(metaJson))
                 File.WriteAllText(metaPath, metaJson);

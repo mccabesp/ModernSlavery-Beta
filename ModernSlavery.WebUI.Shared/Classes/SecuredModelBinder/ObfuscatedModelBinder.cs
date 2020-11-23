@@ -18,15 +18,15 @@ namespace ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder
             var valueProviderResult = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
             if (valueProviderResult == ValueProviderResult.None) return Task.CompletedTask;
 
-            var value = valueProviderResult.FirstValue;
-            if (!string.IsNullOrWhiteSpace(value))
+            var originalValue = valueProviderResult.FirstValue;
+            if (!string.IsNullOrWhiteSpace(originalValue))
             {
-                var deobfuscatedValue = _obfuscator.DeObfuscate(value).ToString();
-                bindingContext.ModelState.SetModelValue(bindingContext.ModelName, value, deobfuscatedValue);
-                bindingContext.ModelState.MarkFieldValid(bindingContext.ModelName);
+                var newValue = _obfuscator.DeObfuscate(originalValue).ToString();
+                bindingContext.ModelState.SetModelValue(bindingContext.ModelName, newValue, originalValue);
+                bindingContext.ModelState.MarkFieldValid(bindingContext.ModelName); bindingContext.ModelState.MarkFieldValid(bindingContext.ModelName);
+                bindingContext.Result = ModelBindingResult.Success(newValue);
             }
 
-            bindingContext.Result = ModelBindingResult.Success(value);
             return Task.CompletedTask;
         }
     }

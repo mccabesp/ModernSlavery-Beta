@@ -18,7 +18,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder
             var propInfo = context.Metadata.ContainerType.GetProperty(propName);
             if (propInfo == null) return null;
 
-            var securedAttribute = context.Metadata.ModelType.GetCustomAttributes().FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
+            var securedAttribute = context.Metadata.ModelType.GetCustomAttributes(true).FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
             if (securedAttribute == null) return null;
 
             if (securedAttribute.SecureMethod == SecuredAttribute.SecureMethods.Obfuscate)

@@ -178,7 +178,7 @@ namespace ModernSlavery.Core.Extensions
 
         public static string EncryptModel<TModel>(TModel model)
         {
-            var modelSerialized = JsonConvert.SerializeObject(model);
+            var modelSerialized = Json.SerializeObject(model);
             var encString = EncryptData(modelSerialized);
             return encString.EncodeUrlBase64();
         }

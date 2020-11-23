@@ -41,7 +41,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 nameof(Organisation.OrganisationReference),
                                 org.OrganisationReference,
                                 null,
-                                JsonConvert.SerializeObject(
+                                Json.SerializeObject(
                                     new {names[0].Name, names[0].Source, names[0].Created, names[0].OrganisationId}),
                                 null,
                                 comment)).ConfigureAwait(false);

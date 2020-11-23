@@ -17,4 +17,22 @@ namespace ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder
             SecureMethod = secureMethod;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    public class ObfuscatedAttribute : SecuredAttribute
+    {
+        public ObfuscatedAttribute():base(SecureMethods.Obfuscate)
+        {
+            
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    public class EncryptedAttribute : SecuredAttribute
+    {
+        public EncryptedAttribute() : base(SecureMethods.Encrypt)
+        {
+
+        }
+    }
 }

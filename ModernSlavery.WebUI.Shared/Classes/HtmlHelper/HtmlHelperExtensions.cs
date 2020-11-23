@@ -2,24 +2,20 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
 using ModernSlavery.WebUI.Shared.Models;
@@ -169,27 +165,28 @@ namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelper
 
             if (propertyInfo.PropertyType.GetCustomAttribute<ExcludeViewStateAttribute>() != null) throw new ArgumentException($"You cannot have [{nameof(ExcludeViewStateAttribute)}] on hidden secured form field", propertyName);
 
-            if (!propertyInfo.PropertyType.IsSimpleType()) throw new ArgumentException($"Cannot add hidden secured form field for non-simple type '{viewModelType.Name}.{propertyName}'", propertyName);
-
+            
             var secureAttribute = propertyInfo.GetCustomAttributes().FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
             if (secureAttribute == null) throw new ArgumentException($"[{nameof(SecuredAttribute)}] is required in class '{viewModelType.Name}' for hidden secured form field property", propertyName);
 
-            var propertyModel = propertyInfo.GetValue(viewModel)?.ToString();
-
-            if (!string.IsNullOrWhiteSpace(propertyModel))
+            var propertyModel = propertyInfo.GetValue(viewModel);
+            if (propertyModel!=null)
             {
+                string hiddenValue;
                 if (secureAttribute.SecureMethod == SecuredAttribute.SecureMethods.Obfuscate)
                 {
                     if (!propertyInfo.PropertyType.IsIntegerType()) throw new ArgumentException($"Cannot use obfuscation on non-integer type {propertyInfo.PropertyType.Name} property '{viewModelType.Name}.{propertyName}' for hidden secured form field", propertyName);
                     _obfuscator = _obfuscator ?? htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IObfuscator>();
-                    propertyModel = _obfuscator.Obfuscate(propertyModel);
+                    hiddenValue = _obfuscator.Obfuscate(propertyModel.ToString());
                 }
                 else
                 {
-                    propertyModel = Encryption.Encrypt(propertyModel);
+                    hiddenValue = propertyInfo.PropertyType.IsSimpleType() ? propertyModel.ToString() : Json.SerializeObject(propertyModel);
+                    hiddenValue = Encryption.Encrypt(hiddenValue);
                 }
+                return htmlHelper.Hidden(propertyName, hiddenValue);
             }
-            return htmlHelper.Hidden(propertyName, propertyModel);
+            return new HtmlString(string.Empty);
         }
 
         public static IHtmlContent HiddenSecuredFor<TModel, TResult>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TResult>> expression)

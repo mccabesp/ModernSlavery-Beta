@@ -9,7 +9,6 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.Core.Entities.StatementSummary;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -20,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
 
 namespace ModernSlavery.WebUI.Submission.Presenters
 {

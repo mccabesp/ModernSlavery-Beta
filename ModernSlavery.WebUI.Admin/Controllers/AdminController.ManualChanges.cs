@@ -1852,7 +1852,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         nameof(Organisation.OrganisationReference),
                                         organisationRef,
                                         nameof(OrganisationSicCode),
-                                        JsonConvert.SerializeObject(
+                                        Core.Extensions.Json.SerializeObject(
                                             new
                                             {
                                                 sic.OrganisationSicCodeId,
@@ -2135,7 +2135,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         nameof(Organisation.OrganisationReference),
                                         organisationRef,
                                         nameof(OrganisationName),
-                                        JsonConvert.SerializeObject(
+                                        Core.Extensions.Json.SerializeObject(
                                             new
                                             {
                                                 name.OrganisationNameId,
@@ -2258,7 +2258,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     if (!test)
                     {
-                        var serialisedInfo = JsonConvert.SerializeObject(
+                        var serialisedInfo = Core.Extensions.Json.SerializeObject(
                             new
                             {
                                 securityCodeWorksOutcome.Result.SecurityCode,
@@ -2365,7 +2365,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                     if (!test)
                     {
-                        var serialisedInfo = JsonConvert.SerializeObject(
+                        var serialisedInfo = Core.Extensions.Json.SerializeObject(
                             new
                             {
                                 securityCodeWorksOutcome.Result.SecurityCode,

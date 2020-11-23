@@ -167,7 +167,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             foreach (var key in settings.Keys)
                 SetValueRecursively(key, jsonObj, settings[key]);
 
-            string output = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObj, Newtonsoft.Json.Formatting.Indented);
+            string output = Json.SerializeObject(jsonObj, indented:true);
 
             File.WriteAllText(filepath, output);
         }

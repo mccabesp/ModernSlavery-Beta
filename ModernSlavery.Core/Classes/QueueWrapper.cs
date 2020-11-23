@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ModernSlavery.Core.Extensions;
+using Newtonsoft.Json;
 
 namespace ModernSlavery.Core.Classes
 {
@@ -6,7 +7,7 @@ namespace ModernSlavery.Core.Classes
     {
         public QueueWrapper(object message)
         {
-            Message = JsonConvert.SerializeObject(message);
+            Message = Json.SerializeObject(message);
             Type = message.GetType().ToString();
         }
 

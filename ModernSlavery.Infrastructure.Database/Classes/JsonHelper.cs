@@ -7,7 +7,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 {
     public static class JsonHelper
     {
-        private static JsonSerializerSettings jsonSettings = new JsonSerializerSettings
+        public static JsonSerializerSettings JsonSettings = new JsonSerializerSettings
         {
             NullValueHandling = NullValueHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore,
@@ -16,12 +16,12 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
         public static T Deserialize<T>(string json) where T : class
         {
-            return string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json, jsonSettings);
+            return string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<T>(json, JsonSettings);
         }
 
         public static string Serialize<T>(T obj) where T : class
         {
-            return obj == null ? null : JsonConvert.SerializeObject(obj, jsonSettings);
+            return obj == null ? null : JsonConvert.SerializeObject(obj, JsonSettings);
         }
     }
 }

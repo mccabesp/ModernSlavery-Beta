@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using ModernSlavery.Core.Extensions;
 using Newtonsoft.Json;
 
 namespace ModernSlavery.Core.Entities
@@ -27,7 +28,7 @@ namespace ModernSlavery.Core.Entities
             get => JsonConvert.DeserializeObject<Dictionary<string, string>>(string.IsNullOrEmpty(Details)
                 ? "{}"
                 : Details);
-            set => Details = JsonConvert.SerializeObject(value);
+            set => Details = Json.SerializeObject(value);
         }
     }
 }

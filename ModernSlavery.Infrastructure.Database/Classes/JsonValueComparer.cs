@@ -19,7 +19,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
         private static string Json(T instance)
         {
-            return JsonConvert.SerializeObject(instance);
+            return JsonConvert.SerializeObject(instance, JsonHelper.JsonSettings);
         }
 
         private static T DoGetSnapshot(T instance)
@@ -28,7 +28,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             if (instance is ICloneable cloneable)
                 return (T)cloneable.Clone();
 
-            var result = (T)JsonConvert.DeserializeObject(Json(instance), typeof(T));
+            var result = (T)JsonConvert.DeserializeObject(Json(instance), typeof(T),JsonHelper.JsonSettings);
             return result;
 
         }

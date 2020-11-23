@@ -68,8 +68,8 @@ namespace ModernSlavery.Infrastructure.Logging
                     userToUpdate.EmailAddress,
                     UserAction.ChangedDetails,
                     nameof(UserAction.ChangedDetails),
-                    JsonConvert.SerializeObject(originalDetails),
-                    JsonConvert.SerializeObject(changeDetails),
+                    Core.Extensions.Json.SerializeObject(originalDetails),
+                    Core.Extensions.Json.SerializeObject(changeDetails),
                     actionByEmailAddress));
         }
 

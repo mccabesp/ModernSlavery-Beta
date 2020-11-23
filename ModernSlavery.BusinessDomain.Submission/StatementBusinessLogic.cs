@@ -247,13 +247,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         private async Task SaveStatementModelToFileAsync(StatementModel statementModel, string draftFilePath)
         {
             //Save the new draft data 
-            var jsonSettings = new JsonSerializerSettings
-            {
-                NullValueHandling = NullValueHandling.Ignore,
-                DefaultValueHandling = DefaultValueHandling.Ignore
-            };
-
-            var draftJson = JsonConvert.SerializeObject(statementModel, _sharedBusinessLogic.SharedOptions.IsProduction() ? Formatting.None : Formatting.Indented, jsonSettings);
+            var draftJson = Json.SerializeObject(statementModel, indented: !_sharedBusinessLogic.SharedOptions.IsProduction());
             await _sharedBusinessLogic.FileRepository.WriteAsync(draftFilePath, Encoding.UTF8.GetBytes(draftJson));
         }
 
@@ -721,7 +715,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
                             //Compare the latest with the previous statementModel
                             var modifications = GetModifications(previousStatementModel, statementModel);
-                            newStatement.Modifications = modifications.Any() ? JsonConvert.SerializeObject(modifications, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore }) : null;
+                            newStatement.Modifications = modifications.Any() ? Json.SerializeObject(modifications) : null;
                         }
 
                         //Set whether thestatement is late
@@ -740,7 +734,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     catch (Exception ex)
                     {
                         _organisationBusinessLogic.DataRepository.RollbackTransaction();
-                        _logger.LogError(ex, JsonConvert.SerializeObject(statementModel));
+                        _logger.LogError(ex, Json.SerializeObject(statementModel));
                         throw;
                     }
                 });

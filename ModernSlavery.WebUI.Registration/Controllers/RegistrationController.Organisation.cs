@@ -1173,7 +1173,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             catch (Exception ex)
             {
                 //This line is to help diagnose object reference not found exception raised at this point 
-                Logger.LogWarning(ex, Core.Extensions.Json.SerializeObjectDisposed(m));
+                Logger.LogWarning(ex, Core.Extensions.Json.SerializeObject(m));
                 throw;
             }
 
@@ -1533,7 +1533,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //This line is to help diagnose object reference not found exception raised at this point 
             if (address == null)
-                Logger.LogDebug("Address should not be null", Core.Extensions.Json.SerializeObjectDisposed(model));
+                Logger.LogDebug("Address should not be null", Core.Extensions.Json.SerializeObject(model));
 
             #endregion
 
@@ -1552,7 +1552,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //This line is to help diagnose object reference not found exception raised at this point 
             if (address == null)
-                Logger.LogWarning("Address should not be null", Core.Extensions.Json.SerializeObjectDisposed(model));
+                Logger.LogWarning("Address should not be null", Core.Extensions.Json.SerializeObject(model));
 
             userOrg.Address = address;
             userOrg.PIN = null;
@@ -1633,7 +1633,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     {
                         _registrationService.OrganisationBusinessLogic.DataRepository.RollbackTransaction();
                         sendRequest = false;
-                        Logger.LogError(ex, JsonConvert.SerializeObject(model));
+                        Logger.LogError(ex, Core.Extensions.Json.SerializeObject(model));
                         throw;
                     }
                 });

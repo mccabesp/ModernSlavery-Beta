@@ -77,7 +77,7 @@ namespace ModernSlavery.Core.Extensions
 
         public static string GetDetailsText(this Exception ex)
         {
-            return JsonConvert.SerializeObject(ex.GetDetails(), Formatting.Indented);
+            return Json.SerializeObject(ex.GetDetails(), indented:true);
         }
 
         private static object GetDetails(this Exception ex)
@@ -96,7 +96,7 @@ namespace ModernSlavery.Core.Extensions
                                + " of "
                                + aex.InnerExceptions.Count
                                + ":"
-                               + JsonConvert.SerializeObject(GetDetails(innerEx))
+                               + Json.SerializeObject(GetDetails(innerEx))
                                + Environment.NewLine;
             }
 
