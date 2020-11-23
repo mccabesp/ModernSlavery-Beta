@@ -47,9 +47,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CookieManagerPlugin.cs" />
+    <Compile Include="IncrementIntPlugin.cs" />
     <Compile Include="ExtractRandomTagAttribute.cs" />
     <Compile Include="RandomAdminPlugin.cs" />
     <Compile Include="RandomEmailPlugin.cs" />
+    <Compile Include="DecrementIntPlugin.cs" />
     <Compile Include="RandomPagePlugin.cs" />
     <Compile Include="RandomGuidPlugin.cs" />
     <Compile Include="RandomIntPlugin.cs" />

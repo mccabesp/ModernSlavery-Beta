@@ -125,6 +125,7 @@
     <None Include="SearchTest.webtest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Web Tests\SubmitStatement.webtest" />
     <None Include="Web Tests\VerifyEmail.webtest" />
   </ItemGroup>
   <ItemGroup>
