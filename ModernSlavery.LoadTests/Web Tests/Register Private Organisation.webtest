@@ -166,7 +166,7 @@
         <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="SectorType" Value="{{$HIDDEN1.SectorType}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="RegistrationType" Value="{{$HIDDEN1.RegistrationType}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="ManualRegistration" Value="{{$HIDDEN1.ManualRegistration}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="IsManualRegistration" Value="{{$HIDDEN1.IsManualRegistration}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="SearchText" Value="{{SearchText}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="command" Value="search" RecordedValue="" CorrelationBinding="{{FormPostParam8.command}}" UrlEncode="True" />
       </FormPostHttpBody>
@@ -245,7 +245,7 @@
         <FormPostParameter Name="SelectedOrganisationIndex" Value="{{$HIDDEN1.SelectedOrganisationIndex}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="SectorType" Value="{{$HIDDEN1.SectorType}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="RegistrationType" Value="{{$HIDDEN1.RegistrationType}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="ManualRegistration" Value="{{$HIDDEN1.ManualRegistration}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="IsManualRegistration" Value="{{$HIDDEN1.IsManualRegistration}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="BackAction" Value="{{$HIDDEN1.BackAction}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="SearchText" Value="{{$HIDDEN1.SearchText}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="Name" Value="{{$HIDDEN1.OrganisationName}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
