@@ -29,10 +29,10 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             var testOptions = host.Services.GetRequiredService<TestOptions>();
             testOptions.ShowEmailVerifyLink = value;
         }
-        public static void SetSkipSpamProtection(this IHost host, bool value)
+        public static void DisableLockoutProtection(this IHost host, bool value)
         {
             var testOptions = host.Services.GetRequiredService<TestOptions>();
-            testOptions.SkipSpamProtection = value;
+            testOptions.DisableLockoutProtection = value;
         }
     }
 }

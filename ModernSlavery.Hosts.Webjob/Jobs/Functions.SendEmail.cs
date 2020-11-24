@@ -25,13 +25,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         {
             var wrapper = JsonConvert.DeserializeObject<QueueWrapper>(queueMessage);
             wrapper.Message = Regex.Unescape(wrapper.Message).TrimI("\"");
-            var messageType = typeof(SendGeoMessageModel).Assembly.GetType(wrapper.Type, true);
+            var messageType = typeof(SendMsuMessageModel).Assembly.GetType(wrapper.Type, true);
             var parameters = JsonConvert.DeserializeObject(wrapper.Message, messageType);
 
-            if (parameters is SendGeoMessageModel)
+            if (parameters is SendMsuMessageModel)
             {
-                var pars = (SendGeoMessageModel) parameters;
-                if (!await _messenger.SendGeoMessageAsync(pars.subject, pars.message, pars.test).ConfigureAwait(false))
+                var pars = (SendMsuMessageModel) parameters;
+                if (!await _messenger.SendMsuMessageAsync(pars.subject, pars.message).ConfigureAwait(false))
                     throw new Exception("Could not send email message to GEO for queued message:" + queueMessage);
             }
             else
@@ -63,7 +63,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             log.LogError($"Could not send email for queued message, Details:{queueMessage}");
 
             //Send Email to GEO reporting errors
-            await _messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR",
+            await _messenger.SendMsuMessageAsync("GPG - GOV WEBJOBS ERROR",
                 "Could not send email for queued message:" + queueMessage).ConfigureAwait(false);
         }
     }

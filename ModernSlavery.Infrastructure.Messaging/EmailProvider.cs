@@ -19,25 +19,22 @@ namespace ModernSlavery.Infrastructure.Messaging
             SmtpEmailProvider smtpEmailProvider,
             IEmailTemplateRepository emailTemplateRepo,
             EmailOptions emailOptions,
-            SharedOptions sharedOptions,
+            TestOptions testOptions,
             ILogger<EmailProvider> logger,
-            [KeyFilter(Filenames.EmailSendLog)] IAuditLogger emailSendLog) : base(sharedOptions, emailTemplateRepo,
-            logger, emailSendLog)
+            [KeyFilter(Filenames.EmailSendLog)] IAuditLogger emailSendLog) : base(testOptions, emailTemplateRepo, logger, emailSendLog)
         {
-            GovNotifyEmailProvider =
-                govNotifyEmailProvider ?? throw new ArgumentNullException(nameof(govNotifyEmailProvider));
+            GovNotifyEmailProvider = govNotifyEmailProvider ?? throw new ArgumentNullException(nameof(govNotifyEmailProvider));
             SmtpEmailProvider = smtpEmailProvider ?? throw new ArgumentNullException(nameof(smtpEmailProvider));
             EmailOptions = emailOptions ?? throw new ArgumentNullException(nameof(emailOptions));
         }
 
-        public override async Task<SendEmailResult> SendEmailAsync<TModel>(string emailAddress, string templateId,
-            TModel model, bool test)
+        public override async Task<SendEmailResult> SendEmailAsync<TModel>(string emailAddress, string templateId,TModel model)
         {
             SendEmailResult result;
 
             if (GovNotifyEmailProvider.Enabled)
             {
-                result = await TrySendGovNotifyEmailAsync(emailAddress, templateId, model, test);
+                result = await TrySendGovNotifyEmailAsync(emailAddress, templateId, model);
 
                 if (result != null)
                     // gov notify provider succeeded 
@@ -45,19 +42,16 @@ namespace ModernSlavery.Infrastructure.Messaging
             }
 
             // gov notify provider failed so trying the smtp provider
-            result = await TrySendSmtpEmail(emailAddress, templateId, model, test);
+            result = await TrySendSmtpEmail(emailAddress, templateId, model);
 
             return result;
         }
 
-        private async Task<SendEmailResult> TrySendGovNotifyEmailAsync<TModel>(string emailAddress,
-            string templateId,
-            TModel model,
-            bool test)
+        private async Task<SendEmailResult> TrySendGovNotifyEmailAsync<TModel>(string emailAddress,string templateId,TModel model)
         {
             try
             {
-                var result = await GovNotifyEmailProvider.SendEmailAsync(emailAddress, templateId, model, test);
+                var result = await GovNotifyEmailProvider.SendEmailAsync(emailAddress, templateId, model);
                 if (result.Status.EqualsI("created", "sending", "delivered") == false)
                     throw new Exception($"Unexpected status '{result.Status}' returned");
 
@@ -94,12 +88,11 @@ namespace ModernSlavery.Infrastructure.Messaging
             return null;
         }
 
-        private async Task<SendEmailResult> TrySendSmtpEmail<TModel>(string emailAddress, string templateId,
-            TModel model, bool test)
+        private async Task<SendEmailResult> TrySendSmtpEmail<TModel>(string emailAddress, string templateId, TModel model)
         {
             try
             {
-                var result = await SmtpEmailProvider.SendEmailAsync(emailAddress, templateId, model, test);
+                var result = await SmtpEmailProvider.SendEmailAsync(emailAddress, templateId, model);
 
                 await EmailSendLog.WriteAsync(
                     new EmailSendLogModel

@@ -21,7 +21,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         public string ConfirmReturnAction { get; set; }
         public string AddressReturnAction { get; set; }
 
-        public bool ManualRegistration { get; set; }
+        public bool IsManualRegistration { get; set; }
         [Secured] public bool IsManualAuthorised { get; set; }
         [Secured] public bool IsSelectedAuthorised { get; set; }
         [Secured] public bool IsFastTrackAuthorised { get; set; }

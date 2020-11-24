@@ -16,28 +16,26 @@ namespace ModernSlavery.WebUI.Registration.Classes
     {
         private readonly ICompaniesHouseAPI _CompaniesHouseAPI;
         private readonly IDataRepository _DataRepository;
-        private readonly SharedOptions _sharedOptions;
         private readonly TestOptions _testOptions;
         private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
 
         public PublicSectorRepository(IDataRepository dataRepository, ICompaniesHouseAPI companiesHouseAPI,
-            SharedOptions sharedOptions,
             TestOptions testOptions,
             IOrganisationBusinessLogic organisationBusinessLogic)
         {
+            _testOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions));
             _DataRepository = dataRepository;
             _CompaniesHouseAPI = companiesHouseAPI;
-            _sharedOptions = sharedOptions;
             _testOptions = testOptions;
             _organisationBusinessLogic = organisationBusinessLogic;
         }
 
-        public async Task<PagedResult<OrganisationRecord>> SearchAsync(string searchText, int page, int pageSize,bool test = false)
+        public async Task<PagedResult<OrganisationRecord>> SearchAsync(string searchText, int page, int pageSize)
         {
             var result = new PagedResult<OrganisationRecord>();
 
             List<Organisation> searchResultsList;
-            if (test)
+            if (_testOptions.LoadTesting)
                 searchResultsList = _DataRepository.GetAll<Organisation>().Where(o => o.SectorType == SectorTypes.Public && o.Status == OrganisationStatuses.Active).OrderBy(o => Guid.NewGuid()).ToList();
             else
                 searchResultsList = _DataRepository.GetAll<Organisation>().Where(o => o.SectorType == SectorTypes.Public && o.Status == OrganisationStatuses.Active).OrderBy(o => o.OrganisationName).ToList().Where(o => o.OrganisationName.ContainsI(searchText)).ToList();

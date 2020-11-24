@@ -27,7 +27,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             catch (Exception ex)
             {
                 //Send Email to GEO reporting errors
-                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", ex.Message).ConfigureAwait(false);
+                await _messenger.SendMsuMessageAsync("GPG - WEBJOBS ERROR", ex.Message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -76,8 +76,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                             && r.Status == StatementStatuses.Submitted
                             && r.Organisation.Status == OrganisationStatuses.Active)
                         .ToListAsync().ConfigureAwait(false);
-                    statements.RemoveAll(r =>
-                        r.Organisation.OrganisationName.StartsWithI(_testOptions.TestPrefix));
 
                     var downloadData = statements.ToList()
                         .Select(r => DownloadModel.Create(r))

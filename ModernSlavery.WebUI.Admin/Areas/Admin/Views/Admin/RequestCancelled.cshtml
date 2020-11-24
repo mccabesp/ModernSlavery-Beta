@@ -13,17 +13,7 @@
                 What happens next.
             </div>
             <p class="dynamic-content privateManual" style="display: block;">
-                We’ve sent
-                @if (!string.IsNullOrWhiteSpace(ViewBag.TestUrl))
-                {
-                    <a data-name="testurl" href="@ViewBag.TestUrl">
-                        @Model.ContactFirstName&nbsp;@Model.ContactLastName
-                    </a>
-                }
-                else
-                {
-                    <span>@Model.ContactFirstName&nbsp;@Model.ContactLastName</span>
-                }
+                We’ve sent <span>@Model.ContactFirstName&nbsp;@Model.ContactLastName</span>
                 an email confirming their registration request for @Model.OrganisationName has been cancelled.
             </p>
             <a href="@Url.Action("PendingRegistrations", "Admin")" class="button">Continue</a>

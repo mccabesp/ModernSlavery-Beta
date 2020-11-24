@@ -298,11 +298,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
 
             try
             {
-                groupSearchViewModel.ResultsPage = await _organisationRepository.SearchAsync(
-                    groupSearchViewModel.SearchKeywords,
-                    groupSearchViewModel.ResultsPage.CurrentPage,
-                    _sharedBusinessLogic.SharedOptions.OrganisationPageSize,
-                    user.EmailAddress.StartsWithI(_sharedBusinessLogic.TestOptions.TestPrefix));
+                groupSearchViewModel.ResultsPage = await _organisationRepository.SearchAsync(groupSearchViewModel.SearchKeywords,groupSearchViewModel.ResultsPage.CurrentPage,_sharedBusinessLogic.SharedOptions.OrganisationPageSize);
             }
             catch (Exception ex)
             {
@@ -315,11 +311,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                     return new Outcome<StatementErrors>(StatementErrors.CoHoTransientError);
                 }
 
-                await _sharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
-                    "GPG - COMPANIES HOUSE ERROR",
-                    $"Cant search using Companies House API for query '{groupSearchViewModel.SearchKeywords}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
-                    user.EmailAddress.StartsWithI(_sharedBusinessLogic.TestOptions.TestPrefix));
-
+                await _sharedBusinessLogic.SendEmailService.SendMsuMessageAsync("GPG - COMPANIES HOUSE ERROR", $"Cant search using Companies House API for query '{groupSearchViewModel.SearchKeywords}' page:'1' due to following error:\n\n{ex.GetDetailsText()}");
                 return new Outcome<StatementErrors>(StatementErrors.CoHoPermanentError);
             }
 

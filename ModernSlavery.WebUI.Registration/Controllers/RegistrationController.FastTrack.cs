@@ -19,10 +19,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [HttpGet("fast-track")]
         public async Task<IActionResult> FastTrack()
         {
-            // lockout from spam, return custom error
-            var remainingTime = await GetRetryLockRemainingTimeAsync("lastFastTrackCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
-            if (remainingTime > TimeSpan.Zero)
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1125, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
+            {
+                // lockout from spam, return custom error
+                var remainingTime = await GetRetryLockRemainingTimeAsync("lastFastTrackCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
+                if (remainingTime > TimeSpan.Zero)
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1125, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+            }
 
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -38,9 +41,12 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         public async Task<IActionResult> FastTrack(FastTrackViewModel model)
         {
             // lockout from spam, return custom error
-            var remainingTime = await GetRetryLockRemainingTimeAsync("lastFastTrackCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
-            if (remainingTime > TimeSpan.Zero)
-                return View("CustomError", WebService.ErrorViewModelFactory.Create(1125, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
+            {
+                var remainingTime = await GetRetryLockRemainingTimeAsync("lastFastTrackCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
+                if (remainingTime > TimeSpan.Zero)
+                    return View("CustomError", WebService.ErrorViewModelFactory.Create(1125, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+            }
 
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -54,7 +60,9 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             var vm = await _registrationPresenter.CreateOrganisationViewModelAsync(model, CurrentUser);
 
-            await IncrementRetryCountAsync("lastFastTrackCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
+                await IncrementRetryCountAsync("lastFastTrackCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
+
             if (vm == null)
             {
                 // fail - no organisation found
@@ -75,7 +83,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             // success state 
-            await ClearRetryLocksAsync("lastFastTrackCode");
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
+                await ClearRetryLocksAsync("lastFastTrackCode");
 
             vm.ConfirmReturnAction = nameof(FastTrack);
             StashModel(vm);

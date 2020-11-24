@@ -71,7 +71,7 @@
             @Html.HiddenFor(model => model.ManualOrganisationIndex)
             @Html.HiddenFor(model => model.MatchedReferenceCount)
 
-            @Html.HiddenFor(model => model.ManualRegistration)
+            @Html.HiddenFor(model => model.IsManualRegistration)
             @Html.HiddenSecuredFor(model => model.IsManualAuthorised)
             @Html.HiddenSecuredFor(model => model.IsSelectedAuthorised)
             @Html.HiddenSecuredFor(model => model.IsFastTrackAuthorised)
@@ -92,7 +92,7 @@
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
-                    @if (Model.ManualRegistration)
+                    @if (Model.IsManualRegistration)
                     {
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">
@@ -209,7 +209,7 @@
                 </tbody>
             </table>
 
-            @if (!Model.IsUkAddress.HasValue && !Model.ManualRegistration)
+            @if (!Model.IsUkAddress.HasValue && !Model.IsManualRegistration)
             {
                 <div class="govuk-form-group">
                     <fieldset class="govuk-fieldset">

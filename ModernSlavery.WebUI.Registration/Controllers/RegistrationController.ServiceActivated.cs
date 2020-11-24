@@ -175,29 +175,28 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Log the registration
-            if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
-                await _registrationService.RegistrationLog.WriteAsync(
-                    new RegisterLogModel
-                    {
-                        StatusDate = VirtualDateTime.Now,
-                        Status = "PIN Confirmed",
-                        ActionBy = VirtualUser.EmailAddress,
-                        Details = "",
-                        Sector = userOrg.Organisation.SectorType,
-                        Organisation = userOrg.Organisation.OrganisationName,
-                        CompanyNo = userOrg.Organisation.CompanyNumber,
-                        Address = userOrg?.Address.GetAddressString(),
-                        SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
-                        UserFirstname = userOrg.User.Firstname,
-                        UserLastname = userOrg.User.Lastname,
-                        UserJobtitle = userOrg.User.JobTitle,
-                        UserEmail = userOrg.User.EmailAddress,
-                        ContactFirstName = userOrg.User.ContactFirstName,
-                        ContactLastName = userOrg.User.ContactLastName,
-                        ContactJobTitle = userOrg.User.ContactJobTitle,
-                        ContactOrganisation = userOrg.User.ContactOrganisation,
-                        ContactPhoneNumber = userOrg.User.ContactPhoneNumber
-                    });
+            await _registrationService.RegistrationLog.WriteAsync(
+                new RegisterLogModel
+                {
+                    StatusDate = VirtualDateTime.Now,
+                    Status = "PIN Confirmed",
+                    ActionBy = VirtualUser.EmailAddress,
+                    Details = "",
+                    Sector = userOrg.Organisation.SectorType,
+                    Organisation = userOrg.Organisation.OrganisationName,
+                    CompanyNo = userOrg.Organisation.CompanyNumber,
+                    Address = userOrg?.Address.GetAddressString(),
+                    SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
+                    UserFirstname = userOrg.User.Firstname,
+                    UserLastname = userOrg.User.Lastname,
+                    UserJobtitle = userOrg.User.JobTitle,
+                    UserEmail = userOrg.User.EmailAddress,
+                    ContactFirstName = userOrg.User.ContactFirstName,
+                    ContactLastName = userOrg.User.ContactLastName,
+                    ContactJobTitle = userOrg.User.ContactJobTitle,
+                    ContactOrganisation = userOrg.User.ContactOrganisation,
+                    ContactPhoneNumber = userOrg.User.ContactPhoneNumber
+                });
 
             //Add this organisation to the search index
             if (updateSearchIndex && !_registrationService.SearchBusinessLogic.SearchOptions.Disabled)

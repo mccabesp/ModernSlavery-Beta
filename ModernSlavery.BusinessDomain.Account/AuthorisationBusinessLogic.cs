@@ -19,39 +19,23 @@ namespace ModernSlavery.BusinessDomain.Account
 
         public bool IsAdministrator(User user)
         {
-            if (IsSystemUser(user))
-                return false;
+            if (IsSystemUser(user))return false;
 
             if (!user.EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
-
-            if (string.IsNullOrWhiteSpace(_sharedOptions.AdminEmails))
-                throw new ArgumentException("Missing AdminEmails from web.config");
 
             return user.EmailAddress.LikeAny(_sharedOptions.AdminEmails.SplitI(";"));
         }
 
         public bool IsSuperAdministrator(User user)
         {
-            if (IsSystemUser(user))
-                return false;
-
-            if (!user.EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
-
-            if (string.IsNullOrWhiteSpace(_sharedOptions.SuperAdminEmails))
-                throw new ArgumentException("Missing SuperAdminEmails from web.config");
+            if (IsAdministrator(user))return false;
 
             return user.EmailAddress.LikeAny(_sharedOptions.SuperAdminEmails.SplitI(";"));
         }
 
         public bool IsDatabaseAdministrator(User user)
         {
-            if (IsSystemUser(user))
-                return false;
-
-            if (!user.EmailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
-
-            if (string.IsNullOrWhiteSpace(_sharedOptions.DatabaseAdminEmails))
-                return IsSuperAdministrator(user);
+            if (IsAdministrator(user)) return false;
 
             return user.EmailAddress.LikeAny(_sharedOptions.DatabaseAdminEmails.SplitI(";"));
         }

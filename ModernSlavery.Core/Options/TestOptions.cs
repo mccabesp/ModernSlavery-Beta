@@ -22,10 +22,13 @@ namespace ModernSlavery.Core.Options
         public bool ForceApplicationInsightsTracking { get; set; }
         public bool ForceGoogleAnalyticsTracking { get; set; }
         public bool StickySessions { get; set; } = true;
-        public bool SkipSpamProtection { get; set; }
-        public bool PinInPostTestMode { get; set; }
+        public bool DisableLockoutProtection { get; set; }
+        public bool SimulateMessageSend { get; set; }
+        public bool ShowPinInPost { get; set; }
         public bool ShowEmailVerifyLink { get; set; }
+        public bool LoadTesting { get; set; }
         public string TestPrefix { get; set; }
+
 
         #region Environment
         public string Environment => _configuration[HostDefaults.EnvironmentKey];
@@ -69,9 +72,23 @@ namespace ModernSlavery.Core.Options
             //Check security settings for production environment
             if (IsProduction())
             {
+                if (!string.IsNullOrWhiteSpace(TestPrefix)) exceptions.Add(new ConfigurationErrorsException("TestPrefix is not permitted in Production environment"));
+                if (LoadTesting) exceptions.Add(new ConfigurationErrorsException("LoadTesting is not permitted in Production environment"));
+                if (SimulateMessageSend) exceptions.Add(new ConfigurationErrorsException("SimulateLetterSend is not permitted in Production environment"));
                 if (ShowEmailVerifyLink) exceptions.Add(new ConfigurationErrorsException("ShowEmailVerifyLink is not permitted in Production environment"));
-                if (PinInPostTestMode) exceptions.Add(new ConfigurationErrorsException("PinInPostTestMode is not permitted in Production environment"));
-                if (SkipSpamProtection) exceptions.Add(new ConfigurationErrorsException("SkipSpamProtection is not permitted in Production environment"));
+                if (ShowPinInPost) exceptions.Add(new ConfigurationErrorsException("ShowPinInPost is not permitted in Production environment"));
+                if (DisableLockoutProtection) exceptions.Add(new ConfigurationErrorsException("DisableLockoutProtection is not permitted in Production environment"));
+            }
+            else
+            {
+                if (LoadTesting)
+                {
+                    DisableLockoutProtection = true;
+                    SimulateMessageSend = true;
+                    ShowEmailVerifyLink = true;
+                    ShowPinInPost = true;
+                    if (string.IsNullOrWhiteSpace(TestPrefix)) exceptions.Add(new ConfigurationErrorsException("TestPrefix cannot be empty when LoadTesting=true"));
+                }
             }
 
             if (exceptions.Count > 0)

@@ -22,17 +22,17 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHttpSession _Session;
-        private readonly SharedOptions SharedOptions;
+        private readonly TestOptions _testOptions;
         private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
         public PrivateSectorRepository(
-            SharedOptions sharedOptions,
+            TestOptions testOptions,
             IHttpContextAccessor httpContextAccessor,
             IHttpSession session,
             IDataRepository dataRepository,
             ICompaniesHouseAPI companiesHouseAPI, CompaniesHouseOptions companiesHouseOptions,
             IOrganisationBusinessLogic organisationBusinessLogic)
         {
-            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
+            _testOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions));
             _httpContextAccessor = httpContextAccessor;
             _Session = session;
             _DataRepository = dataRepository;
@@ -51,7 +51,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
             throw new NotImplementedException();
         }
 
-        public async Task<PagedResult<OrganisationRecord>> SearchAsync(string searchText, int page, int pageSize,bool test = false)
+        public async Task<PagedResult<OrganisationRecord>> SearchAsync(string searchText, int page, int pageSize)
         {
             if (searchText.IsNumber()) searchText = searchText.PadLeft(8, '0');
 
@@ -62,7 +62,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
             {
                 var localResults = new List<Organisation>();
 
-                if (test)
+                if (_testOptions.LoadTesting)
                 {
                     searchResults = new PagedResult<OrganisationRecord>();
                     localResults = _DataRepository.GetAll<Organisation>().Where(o => o.SectorType == SectorTypes.Private && o.Status == OrganisationStatuses.Active).OrderBy(o => Guid.NewGuid()).Take(_companiesHouseOptions.MaxResponseCompanies).ToList();
@@ -163,7 +163,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
             PagedResult<OrganisationRecord> result = null;
 
-            if (!SharedOptions.IsProduction()
+            if (!_testOptions.IsProduction()
                 && _httpContextAccessor.HttpContext != null
                 && _httpContextAccessor.HttpContext.Request.Query["fail"].ToBoolean())
             {

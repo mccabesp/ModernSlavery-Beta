@@ -9,7 +9,7 @@
         @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off", novalidate="" }))
         {
             @Html.AntiForgeryToken()
-            @Html.SpamProtectionTimeStamp()
+            @Html.BotProtectionTimeStamp()
             @await Html.GovUkValidationSummaryAsync();           
 
             <h1 class="govuk-heading-l">

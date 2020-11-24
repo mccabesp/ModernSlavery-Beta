@@ -5,51 +5,52 @@ using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.EmailTemplates;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.Core.Options;
 using ModernSlavery.Infrastructure.Messaging;
 
 namespace ModernSlavery.Hosts.Webjob.Classes
 {
     public interface IMessenger
     {
-        Task<bool> SendGeoMessageAsync(string subject, string message, bool test = false);
+        Task<bool> SendMsuMessageAsync(string subject, string message);
 
-        Task<bool> SendMessageAsync(string subject, string recipients, string message, bool test = false);
+        Task<bool> SendMessageAsync(string subject, string recipients, string message);
 
         Task SendEmailTemplateAsync<TTemplate>(TTemplate parameters) where TTemplate : EmailTemplate;
     }
 
     public class Messenger : IMessenger
     {
-        private readonly EmailProvider GpgEmailProvider;
+        private readonly EmailProvider _msuEmailProvider;
 
-        private readonly ILogger<Messenger> log;
-        private readonly SmtpEmailOptions SmtpOptions;
+        private readonly ILogger<Messenger> _log;
+        private readonly SmtpEmailOptions _smtpOptions; 
+        private readonly TestOptions _testOptions;
 
-        public Messenger(ILogger<Messenger> logger, SmtpEmailOptions smtpOptions, EmailProvider gpgEmailProvider)
+        public Messenger(ILogger<Messenger> logger, SmtpEmailOptions smtpOptions, TestOptions testOptions, EmailProvider msuEmailProvider)
         {
-            log = logger ?? throw new ArgumentNullException(nameof(logger));
-            SmtpOptions = smtpOptions ?? throw new ArgumentNullException(nameof(smtpOptions));
-            GpgEmailProvider = gpgEmailProvider ?? throw new ArgumentNullException(nameof(gpgEmailProvider));
+            _log = logger ?? throw new ArgumentNullException(nameof(logger));
+            _smtpOptions = smtpOptions ?? throw new ArgumentNullException(nameof(smtpOptions));
+            _testOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions));
+            _msuEmailProvider = msuEmailProvider ?? throw new ArgumentNullException(nameof(msuEmailProvider));
         }
 
         #region Emails
 
         /// <summary>
-        ///     Send a message to GEO distribution list
+        ///     Send a message to MSU distribution list
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="message"></param>
-        public async Task<bool> SendGeoMessageAsync(string subject, string message, bool test = false)
+        public async Task<bool> SendMsuMessageAsync(string subject, string message)
         {
-            var emailAddresses = GpgEmailProvider.EmailOptions.AdminDistributionList.SplitI(";").ToList();
+            var emailAddresses = _msuEmailProvider.EmailOptions.AdminDistributionList.SplitI(";").ToList();
             emailAddresses = emailAddresses.RemoveI("sender", "recipient");
             if (emailAddresses.Count == 0)
-                throw new ArgumentNullException(nameof(GpgEmailProvider.EmailOptions.AdminDistributionList));
+                throw new ArgumentNullException(nameof(_msuEmailProvider.EmailOptions.AdminDistributionList));
 
             if (!emailAddresses.ContainsAllEmails())
-                throw new ArgumentException(
-                    $"{GpgEmailProvider.EmailOptions.AdminDistributionList} contains an invalid email address",
-                    nameof(GpgEmailProvider.EmailOptions.AdminDistributionList));
+                throw new ArgumentException($"{_msuEmailProvider.EmailOptions.AdminDistributionList} contains an invalid email address",nameof(_msuEmailProvider.EmailOptions.AdminDistributionList));
 
             var successCount = 0;
             foreach (var emailAddress in emailAddresses)
@@ -57,37 +58,38 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                 {
                     await Email.QuickSendAsync(
                         subject,
-                        SmtpOptions.SenderEmail,
-                        SmtpOptions.SenderName,
-                        SmtpOptions.ReplyEmail,
+                        _smtpOptions.SenderEmail,
+                        _smtpOptions.SenderName,
+                        _smtpOptions.ReplyEmail,
                         emailAddress,
                         message,
-                        SmtpOptions.Server2,
-                        SmtpOptions.Username2,
-                        SmtpOptions.Password2,
-                        SmtpOptions.Port2,
-                        test: test).ConfigureAwait(false);
-                    await GpgEmailProvider.EmailSendLog.WriteAsync(
+                        _smtpOptions.Server2,
+                        _smtpOptions.Username2,
+                        _smtpOptions.Password2,
+                        _smtpOptions.Port2,
+                        simulate: _testOptions.SimulateMessageSend).ConfigureAwait(false);
+
+                    await _msuEmailProvider.EmailSendLog.WriteAsync(
                         new EmailSendLogModel
                         {
-                            Message = "Email successfully sent via SMTP",
+                            Message = $"Email successfully sent {(_testOptions.SimulateMessageSend ? "{Simulated) " : "")}via SMTP",
                             Subject = subject,
                             Recipients = emailAddress,
-                            Server = $"{SmtpOptions.Server2}:{SmtpOptions.Port2}",
-                            Username = SmtpOptions.Username2,
+                            Server = $"{_smtpOptions.Server2}:{_smtpOptions.Port2}",
+                            Username = _smtpOptions.Username2,
                             Details = message
                         }).ConfigureAwait(false);
                     successCount++;
                 }
                 catch (Exception ex1)
                 {
-                    log.LogError(ex1, $"Cant send message '{subject}' '{message}' directly to {emailAddress}:");
+                    _log.LogError(ex1, $"Cant send {(_testOptions.SimulateMessageSend ? "{Simulated) " : "")}message '{subject}' '{message}' directly to {emailAddress}:");
                 }
 
             return successCount == emailAddresses.Count;
         }
 
-        public async Task<bool> SendMessageAsync(string subject, string recipients, string message, bool test = false)
+        public async Task<bool> SendMessageAsync(string subject, string recipients, string message)
         {
             var emailAddresses = recipients.SplitI(";").ToList();
             emailAddresses = emailAddresses.RemoveI("sender", "recipient");
@@ -102,31 +104,31 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                 {
                     await Email.QuickSendAsync(
                         subject,
-                        SmtpOptions.SenderEmail,
-                        SmtpOptions.SenderName,
-                        SmtpOptions.ReplyEmail,
+                        _smtpOptions.SenderEmail,
+                        _smtpOptions.SenderName,
+                        _smtpOptions.ReplyEmail,
                         emailAddress,
                         message,
-                        SmtpOptions.Server2,
-                        SmtpOptions.Username2,
-                        SmtpOptions.Password2,
-                        SmtpOptions.Port2,
-                        test: test).ConfigureAwait(false);
-                    await GpgEmailProvider.EmailSendLog.WriteAsync(
+                        _smtpOptions.Server2,
+                        _smtpOptions.Username2,
+                        _smtpOptions.Password2,
+                        _smtpOptions.Port2,
+                        simulate: _testOptions.SimulateMessageSend).ConfigureAwait(false);
+                    await _msuEmailProvider.EmailSendLog.WriteAsync(
                         new EmailSendLogModel
                         {
-                            Message = "Email successfully sent via SMTP",
+                            Message = $"Email successfully sent {(_testOptions.SimulateMessageSend ? "(Simulated) " : "")}via SMTP",
                             Subject = subject,
                             Recipients = emailAddress,
-                            Server = $"{SmtpOptions.Server2}:{SmtpOptions.Port2}",
-                            Username = SmtpOptions.Username2,
+                            Server = $"{_smtpOptions.Server2}:{_smtpOptions.Port2}",
+                            Username = _smtpOptions.Username2,
                             Details = message
                         }).ConfigureAwait(false);
                     successCount++;
                 }
                 catch (Exception ex1)
                 {
-                    log.LogError(ex1, $"Cant send message '{subject}' '{message}' directly to {emailAddress}:");
+                    _log.LogError(ex1, $"Cant send {(_testOptions.SimulateMessageSend ? "{Simulated) " : "")}message '{subject}' '{message}' directly to {emailAddress}:");
                 }
 
             return successCount == emailAddresses.Count;
@@ -134,7 +136,7 @@ namespace ModernSlavery.Hosts.Webjob.Classes
 
         public async Task SendEmailTemplateAsync<TTemplate>(TTemplate parameters) where TTemplate : EmailTemplate
         {
-            await GpgEmailProvider.SendEmailTemplateAsync(parameters).ConfigureAwait(false);
+            await _msuEmailProvider.SendEmailTemplateAsync(parameters).ConfigureAwait(false);
         }
 
         #endregion

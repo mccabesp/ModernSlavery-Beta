@@ -100,15 +100,19 @@ namespace ModernSlavery.WebUI.Account.Controllers
         public async Task<IActionResult> PasswordReset()
         {
             //Ensure IP address hasnt signed up recently
-            var lastPasswordResetDate = await GetLastPasswordResetDateAsync();
-            var remainingTime = lastPasswordResetDate == DateTime.MinValue
-                ? TimeSpan.Zero
-                : lastPasswordResetDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes) -
-                  VirtualDateTime.Now;
-            if (!SharedBusinessLogic.TestOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
-                return View("CustomError",
-                    WebService.ErrorViewModelFactory.Create(1133,
-                        new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
+            {
+                var lastPasswordResetDate = await GetLastPasswordResetDateAsync();
+                var remainingTime = lastPasswordResetDate == DateTime.MinValue
+                    ? TimeSpan.Zero
+                    : lastPasswordResetDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes) -
+                      VirtualDateTime.Now;
+
+                if (remainingTime > TimeSpan.Zero)
+                    return View("CustomError",
+                        WebService.ErrorViewModelFactory.Create(1133,
+                            new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+            }
 
             //Ensure user has not completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -121,7 +125,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             return View("../NewAccount/PasswordReset", new ResetViewModel());
         }
 
-        [SpamProtection(5)]
+        [BotProtection(5)]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [HttpPost("password-reset")]
@@ -131,13 +135,16 @@ namespace ModernSlavery.WebUI.Account.Controllers
             ModelState.Remove(nameof(model.ConfirmPassword));
 
             //Ensure IP address hasnt signed up recently
-            var lastPasswordResetDate = await GetLastPasswordResetDateAsync();
-            var remainingTime = lastPasswordResetDate == DateTime.MinValue
-                ? TimeSpan.Zero
-                : lastPasswordResetDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes) -
-                  VirtualDateTime.Now;
-            if (!SharedBusinessLogic.TestOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
-                ModelState.AddModelError(3026, null, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) });
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection) 
+            {
+                var lastPasswordResetDate = await GetLastPasswordResetDateAsync();
+                var remainingTime = lastPasswordResetDate == DateTime.MinValue
+                    ? TimeSpan.Zero
+                    : lastPasswordResetDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinPasswordResetMinutes) -
+                      VirtualDateTime.Now;
+                if (remainingTime > TimeSpan.Zero)
+                    ModelState.AddModelError(3026, null, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) });
+            }
 
             if (!ModelState.IsValid)
             {
@@ -161,10 +168,8 @@ namespace ModernSlavery.WebUI.Account.Controllers
             ViewBag.EmailAddress = model.EmailAddress;
 
             //Ensure signup is restricted to every 10 mins
-            await SetLastPasswordResetDateAsync(
-                model.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix)
-                    ? DateTime.MinValue
-                    : VirtualDateTime.Now);
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
+                await SetLastPasswordResetDateAsync(VirtualDateTime.Now);
 
             // find the latest active user by email
             var user = await _accountService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.Active);
@@ -189,17 +194,6 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             //show confirmation
             ViewBag.EmailAddress = user.EmailAddress;
-            if (SharedBusinessLogic.TestOptions.ShowEmailVerifyLink || user.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
-                ViewBag.TestUrl = Url.Action(
-                    "NewPassword",
-                    "Account",
-                    new
-                    {
-                        code = Encryption.EncryptQuerystring(
-                            user.UserId + ":" + VirtualDateTime.Now.ToSmallDateTime())
-                    },
-                    "https");
-
             return View("PasswordResetSent");
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Autofac;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -14,10 +15,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     {
         // This trigger is set to run every hour, on the hour
         [Disable(typeof(DisableWebjobProvider))]
-        public void SendReminderEmails([TimerTrigger("%SendReminderEmails%")] TimerInfo timer, ILogger log)
+        public async Task SendReminderEmailsAsync([TimerTrigger("%SendReminderEmails%")] TimerInfo timer, ILogger log)
         {
-            if (RunningJobs.Contains(nameof(SendReminderEmails))) return;
-            RunningJobs.Add(nameof(SendReminderEmails));
+            if (RunningJobs.Contains(nameof(SendReminderEmailsAsync))) return;
+            RunningJobs.Add(nameof(SendReminderEmailsAsync));
             try
             {
                 var start = VirtualDateTime.Now;
@@ -55,8 +56,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                     if (inScopeOrganisationsThatStillNeedToReport.Count > 0)
                     {
-                        SendReminderEmailsForSectorType(user, inScopeOrganisationsThatStillNeedToReport, SectorTypes.Public, log);
-                        SendReminderEmailsForSectorType(user, inScopeOrganisationsThatStillNeedToReport, SectorTypes.Private, log);
+                        await SendReminderEmailsForSectorTypeAsync(user, inScopeOrganisationsThatStillNeedToReport, SectorTypes.Public, log);
+                        await SendReminderEmailsForSectorTypeAsync(user, inScopeOrganisationsThatStillNeedToReport, SectorTypes.Private, log);
                     }
                 }
 
@@ -64,12 +65,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
             finally
             {
-                RunningJobs.Remove(nameof(SendReminderEmails));
+                RunningJobs.Remove(nameof(SendReminderEmailsAsync));
             }
             
         }
 
-        private void SendReminderEmailsForSectorType(
+        private async Task SendReminderEmailsForSectorTypeAsync(
             User user,
             List<Organisation> inScopeOrganisationsThatStillNeedToReport,
             SectorTypes sectorType, ILogger log)
@@ -83,7 +84,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     && ReminderEmailWasNotSentAfterLatestReminderDate(user, sectorType))
                     try
                     {
-                        SendReminderEmail(user, sectorType, organisationsOfSectorType);
+                        await SendReminderEmailAsync(user, sectorType, organisationsOfSectorType);
                     }
                     catch (Exception ex)
                     {
@@ -100,9 +101,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     }
         }
 
-        private void SendReminderEmail(User user,
-            SectorTypes sectorType,
-            List<Organisation> organisations)
+        private async Task SendReminderEmailAsync(User user, SectorTypes sectorType, List<Organisation> organisations)
         {
             var personalisation = new Dictionary<string, dynamic>
             {
@@ -133,7 +132,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 Personalisation = personalisation
             };
 
-            _govNotifyApi.SendEmail(notifyEmail);
+            await _govNotifyApi.SendEmailAsync(notifyEmail);
             SaveReminderEmailRecord(user, sectorType);
         }
 

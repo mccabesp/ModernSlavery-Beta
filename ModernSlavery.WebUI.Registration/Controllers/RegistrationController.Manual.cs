@@ -31,7 +31,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             //Pre-populate address from selected organisation
-            var organisation = model.ManualRegistration ? null : model.GetManualOrganisation() ?? model.GetSelectedOrganisation();
+            var organisation = model.IsManualRegistration ? null : model.GetManualOrganisation() ?? model.GetSelectedOrganisation();
 
             if (organisation != null)
             {
@@ -103,7 +103,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var sector = model.SectorType;
             var authorised = false;
             OrganisationRecord organisationRecord = null;
-            if (!model.ManualRegistration)
+            if (!model.IsManualRegistration)
             {
                 organisationRecord = model.GetManualOrganisation();
 

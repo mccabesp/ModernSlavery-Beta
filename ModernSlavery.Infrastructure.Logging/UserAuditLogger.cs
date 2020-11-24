@@ -27,8 +27,6 @@ namespace ModernSlavery.Infrastructure.Logging
             User userToUpdate,
             string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(TestOptions.TestPrefix)) return;
-
             await WriteAsync(
                 new UserLogModel(
                     userToUpdate.UserId.ToString(),
@@ -42,8 +40,6 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task LogPasswordChangedAsync(User userToUpdate, string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(TestOptions.TestPrefix)) return;
-
             await WriteAsync(
                 new UserLogModel(
                     userToUpdate.UserId.ToString(),
@@ -60,8 +56,6 @@ namespace ModernSlavery.Infrastructure.Logging
             User userToUpdate,
             string actionByEmailAddress)
         {
-            if (userToUpdate.EmailAddress.StartsWithI(TestOptions.TestPrefix)) return;
-
             await WriteAsync(
                 new UserLogModel(
                     userToUpdate.UserId.ToString(),
@@ -75,8 +69,6 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task LogUserRetiredAsync(User retiredUser, string actionByEmailAddress)
         {
-            if (retiredUser.EmailAddress.StartsWithI(TestOptions.TestPrefix)) return;
-
             await WriteAsync(
                 new UserLogModel(
                     retiredUser.UserId.ToString(),

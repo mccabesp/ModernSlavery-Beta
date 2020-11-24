@@ -75,10 +75,6 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
         public async Task RefreshSearchDocumentsAsync(IEnumerable<Organisation> organisations)
         {
-            //Remove the test organisations
-            if (!string.IsNullOrWhiteSpace(_testOptions.TestPrefix))
-                organisations = organisations.Where(o => !o.OrganisationName.StartsWithI(_testOptions.TestPrefix));
-
             //Remove those which are not to be searched
             organisations = LookupSearchableOrganisations(organisations.ToArray()).ToList();
 

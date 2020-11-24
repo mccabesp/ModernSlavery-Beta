@@ -54,14 +54,17 @@ namespace ModernSlavery.WebUI.Account.Controllers
         [HttpGet("about-you")]
         public async Task<IActionResult> AboutYou()
         {
-            var lastSignupDate = await GetLastSignupDateAsync();
-            var remainingTime = lastSignupDate == DateTime.MinValue
-                ? TimeSpan.Zero
-                : lastSignupDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinSignupMinutes) - VirtualDateTime.Now;
-            if (!SharedBusinessLogic.TestOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
-                return View("CustomError",
-                    WebService.ErrorViewModelFactory.Create(1125,
-                        new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
+            {
+                var lastSignupDate = await GetLastSignupDateAsync();
+                var remainingTime = lastSignupDate == DateTime.MinValue
+                    ? TimeSpan.Zero
+                    : lastSignupDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinSignupMinutes) - VirtualDateTime.Now;
+                if (remainingTime > TimeSpan.Zero)
+                    return View("CustomError",
+                        WebService.ErrorViewModelFactory.Create(1125,
+                            new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+            }
 
             //Ensure user has not completed the registration process
             var result = await CheckUserRegisteredOkAsync();
@@ -93,16 +96,19 @@ namespace ModernSlavery.WebUI.Account.Controllers
         [HttpPost("about-you")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        [SpamProtection]
+        [BotProtection]
         public async Task<IActionResult> AboutYou(SignUpViewModel model)
         {
             //Ensure IP address hasnt signed up recently
-            var lastSignupDate = await GetLastSignupDateAsync();
-            var remainingTime = lastSignupDate == DateTime.MinValue
-                ? TimeSpan.Zero
-                : lastSignupDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinSignupMinutes) - VirtualDateTime.Now;
-            if (!SharedBusinessLogic.TestOptions.SkipSpamProtection && remainingTime > TimeSpan.Zero)
-                ModelState.AddModelError(3024, null, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) });
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
+            {
+                var lastSignupDate = await GetLastSignupDateAsync();
+                var remainingTime = lastSignupDate == DateTime.MinValue
+                    ? TimeSpan.Zero
+                    : lastSignupDate.AddMinutes(SharedBusinessLogic.SharedOptions.MinSignupMinutes) - VirtualDateTime.Now;
+                if (remainingTime > TimeSpan.Zero)
+                    ModelState.AddModelError(3024, null, new { remainingTime = remainingTime.ToFriendly(maxParts: 2) });
+            }
 
             if (!ModelState.IsValid)
             {
@@ -123,9 +129,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             model.EmailAddress = model.EmailAddress.ToLower();
 
             //Check this email address isn't already assigned to another user
-            var virtualUser =
-                await _accountService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.New,
-                    UserStatuses.Active);
+            var virtualUser = await _accountService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.New, UserStatuses.Active);
             if (virtualUser != null)
             {
                 if (virtualUser.EmailVerifySendDate != null)
@@ -138,23 +142,17 @@ namespace ModernSlavery.WebUI.Account.Controllers
                         return View("AboutYou", model);
                     }
 
-                    remainingTime =
-                        virtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions
-                            .EmailVerificationExpiryHours)
-                        - VirtualDateTime.Now;
+                    var remainingTime = virtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours)- VirtualDateTime.Now;
                     if (remainingTime > TimeSpan.Zero)
                     {
-                        AddModelError(3002, "EmailAddress",
-                            new { remainingTime = remainingTime.ToFriendly(maxParts: 2) });
+                        AddModelError(3002, "EmailAddress",new { remainingTime = remainingTime.ToFriendly(maxParts: 2) });
                         this.SetModelCustomErrors<SignUpViewModel>();
                         return View("AboutYou", model);
                     }
                 }
 
                 //Delete the previous user org if there is one
-                var userOrg =
-                    await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo =>
-                        uo.UserId == virtualUser.UserId);
+                var userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == virtualUser.UserId);
                 if (userOrg != null) SharedBusinessLogic.DataRepository.Delete(userOrg);
 
                 //If from a previous user then delete the previous user
@@ -168,10 +166,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             virtualUser.Firstname = model.FirstName;
             virtualUser.Lastname = model.LastName;
             virtualUser.JobTitle = model.JobTitle;
-            if (model.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
-                virtualUser._EmailAddress = model.EmailAddress;
-            else
-                virtualUser.EmailAddress = model.EmailAddress;
+            virtualUser.EmailAddress = model.EmailAddress;
 
             if (!SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(virtualUser))
             {
@@ -207,9 +202,8 @@ namespace ModernSlavery.WebUI.Account.Controllers
             StashModel(model);
 
             //Ensure signup is restricted to every 10 min
-            await SetLastSignupDateAsync(model.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix)
-                ? DateTime.MinValue
-                : VirtualDateTime.Now);
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
+                await SetLastSignupDateAsync(VirtualDateTime.Now);
 
             return RedirectToAction("VerifyEmail");
         }
@@ -302,8 +296,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
                 //If the email address is a test email then add to viewbag
 
-                if (virtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix) ||
-                    SharedBusinessLogic.TestOptions.ShowEmailVerifyLink) ViewBag.VerifyCode = verifyCode;
+                if (SharedBusinessLogic.TestOptions.ShowEmailVerifyLink) ViewBag.VerifyCode = verifyCode;
 
                 //Tell them to verify email
 

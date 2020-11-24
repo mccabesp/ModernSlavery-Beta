@@ -63,7 +63,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             log.LogError($"Could not execute Webjob, Details: {queueMessage}");
 
             //Send Email to GEO reporting errors
-            await _messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not execute Webjob:" + queueMessage).ConfigureAwait(false);
+            await _messenger.SendMsuMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not execute Webjob:" + queueMessage).ConfigureAwait(false);
         }
     }
 }

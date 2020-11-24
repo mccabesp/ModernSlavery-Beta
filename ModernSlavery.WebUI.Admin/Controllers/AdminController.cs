@@ -110,9 +110,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     .Where(uo => uo.PINConfirmedDate != null)
                     .OrderBy(uo => uo.PINConfirmedDate))
                 {
-                    //Dont log test registrations
-                    if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix)) continue;
-
                     var status = await SharedBusinessLogic.DataRepository.GetAll<OrganisationStatus>()
                         .FirstOrDefaultAsync(
                             os => os.OrganisationId == userOrg.OrganisationId
@@ -188,10 +185,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 //Create the first log file
                 foreach (var statement in SharedBusinessLogic.DataRepository.GetAll<Statement>().OrderBy(r => r.StatusDate))
                 {
-                    //Dont log return for test organisations
-                    if (statement.Organisation.OrganisationName.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
-                        continue;
-
                     var status = await SharedBusinessLogic.DataRepository.GetAll<StatementStatus>()
                         .FirstOrDefaultAsync(
                             rs => rs.StatementId == statement.StatementId && rs.Status == statement.Status &&
@@ -1034,9 +1027,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             //Ignore case of email address
             emailAddress = emailAddress?.ToLower();
 
-            //Throw error if the user is not a super administrator of a test admin
-            if (!IsSuperAdministrator && (!IsAdministrator || !IsTestUser ||
-                                          !emailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix)))
+            //Throw error if the user is not a super administrator
+            if (!IsSuperAdministrator)
                 return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a super administrator");
 
             if (string.IsNullOrWhiteSpace(emailAddress) || !emailAddress.IsEmailAddress())
@@ -1049,18 +1041,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var currentUser = SharedBusinessLogic.DataRepository.FindUser(User);
             if (currentUser == null || !_adminService.SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(currentUser)) throw new IdentityNotMappedException();
 
-            if (currentUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix) &&
-                !emailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
-            {
-                ModelState.AddModelError(
-                    "",
-                    "Test administrators are only permitted to impersonate other test users");
-                return View("Impersonate");
-            }
-
             // find the latest active user by email
-            var impersonatedUser =
-                await _adminService.UserRepository.FindByEmailAsync(emailAddress, UserStatuses.Active);
+            var impersonatedUser = await _adminService.UserRepository.FindByEmailAsync(emailAddress, UserStatuses.Active);
+
             if (impersonatedUser == null)
             {
                 ModelState.AddModelError("", "This user does not exist");

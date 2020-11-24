@@ -45,13 +45,13 @@ namespace ModernSlavery.Hosts.Webjob
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpClient<GovNotifyEmailProvider>(nameof(GovNotifyEmailProvider),
+            services.AddHttpClient<GovNotifyAPI>(nameof(GovNotifyAPI),
                 httpClient =>
                 {
-                    GovNotifyEmailProvider.SetupHttpClient(httpClient, _govNotifyOptions.ApiServer);
+                    GovNotifyAPI.SetupHttpClient(httpClient, _govNotifyOptions.ApiServer);
                 })
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10))
-                .AddPolicyHandler(GovNotifyEmailProvider.GetRetryPolicy());
+                .AddPolicyHandler(GovNotifyAPI.GetRetryPolicy());
 
             services.AddSingleton<IJobActivator, AutofacJobActivator>();
 

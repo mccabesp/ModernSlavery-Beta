@@ -1,14 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using ModernSlavery.Core.Models;
 
 namespace ModernSlavery.Core.Interfaces
 {
     public interface IGovNotifyAPI
     {
-        SendEmailResponse SendEmail(SendEmailRequest sendEmailRequest);
+        Task<SendEmailResponse> SendEmailAsync(SendEmailRequest sendEmailRequest);
 
-        SendLetterResponse SendLetter(string templateId,
+        Task<SendLetterResponse> SendLetterAsync(string templateId,
             Dictionary<string, dynamic> personalisation,
             string clientReference = null);
+
+        Task<SendEmailResult> GetEmailResultAsync(string emailId);
+
+        
     }
 }

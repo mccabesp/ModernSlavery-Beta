@@ -174,6 +174,13 @@ namespace ModernSlavery.Core.Models
                 if (string.IsNullOrWhiteSpace(CertThumprint)) exceptions.Add(new ConfigurationErrorsException("CertThumprint cannot be empty in Production environment."));
             }
 
+            if (string.IsNullOrWhiteSpace(AdminEmails))
+                exceptions.Add(new ConfigurationErrorsException($"Missing {nameof(AdminEmails)}"));
+            if (string.IsNullOrWhiteSpace(DatabaseAdminEmails))
+                exceptions.Add(new ConfigurationErrorsException($"Missing {nameof(DatabaseAdminEmails)}"));
+            if (string.IsNullOrWhiteSpace(SuperAdminEmails))
+                exceptions.Add(new ConfigurationErrorsException($"Missing {nameof(SuperAdminEmails)}"));
+
             if (string.IsNullOrWhiteSpace(ApplicationName)) exceptions.Add(new ConfigurationErrorsException($"Missing ApplicationName"));
             if (string.IsNullOrWhiteSpace(CertFilepath) && !string.IsNullOrWhiteSpace(CertPassword)) exceptions.Add(new ConfigurationErrorsException($"Missing CertFilepath"));
             if (!string.IsNullOrWhiteSpace(CertFilepath) && string.IsNullOrWhiteSpace(CertPassword)) exceptions.Add(new ConfigurationErrorsException($"Missing CertPassword"));

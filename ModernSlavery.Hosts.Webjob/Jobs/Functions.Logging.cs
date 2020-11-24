@@ -103,7 +103,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             log.LogError($"Could not log event, Details: {queueMessage}");
 
             //Send Email to GEO reporting errors
-            await _messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not log event:" + queueMessage).ConfigureAwait(false);
+            await _messenger.SendMsuMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not log event:" + queueMessage).ConfigureAwait(false);
         }
 
         [Singleton(Mode = SingletonMode.Listener)] //Ensures execution on only one instance with one listener
@@ -171,7 +171,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             log.LogError($"Could not log record: Details:{queueMessage}");
 
             //Send Email to GEO reporting errors
-            await _messenger.SendGeoMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not log record:" + queueMessage).ConfigureAwait(false);
+            await _messenger.SendMsuMessageAsync("GPG - GOV WEBJOBS ERROR", "Could not log record:" + queueMessage).ConfigureAwait(false);
         }
 
         private static string GetLargeQueueFilepath(string queueMessage)

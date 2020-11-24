@@ -11,6 +11,7 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Messaging
 {
@@ -18,10 +19,10 @@ namespace ModernSlavery.Infrastructure.Messaging
     {
         public SmtpEmailProvider(IEmailTemplateRepository emailTemplateRepo,
             SmtpEmailOptions smtpEmailOptions,
-            SharedOptions sharedOptions,
+            TestOptions testOptions,
             ILogger<SmtpEmailProvider> logger,
             [KeyFilter(Filenames.EmailSendLog)] IAuditLogger emailSendLog)
-            : base(sharedOptions, emailTemplateRepo, logger, emailSendLog)
+            : base(testOptions, emailTemplateRepo, logger, emailSendLog)
         {
             Options = smtpEmailOptions ?? throw new ArgumentNullException(nameof(smtpEmailOptions));
             //TODO ensure smtp config is present (when enabled)
@@ -31,14 +32,13 @@ namespace ModernSlavery.Infrastructure.Messaging
 
         public override bool Enabled => Options.Enabled != false;
 
-        public override async Task<SendEmailResult> SendEmailAsync<TModel>(string emailAddress, string templateId,
-            TModel model, bool test)
+        public override async Task<SendEmailResult> SendEmailAsync<TModel>(string emailAddress, string templateId, TModel model)
         {
             // convert the model's public properties to a dictionary
             var mergeParameters = model.GetPropertiesDictionary();
 
             // prefix subject with environment name
-            mergeParameters["Environment"] = SharedOptions.IsProduction() ? "" : $"[{SharedOptions.Environment}] ";
+            mergeParameters["Environment"] = _testOptions.IsProduction() ? "" : $"[{_testOptions.Environment}] ";
 
             // get template
             var emailTemplateInfo = EmailTemplateRepo.GetByTemplateId(templateId);
@@ -81,7 +81,7 @@ namespace ModernSlavery.Infrastructure.Messaging
                 smtpUsername,
                 smtpPassword,
                 smtpServerPort,
-                test: test);
+                simulate: _testOptions.SimulateMessageSend);
 
             return new SendEmailResult
             {

@@ -7,11 +7,11 @@ using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 {
-    public class SpamProtectionAttribute : ActionFilterAttribute
+    public class BotProtectionAttribute : ActionFilterAttribute
     {
         private readonly int _minimumSeconds;
 
-        public SpamProtectionAttribute(int minimumSeconds = 10)
+        public BotProtectionAttribute(int minimumSeconds = 10)
         {
             _minimumSeconds = minimumSeconds;
         }
@@ -23,8 +23,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 
             try
             {
-                var remoteTime = Encryption.DecryptData(filterContext.HttpContext.GetParams("SpamProtectionTimeStamp"))
-                    .FromSmallDateTime(true);
+                var remoteTime = Encryption.DecryptData(filterContext.HttpContext.GetParams("BotProtectionTimeStamp")).FromSmallDateTime(true);
                 if (remoteTime.AddSeconds(_minimumSeconds) < VirtualDateTime.Now) return;
             }
             catch
@@ -32,9 +31,8 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
             }
 
             var testOptions = filterContext.HttpContext.RequestServices.GetRequiredService<TestOptions>();
-            if (testOptions.SkipSpamProtection) return;
 
-            throw new HttpException(429, "Too Many Requests");
+            if (!testOptions.DisableLockoutProtection) throw new HttpException(429, "Too Many Requests");
         }
     }
 }

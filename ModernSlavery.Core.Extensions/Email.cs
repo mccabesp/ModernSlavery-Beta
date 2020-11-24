@@ -54,7 +54,7 @@ namespace ModernSlavery.Core.Extensions
             int smtpPort = 25,
             byte[] attachment = null,
             string attachmentFilename = "attachment.dat",
-            bool test = false)
+            bool simulate = false)
         {
             if (string.IsNullOrWhiteSpace(senderEmailAddress))
                 throw new ArgumentNullException(nameof(senderEmailAddress), "Missing or empty senderEmailAddress");
@@ -113,7 +113,7 @@ namespace ModernSlavery.Core.Extensions
             foreach (var recipient in recipients.SplitI(";")) myMail.To.Add(new MailAddress(recipient));
 
             //Add the attachment
-            if (!test)
+            if (!simulate)
             {
                 if (attachment == null)
                     await mySmtpClient.SendMailAsync(myMail).ConfigureAwait(false);

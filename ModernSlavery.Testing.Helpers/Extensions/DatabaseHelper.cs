@@ -101,18 +101,6 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             dataRepository.GetAll<PublicSectorType>().Where(r => r.Created >= createdDate).BatchDelete();
             dataRepository.GetAll<SicCode>().Where(r => r.Created >= createdDate).BatchDelete();
             dataRepository.GetAll<SicSection>().Where(r => r.Created >= createdDate).BatchDelete();
-
-        }
-
-        /// <summary>
-        /// Delete all the test records in the database created before the specified deadline 
-        /// </summary>
-        /// <param name="host">The WebHost connected to the database</param>
-        /// <param name="deadline">If empty deletes all test records</param>
-        public static void DeleteAllTestRecords(this IHost host, DateTime? deadline = null)
-        {
-            var dbContext = host.Services.GetRequiredService<IDbContext>();
-            dbContext.DeleteAllTestRecords(deadline);
         }
 
         /// <summary>

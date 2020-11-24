@@ -159,7 +159,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (result != null) return result;
 
             //Tell reviewer if this org has already been approved
-            if (model.ManualRegistration)
+            if (model.IsManualRegistration)
             {
                 var firstRegistered = userOrg.Organisation.UserOrganisations
                     .OrderByDescending(uo => uo.PINConfirmedDate)
@@ -501,8 +501,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 //Send the approved email to the applicant
                 if (!await SendRegistrationAcceptedAsync(
                     userOrg.Organisation.OrganisationName,
-                    userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress),
-                    userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix)))
+                    userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress)))
                 {
                     ModelState.AddModelError(1132);
                     this.SetModelCustomErrors<OrganisationViewModel>();
@@ -510,34 +509,28 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 //Log the approval
-                if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
-                    await _adminService.RegistrationLog.WriteAsync(
-                        new RegisterLogModel
-                        {
-                            StatusDate = VirtualDateTime.Now,
-                            Status = "Manually registered",
-                            ActionBy = VirtualUser.EmailAddress,
-                            Details = "",
-                            Sector = userOrg.Organisation.SectorType,
-                            Organisation = userOrg.Organisation.OrganisationName,
-                            CompanyNo = userOrg.Organisation.CompanyNumber,
-                            Address = userOrg?.Address.GetAddressString(),
-                            SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
-                            UserFirstname = userOrg.User.Firstname,
-                            UserLastname = userOrg.User.Lastname,
-                            UserJobtitle = userOrg.User.JobTitle,
-                            UserEmail = userOrg.User.EmailAddress,
-                            ContactFirstName = userOrg.User.ContactFirstName,
-                            ContactLastName = userOrg.User.ContactLastName,
-                            ContactJobTitle = userOrg.User.ContactJobTitle,
-                            ContactOrganisation = userOrg.User.ContactOrganisation,
-                            ContactPhoneNumber = userOrg.User.ContactPhoneNumber
-                        });
-
-                //Show confirmation
-                if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
-                    TempData["TestUrl"] = Url.Action("Impersonate", "Admin",
-                        new {emailAddress = userOrg.User.EmailAddress});
+                await _adminService.RegistrationLog.WriteAsync(
+                    new RegisterLogModel
+                    {
+                        StatusDate = VirtualDateTime.Now,
+                        Status = "Manually registered",
+                        ActionBy = VirtualUser.EmailAddress,
+                        Details = "",
+                        Sector = userOrg.Organisation.SectorType,
+                        Organisation = userOrg.Organisation.OrganisationName,
+                        CompanyNo = userOrg.Organisation.CompanyNumber,
+                        Address = userOrg?.Address.GetAddressString(),
+                        SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
+                        UserFirstname = userOrg.User.Firstname,
+                        UserLastname = userOrg.User.Lastname,
+                        UserJobtitle = userOrg.User.JobTitle,
+                        UserEmail = userOrg.User.EmailAddress,
+                        ContactFirstName = userOrg.User.ContactFirstName,
+                        ContactLastName = userOrg.User.ContactLastName,
+                        ContactJobTitle = userOrg.User.ContactJobTitle,
+                        ContactOrganisation = userOrg.User.ContactOrganisation,
+                        ContactPhoneNumber = userOrg.User.ContactPhoneNumber
+                    });
 
                 result = RedirectToAction("RequestAccepted");
             }
@@ -566,12 +559,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         //Send the registration request
-        protected async Task<bool> SendRegistrationAcceptedAsync(string organisationName, string emailAddress, bool test = false)
+        protected async Task<bool> SendRegistrationAcceptedAsync(string organisationName, string emailAddress)
         {
             //Send an acceptance link to the email address
             var returnUrl = Url.ActionArea("ManageOrganisations", "Submission", "Submission", null, "https");
-            return await _adminService.SharedBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(organisationName, returnUrl,
-                emailAddress, test);
+            return await _adminService.SharedBusinessLogic.SendEmailService.SendRegistrationApprovedAsync(organisationName, returnUrl, emailAddress);
         }
 
         /// <summary>
@@ -618,29 +610,28 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (result != null) return result;
 
             //Log the rejection
-            if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
-                await _adminService.RegistrationLog.WriteAsync(
-                    new RegisterLogModel
-                    {
-                        StatusDate = VirtualDateTime.Now,
-                        Status = "Manually Rejected",
-                        ActionBy = VirtualUser.EmailAddress,
-                        Details = "",
-                        Sector = userOrg.Organisation.SectorType,
-                        Organisation = userOrg.Organisation.OrganisationName,
-                        CompanyNo = userOrg.Organisation.CompanyNumber,
-                        Address = userOrg?.Address.GetAddressString(),
-                        SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
-                        UserFirstname = userOrg.User.Firstname,
-                        UserLastname = userOrg.User.Lastname,
-                        UserJobtitle = userOrg.User.JobTitle,
-                        UserEmail = userOrg.User.EmailAddress,
-                        ContactFirstName = userOrg.User.ContactFirstName,
-                        ContactLastName = userOrg.User.ContactLastName,
-                        ContactJobTitle = userOrg.User.ContactJobTitle,
-                        ContactOrganisation = userOrg.User.ContactOrganisation,
-                        ContactPhoneNumber = userOrg.User.ContactPhoneNumber
-                    });
+            await _adminService.RegistrationLog.WriteAsync(
+                new RegisterLogModel
+                {
+                    StatusDate = VirtualDateTime.Now,
+                    Status = "Manually Rejected",
+                    ActionBy = VirtualUser.EmailAddress,
+                    Details = "",
+                    Sector = userOrg.Organisation.SectorType,
+                    Organisation = userOrg.Organisation.OrganisationName,
+                    CompanyNo = userOrg.Organisation.CompanyNumber,
+                    Address = userOrg?.Address.GetAddressString(),
+                    SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
+                    UserFirstname = userOrg.User.Firstname,
+                    UserLastname = userOrg.User.Lastname,
+                    UserJobtitle = userOrg.User.JobTitle,
+                    UserEmail = userOrg.User.EmailAddress,
+                    ContactFirstName = userOrg.User.ContactFirstName,
+                    ContactLastName = userOrg.User.ContactLastName,
+                    ContactJobTitle = userOrg.User.ContactJobTitle,
+                    ContactOrganisation = userOrg.User.ContactOrganisation,
+                    ContactPhoneNumber = userOrg.User.ContactPhoneNumber
+                });
 
             //Delete address for this user and organisation
             if (userOrg.Address.Status != AddressStatuses.Active && userOrg.Address.CreatedByUserId == userOrg.UserId)
@@ -719,9 +710,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             //Clear the stash
             ClearStash();
 
-            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix) &&
-                TempData.ContainsKey("TestUrl")) ViewBag.TestUrl = TempData["TestUrl"];
-
             return View("RequestAccepted", model);
         }
 
@@ -741,15 +729,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             //Clear the stash
             ClearStash();
-
-            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
-            {
-                UserOrganisation userOrg;
-                var result = UnwrapRegistrationRequest(model, out userOrg, true);
-
-                ViewBag.TestUrl = Url.Action("Impersonate", "Admin",
-                    new {emailAddress = userOrg.User.EmailAddress});
-            }
 
             return View("RequestCancelled", model);
         }

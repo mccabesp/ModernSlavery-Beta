@@ -14,7 +14,7 @@
             @Html.AntiForgeryToken()
             @Html.HiddenFor(m => m.SectorType)
             @Html.HiddenFor(model => model.RegistrationType)
-            @Html.HiddenFor(m => m.ManualRegistration)
+            @Html.HiddenFor(m => m.IsManualRegistration)
 
             @await Html.GovUkValidationSummaryAsync()
             <h1 class="govuk-heading-l">

@@ -9,7 +9,7 @@ namespace ModernSlavery.Core.Interfaces
         void Delete(T entity);
         void ClearSearch();
 
-        Task<PagedResult<T>> SearchAsync(string searchText, int page, int pageSize, bool test = false);
+        Task<PagedResult<T>> SearchAsync(string searchText, int page, int pageSize);
 
         Task<string> GetSicCodesAsync(string companyNumber);
     }

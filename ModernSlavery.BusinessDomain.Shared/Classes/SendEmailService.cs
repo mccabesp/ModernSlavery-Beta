@@ -15,14 +15,12 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
     public class SendEmailService : ISendEmailService
     {
         private readonly EmailOptions EmailOptions;
-        private readonly SharedOptions SharedOptions;
         private readonly TestOptions TestOptions;
 
-        public SendEmailService(EmailOptions emailOptions, SharedOptions sharedOptions, TestOptions testOptions,
+        public SendEmailService(EmailOptions emailOptions, TestOptions testOptions,
             ILogger<SendEmailService> logger, [KeyFilter(QueueNames.SendEmail)] IQueue sendEmailQueue)
         {
             EmailOptions = emailOptions ?? throw new ArgumentNullException(nameof(emailOptions));
-            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             TestOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             SendEmailQueue = sendEmailQueue ?? throw new ArgumentNullException(nameof(sendEmailQueue));
@@ -36,10 +34,10 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
         /// </summary>
         /// <param name="subject"></param>
         /// <param name="message"></param>
-        public async Task<bool> SendGeoMessageAsync(string subject, string message, bool test = false)
+        public async Task<bool> SendMsuMessageAsync(string subject, string message)
         {
-            return await QueueEmailAsync(new QueueWrapper(new SendGeoMessageModel
-            { subject = subject, message = message, test = test }));
+            return await QueueEmailAsync(new QueueWrapper(new SendMsuMessageModel
+            { subject = subject, message = message }));
         }
 
         public async Task<bool> SendCreateAccountPendingVerificationAsync(string verifyUrl, string emailAddress)
@@ -47,8 +45,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             var createAccountPendingTemplate = new CreateAccountPendingVerificationTemplate
             {
                 Url = verifyUrl,
-                RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(TestOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress
             };
 
             return await QueueEmailAsync(createAccountPendingTemplate);
@@ -59,8 +56,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             var changeEmailPendingTemplate = new ChangeEmailPendingVerificationTemplate
             {
                 Url = verifyUrl,
-                RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(TestOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress
             };
 
             return await QueueEmailAsync(changeEmailPendingTemplate);
@@ -70,8 +66,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
         {
             var changeEmailCompletedVerification = new ChangeEmailCompletedVerificationTemplate
             {
-                RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(TestOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress
             };
 
             return await QueueEmailAsync(changeEmailCompletedVerification);
@@ -81,8 +76,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
         {
             var changeEmailCompletedNotification = new ChangeEmailCompletedNotificationTemplate
             {
-                RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(TestOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress
             };
 
             return await QueueEmailAsync(changeEmailCompletedNotification);
@@ -92,8 +86,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
         {
             var changePasswordCompleted = new ChangePasswordCompletedTemplate
             {
-                RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(TestOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress
             };
 
             return await QueueEmailAsync(changePasswordCompleted);
@@ -104,9 +97,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             var resetPasswordVerification = new ResetPasswordVerificationTemplate
             {
                 Url = resetUrl,
-                RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(TestOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(TestOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress
             };
 
             return await QueueEmailAsync(resetPasswordVerification);
@@ -116,44 +107,41 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
         {
             var resetPasswordCompleted = new ResetPasswordCompletedTemplate
             {
-                RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(TestOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(TestOptions.TestPrefix)
+                RecipientEmailAddress = emailAddress
             };
 
             return await QueueEmailAsync(resetPasswordCompleted);
         }
 
-        public async Task<bool> SendAccountClosedNotificationAsync(string emailAddress, bool test)
+        public async Task<bool> SendAccountClosedNotificationAsync(string emailAddress)
         {
             var closeAccountCompleted = new CloseAccountCompletedTemplate
-            { RecipientEmailAddress = emailAddress, Test = test };
+            { 
+                RecipientEmailAddress = emailAddress 
+            };
 
             return await QueueEmailAsync(closeAccountCompleted);
         }
 
-        public async Task<bool> SendGEOOrphanOrganisationNotificationAsync(string organisationName, bool test)
+        public async Task<bool> SendMsuOrphanOrganisationNotificationAsync(string organisationName)
         {
             var orphanOrganisationTemplate = new OrphanOrganisationTemplate
             {
                 RecipientEmailAddress = EmailOptions.AdminDistributionList,
-                OrganisationName = organisationName,
-                Test = test
+                OrganisationName = organisationName
             };
 
             return await QueueEmailAsync(orphanOrganisationTemplate);
         }
 
-        public async Task<bool> SendGEORegistrationRequestAsync(string reviewUrl,
+        public async Task<bool> SendMsuRegistrationRequestAsync(string reviewUrl,
             string contactName,
             string reportingOrg,
-            string reportingAddress,
-            bool test = false)
+            string reportingAddress)
         {
             var geoOrganisationRegistrationRequest = new MsuOrganisationRegistrationRequestTemplate
             {
                 RecipientEmailAddress = EmailOptions.AdminDistributionList,
-                Test = test,
                 Name = contactName,
                 Org2 = reportingOrg,
                 Address = reportingAddress,
@@ -163,13 +151,11 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             return await QueueEmailAsync(geoOrganisationRegistrationRequest);
         }
 
-        public async Task<bool> SendRegistrationApprovedAsync(string organisationName, string returnUrl, string emailAddress, bool test = false)
+        public async Task<bool> SendRegistrationApprovedAsync(string organisationName, string returnUrl, string emailAddress)
         {
             var organisationRegistrationApproved = new OrganisationRegistrationApprovedTemplate
             {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(TestOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(TestOptions.TestPrefix),
                 OrganisationName = organisationName,
                 Url = returnUrl
             };
@@ -182,8 +168,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             var organisationRegistrationDeclined = new OrganisationRegistrationDeclinedTemplate
             {
                 RecipientEmailAddress = emailAddress,
-                Test = emailAddress.StartsWithI(TestOptions.TestPrefix),
-                Simulate = emailAddress.StartsWithI(TestOptions.TestPrefix),
                 OrganisationName = organisationName,
                 Reason = reason
             };

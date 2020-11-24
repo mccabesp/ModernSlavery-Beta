@@ -60,7 +60,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(PurgeUsers)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendMsuMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -118,7 +118,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(PurgeRegistrations)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendMsuMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -225,7 +225,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(PurgeOrganisations)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendMsuMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -274,7 +274,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(PurgeStatementData)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendMsuMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }
@@ -282,39 +282,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             {
                 RunningJobs.Remove(nameof(PurgeStatementData));
             }
-            
-        }
-
-        //Remove test users and organisations
-        [Disable(typeof(DisableWebjobProvider))]
-        public async Task PurgeTestDataAsync([TimerTrigger("%PurgeTestDataAsync%")]
-            TimerInfo timer,
-            ILogger log)
-        {
-            if (RunningJobs.Contains(nameof(PurgeTestDataAsync))) return;
-            RunningJobs.Add(nameof(PurgeTestDataAsync));
-            try
-            {
-                var databaseContext = new DatabaseContext(default);
-                databaseContext.DeleteAllTestRecords(VirtualDateTime.Now.AddDays(-1));
-
-                log.LogDebug($"Executed {nameof(PurgeTestDataAsync)} successfully");
-            }
-            catch (Exception ex)
-            {
-                //Send Email to GEO reporting errors
-                var message = $"Failed webjob ({nameof(PurgeTestDataAsync)}):{ex.Message}:{ex.GetDetailsText()}";
-                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
-
-                //Rethrow the error
-                throw;
-            }
-            finally
-            {
-                RunningJobs.Remove(nameof(PurgeTestDataAsync));
-            }
-            if (_sharedOptions.IsProduction()) return;
-
             
         }
     }

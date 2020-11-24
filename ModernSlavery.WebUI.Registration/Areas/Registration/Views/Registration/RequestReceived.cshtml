@@ -1,41 +1,44 @@
 ﻿@using ModernSlavery.Core.Models
 @inject IWebService WebService
+@inject IObfuscator Obfuscator
 @inject SharedOptions sharedOptions
 @{
     Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Registration request received - Modern Slavery reporting service";
+
+    var newOrganisationIdentifier=TempData.ContainsKey("NewOrganisationIdentifier") ? TempData["NewOrganisationIdentifier"] : null;
 }
-    @await Html.PartialAsync("_ServiceInfo")
+@await Html.PartialAsync("_ServiceInfo")
 
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            <div class="govuk-form-group">
-                <div class="govuk-panel govuk-panel--confirmation">
-                    <h1 class="govuk-panel__title govuk-!-font-size-24">
-                        We’ve got your details.
-                        <br />
-                        We will review them and get in touch to let you know if your registration was successful.
-                    </h1>
-                </div>
-
-                <span class="govuk-!-font-weight-bold">
-                    What happens next
-                </span>        
-                <p class="govuk-body">If we need more information to complete your registration, we will call or email you.</p>
-                <p class="govuk-body">If you have not heard from us within 5 working days, check your junk email folder.</p>
-                <p class="govuk-body">
-                    If there is still no email from us, or for any other help with your registration, contact 
-                    <a class="govuk-link" href="mailto:@(sharedOptions.MsuReportingEmail)" target="_blank">@sharedOptions.MsuReportingEmail</a>
-                </p>
-                <span class="govuk-!-font-weight-bold">
-                    More options
-                </span>
-                <p class="govuk-body">
-                    <a class="govuk-link" href="@Url.Action("OrganisationType")">Add another organisation</a>
-                </p>
-                <p class="govuk-body">
-                    <a class="govuk-link" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Manage organisations</a>
-                </p>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-form-group">
+            <div class="govuk-panel govuk-panel--confirmation">
+                <h1 class="govuk-panel__title govuk-!-font-size-24">
+                    We’ve got your details.
+                    <br />
+                    We will review them and get in touch to let you know if your registration was successful.
+                </h1>
             </div>
+
+            <span class="govuk-!-font-weight-bold">
+                What happens next
+            </span>
+            <p class="govuk-body">If we need more information to complete your registration, we will call or email you.</p>
+            <p class="govuk-body">If you have not heard from us within 5 working days, check your junk email folder.</p>
+            <p class="govuk-body">
+                If there is still no email from us, or for any other help with your registration, contact
+                <a class="govuk-link" href="mailto:@(sharedOptions.MsuReportingEmail)" target="_blank">@sharedOptions.MsuReportingEmail</a>
+            </p>
+            <span class="govuk-!-font-weight-bold">
+                More options
+            </span>
+            <p class="govuk-body">
+                <a class="govuk-link" href="@Url.Action("OrganisationType")">Add another organisation</a>
+            </p>
+            <p class="govuk-body">
+                <a class="govuk-link" name="ReturnLink" data-organisationidentifier="@newOrganisationIdentifier" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Manage organisations</a>
+            </p>
         </div>
     </div>
+</div>

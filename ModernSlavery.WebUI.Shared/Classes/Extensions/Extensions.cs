@@ -31,12 +31,12 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 
         #region AntiSpam
 
-        public static IHtmlContent SpamProtectionTimeStamp(this IHtmlHelper helper)
+        public static IHtmlContent BotProtectionTimeStamp(this IHtmlHelper helper)
         {
             var builder = new TagBuilder("input");
 
-            builder.MergeAttribute("id", "SpamProtectionTimeStamp");
-            builder.MergeAttribute("name", "SpamProtectionTimeStamp");
+            builder.MergeAttribute("id", "BotProtectionTimeStamp");
+            builder.MergeAttribute("name", "BotProtectionTimeStamp");
             builder.MergeAttribute("type", "hidden");
             builder.MergeAttribute("value", Encryption.EncryptData(VirtualDateTime.Now.ToSmallDateTime()));
             return builder.RenderSelfClosingTag();

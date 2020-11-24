@@ -22,7 +22,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             catch (Exception ex)
             {
                 //Send Email to GEO reporting errors
-                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", ex.Message).ConfigureAwait(false);
+                await _messenger.SendMsuMessageAsync("GPG - WEBJOBS ERROR", ex.Message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }

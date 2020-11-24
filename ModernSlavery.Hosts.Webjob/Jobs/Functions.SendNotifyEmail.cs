@@ -33,7 +33,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 throw;
             }
 
-            _govNotifyApi.SendEmail(notifyEmail);
+            await _govNotifyApi.SendEmailAsync(notifyEmail);
             log.LogInformation("Successfully received message from queue and passed to GovNotifyAPI. Details: {notifyEmail}", notifyEmail);
         }
 

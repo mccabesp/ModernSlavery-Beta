@@ -114,7 +114,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
                     // Check if we are a test user (for load testing)
-                    if (SharedBusinessLogic.TestOptions.PinInPostTestMode || userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
+                    if (SharedBusinessLogic.TestOptions.ShowPinInPost)
                     {
                         ViewBag.PinCode = pin;
                         ViewBag.OrganisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId);
@@ -123,23 +123,20 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     {
                         // Try and send the PIN in post
                         var returnUrl = Url.ActionArea("ManageOrganisations", "Submission", "Submission", null, "https");
-                        if (_registrationService.PinInThePostService.SendPinInThePost(userOrg, pin, returnUrl,
-                            out var letterId))
+                        try
                         {
-                            userOrg.PITPNotifyLetterId = letterId;
-                            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+                            var response = await _registrationService.PinInThePostService.SendPinInThePostAsync(userOrg, pin, returnUrl);
+                            userOrg.PITPNotifyLetterId = response.LetterId;
                         }
-                        else
+                        catch
                         {
                             // Show "Notify is down" error message
-                            return View(
-                                "PinFailedToSend",
-                                new PinFailedToSendViewModel
-                                    {OrganisationName = userOrg.Organisation.OrganisationName});
+                            return View("PinFailedToSend", new PinFailedToSendViewModel { OrganisationName = userOrg.Organisation.OrganisationName });
                         }
-                    }
 
-                    Logger.LogInformation($"Send Pin-in-post. Name {VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}, Address:{userOrg?.Address.GetAddressString()}");
+                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+                        Logger.LogInformation($"Send Pin-in-post. Name {VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}, Address:{userOrg?.Address.GetAddressString()}");
+                    }
                 }
                 catch (Exception ex)
                 {

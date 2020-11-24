@@ -15,7 +15,5 @@ namespace ModernSlavery.Infrastructure.Messaging
         public string ApiKey { get; set; }
 
         public string ApiTestKey { get; set; }
-
-        public bool AllowTestKeyOnly { get; set; }
     }
 }

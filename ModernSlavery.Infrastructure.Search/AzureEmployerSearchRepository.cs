@@ -256,10 +256,6 @@ namespace ModernSlavery.Infrastructure.Search
             if (newRecords == null || !newRecords.Any())
                 throw new ArgumentNullException(nameof(newRecords), "You must supply at least one record to index");
 
-            //Remove all test organisations
-            if (!string.IsNullOrWhiteSpace(_testOptions.TestPrefix))
-                newRecords = newRecords.Where(e => !e.OrganisationName.StartsWithI(_testOptions.TestPrefix));
-
             //Ensure the records are ordered by name
             newRecords = newRecords.OrderBy(o => o.OrganisationName);
 

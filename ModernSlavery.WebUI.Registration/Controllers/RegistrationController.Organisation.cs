@@ -100,7 +100,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var model = UnstashModel<OrganisationViewModel>();
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-            model.ManualRegistration = true;
+            model.IsManualRegistration = true;
             model.BackAction = "OrganisationSearch";
             model.OrganisationName = null;
             model.CompanyNumber = null;
@@ -141,7 +141,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             model.Organisations = m.Organisations;
-            model.ManualRegistration = true;
+            model.IsManualRegistration = true;
             model.BackAction = "OrganisationSearch";
             model.SelectedOrganisationIndex = -1;
             model.OrganisationName = null;
@@ -160,11 +160,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 case SectorTypes.Private:
                     try
                     {
-                        model.Organisations = await _registrationService.PrivateSectorRepository.SearchAsync(
-                            model.SearchText,
-                            1,
-                            SharedBusinessLogic.SharedOptions.OrganisationPageSize,
-                            VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
+                        model.Organisations = await _registrationService.PrivateSectorRepository.SearchAsync(model.SearchText, 1, SharedBusinessLogic.SharedOptions.OrganisationPageSize);
                     }
                     catch (Exception ex)
                     {
@@ -179,20 +175,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             return View(model);
                         }
 
-                        await _registrationService.SharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
-                            "GPG - COMPANIES HOUSE ERROR",
-                            $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
-                            VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
+                        await _registrationService.SharedBusinessLogic.SendEmailService.SendMsuMessageAsync("GPG - COMPANIES HOUSE ERROR", $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}");
                         return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                     }
 
                     break;
                 case SectorTypes.Public:
-                    model.Organisations = await _registrationService.PublicSectorRepository.SearchAsync(
-                        model.SearchText,
-                        1,
-                        SharedBusinessLogic.SharedOptions.OrganisationPageSize,
-                        VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
+                    model.Organisations = await _registrationService.PublicSectorRepository.SearchAsync(model.SearchText, 1, SharedBusinessLogic.SharedOptions.OrganisationPageSize);
 
                     break;
 
@@ -245,7 +234,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             model.NoReference = false;
-            model.ManualRegistration = false;
+            model.IsManualRegistration = false;
             model.AddressReturnAction = null;
             model.ConfirmReturnAction = null;
             model.IsManualAuthorised = false;
@@ -356,11 +345,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     case SectorTypes.Private:
                         try
                         {
-                            model.Organisations = await _registrationService.PrivateSectorRepository.SearchAsync(
-                                model.SearchText,
-                                nextPage,
-                                SharedBusinessLogic.SharedOptions.OrganisationPageSize,
-                                VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
+                            model.Organisations = await _registrationService.PrivateSectorRepository.SearchAsync(model.SearchText, nextPage, SharedBusinessLogic.SharedOptions.OrganisationPageSize);
                         }
                         catch (Exception ex)
                         {
@@ -375,10 +360,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                                 return View(model);
                             }
 
-                            await _registrationService.SharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
-                                "GPG - COMPANIES HOUSE ERROR",
-                                $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}",
-                                VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
+                            await _registrationService.SharedBusinessLogic.SendEmailService.SendMsuMessageAsync("GPG - COMPANIES HOUSE ERROR", $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}");
                             return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                         }
 
@@ -397,11 +379,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         break;
 
                     case SectorTypes.Public:
-                        model.Organisations = await _registrationService.PublicSectorRepository.SearchAsync(
-                            model.SearchText,
-                            nextPage,
-                            SharedBusinessLogic.SharedOptions.OrganisationPageSize,
-                            VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
+                        model.Organisations = await _registrationService.PublicSectorRepository.SearchAsync(model.SearchText, nextPage, SharedBusinessLogic.SharedOptions.OrganisationPageSize);
                         break;
 
                     default:
@@ -494,7 +472,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 //Make sure the organisation has an address
                 if (organisation.SectorType == SectorTypes.Public)
                 {
-                    model.ManualRegistration = false;
+                    model.IsManualRegistration = false;
                     model.IsSelectedAuthorised = organisation.IsAuthorised(VirtualUser.EmailAddress);
                     if (!model.IsSelectedAuthorised || !organisation.HasAnyAddress())
                     {
@@ -507,13 +485,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 else if (organisation.SectorType == SectorTypes.Private && !organisation.HasAnyAddress())
                 {
                     model.AddressReturnAction = nameof(ChooseOrganisation);
-                    model.ManualRegistration = false;
+                    model.IsManualRegistration = false;
                     model.IsManualAddress = true;
                     StashModel(model);
                     return RedirectToAction("AddAddress");
                 }
 
-                model.ManualRegistration = false;
+                model.IsManualRegistration = false;
                 model.IsManualAddress = false;
                 model.AddressReturnAction = null;
             }
@@ -551,7 +529,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 && (model.SearchText.Length != 8 || !model.SearchText.ContainsNumber()))
                 model.OrganisationName = model.SearchText;
 
-            model.ManualRegistration = true;
+            model.IsManualRegistration = true;
             model.IsManualAuthorised = false;
             model.IsManualAddress = false;
             StashModel(model);
@@ -759,7 +737,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 if (results.Any()) orgIds.AddRange(results);
             }
 
-            model.ManualRegistration = true;
+            model.IsManualRegistration = true;
             model.ManualOrganisationIndex = -1;
             model.NameSource = VirtualUser.EmailAddress;
 
@@ -816,7 +794,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             model.IsManualAuthorised = false;
-            model.ManualRegistration = true;
+            model.IsManualRegistration = true;
             model.IsManualAddress = false;
             StashModel(model);
             return View("SelectOrganisation", model);
@@ -841,7 +819,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 //Ensure they select one of the matched references
                 if (model.MatchedReferenceCount > 0) throw new ArgumentException(nameof(model.MatchedReferenceCount));
 
-                model.ManualRegistration = true;
+                model.IsManualRegistration = true;
                 model.ManualOrganisationIndex = -1;
                 model.AddressReturnAction = nameof(SelectOrganisation);
                 StashModel(model);
@@ -912,7 +890,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 model.IsManualAddress = true;
             }
 
-            model.ManualRegistration = false;
+            model.IsManualRegistration = false;
             if (model.IsManualAddress)
             {
                 model.AddressReturnAction = returnAction;
@@ -963,24 +941,23 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //Get the sic codes from companies house
             OrganisationRecord organisation = null;
-            if (!model.ManualRegistration) organisation = model.GetManualOrganisation() ?? model.GetSelectedOrganisation();
+            if (!model.IsManualRegistration) organisation = model.GetManualOrganisation() ?? model.GetSelectedOrganisation();
 
             #region Get the sic codes if there isnt any
 
             if (organisation != null)
             {
-                if (!model.ManualRegistration && string.IsNullOrWhiteSpace(organisation.SicCodeIds))
+                if (!model.IsManualRegistration && string.IsNullOrWhiteSpace(organisation.SicCodeIds))
                 {
                     organisation.SicSource = "CoHo";
-                    if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
+                    if (SharedBusinessLogic.TestOptions.LoadTesting)
                     {
-                        var sic = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<SicCode>(s =>
-                            s.SicSectionId != "X");
+                        var sic = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<SicCode>(s => s.SicSectionId != "X");
                         organisation.SicCodeIds = sic?.SicCodeId.ToString();
                     }
                     else if (organisation.OrganisationId > 0)
                     {
-                        var org= await SharedBusinessLogic.DataRepository.GetAsync<Organisation>(organisation.OrganisationId);
+                        var org = await SharedBusinessLogic.DataRepository.GetAsync<Organisation>(organisation.OrganisationId);
                         if (org != null)
                         {
                             var sicCodes = org.GetLatestSicCodes();
@@ -1016,10 +993,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                                 return View(model);
                             }
 
-                            await _registrationService.SharedBusinessLogic.SendEmailService.SendGeoMessageAsync(
-                                "GPG - COMPANIES HOUSE ERROR",
-                                $"Cant get SIC Codes from Companies House API for company {organisation.OrganisationName} No:{organisation.CompanyNumber} due to following error:\n\n{ex.Message}",
-                                VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
+                            await _registrationService.SharedBusinessLogic.SendEmailService.SendMsuMessageAsync("GPG - COMPANIES HOUSE ERROR", $"Cant get SIC Codes from Companies House API for company {organisation.OrganisationName} No:{organisation.CompanyNumber} due to following error:\n\n{ex.Message}");
                             return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                         }
 
@@ -1146,7 +1120,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             {
                 m.AddressReturnAction = nameof(ConfirmOrganisation);
                 m.IsWrongAddress = true;
-                m.ManualRegistration = false;
+                m.IsManualRegistration = false;
                 m.AddressSource = null;
                 m.Address1 = null;
                 m.Address2 = null;
@@ -1177,6 +1151,9 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 throw;
             }
 
+            //Save the organisation identifier
+            TempData["NewOrganisationIdentifier"] = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId);
+
             PendingFasttrackCodes = null;
 
             //Save the model state
@@ -1191,7 +1168,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var authorised = false;
             var hasAddress = false;
             OrganisationRecord organisation = null;
-            if (!model.ManualRegistration)
+            if (!model.IsManualRegistration)
             {
                 organisation = model.GetManualOrganisation();
                 if (organisation != null)
@@ -1210,14 +1187,11 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var sector = organisation == null ? model.SectorType : organisation.SectorType;
 
             //If manual registration then show confirm receipt
-            if (model.ManualRegistration ||
+            if (model.IsManualRegistration ||
                 model.IsManualAddress && (sector == SectorTypes.Private || !authorised || hasAddress))
             {
                 var reviewCode = Encryption.EncryptQuerystring(
                     userOrg.UserId + ":" + userOrg.OrganisationId + ":" + VirtualDateTime.Now.ToSmallDateTime());
-
-                if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
-                    TempData["TestUrl"] = Url.ActionArea("ReviewRequest", "Admin", "Admin", new { code = reviewCode });
 
                 return RedirectToAction("RequestReceived");
             }
@@ -1226,29 +1200,28 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (sector == SectorTypes.Public || model.IsFastTrackAuthorised)
             {
                 //Log the registration
-                if (!userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
-                    await _registrationService.RegistrationLog.WriteAsync(
-                        new RegisterLogModel
-                        {
-                            StatusDate = VirtualDateTime.Now,
-                            Status = "Public sector email confirmed",
-                            ActionBy = VirtualUser.EmailAddress,
-                            Details = "",
-                            Sector = userOrg.Organisation.SectorType,
-                            Organisation = userOrg.Organisation.OrganisationName,
-                            CompanyNo = userOrg.Organisation.CompanyNumber,
-                            Address = userOrg?.Address.GetAddressString(),
-                            SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
-                            UserFirstname = userOrg.User.Firstname,
-                            UserLastname = userOrg.User.Lastname,
-                            UserJobtitle = userOrg.User.JobTitle,
-                            UserEmail = userOrg.User.EmailAddress,
-                            ContactFirstName = userOrg.User.ContactFirstName,
-                            ContactLastName = userOrg.User.ContactLastName,
-                            ContactJobTitle = userOrg.User.ContactJobTitle,
-                            ContactOrganisation = userOrg.User.ContactOrganisation,
-                            ContactPhoneNumber = userOrg.User.ContactPhoneNumber
-                        });
+                await _registrationService.RegistrationLog.WriteAsync(
+                    new RegisterLogModel
+                    {
+                        StatusDate = VirtualDateTime.Now,
+                        Status = "Public sector email confirmed",
+                        ActionBy = VirtualUser.EmailAddress,
+                        Details = "",
+                        Sector = userOrg.Organisation.SectorType,
+                        Organisation = userOrg.Organisation.OrganisationName,
+                        CompanyNo = userOrg.Organisation.CompanyNumber,
+                        Address = userOrg?.Address.GetAddressString(),
+                        SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
+                        UserFirstname = userOrg.User.Firstname,
+                        UserLastname = userOrg.User.Lastname,
+                        UserJobtitle = userOrg.User.JobTitle,
+                        UserEmail = userOrg.User.EmailAddress,
+                        ContactFirstName = userOrg.User.ContactFirstName,
+                        ContactLastName = userOrg.User.ContactLastName,
+                        ContactJobTitle = userOrg.User.ContactJobTitle,
+                        ContactOrganisation = userOrg.User.ContactOrganisation,
+                        ContactPhoneNumber = userOrg.User.ContactPhoneNumber
+                    });
 
                 StashModel(
                     new CompleteViewModel
@@ -1282,7 +1255,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var hasAddress = false;
             OrganisationRecord organisationRecord = null;
             var now = VirtualDateTime.Now;
-            if (!model.ManualRegistration)
+            if (!model.IsManualRegistration)
             {
                 organisationRecord = model.GetManualOrganisation();
 
@@ -1360,7 +1333,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 }
 
                 org.SetStatus(
-                    authorised && !model.ManualRegistration
+                    authorised && !model.IsManualRegistration
                         ? OrganisationStatuses.Active
                         : OrganisationStatuses.Pending,
                     OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId);
@@ -1375,7 +1348,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var oldName = org.OrganisationName;
             string newName = null;
             string newNameSource = null;
-            if (model.ManualRegistration)
+            if (model.IsManualRegistration)
             {
                 newName = model.OrganisationName;
                 newNameSource = model.NameSource;
@@ -1416,7 +1389,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var newSicCodeIds = new SortedSet<int>();
             string newSicSource = null;
 
-            if (model.ManualRegistration)
+            if (model.IsManualRegistration)
             {
                 newSicCodeIds = model.GetSicCodeIds();
                 newSicSource = model.SicSource;
@@ -1475,7 +1448,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var oldAddressSource = oldAddress?.Source;
             string newAddressSource = null;
 
-            if (model.ManualRegistration || model.IsManualAddress)
+            if (model.IsManualRegistration || model.IsManualAddress)
             {
                 newAddressModel = model.GetAddressModel();
                 newAddressSource = model.AddressSource;
@@ -1564,7 +1537,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             #region Save the contact details
 
             var sendRequest = false;
-            if (model.ManualRegistration
+            if (model.IsManualRegistration
                 || model.IsManualAddress && (org.SectorType == SectorTypes.Private || !authorised || hasAddress)
                 || !model.IsUkAddress.HasValue
                 || !model.IsUkAddress.Value)
@@ -1584,7 +1557,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             #region Activate organisation and address if the user is authorised
 
-            if (authorised && !model.ManualRegistration && (!model.IsManualAddress || !hasAddress))
+            if (authorised && !model.IsManualRegistration && (!model.IsManualAddress || !hasAddress))
             {
                 //Set the user org as confirmed
                 userOrg.Method = model.IsFastTrackAuthorised
@@ -1651,41 +1624,34 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             //Send request to GEO
             if (sendRequest)
             {
-                if (model.ManualRegistration)
-                    await SendGEORegistrationRequestAsync(
+                if (model.IsManualRegistration)
+                    await SendMsuRegistrationRequestAsync(
                         userOrg,
                         $"{model.ContactFirstName} {VirtualUser.ContactLastName} ({VirtualUser.JobTitle})",
                         org.OrganisationName,
-                        address.GetAddressString(),
-                        VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
+                        address.GetAddressString());
                 else
-                    await SendGEORegistrationRequestAsync(
+                    await SendMsuRegistrationRequestAsync(
                         userOrg,
                         $"{VirtualUser.Fullname} ({VirtualUser.JobTitle})",
                         org.OrganisationName,
-                        address.GetAddressString(),
-                        VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix));
+                        address.GetAddressString());
             }
 
             return userOrg;
         }
 
         //Send the registration request
-        protected async Task SendGEORegistrationRequestAsync(UserOrganisation userOrg,
+        protected async Task SendMsuRegistrationRequestAsync(UserOrganisation userOrg,
             string contactName,
             string reportingOrg,
-            string reportingAddress,
-            bool test = false)
+            string reportingAddress)
         {
             //Send a verification link to the email address
             var reviewCode = userOrg.GetReviewCode();
             var reviewUrl = Url.ActionArea("ReviewRequest", "Admin", "Admin", new { code = reviewCode }, protocol: "https");
 
-            //If the email address is a test email then simulate sending
-            if (userOrg.User.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix)) return;
-
-            await _registrationService.SharedBusinessLogic.SendEmailService.SendGEORegistrationRequestAsync(reviewUrl,
-                contactName, reportingOrg, reportingAddress, test);
+            await _registrationService.SharedBusinessLogic.SendEmailService.SendMsuRegistrationRequestAsync(reviewUrl, contactName, reportingOrg, reportingAddress);
         }
 
 
@@ -1699,9 +1665,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //Clear the stash
             ClearStash();
-
-            if (VirtualUser.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix) &&
-                TempData.ContainsKey("TestUrl")) ViewBag.TestUrl = TempData["TestUrl"];
 
             return View("RequestReceived");
         }

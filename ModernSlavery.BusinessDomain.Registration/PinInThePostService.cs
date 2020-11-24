@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -10,24 +11,23 @@ namespace ModernSlavery.BusinessDomain.Registration
 {
     public class PinInThePostService : IPinInThePostService
     {
-        private const int NotifyAddressLineLength = 35;
-        private readonly IEventLogger CustomLogger;
-        private readonly IGovNotifyAPI govNotifyApi;
+        private const int _notifyAddressLineLength = 35;
+        private readonly IEventLogger _customLogger;
+        private readonly IGovNotifyAPI _govNotifyApi;
 
-        private readonly SharedOptions SharedOptions;
+        private readonly SharedOptions _sharedOptions;
 
         public PinInThePostService(
             SharedOptions sharedOptions, 
             IEventLogger customLogger, 
             IGovNotifyAPI govNotifyApi)
         {
-            SharedOptions = sharedOptions;
-            CustomLogger = customLogger;
-            this.govNotifyApi = govNotifyApi;
+            _sharedOptions = sharedOptions;
+            _customLogger = customLogger;
+            _govNotifyApi = govNotifyApi;
         }
 
-        public bool SendPinInThePost(UserOrganisation userOrganisation, string pin, string returnUrl,
-            out string letterId)
+        public async Task<SendLetterResponse> SendPinInThePostAsync(UserOrganisation userOrganisation, string pin, string returnUrl)
         {
             var userFullNameAndJobTitle = $"{userOrganisation.User.Fullname} ({userOrganisation.User.JobTitle})";
 
@@ -35,13 +35,11 @@ namespace ModernSlavery.BusinessDomain.Registration
 
             var address = GetAddressInFourLineFormat(userOrganisation.Organisation);
 
-            var postCode = userOrganisation.Organisation.OrganisationAddresses.OrderByDescending(a => a.Modified)
-                .FirstOrDefault()
-                .PostCode;
+            var postCode = userOrganisation.Organisation.OrganisationAddresses.OrderByDescending(a => a.Modified).FirstOrDefault().PostCode;
 
-            var pinExpiryDate = VirtualDateTime.Now.AddDays(SharedOptions.PinInPostExpiryDays);
+            var pinExpiryDate = VirtualDateTime.Now.AddDays(_sharedOptions.PinInPostExpiryDays);
 
-            var templateId = SharedOptions.GovUkNotifyPinInThePostTemplateId;
+            var templateId = _sharedOptions.GovUkNotifyPinInThePostTemplateId;
 
             var personalisation = new Dictionary<string, dynamic>
             {
@@ -58,15 +56,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 {"expires", pinExpiryDate.ToString("d MMMM yyyy")}
             };
 
-            var response = govNotifyApi.SendLetter(templateId, personalisation);
-            if (response != null)
-            {
-                letterId = response.LetterId;
-                return true;
-            }
-
-            letterId = null;
-            return false;
+            return await _govNotifyApi.SendLetterAsync(templateId, personalisation);
         }
 
         public List<string> GetAddressInFourLineFormat(Organisation organisation)
@@ -126,7 +116,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 var originalAddress = address.ToList(); // Take a copy of the list for the log message
                 address.RemoveRange(4, address.Count - 1);
 
-                CustomLogger.Error(
+                _customLogger.Error(
                     "PITP address is too long and has been reduced to 4 lines to fit on the Gov.UK Notify envelope",
                     new {OriginalAddress = originalAddress, ReducedAddress = address});
             }
@@ -140,7 +130,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 var currentLine = address[currentLineNumber];
                 var nextLine = address[currentLineNumber + 1];
 
-                if (currentLine.Length + nextLine.Length < NotifyAddressLineLength)
+                if (currentLine.Length + nextLine.Length < _notifyAddressLineLength)
                 {
                     var concatenatedLines = currentLine + ", " + nextLine;
                     address.RemoveRange(currentLineNumber, 2);

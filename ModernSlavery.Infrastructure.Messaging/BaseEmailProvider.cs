@@ -10,42 +10,40 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Messaging
 {
     public abstract class BaseEmailProvider
     {
+        protected readonly TestOptions _testOptions;
+
         public BaseEmailProvider(
-            SharedOptions sharedOptions,
+            TestOptions testOptions,
             IEmailTemplateRepository emailTemplateRepo,
             ILogger logger,
             [KeyFilter(Filenames.EmailSendLog)] IAuditLogger emailSendLog)
         {
+            _testOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions)); 
             EmailTemplateRepo = emailTemplateRepo ?? throw new ArgumentNullException(nameof(emailTemplateRepo));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             EmailSendLog = emailSendLog ?? throw new ArgumentNullException(nameof(emailSendLog));
-            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
         }
 
         public virtual bool Enabled { get; } = true;
-        public SharedOptions SharedOptions { get; }
 
-        public abstract Task<SendEmailResult> SendEmailAsync<TModel>(string emailAddress, string templateId,
-            TModel parameters, bool test);
+        public abstract Task<SendEmailResult> SendEmailAsync<TModel>(string emailAddress, string templateId,TModel parameters);
 
-        public virtual async Task<SendEmailResult> SendEmailTemplateAsync<TTemplate>(TTemplate parameters)
-            where TTemplate : EmailTemplate
+        public virtual async Task<SendEmailResult> SendEmailTemplateAsync<TTemplate>(TTemplate parameters)where TTemplate : EmailTemplate
         {
-            if (parameters is null)
-                throw new ArgumentNullException(nameof(parameters), "Email template parameters are null");
+            if (parameters is null)throw new ArgumentNullException(nameof(parameters), "Email template parameters are null");
 
             var emailTemplateType = parameters.GetType();
             var emailTemplate = EmailTemplateRepo.GetByType(emailTemplateType);
-            if (emailTemplate == null)
-                new NullReferenceException($"Could not find email template by type {emailTemplateType.FullName}");
+            if (emailTemplate == null)new NullReferenceException($"Could not find email template by type {emailTemplateType.FullName}");
 
             // check if this is a simulation
-            if (parameters.Simulate)
+            if (_testOptions.SimulateMessageSend)
                 return new SendEmailResult
                 {
                     Status = "sent",
@@ -62,21 +60,18 @@ namespace ModernSlavery.Infrastructure.Messaging
                 var results = await SendDistributionEmailAsync(
                     parameters.RecipientEmailAddress,
                     emailTemplate.TemplateId,
-                    parameters,
-                    parameters.Test);
+                    parameters);
 
                 return results.FirstOrDefault();
             }
 
             // send email using the provider implementation
-            return await SendEmailAsync(parameters.RecipientEmailAddress, emailTemplate.TemplateId, parameters,
-                parameters.Test);
+            return await SendEmailAsync(parameters.RecipientEmailAddress, emailTemplate.TemplateId, parameters);
         }
 
         public virtual async Task<List<SendEmailResult>> SendDistributionEmailAsync<TModel>(string emailAddresses,
             string templateId,
-            TModel model,
-            bool test)
+            TModel model)
         {
             var emailList = emailAddresses.SplitI(";").ToList();
             emailList = emailList.RemoveI("sender", "recipient");
@@ -90,7 +85,7 @@ namespace ModernSlavery.Infrastructure.Messaging
             foreach (var emailAddress in emailList)
                 try
                 {
-                    var result = await SendEmailAsync(emailAddress, templateId, model, test);
+                    var result = await SendEmailAsync(emailAddress, templateId, model);
 
                     await EmailSendLog.WriteAsync(
                         new EmailSendLogModel

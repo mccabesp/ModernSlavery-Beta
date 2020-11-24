@@ -30,7 +30,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         var expires = cert.GetExpirationDateString().ToDateTime();
                         if (expires < VirtualDateTime.UtcNow)
                         {
-                            await _messenger.SendGeoMessageAsync(
+                            await _messenger.SendMsuMessageAsync(
                                 "GPG - WEBSITE CERTIFICATE EXPIRED",
                                 $"The website certificate for '{_sharedOptions.WEBSITE_HOSTNAME}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.").ConfigureAwait(false);
                         }
@@ -40,7 +40,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                             if (expires < VirtualDateTime.UtcNow.AddDays(_sharedOptions
                                 .CertExpiresWarningDays))
-                                await _messenger.SendGeoMessageAsync(
+                                await _messenger.SendMsuMessageAsync(
                                     "GPG - WEBSITE CERTIFICATE EXPIRING",
                                     $"The website certificate for '{_sharedOptions.WEBSITE_HOSTNAME}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.").ConfigureAwait(false);
                         }
@@ -54,7 +54,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed webjob ({nameof(CheckSiteCertAsync)}):{ex.Message}:{ex.GetDetailsText()}";
 
                 //Send Email to GEO reporting errors
-                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendMsuMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }

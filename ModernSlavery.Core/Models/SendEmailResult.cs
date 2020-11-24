@@ -1,4 +1,4 @@
-﻿namespace ModernSlavery.Infrastructure.Messaging
+﻿namespace ModernSlavery.Core.Models
 {
     public class SendEmailResult
     {

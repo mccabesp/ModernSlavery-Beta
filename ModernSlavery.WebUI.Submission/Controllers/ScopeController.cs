@@ -50,12 +50,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             var model = currentStateModel?.EnterCodes ?? new EnterCodesViewModel();
 
             // when spamlocked then return a CustomError view
-            var remainingTime =
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
+            {
+                var remainingTime =
                 await GetRetryLockRemainingTimeAsync("lastScopeCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
-            if (remainingTime > TimeSpan.Zero)
-                return View("CustomError",
-                    WebService.ErrorViewModelFactory.Create(1125,
-                        new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+                if (remainingTime > TimeSpan.Zero)
+                    return View("CustomError",
+                        WebService.ErrorViewModelFactory.Create(1125,
+                            new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+            }
 
             PendingFasttrackCodes = null;
 
@@ -73,12 +76,15 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return RedirectToActionArea("Home", "Admin", "Admin");
 
             // When Spamlocked then return a CustomError view
-            var remainingTime =
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
+            {
+                var remainingTime =
                 await GetRetryLockRemainingTimeAsync("lastScopeCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
-            if (remainingTime > TimeSpan.Zero)
-                return View("CustomError",
-                    WebService.ErrorViewModelFactory.Create(1125,
-                        new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+                if (remainingTime > TimeSpan.Zero)
+                    return View("CustomError",
+                        WebService.ErrorViewModelFactory.Create(1125,
+                            new { remainingTime = remainingTime.ToFriendly(maxParts: 2) }));
+            }
 
             // the following fields are validatable at this stage
             ModelState.Include(
@@ -97,7 +103,9 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             if (stateModel == null)
             {
-                await IncrementRetryCountAsync("lastScopeCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
+                if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
+                    await IncrementRetryCountAsync("lastScopeCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
+
                 ModelState.AddModelError(3027);
                 this.SetModelCustomErrors<EnterCodesViewModel>();
                 return View("EnterCodes", model);
@@ -105,7 +113,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
 
             //Clear the retry locks
-            await ClearRetryLocksAsync("lastScopeCode");
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection) 
+                await ClearRetryLocksAsync("lastScopeCode");
 
             // set the back link
             stateModel.StartUrl = Url.ActionArea("OutOfScope", "Scope", "Submission");

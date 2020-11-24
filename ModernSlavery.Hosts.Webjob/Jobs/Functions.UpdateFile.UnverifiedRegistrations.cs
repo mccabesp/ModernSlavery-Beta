@@ -38,7 +38,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var message = $"Failed {nameof(UpdateUnverifiedRegistrations)}:{ex.Message}";
 
                 //Send Email to GEO reporting errors
-                await _messenger.SendGeoMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
+                await _messenger.SendMsuMessageAsync("GPG - WEBJOBS ERROR", message).ConfigureAwait(false);
                 //Rethrow the error
                 throw;
             }

@@ -85,24 +85,17 @@ namespace ModernSlavery.WebUI.Account.ViewServices
                     }
                 });
 
-            if (!userToRetire.EmailAddress.StartsWithI(_sharedBusinessLogic.TestOptions.TestPrefix))
-            {
-                // Create the close account notification to user
-                var sendEmails = new List<Task>();
-                var testEmail = !_sharedBusinessLogic.SharedOptions.IsProduction();
-                sendEmails.Add(
-                    SendEmailService.SendAccountClosedNotificationAsync(userToRetire.EmailAddress, testEmail));
+            // Create the close account notification to user
+            var sendEmails = new List<Task>();
+            sendEmails.Add(
+                SendEmailService.SendAccountClosedNotificationAsync(userToRetire.EmailAddress));
 
-                //Create the notification to GEO for each newly orphaned organisation
-                userOrgs.Where(org => _organisationBusinessLogic.GetOrganisationIsOrphan(org))
-                    .ForEach(org =>
-                        sendEmails.Add(
-                            SendEmailService.SendGEOOrphanOrganisationNotificationAsync(org.OrganisationName,
-                                testEmail)));
+            //Create the notification to GEO for each newly orphaned organisation
+            userOrgs.Where(org => _organisationBusinessLogic.GetOrganisationIsOrphan(org))
+                .ForEach(org => sendEmails.Add(SendEmailService.SendMsuOrphanOrganisationNotificationAsync(org.OrganisationName)));
 
-                //Send all the notifications in parallel
-                await Task.WhenAll(sendEmails);
-            }
+            //Send all the notifications in parallel
+            await Task.WhenAll(sendEmails);
 
             return errorState;
         }

@@ -141,17 +141,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     userToUnregister.Fullname);
 
             // Send the notification to GEO for each newly orphaned organisation
-            if (!userToUnregister.EmailAddress.StartsWithI(SharedBusinessLogic.TestOptions.TestPrefix))
-            {
-                var sendEmails = new List<Task>();
-                var testEmail = !SharedBusinessLogic.SharedOptions.IsProduction();
-                if (_registrationService.OrganisationBusinessLogic.GetOrganisationIsOrphan(orgToRemove))
-                    sendEmails.Add(
-                        SharedBusinessLogic.SendEmailService.SendGEOOrphanOrganisationNotificationAsync(
-                            orgToRemove.OrganisationName, testEmail));
+            var sendEmails = new List<Task>();
+            var testEmail = !SharedBusinessLogic.SharedOptions.IsProduction();
+            if (_registrationService.OrganisationBusinessLogic.GetOrganisationIsOrphan(orgToRemove))
+                sendEmails.Add(
+                    SharedBusinessLogic.SendEmailService.SendMsuOrphanOrganisationNotificationAsync(orgToRemove.OrganisationName));
 
-                await Task.WhenAll(sendEmails);
-            }
+            await Task.WhenAll(sendEmails);
 
             //Make sure this organisation is no longer selected
             if (ReportingOrganisationId == organisationId) ReportingOrganisationId = 0;

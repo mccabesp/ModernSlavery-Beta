@@ -42,8 +42,6 @@ namespace ModernSlavery.Infrastructure.Logging
             var logUser = logUserOrg.User;
             var logAddress = logUserOrg.Address;
 
-            if (logUser.EmailAddress.StartsWithI(TestOptions.TestPrefix)) return;
-
             await WriteAsync(
                 new RegisterLogModel
                 {
