@@ -1,7 +1,7 @@
 ﻿using ModernSlavery.Core.Attributes;
 using ModernSlavery.Core.Options;
 
-namespace ModernSlavery.Infrastructure.Messaging
+namespace ModernSlavery.Infrastructure.Messaging.GovNotify
 {
     [Options("Email:Providers:GovNotify")]
     public class GovNotifyOptions : IOptions

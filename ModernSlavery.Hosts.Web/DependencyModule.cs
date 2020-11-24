@@ -21,7 +21,6 @@ using ModernSlavery.Core.Options;
 using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
-using ModernSlavery.Infrastructure.Messaging;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Telemetry;
 using ModernSlavery.WebAPI.Public.Classes;
@@ -179,8 +178,6 @@ namespace ModernSlavery.Hosts.Web
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
-
             //Register the user audit log repository
             builder.RegisterType<UserRepository>().As<IUserRepository>().InstancePerLifetimeScope();
 
@@ -292,6 +289,9 @@ namespace ModernSlavery.Hosts.Web
 
             //Register the Companies House dependencies
             modules.AddDependency<Infrastructure.CompaniesHouse.DependencyModule>();
+
+            //Register the Gov Notify dependencies
+            modules.AddDependency<Infrastructure.Messaging.GovNotify.DependencyModule>();
         }
     }
 }

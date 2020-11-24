@@ -110,6 +110,7 @@
     <ContextParameter Name="SigninUrl" Value="{{WebServer}}/manage-organisations" />
   </ContextParameters>
   <WebTestPlugins>
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.ResolveParameterPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="ResolveParameterPlugIn" Description="" />
     <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.RelativePathPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="RelativePathPlugIn" Description="" />
     <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.CookieManagerPlugin, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="CookieManagerPlugin" Description="">
       <RuleParameters>

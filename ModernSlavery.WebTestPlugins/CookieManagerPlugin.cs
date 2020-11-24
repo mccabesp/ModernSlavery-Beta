@@ -7,8 +7,6 @@ namespace ModernSlavery.WebTestPlugins
 {
     public class CookieManagerPlugin : WebTestPlugin
     {
-        public string ContextParamTarget { get; set; }
-
         public override void PreWebTest(object sender, PreWebTestEventArgs e)
         {
             if (!e.WebTest.Context.ContainsKey("IsNewContext"))

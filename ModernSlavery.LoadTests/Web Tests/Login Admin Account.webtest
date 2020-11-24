@@ -1,13 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <WebTest Name="Login Admin Account" Id="835c8061-0878-4427-ba1f-deadd395ba75" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="" ResultsLocale="">
   <Items>
-    <IncludedWebTest Name="Login" Path="login.webtest" Id="483ed062-6ecc-49b3-9e36-5800b8679530" IsCodedWebTest="False" InheritWebTestSettings="False" />
+    <IncludedWebTest Name="Login" Path="login.webtest" Id="483ed062-6ecc-49b3-9e36-5800b8679530" IsCodedWebTest="False" InheritWebTestSettings="True" />
   </Items>
   <ContextParameters>
     <ContextParameter Name="RandomAdminEmail" Value="TISCTEST-{{RandomGuid}}@cadenceinnova.com" />
     <ContextParameter Name="SigninUrl" Value="{{WebServer}}/admin" />
   </ContextParameters>
   <WebTestPlugins>
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.ResolveParameterPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="ResolveParameterPlugIn" Description="" />
     <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.OverrideParameterPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="OverrideParameterPlugIn" Description="">
       <RuleParameters>
         <RuleParameter Name="ContextParam" Value="RandomEmail" />

@@ -25,7 +25,7 @@
       </ExtractionRules>
       <FormPostHttpBody>
         <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDENTest1.__RequestVerificationToken}}" RecordedValue="GDHxfs87EKdZL6fnhXYpsJaFEW5juRYx19Cb60McZT9uIj6cO04eGgbZYOFttHdcDAF8JzoUb0MzQl3YpRhqBi1thz01" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="SpamProtectionTimeStamp" Value="{{$HIDDENTest1.SpamProtectionTimeStamp}}" RecordedValue="===B8ypX4tHIEniyaEg/YSm1c6FdXWNAzXu6zzvGh7cU3k====" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="BotProtectionTimeStamp" Value="{{$HIDDENTest1.BotProtectionTimeStamp}}" RecordedValue="===B8ypX4tHIEniyaEg/YSm1c6FdXWNAzXu6zzvGh7cU3k====" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="OutOfScope" Value="{{$HIDDENTest1.OutOfScope}}" RecordedValue="True" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="EmployerReference" Value="C3867930-A0BC-4A5C-B597-1DE96E86B478" RecordedValue="C3867930-A0BC-4A5C-B597-1DE96E86B478" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="SecurityToken" Value="C3867930-A0BC-4A5C-B597-1DE96E86B478" RecordedValue="C3867930-A0BC-4A5C-B597-1DE96E86B478" CorrelationBinding="" UrlEncode="True" />

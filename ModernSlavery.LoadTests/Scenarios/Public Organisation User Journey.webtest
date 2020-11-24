@@ -3,7 +3,11 @@
   <Items>
     <IncludedWebTest Name="Create User Account" Path="..\web tests\create user account.webtest" Id="4023c953-f79e-46ed-8182-ce311bb60956" IsCodedWebTest="False" InheritWebTestSettings="True" />
     <IncludedWebTest Name="Register Public Organisation" Path="..\web tests\register public organisation.webtest" Id="7452106f-b520-4696-aa92-2f83a35c543d" IsCodedWebTest="False" InheritWebTestSettings="True" />
-    <IncludedWebTest Name="Logout" Path="..\web tests\logout.webtest" Id="ad2a6722-4678-41fc-848f-18dc51ef1346" IsCodedWebTest="False" InheritWebTestSettings="True" />
+    <IncludedWebTest Name="Logout" Path="..\web tests\logout.webtest" Id="ad2a6722-4678-41fc-848f-18dc51ef1346" IsCodedWebTest="False" InheritWebTestSettings="False" />
+    <IncludedWebTest Name="ApproveOrganisation" Path="..\web tests\approveorganisation.webtest" Id="96edfbeb-5095-4988-8dc8-6a97f84645d9" IsCodedWebTest="False" InheritWebTestSettings="True" />
+    <IncludedWebTest Name="Login" Path="..\web tests\login.webtest" Id="483ed062-6ecc-49b3-9e36-5800b8679530" IsCodedWebTest="False" InheritWebTestSettings="True" />
+    <IncludedWebTest Name="SubmitStatement" Path="..\web tests\submitstatement.webtest" Id="e291433d-34ee-4484-b97b-6ba49b9f58d0" IsCodedWebTest="False" InheritWebTestSettings="True" />
+    <IncludedWebTest Name="Logout" Path="..\web tests\logout.webtest" Id="ad2a6722-4678-41fc-848f-18dc51ef1346" IsCodedWebTest="False" InheritWebTestSettings="False" />
   </Items>
   <ContextParameters>
     <ContextParameter Name="DeleteAccount" Value="1" />
@@ -25,5 +29,6 @@
       </RuleParameters>
     </WebTestPlugin>
     <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.ResolveParameterPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="ResolveParameterPlugIn" Description="" />
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.RelativePathPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="RelativePathPlugIn" Description="" />
   </WebTestPlugins>
 </WebTest>

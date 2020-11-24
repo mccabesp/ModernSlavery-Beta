@@ -14,7 +14,7 @@ using Notify.Interfaces;
 using Polly;
 using Polly.Extensions.Http;
 
-namespace ModernSlavery.Infrastructure.Messaging
+namespace ModernSlavery.Infrastructure.Messaging.GovNotify
 {
     public class GovNotifyEmailProvider : BaseEmailProvider
     {
@@ -25,14 +25,14 @@ namespace ModernSlavery.Infrastructure.Messaging
             IEmailTemplateRepository emailTemplateRepo,
             TestOptions testOptions,
             ILogger<GovNotifyEmailProvider> logger,
-            [KeyFilter(Filenames.EmailSendLog)] IAuditLogger emailSendLog): base(testOptions, emailTemplateRepo, logger, emailSendLog)
+            [KeyFilter(Filenames.EmailSendLog)] IAuditLogger emailSendLog) : base(testOptions, emailTemplateRepo, logger, emailSendLog)
         {
             _govNotifyAPI = govNotifyAPI;
         }
 
         public override async Task<SendEmailResult> SendEmailAsync<TTemplate>(string emailAddress, string templateId, TTemplate parameters)
         {
-            var sendRequest = new SendEmailRequest {EmailAddress = emailAddress, TemplateId = templateId, Personalisation = parameters.GetPropertiesDictionary() };
+            var sendRequest = new SendEmailRequest { EmailAddress = emailAddress, TemplateId = templateId, Personalisation = parameters.GetPropertiesDictionary() };
 
             // send email
             var response = await _govNotifyAPI.SendEmailAsync(sendRequest);

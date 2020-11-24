@@ -12,20 +12,23 @@ namespace ModernSlavery.WebTestPlugins
         public string TargetParam { get; set; }
         public bool NoRestore { get; set; }
 
-        private object OldValue=null;
+        private Stack<object> stack = new Stack<object>();
 
         public override void PreWebTest(object sender, PreWebTestEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(SourceParam) || string.IsNullOrWhiteSpace(TargetParam)) return;
-            OldValue=e.WebTest.Context.ContainsKey(TargetParam) ? e.WebTest.Context[TargetParam] : null;
+            var oldValue = e.WebTest.Context.ContainsKey(TargetParam) ? e.WebTest.Context[TargetParam] : null;
+            stack.Push(oldValue);
             if (e.WebTest.Context.ContainsKey(SourceParam))
                 e.WebTest.Context[TargetParam] = e.WebTest.Context[SourceParam];
         }
 
         public override void PostWebTest(object sender, PostWebTestEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(SourceParam) || string.IsNullOrWhiteSpace(TargetParam)) return;
+            var oldValue = stack.Pop();
             if (NoRestore || string.IsNullOrWhiteSpace(SourceParam) || string.IsNullOrWhiteSpace(TargetParam)) return;
-            e.WebTest.Context[TargetParam] = OldValue;
+            e.WebTest.Context[TargetParam] = oldValue;
         }
     }
 }

@@ -40,7 +40,7 @@
       </CorrelationExtractionRules>
       <FormPostHttpBody>
         <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="-Fy-eHOmQx9veVp6ciluISDgZI1tAg11V4vhXAOg9dbZL8IaDn6ZWlIYAP62shX7v8zr2TpDiY9hAHO3wmCNE0jr7ZQ1" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="SpamProtectionTimeStamp" Value="{{$HIDDEN1.SpamProtectionTimeStamp}}" RecordedValue="===78/LRZXsdPOWDq+lISjW/70c6Zdw8dVW8cVOdHrtlGw====" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="BotProtectionTimeStamp" Value="{{$HIDDEN1.BotProtectionTimeStamp}}" RecordedValue="===78/LRZXsdPOWDq+lISjW/70c6Zdw8dVW8cVOdHrtlGw====" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="EmailAddress" Value="{{RandomEmail}}" RecordedValue="msutest123@domain.co.uk" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="ConfirmEmailAddress" Value="{{RandomEmail}}" RecordedValue="msutest123@domain.co.uk" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="FirstName" Value="{{RandomFirstName}}" RecordedValue="msutest" CorrelationBinding="" UrlEncode="True" />

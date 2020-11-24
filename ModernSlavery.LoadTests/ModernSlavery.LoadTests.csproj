@@ -89,13 +89,7 @@
     <None Include="Web Tests\Register Public Organisation.webtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Web Tests\Reset Password.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Web Tests\Logout.webtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Web Tests\Create Draft Statement.webtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Web Tests\Register Private Organisation.webtest">

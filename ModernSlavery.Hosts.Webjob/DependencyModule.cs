@@ -24,6 +24,7 @@ using System.Net.Http;
 using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Logging;
+using ModernSlavery.Infrastructure.Messaging.GovNotify;
 
 namespace ModernSlavery.Hosts.Webjob
 {
@@ -45,14 +46,6 @@ namespace ModernSlavery.Hosts.Webjob
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpClient<GovNotifyAPI>(nameof(GovNotifyAPI),
-                httpClient =>
-                {
-                    GovNotifyAPI.SetupHttpClient(httpClient, _govNotifyOptions.ApiServer);
-                })
-                .SetHandlerLifetime(TimeSpan.FromMinutes(10))
-                .AddPolicyHandler(GovNotifyAPI.GetRetryPolicy());
-
             services.AddSingleton<IJobActivator, AutofacJobActivator>();
 
             //Register the AutoMapper configurations in all domain assemblies
@@ -69,7 +62,6 @@ namespace ModernSlavery.Hosts.Webjob
 
             //Register the messaging dependencies
             builder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
-            builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>().SingleInstance();
 
             // Register the email template dependencies
             builder.RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates")))
@@ -82,10 +74,7 @@ namespace ModernSlavery.Hosts.Webjob
             // Register email provider dependencies
             builder.RegisterType<GovNotifyEmailProvider>()
                 .SingleInstance()
-                .WithAttributeFiltering()
-                .WithParameter(
-                    (p, ctx) => p.ParameterType == typeof(HttpClient),
-                    (p, ctx) => ctx.Resolve<IHttpClientFactory>().CreateClient(nameof(GovNotifyEmailProvider)));
+                .WithAttributeFiltering();
 
             builder.RegisterType<SmtpEmailProvider>().SingleInstance().WithAttributeFiltering();
             builder.RegisterType<EmailProvider>().SingleInstance().WithAttributeFiltering();
@@ -182,6 +171,9 @@ namespace ModernSlavery.Hosts.Webjob
             
             //Register the Companies House dependencies
             modules.AddDependency<Infrastructure.CompaniesHouse.DependencyModule>();
+
+            //Register the Gov Notify dependencies
+            modules.AddDependency<Infrastructure.Messaging.GovNotify.DependencyModule>();
         }
 
         public class AutofacJobActivator : IJobActivator

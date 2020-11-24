@@ -13,7 +13,7 @@ using Notify.Interfaces;
 using Polly;
 using Polly.Extensions.Http;
 
-namespace ModernSlavery.Infrastructure.Messaging
+namespace ModernSlavery.Infrastructure.Messaging.GovNotify
 {
     public class GovNotifyAPI : IGovNotifyAPI
     {
@@ -83,7 +83,7 @@ namespace ModernSlavery.Infrastructure.Messaging
             try
             {
                 var response = await _govNotifyClient.SendLetterAsync(templateId, personalisation, clientReference);
-                return response != null ? new SendLetterResponse {LetterId = response.id} : throw new NotifyClientException("No response returned");
+                return response != null ? new SendLetterResponse { LetterId = response.id } : throw new NotifyClientException("No response returned");
             }
             catch (NotifyClientException e)
             {
@@ -122,16 +122,11 @@ namespace ModernSlavery.Infrastructure.Messaging
             ServicePointManager.FindServicePoint(httpClient.BaseAddress).ConnectionLeaseTimeout = 60 * 1000;
         }
 
-        public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+        public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(bool linear)
         {
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .WaitAndRetryAsync(
-                    3,
-                    retryAttempt =>
-                        TimeSpan.FromMilliseconds(new Random().Next(1, 1000)) +
-                        TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+            return linear
+                    ? HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromMilliseconds(new Random().Next(100, 500)))
+                    : HttpPolicyExtensions.HandleTransientHttpError().WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromMilliseconds(new Random().Next(100, 1000)) + TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
         }
-
     }
 }

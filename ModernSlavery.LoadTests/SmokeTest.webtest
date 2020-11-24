@@ -54,7 +54,7 @@
       </CorrelationExtractionRules>
       <FormPostHttpBody>
         <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="-Fy-eHOmQx9veVp6ciluISDgZI1tAg11V4vhXAOg9dbZL8IaDn6ZWlIYAP62shX7v8zr2TpDiY9hAHO3wmCNE0jr7ZQ1" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="SpamProtectionTimeStamp" Value="{{$HIDDEN1.SpamProtectionTimeStamp}}" RecordedValue="===78/LRZXsdPOWDq+lISjW/70c6Zdw8dVW8cVOdHrtlGw====" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="BotProtectionTimeStamp" Value="{{$HIDDEN1.BotProtectionTimeStamp}}" RecordedValue="===78/LRZXsdPOWDq+lISjW/70c6Zdw8dVW8cVOdHrtlGw====" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="EmailAddress" Value="{{RandomEmail}}" RecordedValue="msutest123@domain.co.uk" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="ConfirmEmailAddress" Value="{{RandomEmail}}" RecordedValue="msutest123@domain.co.uk" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="FirstName" Value="TISCTEST-{{RandomGuid}}_First" RecordedValue="msutest" CorrelationBinding="" UrlEncode="True" />
@@ -554,7 +554,7 @@
       </ExtractionRules>
       <FormPostHttpBody>
         <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="3coP49Mn6UYnd60etnIyvAOvX_BdZCd9soVnngXmU1mfzkuPHUPOou8jVvfCm7PsAyiNate2ggh7pvPfkc1qMxptH6o1" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="SpamProtectionTimeStamp" Value="{{$HIDDEN1.SpamProtectionTimeStamp}}" RecordedValue="===W5/WZR3zjVAfcy0sWEPHRDIZGyNropqZdfuHCIMqOsA====" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="BotProtectionTimeStamp" Value="{{$HIDDEN1.BotProtectionTimeStamp}}" RecordedValue="===W5/WZR3zjVAfcy0sWEPHRDIZGyNropqZdfuHCIMqOsA====" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="EmailAddress" Value="{{Username}}" RecordedValue="msutest381f61b429364ecb9d0ce52cd3beaf83@domain.co.uk" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="ConfirmEmailAddress" Value="{{Username}}" RecordedValue="msutest381f61b429364ecb9d0ce52cd3beaf83@domain.co.uk" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
@@ -581,7 +581,7 @@
       </Headers>
       <FormPostHttpBody>
         <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="W7a7tiaETMPio30_GEijm4jWSy0nVhfgCIm1cMFBpRSwnhyOXBSs-uQw-CjB8q_Sjpot0K5Ciihguwz3g9DVPrJUMqA1" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="SpamProtectionTimeStamp" Value="{{$HIDDEN1.SpamProtectionTimeStamp}}" RecordedValue="===0GhSNmOztqZGjrwUk+byel9UdwOlep5eIoW4sTXDtvQ====" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="BotProtectionTimeStamp" Value="{{$HIDDEN1.BotProtectionTimeStamp}}" RecordedValue="===0GhSNmOztqZGjrwUk+byel9UdwOlep5eIoW4sTXDtvQ====" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="Password" Value="{{Password}}" RecordedValue="Testing123" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="ConfirmPassword" Value="{{Password}}" RecordedValue="Testing123" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>

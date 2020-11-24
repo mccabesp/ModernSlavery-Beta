@@ -13,7 +13,7 @@ namespace ModernSlavery.WebTestPlugins
         public override void PreRequest(object sender, PreRequestEventArgs e)
         {
             var lastUrl= e.WebTest.Context.ContainsKey("LastUrl") ? e.WebTest.Context["LastUrl"] as Uri : null;
-            if (!e.Request.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase) && lastUrl != null)
+            if (e.Request.Url.StartsWith("/") && lastUrl != null)
                 e.Request.Url = $"{lastUrl.Scheme}://{lastUrl.Authority}{e.Request.Url}";
         }
 

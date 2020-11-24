@@ -76,7 +76,7 @@
       </ValidationRules>
       <FormPostHttpBody>
         <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDENTest1.__RequestVerificationToken}}" RecordedValue="rVhprFAbOHesetcbveRx7CvTsqCYj_47-r_nbtxNSgFDxO0ElzoPd68-MbIbaiHgVUpQ11Cw0jfio8Wl_MFydFzhFHY1" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="SpamProtectionTimeStamp" Value="{{$HIDDENTest1.SpamProtectionTimeStamp}}" RecordedValue="===oKLdlkqTVbDQPwAW2IWLO233e8lIkSgQv4Cln6aRrA4====" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="BotProtectionTimeStamp" Value="{{$HIDDENTest1.BotProtectionTimeStamp}}" RecordedValue="===oKLdlkqTVbDQPwAW2IWLO233e8lIkSgQv4Cln6aRrA4====" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="EmployerReference" Value="C3867930-A0BC-4A5C-B597-1DE96E86B478" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="SecurityToken" Value="591FEC8F-3DD6-43E3-8742-7F4845D5D21F" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
         <FormPostParameter Name="OutOfScope" Value="True" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
