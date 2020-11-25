@@ -100,11 +100,11 @@ namespace ModernSlavery.WebUI.Viewing.Models
         #endregion
 
         #region Turnover Fields
-        public StatementTurnoverRanges? Turnover;
+        public StatementTurnoverRanges Turnover { get; set; }
         #endregion
 
         #region Statement Years Fields
-        public StatementYearRanges? StatementYears { get; set; }
+        public StatementYearRanges StatementYears { get; set; }
         #endregion
 
         #region Statement Summary Fields

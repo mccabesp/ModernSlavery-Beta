@@ -255,7 +255,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
                 OtherSectors = submittedStatement?.OtherSectors,
 
                 Turnover = submittedStatement==null ? null : _autoMapper.Map<OrganisationSearchModel.KeyName>(submittedStatement.Turnover),
-                StatementYears = submittedStatement==null ? null : _autoMapper.Map<OrganisationSearchModel.KeyName>(submittedStatement.StatementYears),
+                StatementYears = submittedStatement == null ? null : _autoMapper.Map<OrganisationSearchModel.KeyName>(submittedStatement.StatementYears),
 
                 Summary = submittedStatement == null ? null : _autoMapper.Map<OrganisationSearchModel.SummarySearchModel>(submittedStatement.Summary),
 

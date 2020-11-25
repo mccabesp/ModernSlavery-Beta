@@ -130,8 +130,11 @@ namespace ModernSlavery.Core.Models
             {
                 public AutoMapperProfile() : base()
                 {
+                    CreateMap<KeyName, SectorTypes>().ConvertUsing(s => s == null ? default : (SectorTypes)s.Key);
                     CreateMap<KeyName, SectorTypes?>().ConvertUsing(s => s == null ? (SectorTypes?)null : (SectorTypes)s.Key);
+                    CreateMap<KeyName, StatementTurnoverRanges>().ConvertUsing(s => s == null ? default : (StatementTurnoverRanges)s.Key);
                     CreateMap<KeyName, StatementTurnoverRanges?>().ConvertUsing(s => s == null ? (StatementTurnoverRanges?)null : (StatementTurnoverRanges)s.Key);
+                    CreateMap<KeyName, StatementYearRanges>().ConvertUsing(s => s == null ? default: (StatementYearRanges)s.Key);
                     CreateMap<KeyName, StatementYearRanges?>().ConvertUsing(s => s == null ? (StatementYearRanges?)null : (StatementYearRanges)s.Key);
                     CreateMap<KeyName, SectorTypeIndex.SectorType>().ConvertUsing<SectorConverter>();
 
@@ -147,9 +150,9 @@ namespace ModernSlavery.Core.Models
                     CreateMap<KeyName, IndicatorTypes>().ConvertUsing(s => s == null ? IndicatorTypes.Unknown : (IndicatorTypes)s.Key);
                     CreateMap<KeyName, RemediationTypes>().ConvertUsing(s => s == null ? RemediationTypes.Unknown : (RemediationTypes)s.Key);
 
-                    CreateMap<SectorTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<StatementTurnoverRanges, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<StatementYearRanges, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<SectorTypes, KeyName>().ConvertUsing(s => s==default ? null :  new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<StatementTurnoverRanges, KeyName>().ConvertUsing(s => s == default ? null: new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<StatementYearRanges, KeyName>().ConvertUsing(s => s == default ? null: new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<SectorTypeIndex.SectorType, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s.Id, Name = s.Description });
 
                     CreateMap<PolicyTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
@@ -157,7 +160,7 @@ namespace ModernSlavery.Core.Models
                     CreateMap<PartnerTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<SocialAuditTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<GrievanceMechanismTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<RiskSourceTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<RiskSourceTypes, KeyName>().ConvertUsing(s => s == default ? null : new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<SupplyChainTierTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<RiskTargetTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<CountryTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });

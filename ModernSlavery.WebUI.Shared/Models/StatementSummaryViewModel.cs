@@ -85,7 +85,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         #endregion
 
         #region Group Organisation Fields
-        public bool GroupSubmission { get; set; }
+        public bool? GroupSubmission { get; set; }
         public string ParentName { get; set; }
         public string ChildOrganisationId { get; set; }
         #endregion
