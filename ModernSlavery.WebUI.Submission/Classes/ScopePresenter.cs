@@ -13,7 +13,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
     public interface IScopePresenter
     {
         // inteface
-        ScopingViewModel CreateScopingViewModel(Organisation org, User currentUser, int reportingYear);
+        Task<ScopingViewModel> CreateScopingViewModelAsync(Organisation org, User currentUser, int reportingYear);
         Task<ScopingViewModel> CreateScopingViewModelAsync(EnterCodesViewModel enterCodes, User currentUser);
         Task SaveScopesAsync(ScopingViewModel model, IEnumerable<int> years);
         Task SavePresumedScopeAsync(ScopingViewModel model, int reportingStartYear);
@@ -49,7 +49,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             var org = await _organisationBusinessLogic.GetOrganisationByOrganisationReferenceAndSecurityCodeAsync(enterCodes.OrganisationReference, enterCodes.SecurityToken);
             if (org == null) return null;
 
-            var scope = CreateScopingViewModel(org, currentUser, _sharedBusinessLogic.ReportingDeadlineHelper.CurrentSnapshotYear);
+            var scope = await CreateScopingViewModelAsync(org, currentUser, _sharedBusinessLogic.ReportingDeadlineHelper.CurrentSnapshotYear);
             //TODO: clarify if we should be showing this security token when navigate back to page or if it's a security issue?
             scope.EnterCodes.SecurityToken = org.SecurityCode;
             scope.IsSecurityCodeExpired = org.HasSecurityCodeExpired();
@@ -57,7 +57,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             return scope;
         }
 
-        public virtual ScopingViewModel CreateScopingViewModel(Organisation org, User currentUser, int reportingYear)
+        public virtual async Task<ScopingViewModel> CreateScopingViewModelAsync(Organisation org, User currentUser, int reportingYear)
         {
             if (org == null) throw new ArgumentNullException(nameof(org));
 
@@ -72,7 +72,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
             model.EnterCodes.OrganisationReference = org.OrganisationReference;
 
             // get the scope info for this year
-            var scope = ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org, model.DeadlineDate);
+            var scope = await ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org, model.DeadlineDate);
             if (scope != null)
                 model.ThisScope = new ScopeViewModel
                 {
@@ -84,7 +84,7 @@ namespace ModernSlavery.WebUI.Submission.Classes
                 };
 
             // get the scope info for last year
-            scope = ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org, model.DeadlineDate);
+            scope = await ScopeBusinessLogic.GetScopeByReportingDeadlineOrLatestAsync(org, model.DeadlineDate);
             if (scope != null)
                 model.LastScope = new ScopeViewModel
                 {

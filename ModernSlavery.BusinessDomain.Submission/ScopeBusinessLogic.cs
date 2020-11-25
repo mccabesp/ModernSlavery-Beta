@@ -33,6 +33,25 @@ namespace ModernSlavery.BusinessDomain.Submission
             return await _dataRepository.GetAsync<OrganisationScope>(organisationScopeId);
         }
 
+        #region GetScopeByReportingDeadlineYearOrLatest
+
+        public virtual async Task<OrganisationScope> GetScopeByReportingDeadlineYearOrLatestAsync(long organisationId, int reportingDeadlineYear = 0)
+        {
+            var org = await _dataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == organisationId);
+            if (org == null) throw new ArgumentException($"Cannot find organisation with id {organisationId}", nameof(organisationId));
+
+            return await GetScopeByReportingDeadlineYearOrLatestAsync(org, reportingDeadlineYear);
+        }
+
+        public virtual async Task<OrganisationScope> GetScopeByReportingDeadlineYearOrLatestAsync(Organisation organisation, int reportingDeadlineYear = 0)
+        {
+            var reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(organisation.SectorType, reportingDeadlineYear);
+
+            return await GetScopeByReportingDeadlineOrLatestAsync(organisation,reportingDeadline);
+        }
+
+        #endregion
+
         #region GetScopeByReportingDeadlineOrLatest
 
         public virtual async Task<OrganisationScope> GetScopeByReportingDeadlineOrLatestAsync(long organisationId, DateTime? reportingDeadline = null)
@@ -40,10 +59,10 @@ namespace ModernSlavery.BusinessDomain.Submission
             var org = await _dataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == organisationId);
             if (org == null) throw new ArgumentException($"Cannot find organisation with id {organisationId}", nameof(organisationId));
 
-            return GetScopeByReportingDeadlineOrLatestAsync(org, reportingDeadline);
+            return await GetScopeByReportingDeadlineOrLatestAsync(org, reportingDeadline);
         }
 
-        public virtual OrganisationScope GetScopeByReportingDeadlineOrLatestAsync(Organisation organisation, DateTime? reportingDeadline = null)
+        public virtual async Task<OrganisationScope> GetScopeByReportingDeadlineOrLatestAsync(Organisation organisation, DateTime? reportingDeadline = null)
         {
             if (reportingDeadline == null) reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(organisation.SectorType);
 
@@ -63,9 +82,9 @@ namespace ModernSlavery.BusinessDomain.Submission
             return latestScope.ScopeStatus;
         }
 
-        public virtual ScopeStatuses GetScopeStatusByReportingDeadlineOrLatestAsync(Organisation org, DateTime? reportingDeadline = null)
+        public virtual async Task<ScopeStatuses> GetScopeStatusByReportingDeadlineOrLatestAsync(Organisation org, DateTime? reportingDeadline = null)
         {
-            var latestScope = GetScopeByReportingDeadlineOrLatestAsync(org, reportingDeadline);
+            var latestScope = await GetScopeByReportingDeadlineOrLatestAsync(org, reportingDeadline);
             if (latestScope == null) return ScopeStatuses.Unknown;
 
             return latestScope.ScopeStatus;

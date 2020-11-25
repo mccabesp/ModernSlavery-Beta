@@ -574,7 +574,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     $"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
 
             // Generate the scope state model
-            var stateModel = ScopePresentation.CreateScopingViewModel(userOrg.Organisation, CurrentUser, reportingDeadlineYear);
+            var stateModel = await ScopePresentation.CreateScopingViewModelAsync(userOrg.Organisation, CurrentUser, reportingDeadlineYear);
 
             // Get the latest scope for the reporting year
             var latestScope = stateModel.ThisScope?.DeadlineDate.Year == reportingDeadlineYear ? stateModel.ThisScope :

@@ -17,6 +17,23 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// </summary>
         /// <param name="organisationId"></param>
         /// <param name="reportingDeadline"></param>
+        Task<OrganisationScope> GetScopeByReportingDeadlineYearOrLatestAsync(long organisationId, int reportingDeadlineYear = 0);
+
+
+        /// <summary>
+        ///     Gets the latest scope for the specified organisation or for a specified reporting deadline
+        /// </summary>
+        /// <param name="organisationId"></param>
+        /// <param name="reportingDeadline"></param>
+        Task<OrganisationScope> GetScopeByReportingDeadlineYearOrLatestAsync(Organisation organisation, int reportingDeadlineYear = 0);
+        #endregion
+
+        #region GetScopeByReportingDeadlineOrLatest
+        /// <summary>
+        ///     Gets the latest scope for the specified organisation or for a specified reporting deadline
+        /// </summary>
+        /// <param name="organisationId"></param>
+        /// <param name="reportingDeadline"></param>
         Task<OrganisationScope> GetScopeByReportingDeadlineOrLatestAsync(long organisationId, DateTime? reportingDeadline = null);
 
     
@@ -25,7 +42,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// </summary>
         /// <param name="organisationId"></param>
         /// <param name="reportingDeadline"></param>
-        OrganisationScope GetScopeByReportingDeadlineOrLatestAsync(Organisation organisation, DateTime? reportingDeadline = null);
+        Task<OrganisationScope> GetScopeByReportingDeadlineOrLatestAsync(Organisation organisation, DateTime? reportingDeadline = null);
         #endregion
 
         #region GetScopeStatusByReportingDeadlineOrLatest
@@ -42,7 +59,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="org"></param>
         /// <param name="reportingDeadline"></param>
         /// <returns></returns>
-        ScopeStatuses GetScopeStatusByReportingDeadlineOrLatestAsync(Organisation organisation, DateTime? reportingDeadline = null);
+        Task<ScopeStatuses> GetScopeStatusByReportingDeadlineOrLatestAsync(Organisation organisation, DateTime? reportingDeadline = null);
         #endregion
 
         /// <summary>
