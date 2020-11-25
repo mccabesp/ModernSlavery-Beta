@@ -53,7 +53,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     break;
             }
 
-            log.LogDebug($"Executed {nameof(ExecuteWebjob)}:{command} successfully");
+            log.LogDebug($"Executed Webjob {nameof(ExecuteWebjob)}:{command} successfully");
         }
 
         public async Task ExecuteWebjobPoisonAsync([QueueTrigger(QueueNames.ExecuteWebJob + "-poison")]

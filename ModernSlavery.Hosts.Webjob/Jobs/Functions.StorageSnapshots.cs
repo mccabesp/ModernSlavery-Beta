@@ -25,6 +25,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(TakeSnapshotAsync));
             try
             {
+                var deletedCount = 0;
+
                 var azureStorageConnectionString = _storageOptions.AzureConnectionString;
                 if (azureStorageConnectionString.Equals("UseDevelopmentStorage=true")) return;
 
@@ -39,7 +41,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 //Get the list of snapshots
                 var response = await ListSnapshotsAsync(azureStorageAccount, azureStorageKey, azureStorageShareName).ConfigureAwait(false);
-                var count = 0;
                 if (!string.IsNullOrWhiteSpace(response))
                 {
                     var xml = XElement.Parse(response);
@@ -53,13 +54,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         var date = DateTime.Parse(snapshot);
                         if (date > deadline) continue;
 
-                        await DeleteSnapshotAsync(log, azureStorageAccount, azureStorageKey, azureStorageShareName,
-                            snapshot).ConfigureAwait(false);
-                        count++;
+                        await DeleteSnapshotAsync(log, azureStorageAccount, azureStorageKey, azureStorageShareName,snapshot).ConfigureAwait(false);
+                        deletedCount++;
                     }
                 }
 
-                log.LogDebug($"Executed {nameof(TakeSnapshotAsync)} successfully and deleted {count} stale snapshots");
+                log.LogDebug($"Executed Webjob {nameof(TakeSnapshotAsync)} successfully. Deleted: {deletedCount} stale snapshots");
             }
             catch (Exception ex)
             {
@@ -93,7 +93,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Take the snapshot
                 await TakeSnapshotAsync(azureStorageAccount, azureStorageKey, azureStorageShareName).ConfigureAwait(false);
 
-                log.LogDebug($"Executed {nameof(TakeSnapshotAsync)} successfully");
+                log.LogDebug($"Executed Webjob {nameof(TakeSnapshotAsync)} successfully");
             }
             catch (Exception ex)
             {

@@ -83,7 +83,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             if (!string.IsNullOrWhiteSpace(filepath))
                 await _fileRepository.DeleteFileAsync(filepath).ConfigureAwait(false);
 
-            log.LogDebug($"Executed {nameof(LogEvent)}:{queueMessage} successfully");
+            log.LogDebug($"Executed Webjob {nameof(LogEvent)}:{queueMessage} successfully");
         }
 
         public async Task LogEventPoison([QueueTrigger(QueueNames.LogEvent + "-poison")]
@@ -151,7 +151,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             if (!string.IsNullOrWhiteSpace(filepath))
                 await _fileRepository.DeleteFileAsync(filepath).ConfigureAwait(false);
 
-            log.LogDebug($"Executed {nameof(LogRecord)}:{queueMessage} successfully");
+            log.LogDebug($"Executed Webjob {nameof(LogRecord)}:{queueMessage} successfully");
         }
 
         public async Task LogRecordPoison([QueueTrigger(QueueNames.LogRecord + "-poison")]

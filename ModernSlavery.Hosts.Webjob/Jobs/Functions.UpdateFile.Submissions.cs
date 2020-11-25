@@ -30,7 +30,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 await UpdateSubmissionsAsync(filePath).ConfigureAwait(false);
 
-                log.LogDebug($"Executed {nameof(UpdateSubmissions)}:successfully");
+                log.LogDebug($"Executed Webjob {nameof(UpdateSubmissions)} successfully");
             }
             catch (Exception ex)
             {

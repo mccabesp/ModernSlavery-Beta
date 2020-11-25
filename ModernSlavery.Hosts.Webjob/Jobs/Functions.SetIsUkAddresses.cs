@@ -21,7 +21,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 var addresses = _dataRepository.GetAll<OrganisationAddress>().Where(a => a.IsUkAddress == null);
                 foreach (var org in addresses) await SetIsUkAddressAsync(org);
 
-                log.LogDebug($"Executed {nameof(SetIsUkAddressesAsync)} successfully");
+                log.LogDebug($"Executed Webjob {nameof(SetIsUkAddressesAsync)} successfully");
             }
             catch (Exception ex)
             {

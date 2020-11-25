@@ -18,6 +18,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 await UpdateOrganisationSearchAsync(log).ConfigureAwait(false);
+
+                log.LogDebug($"Executed Webjob {nameof(UpdateOrganisationSearchIndexesAsync)} successfully");
             }
             catch (Exception ex)
             {

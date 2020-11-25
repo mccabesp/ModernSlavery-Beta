@@ -16,7 +16,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             {
                 await UpdateFromCompaniesHouseAsync().ConfigureAwait(false);
 
-                log.LogDebug($"Executed {nameof(UpdateFromCompaniesHouseAsync)} successfully");
+                log.LogDebug($"Executed Webjob {nameof(UpdateFromCompaniesHouseAsync)} successfully");
             }
             catch (Exception ex)
             {

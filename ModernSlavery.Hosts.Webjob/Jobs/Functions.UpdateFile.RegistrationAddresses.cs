@@ -42,7 +42,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 await UpdateRegistrationAddressesAsync(filePath, log).ConfigureAwait(false);
 
-                log.LogDebug($"Executed {funcName}:successfully");
+                log.LogDebug($"Executed Webjob {funcName} successfully");
             }
             catch (Exception ex)
             {

@@ -47,7 +47,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 }
             }
 
-            log.LogDebug($"Executed {nameof(SendEmail)}:{wrapper.Type} successfully");
+            log.LogDebug($"Executed Webjob {nameof(SendEmail)}:{wrapper.Type} successfully");
         }
 
         /// <summary>

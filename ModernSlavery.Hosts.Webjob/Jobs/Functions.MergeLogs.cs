@@ -69,7 +69,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 await Task.WhenAll(actions).ConfigureAwait(false);
 
-                log.LogDebug($"Executed {nameof(MergeLogs)} successfully");
+                log.LogDebug($"Executed Webjob {nameof(MergeLogs)} successfully");
             }
             catch (Exception ex)
             {

@@ -24,6 +24,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(PurgeUsers));
             try
             {
+                var deletedCount=0;
                 var deadline =
                     VirtualDateTime.Now.AddDays(0 - _sharedOptions.PurgeUnverifiedUserDays);
                 var users = await _dataRepository.GetAll<User>()
@@ -50,10 +51,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         null);
                     _dataRepository.Delete(user);
                     await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
+                    deletedCount++;
+                    
                     await _manualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
                 }
 
-                log.LogDebug($"Executed {nameof(PurgeUsers)} successfully");
+                log.LogDebug($"Executed Webjob {nameof(PurgeUsers)} successfully. Deleted: {deletedCount}.");
             }
             catch (Exception ex)
             {
@@ -79,6 +82,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(PurgeRegistrations));
             try
             {
+                var deletedCount = 0;
+
                 var deadline =
                     VirtualDateTime.Now.AddDays(0 - _sharedOptions.PurgeUnconfirmedPinDays);
                 var registrations = await _dataRepository.GetAll<UserOrganisation>()
@@ -108,10 +113,12 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         null);
                     _dataRepository.Delete(registration);
                     await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
+                    deletedCount++;
+                    
                     await _manualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
                 }
 
-                log.LogDebug($"Executed {nameof(PurgeRegistrations)} successfully");
+                log.LogDebug($"Executed Webjob {nameof(PurgeRegistrations)} successfully. Deleted: {deletedCount}.");
             }
             catch (Exception ex)
             {
@@ -139,6 +146,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(PurgeOrganisations));
             try
             {
+                var deletedCount = 0;
+
                 var deadline =
                     VirtualDateTime.Now.AddDays(0 - _sharedOptions.PurgeUnusedOrganisationDays);
                 var orgs = await _dataRepository.GetAll<Organisation>()
@@ -156,7 +165,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 if (orgs.Any())
                 {
-                    var count = 0;
                     foreach (var org in orgs)
                     {
                         var logItem = new ManualChangeLogModel(
@@ -199,8 +207,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                                     _dataRepository.Delete(org);
                                     await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
-
                                     _dataRepository.CommitTransaction();
+                                    deletedCount++;
                                 }
                                 catch (Exception ex)
                                 {
@@ -210,15 +218,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                         $"{nameof(PurgeOrganisations)}: Failed to purge organisation {org.OrganisationId} '{org.OrganisationName}' ERROR: {ex.Message}:{ex.GetDetailsText()}");
                                 }
                             }).ConfigureAwait(false);
+
                         //Remove this organisation from the search index
                         await _organisationSearchRepository.DeleteDocumentsAsync(searchRecords).ConfigureAwait(false);
 
                         await _manualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
-                        count++;
                     }
-
-                    log.LogDebug($"Executed {nameof(PurgeOrganisations)} successfully: {count} deleted");
                 }
+                log.LogDebug($"Executed Webjob {nameof(PurgeOrganisations)} successfully. Deleted: {deletedCount}.");
             }
             catch (Exception ex)
             {
@@ -244,6 +251,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(PurgeStatementData));
             try
             {
+                var deletedCount = 0;
+
                 var deadline =
                     VirtualDateTime.Now.AddDays(0 - _sharedOptions.PurgeRetiredReturnDays);
                 var statements = await _dataRepository.GetAll<Statement>()
@@ -264,10 +273,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                         null);
                     _dataRepository.Delete(statement);
                     await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
+                    deletedCount++;
                     await _manualChangeLog.WriteAsync(logItem).ConfigureAwait(false);
                 }
 
-                log.LogDebug($"Executed {nameof(PurgeStatementData)} successfully");
+                log.LogDebug($"Executed Webjob {nameof(PurgeStatementData)} successfully. Deleted: {deletedCount}.");
             }
             catch (Exception ex)
             {
@@ -282,7 +292,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             {
                 RunningJobs.Remove(nameof(PurgeStatementData));
             }
-            
         }
     }
 }

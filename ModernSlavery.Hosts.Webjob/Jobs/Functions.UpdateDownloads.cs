@@ -23,6 +23,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 await UpdateDownloadFilesAsync(log).ConfigureAwait(false);
+                log.LogDebug($"Executed Webjob {nameof(UpdateDownloadFiles)} successfully");
             }
             catch (Exception ex)
             {

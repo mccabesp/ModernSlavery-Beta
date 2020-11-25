@@ -29,7 +29,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 await UpdateRegistrationsAsync(log, filePath).ConfigureAwait(false);
 
-                log.LogDebug($"Executed {nameof(UpdateRegistrations)}:successfully");
+                log.LogDebug($"Executed Webjob {nameof(UpdateRegistrations)} successfully");
             }
             catch (Exception ex)
             {

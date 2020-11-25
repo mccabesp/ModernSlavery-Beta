@@ -25,7 +25,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private readonly SearchOptions _searchOptions;
         private readonly IAuditLogger _badSicLog;
         private readonly IAuditLogger _manualChangeLog;
-        private readonly IMessenger _messenger;
+        private readonly ISmtpMessenger _messenger;
         private readonly SharedOptions _sharedOptions;
         private readonly TestOptions _testOptions;
         private readonly IFileRepository _fileRepository;
@@ -47,7 +47,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             SearchOptions searchOptions,
             [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog,
             [KeyFilter(Filenames.ManualChangeLog)] IAuditLogger manualChangeLog,
-            IMessenger messenger,
+            ISmtpMessenger messenger,
             SharedOptions sharedOptions,
             TestOptions testOptions,
             IFileRepository fileRepository,

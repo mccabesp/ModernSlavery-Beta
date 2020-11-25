@@ -17,7 +17,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 await _organisationBusinessLogic.SetUniqueOrganisationReferencesAsync().ConfigureAwait(false);
-                log.LogDebug($"Executed {nameof(ReferenceOrganisations)} successfully");
+                log.LogDebug($"Executed Webjob {nameof(ReferenceOrganisations)} successfully");
             }
             catch (Exception ex)
             {

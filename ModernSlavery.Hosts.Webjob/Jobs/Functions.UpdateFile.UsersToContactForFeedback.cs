@@ -30,7 +30,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     return;
 
                 await UpdateUsersToContactForFeedbackAsync(filePath).ConfigureAwait(false);
-                log.LogDebug($"Executed {nameof(UpdateUsersToContactForFeedback)}:successfully");
+                log.LogDebug($"Executed Webjob {nameof(UpdateUsersToContactForFeedback)} successfully");
             }
             catch (Exception ex)
             {

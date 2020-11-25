@@ -47,7 +47,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     }
                 }
 
-                log.LogDebug($"Executed {nameof(CheckSiteCertAsync)} successfully");
+                log.LogDebug($"Executed Webjob {nameof(CheckSiteCertAsync)} successfully");
             }
             catch (Exception ex)
             {

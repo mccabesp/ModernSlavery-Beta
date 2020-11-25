@@ -31,7 +31,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     return;
 
                 await UpdateUnverifiedRegistrationsAsync(log, filePath).ConfigureAwait(false);
-                log.LogDebug($"Executed {nameof(UpdateUnverifiedRegistrations)}:successfully");
+                log.LogDebug($"Executed Webjob {nameof(UpdateUnverifiedRegistrations)} successfully");
             }
             catch (Exception ex)
             {

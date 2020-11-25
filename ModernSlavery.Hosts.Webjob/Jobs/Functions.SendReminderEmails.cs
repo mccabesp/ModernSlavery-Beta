@@ -61,7 +61,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     }
                 }
 
-                log.LogInformation("SendReminderEmails Function finished");
+                log.LogDebug($"Executed Webjob {nameof(SendReminderEmailsAsync)} successfully");
             }
             finally
             {

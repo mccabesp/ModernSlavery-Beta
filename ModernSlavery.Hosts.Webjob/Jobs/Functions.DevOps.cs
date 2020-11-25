@@ -68,6 +68,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //TODO: Check user status matches latest status
 
                 //TODO: Check users with too many login attempts 
+                log.LogDebug($"Executed Webjob {nameof(StorageHealthCheck)} successfully");
             }
             catch (Exception ex)
             {

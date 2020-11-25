@@ -84,6 +84,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                     count++;
                 }
+                log.LogDebug($"Executed Webjob {nameof(FixOrganisationAddresses)} successfully");
             }
             catch (Exception ex)
             {

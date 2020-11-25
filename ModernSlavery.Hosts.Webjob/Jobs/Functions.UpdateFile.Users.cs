@@ -28,7 +28,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     await _fileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false)) return;
 
                 await UpdateUsersAsync(filePath).ConfigureAwait(false);
-                log.LogDebug($"Executed {nameof(UpdateUsers)}:successfully");
+                log.LogDebug($"Executed Webjob {nameof(UpdateUsers)} successfully");
             }
             catch (Exception ex)
             {

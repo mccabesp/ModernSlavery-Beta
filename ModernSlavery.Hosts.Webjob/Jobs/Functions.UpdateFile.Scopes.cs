@@ -31,7 +31,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 await UpdateScopesAsync(filePath).ConfigureAwait(false);
 
-                log.LogDebug($"Executed {nameof(UpdateScopes)}:successfully");
+                log.LogDebug($"Executed Webjob {nameof(UpdateScopes)} successfully");
             }
             catch (Exception ex)
             {

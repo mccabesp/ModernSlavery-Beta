@@ -41,7 +41,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 await UpdateOrphanOrganisationsAsync(filePath, log).ConfigureAwait(false);
 
-                log.LogDebug($"Executed {funcName}:successfully");
+                log.LogDebug($"Executed Webjob {funcName} successfully");
             }
             catch (Exception ex)
             {

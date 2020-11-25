@@ -15,7 +15,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             try
             {
                 await FixLatestAsync().ConfigureAwait(false);
-                log.LogDebug($"Executed {nameof(FixLatestAsync)} successfully");
+                log.LogDebug($"Executed Webjob {nameof(FixLatestAsync)} successfully");
             }
             catch (Exception ex)
             {

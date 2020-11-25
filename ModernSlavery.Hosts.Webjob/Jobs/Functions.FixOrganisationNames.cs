@@ -81,7 +81,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     }
                 }
 
-                log.LogDebug($"Executed {nameof(FixOrganisationsNamesAsync)} successfully and deleted {count} names");
+                log.LogDebug($"Executed Webjob {nameof(FixOrganisationsNamesAsync)} successfully and deleted {count} names");
             }
             finally
             {

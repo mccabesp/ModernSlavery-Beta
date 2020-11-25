@@ -34,7 +34,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             }
 
             await _govNotifyApi.SendEmailAsync(notifyEmail);
-            log.LogInformation("Successfully received message from queue and passed to GovNotifyAPI. Details: {notifyEmail}", notifyEmail);
+            log.LogDebug($"Executed Webjob {nameof(SendNotifyEmail)} successfully");
         }
 
         /// <summary>

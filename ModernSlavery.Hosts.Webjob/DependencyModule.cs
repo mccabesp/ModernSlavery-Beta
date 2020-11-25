@@ -62,7 +62,7 @@ namespace ModernSlavery.Hosts.Webjob
             builder.RegisterType<SqlRepository>().As<IDataRepository>().InstancePerDependency();
 
             //Register the messaging dependencies
-            builder.RegisterType<Messenger>().As<IMessenger>().SingleInstance();
+            builder.RegisterType<SmtpMessenger>().As<ISmtpMessenger>().SingleInstance();
 
             // Register the email template dependencies
             builder.RegisterInstance(new EmailTemplateRepository(FileSystem.ExpandLocalPath("~/App_Data/EmailTemplates")))

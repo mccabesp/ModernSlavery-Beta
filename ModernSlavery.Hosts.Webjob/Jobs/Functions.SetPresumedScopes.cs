@@ -28,7 +28,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 //Update the search indexes
                 if (changedOrgs.Count > 0 && !_searchOptions.Disabled) await _searchBusinessLogic.RefreshSearchDocumentsAsync(changedOrgs.ToArray()).ConfigureAwait(false);
 
-                log.LogDebug($"Executed {nameof(SetPresumedScopes)} successfully");
+                log.LogDebug($"Executed Webjob {nameof(SetPresumedScopes)} successfully");
             }
             catch (Exception ex)
             {

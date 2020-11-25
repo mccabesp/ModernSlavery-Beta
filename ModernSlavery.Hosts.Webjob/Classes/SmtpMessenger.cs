@@ -10,7 +10,7 @@ using ModernSlavery.Infrastructure.Messaging;
 
 namespace ModernSlavery.Hosts.Webjob.Classes
 {
-    public interface IMessenger
+    public interface ISmtpMessenger
     {
         Task<bool> SendMsuMessageAsync(string subject, string message);
 
@@ -19,15 +19,15 @@ namespace ModernSlavery.Hosts.Webjob.Classes
         Task SendEmailTemplateAsync<TTemplate>(TTemplate parameters) where TTemplate : EmailTemplate;
     }
 
-    public class Messenger : IMessenger
+    public class SmtpMessenger : ISmtpMessenger
     {
         private readonly EmailProvider _msuEmailProvider;
 
-        private readonly ILogger<Messenger> _log;
+        private readonly ILogger<SmtpMessenger> _log;
         private readonly SmtpEmailOptions _smtpOptions; 
         private readonly TestOptions _testOptions;
 
-        public Messenger(ILogger<Messenger> logger, SmtpEmailOptions smtpOptions, TestOptions testOptions, EmailProvider msuEmailProvider)
+        public SmtpMessenger(ILogger<SmtpMessenger> logger, SmtpEmailOptions smtpOptions, TestOptions testOptions, EmailProvider msuEmailProvider)
         {
             _log = logger ?? throw new ArgumentNullException(nameof(logger));
             _smtpOptions = smtpOptions ?? throw new ArgumentNullException(nameof(smtpOptions));
