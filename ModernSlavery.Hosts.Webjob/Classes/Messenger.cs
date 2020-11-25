@@ -63,10 +63,10 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                         _smtpOptions.ReplyEmail,
                         emailAddress,
                         message,
-                        _smtpOptions.Server2,
-                        _smtpOptions.Username2,
-                        _smtpOptions.Password2,
-                        _smtpOptions.Port2,
+                        _smtpOptions.Server,
+                        _smtpOptions.Username,
+                        _smtpOptions.Password,
+                        _smtpOptions.Port,
                         simulate: _testOptions.SimulateMessageSend).ConfigureAwait(false);
 
                     await _msuEmailProvider.EmailSendLog.WriteAsync(
@@ -75,8 +75,8 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                             Message = $"Email successfully sent {(_testOptions.SimulateMessageSend ? "{Simulated) " : "")}via SMTP",
                             Subject = subject,
                             Recipients = emailAddress,
-                            Server = $"{_smtpOptions.Server2}:{_smtpOptions.Port2}",
-                            Username = _smtpOptions.Username2,
+                            Server = $"{_smtpOptions.Server}:{_smtpOptions.Port}",
+                            Username = _smtpOptions.Username,
                             Details = message
                         }).ConfigureAwait(false);
                     successCount++;
@@ -109,10 +109,10 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                         _smtpOptions.ReplyEmail,
                         emailAddress,
                         message,
-                        _smtpOptions.Server2,
-                        _smtpOptions.Username2,
-                        _smtpOptions.Password2,
-                        _smtpOptions.Port2,
+                        _smtpOptions.Server,
+                        _smtpOptions.Username,
+                        _smtpOptions.Password,
+                        _smtpOptions.Port,
                         simulate: _testOptions.SimulateMessageSend).ConfigureAwait(false);
                     await _msuEmailProvider.EmailSendLog.WriteAsync(
                         new EmailSendLogModel
@@ -120,8 +120,8 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                             Message = $"Email successfully sent {(_testOptions.SimulateMessageSend ? "(Simulated) " : "")}via SMTP",
                             Subject = subject,
                             Recipients = emailAddress,
-                            Server = $"{_smtpOptions.Server2}:{_smtpOptions.Port2}",
-                            Username = _smtpOptions.Username2,
+                            Server = $"{_smtpOptions.Server}:{_smtpOptions.Port}",
+                            Username = _smtpOptions.Username,
                             Details = message
                         }).ConfigureAwait(false);
                     successCount++;

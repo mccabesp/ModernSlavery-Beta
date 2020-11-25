@@ -1,4 +1,7 @@
-﻿using ModernSlavery.Core.Attributes;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using ModernSlavery.Core.Attributes;
 using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Messaging
@@ -14,7 +17,6 @@ namespace ModernSlavery.Infrastructure.Messaging
 
         public string ReplyEmail { get; set; }
 
-
         public string Server { get; set; }
 
         public int Port { get; set; } = 25;
@@ -23,13 +25,23 @@ namespace ModernSlavery.Infrastructure.Messaging
 
         public string Password { get; set; }
 
+        public void Validate() 
+        {
+            if (Enabled==false) return;
 
-        public string Server2 { get; set; }
+            var exceptions = new List<Exception>();
 
-        public int Port2 { get; set; } = 25;
+            if (string.IsNullOrWhiteSpace(SenderEmail)) exceptions.Add(new ConfigurationErrorsException($"Missing {nameof(SenderEmail)}"));
+            if (string.IsNullOrWhiteSpace(Server)) exceptions.Add(new ConfigurationErrorsException($"Missing {nameof(Server)}"));
+            if (string.IsNullOrWhiteSpace(Username)) exceptions.Add(new ConfigurationErrorsException($"Missing {nameof(Username)}"));
+            if (string.IsNullOrWhiteSpace(Password)) exceptions.Add(new ConfigurationErrorsException($"Missing {nameof(Password)}"));
 
-        public string Username2 { get; set; }
+            if (exceptions.Count > 0)
+            {
+                if (exceptions.Count == 1) throw exceptions[0];
+                throw new AggregateException(exceptions);
+            }
+        }
 
-        public string Password2 { get; set; }
     }
 }

@@ -65,11 +65,6 @@ namespace ModernSlavery.Infrastructure.Messaging
                 messageHtml = messageHtml.Replace($"(({name}))", value.ToString());
             }
 
-            var smtpServer = string.IsNullOrWhiteSpace(Options.Server) ? Options.Server2 : Options.Server;
-            var smtpServerPort = Options.Port <= 0 ? Options.Port2 : Options.Port;
-            var smtpUsername = string.IsNullOrWhiteSpace(Options.Username) ? Options.Username2 : Options.Username;
-            var smtpPassword = string.IsNullOrWhiteSpace(Options.Password) ? Options.Password2 : Options.Password;
-
             await Email.QuickSendAsync(
                 messageSubject,
                 Options.SenderEmail,
@@ -77,17 +72,17 @@ namespace ModernSlavery.Infrastructure.Messaging
                 Options.ReplyEmail,
                 emailAddress,
                 messageHtml,
-                smtpServer,
-                smtpUsername,
-                smtpPassword,
-                smtpServerPort,
+                Options.Server,
+                Options.Username,
+                Options.Password,
+                Options.Port,
                 simulate: _testOptions.SimulateMessageSend);
 
             return new SendEmailResult
             {
                 Status = "sent",
-                Server = $"{smtpServer}:{smtpServerPort}",
-                ServerUsername = smtpUsername,
+                Server = $"{Options.Server}:{Options.Port}",
+                ServerUsername = Options.Username,
                 EmailAddress = emailAddress,
                 EmailSubject = messageSubject,
                 EmailMessagePlainText = messageText
