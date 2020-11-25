@@ -23,6 +23,7 @@ using ModernSlavery.Infrastructure.Hosts;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Telemetry;
+using ModernSlavery.Infrastructure.Telemetry.AppInsights;
 using ModernSlavery.WebAPI.Public.Classes;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
@@ -285,7 +286,7 @@ namespace ModernSlavery.Hosts.Web
             modules.AddDependency<GoogleAnalyticsDependencyModule>();
 
             //Register the app insights dependencies
-            modules.AddDependency<ApplicationInsightsDependencyModule>();
+            modules.AddDependency<WebAppInsightsDependencyModule>();
 
             //Register the Companies House dependencies
             modules.AddDependency<Infrastructure.CompaniesHouse.DependencyModule>();

@@ -25,6 +25,7 @@ using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Database;
 using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Messaging.GovNotify;
+using ModernSlavery.Infrastructure.Telemetry.AppInsights;
 
 namespace ModernSlavery.Hosts.Webjob
 {
@@ -168,7 +169,10 @@ namespace ModernSlavery.Hosts.Webjob
 
             //Register the search dependencies
             modules.AddDependency<Infrastructure.Search.DependencyModule>();
-            
+
+            //Register the app insights dependencies
+            modules.AddDependency<WebjobAppInsightsDependencyModule>();
+
             //Register the Companies House dependencies
             modules.AddDependency<Infrastructure.CompaniesHouse.DependencyModule>();
 
