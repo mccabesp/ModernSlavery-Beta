@@ -45,8 +45,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 #region IdentityServer Logs
 
-                var identityServerlogPath = Path.Combine(_sharedOptions.LogPath,
-                    "ModernSlavery.Hosts.IdServer");
+                var identityServerlogPath = Path.Combine(_sharedOptions.LogPath,"ModernSlavery.Hosts.IdServer");
+                
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "ErrorLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "DebugLog"));
                 actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "WarningLog"));
@@ -90,6 +90,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
         private async Task MergeCsvLogsAsync<T>(ILogger log, string logPath, string prefix, string extension = ".csv")
         {
+            //Ensure the directory exists
+            if (!await _fileRepository.GetDirectoryExistsAsync(logPath).ConfigureAwait(false))
+                await _fileRepository.CreateDirectoryAsync(logPath).ConfigureAwait(false);
+
             //Get all the daily log files
             var files = await _fileRepository.GetFilesAsync(logPath, $"{prefix}_*{extension}").ConfigureAwait(false);
             var fileList = files.OrderBy(o => o).ToList();

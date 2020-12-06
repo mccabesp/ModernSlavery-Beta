@@ -29,19 +29,21 @@ namespace ModernSlavery.Core.Entities
     }
     public enum WhyVisitMSUSite : byte
     {
-        SubmittedAStatement = 0,
-        Viewed1OrMoreStatements = 1,
-        SubmittedAndViewedStatements = 2,
+        Unknown = 0,
+        SubmittedAStatement = 1,
+        Viewed1OrMoreStatements = 2,
+        SubmittedAndViewedStatements = 3,
 
     }
 
     public enum DifficultyTypes : byte
     {
-        VeryEasy = 0,
-        Easy = 1,
-        Neutral = 2,
-        Difficult = 3,
-        VeryDifficult = 4
+        Unknown = 0,
+        VeryEasy = 1,
+        Easy = 2,
+        Neutral = 3,
+        Difficult = 4,
+        VeryDifficult = 5
     }
 
 

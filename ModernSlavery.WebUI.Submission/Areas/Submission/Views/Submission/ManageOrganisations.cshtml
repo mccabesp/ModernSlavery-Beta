@@ -4,39 +4,41 @@
 @using ModernSlavery.Core.Interfaces
 @model IEnumerable<UserOrganisation>
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
+    Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Manage your organisation - Modern Slavery reporting service";
     var hasRegisteredOrgs = Model.Any();
 }
 
-@await Html.PartialAsync("AccountNavigation")
+@section BeforeMain {
+    @await Html.PartialAsync("AccountNavigation")
+}
 
-<div class="grid-row">
-    <div class="column-full">
-        <h1 class="heading-large">
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-l">
             Select an organisation
         </h1>
-        <p>Use this page to access your registered organisations or to register a new organisation.</p>
+        <p class="govuk-body">Use this page to access your registered organisations or to register a new organisation.</p>
 
-        <p>Once you've selected an organisation (by clicking on its name, below) you can:</p>
+        <p class="govuk-body">Once you've selected an organisation (by clicking on its name, below) you can:</p>
 
-        <ul class="list-bullet">
+        <ul class="govuk-list govuk-list--bullet">
             <li>state whether this organisation is required to publish an annual modern slavery statement</li>
             <li>provide a link to the full modern slavery statement published on the organisation's website</li>
             <li>enter information about this organisation's modern slavery statement</li>
             <li>save this information as a draft, and complete it at a later date before submitting it</li>
         </ul>
 
-        <p>The information you submit will be published on our viewing service as a summary of your modern slavery statement.</p>
+        <p class="govuk-body">The information you submit will be published on our viewing service as a summary of your modern slavery statement.</p>
 
-        <table class="organisations-table" summary="A list of organisations registered to your account" style="margin-top: 30px">
-            <thead>
-                <tr>
-                    <th class="org-name" scope="col">Organisation name</th>
-                    <th scope="col">Registration status</th>
+        <table class="govuk-table" summary="A list of organisations registered to your account" style="margin-top: 30px">
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th class="govuk-table__header" scope="col">Organisation name</th>
+                    <th scope="col" class="govuk-table__header">Registration status</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="govuk-table__body">
                 @foreach (var userOrg in Model)
                 {
                     // include the currrent user in the count but dont show a count to pending users
@@ -48,35 +50,35 @@
                     var scopeStatus = userOrg.Organisation.GetActiveScopeStatus(accountingDate);
                     var address = userOrg.Organisation.GetLatestAddress()?.GetAddressString();
 
-                    <tr>
+                    <tr class="govuk-table__row">
                         @if (userOrg.PINSentDate != null && userOrg.PINConfirmedDate == null)
                         {
-                            <th scope="row">
-                                <a id="ActivateOrg-@(encOrgId)" href="@Url.ActionArea("ActivateService","Registration", "Registration", new {id = encOrgId})">
+                            <td class="govuk-table__cell" scope="row">
+                                <a class="govuk-link" id="ActivateOrg-@(encOrgId)" href="@Url.ActionArea("ActivateService","Registration", "Registration", new {id = encOrgId})">
                                     <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
                                 </a>
-                            </th>
-                            <td data-prefix="Status">
+                            </td>
+                            <td class="govuk-table__cell" data-prefix="Status">
                                 Awaiting activation PIN
                             </td>
                         }
                         else if (userOrg.PINSentDate == null && userOrg.PINConfirmedDate == null)
                         {
-                            <th scope="row">
+                            <td class="govuk-table__cell" scope="row">
                                 <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
-                            </th>
-                            <td data-prefix="Status">
+                            </td>
+                            <td class="govuk-table__cell" data-prefix="Status">
                                 Awaiting registration approval
                             </td>
                         }
                         else
                         {
-                            <th scope="row">
-                                <a id="ManageOrg-@(encOrgId)" href="@Url.Action("ManageOrganisation", "Submission", new {organisationIdentifier = encOrgId})">
+                            <td class="govuk-table__cell" scope="row">
+                                <a class="govuk-link" id="ManageOrg-@(encOrgId)" href="@Url.Action("ManageOrganisation", "Submission", new {organisationIdentifier = encOrgId})">
                                     <span>@userOrg.Organisation.OrganisationName.ToUpper()</span>
                                 </a>
-                            </th>
-                            <td data-prefix="Status">
+                            </td>
+                            <td class="govuk-table__cell" data-prefix="Status">
                                 <span>Registration complete</span>
                             </td>
                         }
@@ -85,8 +87,8 @@
 
                 @if (hasRegisteredOrgs == false)
                 {
-                    <tr>
-                        <td colspan="2" style="border-bottom: none">There are no organisations registered to your account.</td>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell" colspan="2" style="border-bottom: none">There are no organisations registered to your account.</td>
                     </tr>
                 }
 
@@ -97,18 +99,18 @@
 
 </div>
 
-<div class="grid-row">
+<div class="govuk-grid-row">
 
-    <div class="column-two-thirds">
+    <div class="govuk-grid-column-two-thirds">
 
-        <p>
-            <a class="button" href="@Url.ActionArea("OrganisationType","Registration", "Registration")">Register an organisation</a>
+        <p class="govuk-body">
+            <a class="govuk-button" href="@Url.ActionArea("OrganisationType","Registration", "Registration")">Register an organisation</a>
         </p>
 
         @if (hasRegisteredOrgs == false)
         {
-            <h2 class="heading-small">Need to close your account?</h2>
-            <p>
+            <h2 class="govuk-heading-s">Need to close your account?</h2>
+            <p class="govuk-body">
                 If you created an account by mistake or no longer responsible
                 for reporting Modern Slavery statement you can close your account in <a asp-action="home" asp-controller="Account" asp-area="Account">manage account</a>.
             </p>

@@ -48,7 +48,7 @@
                             </span>
                         </span>
                         <span class="gem-c-pagination__link-divider visually-hidden">:</span>
-                        <span class="gem-c-pagination__link-label">@(Model.Organisations.CurrentPage + 1) of @Model.Organisations.PageCount</span>
+                        <span class="gem-c-pagination__link-label">@(Model.Organisations.CurrentPage + 1) of <span id="pageCount" data-pagecount="@(Model.Organisations.PageCount)">@(Model.Organisations.PageCount)</span></span>
 
                     </a>
                 </li>

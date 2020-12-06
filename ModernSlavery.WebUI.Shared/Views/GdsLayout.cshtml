@@ -21,24 +21,24 @@
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="/assets/images/favicon.ico" type="image/x-icon" />
-    <link rel="mask-icon" href="/assets/images/govuk-mask-icon.svg" color="blue">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/govuk-apple-touch-icon-180x180.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="/assets/images/govuk-apple-touch-icon-167x167.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/assets/images/govuk-apple-touch-icon-152x152.png">
-    <link rel="apple-touch-icon" href="/assets/images/govuk-apple-touch-icon.png">
+    <link asp-append-version="true" rel="shortcut icon" sizes="16x16 32x32 48x48" href="/assets/images/favicon.ico" type="image/x-icon" />
+    <link asp-append-version="true" rel="mask-icon" href="/assets/images/govuk-mask-icon.svg" color="blue">
+    <link asp-append-version="true" rel="apple-touch-icon" sizes="180x180" href="/assets/images/govuk-apple-touch-icon-180x180.png">
+    <link asp-append-version="true" rel="apple-touch-icon" sizes="167x167" href="/assets/images/govuk-apple-touch-icon-167x167.png">
+    <link asp-append-version="true" rel="apple-touch-icon" sizes="152x152" href="/assets/images/govuk-apple-touch-icon-152x152.png">
+    <link asp-append-version="true" rel="apple-touch-icon" href="/assets/images/govuk-apple-touch-icon.png">
 
-    <environment exclude="Development, DEV, TEST">
+    <environment exclude="Development, DEV, TEST, QAT, UR">
         <!--[if !IE 8]><!-->
-        <link href="/assets/styles/app-all.min.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
+        <link asp-append-version="true" href="/assets/styles/app-all.min.css" rel="stylesheet" type="text/css" media="all" />
         <!--<![endif]-->
         <!--[if IE 8]>
-            <link href="/assets/styles/app-ie8.min.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
+            <link href="/assets/styles/app-ie8.min.css" rel="stylesheet" type="text/css" media="all" />
         <![endif]-->
     </environment>
-    <environment include="Development, DEV, TEST">
+    <environment include="Development, DEV, TEST, QAT, UR">
         <!--[if !IE 8]><!-->
-        <link href="/assets/styles/app-all.css" rel="stylesheet" type="text/css" media="all" />
+        <link asp-append-version="true" href="/assets/styles/app-all.css" rel="stylesheet" type="text/css" media="all" />
         <!--<![endif]-->
         <!--[if IE 8]>
             <link href="/assets/styles/app-ie8.css" rel="stylesheet" type="text/css" media="all" />
@@ -51,7 +51,7 @@
 </head>
 
 <body class="govuk-template__body govuk-body app-body-class">
-    <script>
+    <script type="text/javascript" nonce="@Html.GetNonce()">
         document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
     </script>
 
@@ -64,45 +64,29 @@
 
     @{
         var headerNavigationLinks = new List<HeaderNavigationViewModel>();
-        if (featureSwitchOptions.IsEnabled("NavigationLinks"))
+        if (featureSwitchOptions.IsEnabled("NavigationLinks") && User.Identity.IsAuthenticated)
         {
-            if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
+
+            headerNavigationLinks.Add(new HeaderNavigationViewModel
             {
-                headerNavigationLinks.Add(new HeaderNavigationViewModel
-                {
-                    Text = "Search",
-                    Href = Url.ActionArea("SearchResults", "Viewing", "Viewing")
-                });
-                headerNavigationLinks.Add(new HeaderNavigationViewModel
-                {
-                    Text = "Guidance",
-                    Href = Url.ActionArea("StepByStepStandalone", "ReportingStepByStep", "Viewing")
-                });
-                headerNavigationLinks.Add(new HeaderNavigationViewModel
-                {
-                    Text = "Submit",
-                    Href = Url.ActionArea("ManageOrganisations", "Submission", "Submission")
-                });
-            }
-            else
+                Text = "Your organisations",
+                Href = Url.ActionArea("ManageOrganisations", "Submission", "Submission"),
+
+            });
+            headerNavigationLinks.Add(new HeaderNavigationViewModel
             {
-                headerNavigationLinks.Add(new HeaderNavigationViewModel
-                {
-                    Text = "Search and compare",
-                    Href = Url.ActionArea("SearchResults", "Viewing", "Viewing")
-                });
-                headerNavigationLinks.Add(new HeaderNavigationViewModel
-                {
-                    Text = "Download",
-                    Href = Url.ActionArea("Download", "Viewing", "Viewing")
-                });
-                headerNavigationLinks.Add(new HeaderNavigationViewModel
-                {
-                    Text = "Close the gap",
-                    Href = Url.ActionArea("Overview", "ActionsHub", "Viewing")
-                });
-            }
+                Text = "Your details",
+                Href = Url.ActionArea("ManageAccount", "Account", "Account")
+            });
+
+            headerNavigationLinks.Add(new HeaderNavigationViewModel
+            {
+                Text = "Sign out",
+                Href = Url.ActionArea("SignOut", "Account", "Account"),
+                //Classes = "sign-out-link"
+            });
         }
+
 
         var controllerName = ViewContext.RouteData.Values["Controller"].ToString();
         if (controllerName.StartsWith("Admin"))
@@ -114,16 +98,7 @@
             });
         }
 
-        if (User.Identity.IsAuthenticated)
-        {
-            headerNavigationLinks.Add(new HeaderNavigationViewModel
-            {
-                Text = "Sign out",
-                Href = Url.ActionArea("SignOut", "Account", "Account"),
-                Classes = "sign-out-link"
-            });
-        }
-        else if (!Url.IsAction("Login", "Identity", "Identity"))
+        else if (!Url.IsAction("Login", "Identity", "Identity") && !User.Identity.IsAuthenticated)
         {
             headerNavigationLinks.Add(new HeaderNavigationViewModel
             {
@@ -145,7 +120,7 @@
     {
         Classes= "phase-banner-beta govuk-width-container",
         Phase = "BETA",
-        Html = @<text>This is a new service – your <a class="govuk-link" asp-action="SendFeedback" asp-controller="shared">feedback</a> will help us to improve it.</text>
+        Html = @<text>This is a new service – your <a rel="track" data-track-category="pageElementInteraction" class="govuk-link" asp-action="SendFeedback" asp-controller="shared">feedback</a> will help us to improve it.</text>
     }))
 
     }
@@ -188,18 +163,21 @@
 
     }
     @(Html.GovUkFooter(new FooterViewModel { MetaNavigation = new FooterMetaNavigationViewModel() { Links = links.ToArray() } }))
-    <script src="/assets/scripts/jquery-1.11.3.js"></script>
+    <script asp-append-version="true" src="/assets/scripts/jquery-1.11.3.js"></script>
 
-    <environment exclude="Development, DEV, TEST, QAT, PROD, PREPROD, UR">
-        <script src="/assets/scripts/app.min.js" type="text/javascript" asp-append-version="true"></script>
-        <script src="/assets/javascripts/**/*.min.js" type="text/javascript" asp-append-version="true"></script>
+    <environment exclude="Development, DEV, TEST, QAT, UR">
+        <script asp-append-version="true" src="/assets/scripts/app.min.js" type="text/javascript"></script>
+        <script asp-append-version="true" src="/assets/javascripts/application.min.js" type="text/javascript"></script>
     </environment>
-    <environment include="Development, DEV, TEST, QAT, PROD, PREPROD, UR">
-        <script asp-src-include="/assets/scripts/**/*.js" asp-src-exclude="/assets/scripts/app.min.js" type="text/javascript"></script>
-        <script asp-src-include="/assets/javascripts/**/*.js" asp-src-exclude="/assets/javascripts/**/*.min.js" type="text/javascript"></script>
+    <environment include="Development, DEV, TEST, QAT, UR">
+        <script asp-append-version="true" asp-src-include="/assets/scripts/**/*.js" asp-src-exclude="/assets/scripts/app.min.js" type="text/javascript"></script>
+        <script asp-append-version="true" src="/assets/javascripts/location-autocomplete.min.js" type="text/javascript"></script>
+        <script asp-append-version="true" asp-src-include="/assets/javascripts/**/*.js" asp-src-exclude="/assets/javascripts/**/*.min.js" type="text/javascript"></script>
     </environment>
 
-    <script>window.GOVUKFrontend.initAll()</script>
+    <script type="text/javascript" nonce="@Html.GetNonce()">window.GOVUKFrontend.initAll()</script>
+    @{ await Html.RenderPartialAsync("_GoogleAnalyticsEventTracking"); }
     @RenderSection("AfterLoadedCompiledScripts", false)
+
 </body>
 </html>

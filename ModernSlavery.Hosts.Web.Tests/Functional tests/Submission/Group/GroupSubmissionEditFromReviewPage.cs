@@ -6,7 +6,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 {
     [TestFixture, Ignore("Waiting on 4773")]
 
-    public class GoupSubmissionEditFromReviewPage : GoupSubmission_SwitchSingleToGroup
+    public class GroupSubmissionEditFromReviewPage : GroupSubmission_SwitchSingleToGroup
 
         //DATA NEEDED: a third Group org to swap out for - Fly Jet Sweeden
     {

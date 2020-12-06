@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.WebUI.GDSDesignSystem;
@@ -26,33 +27,37 @@ namespace ModernSlavery.WebUI.Shared.Models
     }
     public enum WhyVisitSite : byte
     {
-        [Display(Description = "Submitted a statement")]
-        SubmittedAStatement = 0,
+        //Unknown
+        Unknown = 0,
 
-        [Display(Description = "Viewed 1 or more statements")]
-        Viewed1OrMoreStatements = 1,
+        [Description("Submitted a statement")]
+        SubmittedAStatement = 1,
 
-        [Display(Description = "Submitted and viewed statements")]
-        SubmittedAndViewedStatements = 2,
+        [Description("Viewed 1 or more statements")]
+        Viewed1OrMoreStatements = 2,
 
-
+        [Description("Submitted and viewed statements")]
+        SubmittedAndViewedStatements = 3,
     }
 
     public enum HowEasyIsThisServiceToUse : byte
     {
-        [Display(Description = "Very easy")]
-        VeryEasy = 0,
+        //Unknown
+        Unknown = 0,
 
-        [Display(Description = "Easy")]
-        Easy = 1,
+        [Description("Very easy")]
+        VeryEasy = 1,
 
-        [Display(Description = "Neither easy nor difficult")]
-        Neutral = 2,
+        [Description("Easy")]
+        Easy = 2,
 
-        [Display(Description = "Difficult")]
-        Difficult = 3,
+        [Description("Neither easy nor difficult")]
+        Neutral = 3,
 
-        [Display(Description = "Very difficult")]
-        VeryDifficult = 4
+        [Description("Difficult")]
+        Difficult = 4,
+
+        [Description("Very difficult")]
+        VeryDifficult = 5
     }
 }

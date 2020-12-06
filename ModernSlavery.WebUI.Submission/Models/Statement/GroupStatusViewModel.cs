@@ -25,7 +25,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class GroupStatusViewModel : GroupOrganisationsViewModel
     {
-        public override string PageTitle => "Who is your statement for?";
+        public override string PageTitle => "Does your modern slavery statement cover a single organisation or a group of organisations?";
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

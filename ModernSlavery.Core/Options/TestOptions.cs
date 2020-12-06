@@ -76,7 +76,6 @@ namespace ModernSlavery.Core.Options
                 if (LoadTesting) exceptions.Add(new ConfigurationErrorsException("LoadTesting is not permitted in Production environment"));
                 if (SimulateMessageSend) exceptions.Add(new ConfigurationErrorsException("SimulateLetterSend is not permitted in Production environment"));
                 if (ShowEmailVerifyLink) exceptions.Add(new ConfigurationErrorsException("ShowEmailVerifyLink is not permitted in Production environment"));
-                if (ShowPinInPost) exceptions.Add(new ConfigurationErrorsException("ShowPinInPost is not permitted in Production environment"));
                 if (DisableLockoutProtection) exceptions.Add(new ConfigurationErrorsException("DisableLockoutProtection is not permitted in Production environment"));
             }
             else

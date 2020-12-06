@@ -10,6 +10,13 @@
     }
 }
 <div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-three-quarters">
+    <h1 class="govuk-heading-xl">
+        @Model.PageTitle
+    </h1>
+    </div>
+
     <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm())
         {
@@ -17,21 +24,18 @@
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
 
-            <h1 class="govuk-heading-xl">
-                @Model.PageTitle
-            </h1>
-
-            <p class="govuk-body govuk-!-font-weight-bold">
+            
+            <h2 class="govuk-heading-s govuk-!-margin-bottom-3 ">
                 @Model.SubTitle
-            </p>
+            </h2>
 
-            <p class="govuk-body govuk-!-margin-bottom-8 ">
+            <p class="govuk-body govuk-!-margin-bottom-7 ">
                 @Model.SectionCountTitle
             </p>
 
             <ol class="app-task-list">
                 <li>
-                    <h2 class="govuk-heading-s app-task-list__section">
+                    <h2 class="govuk-heading-s app-task-list__section govuk-!-margin-bottom-1">
                         <span class="app-task-list__section-number">1. </span>
                         Basic information about your statement and organisation (required)
                     </h2>
@@ -63,7 +67,7 @@
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
                                 <a class="govuk-link" href="@Model.SectorsUrl" aria-describedby="slavery-statement">
-                                    Your organisation's sector(s) and turnover or budget
+                                    Your organisation's sectors and turnover
                                 </a>
                             </span>
                             <strong class="govuk-tag @(Model.GetSectorTurnoverStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetSectorTurnoverStatus().GetEnumDescription().ToUpper())</strong>
@@ -80,7 +84,7 @@
                 </li>
 
                 <li>
-                    <h2 class="govuk-heading-s app-task-list__section">
+                    <h2 class="govuk-heading-s app-task-list__section govuk-!-margin-bottom-1">
                         <span class="app-task-list__section-number">2. </span>
                         Statement summary (optional)
                     </h2>
@@ -88,7 +92,7 @@
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
                                 <a class="govuk-link" href="@Model.PoliciesUrl" aria-describedby="Policies">
-                                    Your policies
+                                    Policies
                                 </a>
                             </span>
                             <strong class="govuk-tag @(Model.PoliciesPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.PoliciesPage.GetStatus().GetEnumDescription().ToUpper())</strong>
@@ -96,7 +100,7 @@
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
                                 <a class="govuk-link" href="@Model.TrainingUrl" aria-describedby="training">
-                                    Training and raising awareness
+                                    Training
                                 </a>
                             </span>
                             <strong class="govuk-tag @(Model.TrainingPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.TrainingPage.GetStatus().GetEnumDescription().ToUpper())</strong>
@@ -104,7 +108,7 @@
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
                                 <a class="govuk-link" href="@Model.WorkingConditionsUrl" aria-describedby="monitoring-progress">
-                                    How you monitor working conditions
+                                    Monitoring working conditions
                                 </a>
                             </span>
                             <strong class="govuk-tag @(Model.GetWorkingConditionsStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetWorkingConditionsStatus().GetEnumDescription().ToUpper())</strong>
@@ -112,7 +116,7 @@
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
                                 <a class="govuk-link" href="@Model.RisksUrl" aria-describedby="monitoring-progress">
-                                    Your highest risks of modern slavery
+                                    Modern slavery risks
                                 </a>
                             </span>
                             <strong class="govuk-tag @(Model.GetRisksStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetRisksStatus().GetEnumDescription().ToUpper())</strong>
@@ -130,7 +134,7 @@
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
                                 <a class="govuk-link" href="@Model.ProgressUrl" aria-describedby="monitoring-progress">
-                                    Monitoring your progress
+                                    Demonstrating progress
                                 </a>
                             </span>
                             <strong class="govuk-tag @(Model.ProgressPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.ProgressPage.GetStatus().GetEnumDescription().ToUpper())</strong>
@@ -140,9 +144,9 @@
             </ol>
             if (Model.CanSubmit())
             {
-                <h3 class="govuk-heading-m">Submit your answers</h3>
+                <h3 class="govuk-heading-m govuk-!-margin-bottom-2">Submit your answers</h3>
 
-                <details class="govuk-details" data-module="govuk-details">
+                <details class="govuk-details govuk-!-margin-bottom-4" data-module="govuk-details">
                     <summary class="govuk-details__summary">
                         <span class="govuk-details__summary-text">
                             Declaration
@@ -163,7 +167,7 @@
                     </div>
                 </details>
 
-                <div class="govuk-form-group">
+                <div class="govuk-form-group govuk-!-margin-bottom-7">
                     <div class="govuk-checkboxes @Html.SetErrorClass("AcceptedDeclaration", "govuk-form-group--error")">
                         <div class="govuk-checkboxes__item">
                             <input name="AcceptedDeclaration" id="AcceptedDeclaration" class="govuk-checkboxes__input" type="checkbox" value="true">
@@ -181,7 +185,7 @@
             }
 
             <button class="govuk-button govuk-button--secondary" name="command" value="@BaseStatementViewModel.CommandType.Skip">
-                Save draft
+                Save as draft
             </button>
         }
     </div>

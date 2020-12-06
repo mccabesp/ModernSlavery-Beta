@@ -65,7 +65,7 @@
         {
             @if (!string.IsNullOrEmpty(Model.ServiceUrl))
             {
-                <a href="@(Model.ServiceUrl)" class="govuk-header__link govuk-header__link--service-name">
+                <a href="@(Model.ServiceUrl)" class="govuk-header__link govuk-header__link--service-name" rel="track" data-track-category="Header Link Clicked">
                     @(Model.ServiceName)
                 </a>
             }
@@ -83,8 +83,8 @@
                     {
                         @if (!string.IsNullOrEmpty(navigationItem.Href) && !string.IsNullOrEmpty(navigationItem.Text))
                         {
-                            <li class="govuk-header__navigation-item @(navigationItem.Active ? " govuk-header__navigation-item--active" : "") @(navigationItem.Classes)">
-                                <a class="govuk-header__link" href="@(navigationItem.Href)">
+                            <li class="govuk-header__navigation-item @(navigationItem.Href.EndsWith(Context.Request.Path.Value) ? " govuk-header__navigation-item--active" : "") @(navigationItem.Classes)">
+                                <a class="govuk-header__link" href="@(navigationItem.Href)" rel="track" data-track-category="pageElementInteraction">
                                     @*@(Html.Raw( string.Join(" ", navigationItem.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) ))*@
                                     @(navigationItem.Text)
                                 </a>

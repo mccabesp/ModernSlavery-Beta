@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.Core.Entities.StatementSummary;
+using ModernSlavery.Core.Entities.StatementSummary.V1;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 using Newtonsoft.Json;
@@ -167,7 +167,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Models
         #endregion
 
         #region Statement Summary Fields
-        public StatementSummary1 Summary { get; set; } = new StatementSummary1();
+        public StatementSummary Summary { get; set; } = new StatementSummary();
         #endregion
 
         #region Methods

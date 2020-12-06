@@ -143,6 +143,7 @@ namespace ModernSlavery.Infrastructure.Configuration
                 var section = config.GetSection(sectionName);
                 foreach (var childValue in section.GetChildValues())
                 {
+                    if (childValue.Key == sectionName) continue;
                     if (!ignoreEmpty || !string.IsNullOrWhiteSpace(childValue.Value)) result[childValue.Key.Substring(section.Path.Length + 1)] = childValue.Value;
                 }
             }

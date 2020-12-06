@@ -76,13 +76,12 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="turnovers">A list of turnovers to apply as a filter</param>
         /// <param name="sectors">A list of sectors to apply as a filter</param>
         /// <param name="deadlineYears">A list of deadline years to apply as a filter</param>
-        /// <param name="submittedOnly">Whether to return only only organisations who have submitted</param>
         /// <param name="returnFacets">Whether to return the faceted results (i.e., filter counts) </param>
         /// <param name="returnAllFields">When true returns all retrievable fields (for Api) otherwise returns only fields for viewing service</param>
         /// <param name="currentPage">The page of results to return</param>
         /// <param name="pageSize">The size of the results page</param>
         /// <returns></returns>
-        Task<PagedSearchResult<OrganisationSearchModel>> SearchOrganisationsAsync(string keywords, IEnumerable<byte> turnovers = null, IEnumerable<short> sectors = null, IEnumerable<int> deadlineYears = null, bool submittedOnly = true, bool returnFacets = false, bool returnAllFields = false, int currentPage = 1, int pageSize = 20);
+        Task<PagedSearchResult<OrganisationSearchModel>> SearchOrganisationsAsync(string keywords, IEnumerable<byte> turnovers = null, IEnumerable<short> sectors = null, IEnumerable<int> deadlineYears = null, bool returnFacets = false, bool returnAllFields = false, int currentPage = 1, int pageSize = 20);
 
         /// <summary>
         /// Returns a list of group organisations reporting under the parent organisation for the specified reporting year

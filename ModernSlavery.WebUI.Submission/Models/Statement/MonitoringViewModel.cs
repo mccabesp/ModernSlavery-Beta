@@ -18,13 +18,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.OrganisationId, opt => opt.Ignore())
                 .ForMember(d => d.OrganisationName, opt => opt.Ignore())
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
-                .ForPath(d => d.Summary.OtherWorkConditionsMonitoring, opt => opt.MapFrom(s=>s.OtherWorkConditionsMonitoring));
+                .ForPath(d => d.Summary.OtherWorkConditionsMonitoring, opt => opt.MapFrom(s => s.OtherWorkConditionsMonitoring));
         }
     }
 
     public class MonitoringViewModel : BaseStatementViewModel
     {
-        public override string PageTitle => "Do you want to tell us about any other ways you monitored working conditions across your organisation and supply chain?";
+        public override string PageTitle => "Are there any other ways you monitored working conditions across your operations and supply chains?";
 
         [MaxLength(200)]
         public string OtherWorkConditionsMonitoring { get; set; }

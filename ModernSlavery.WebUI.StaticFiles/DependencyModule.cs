@@ -5,9 +5,11 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
@@ -52,10 +54,19 @@ namespace ModernSlavery.WebUI.StaticFiles
             //Set the static file options
             var staticFileOptions = new StaticFileOptions
             {
-                OnPrepareResponse = ctx =>
+                OnPrepareResponse = context =>
                 {
-                    //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
-                    if (_responseCachingOptions.StaticCacheSeconds > 0) ctx.Context.SetResponseCache(_responseCachingOptions.StaticCacheSeconds);
+                    if (_responseCachingOptions.Enabled && _responseCachingOptions.StaticCacheSeconds > 0)
+                    {
+                        //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
+                        var headers = context.Context.Response.GetTypedHeaders();
+
+                        headers.CacheControl = new CacheControlHeaderValue
+                        {                             
+                            Public = true,
+                            MaxAge = TimeSpan.FromSeconds(_responseCachingOptions.StaticCacheSeconds)
+                        };
+                    }
                 }
             };
 

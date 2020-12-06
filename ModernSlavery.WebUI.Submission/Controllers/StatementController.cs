@@ -6,6 +6,7 @@ using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
@@ -18,8 +19,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
-using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1.StatementRisk;
+using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
+using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary.StatementRisk;
 
 //TODO: Ensure we use PRG model on all POST actions so the 'Browser' back button will work correctly on all pages in this journey.
 
@@ -31,13 +32,16 @@ namespace ModernSlavery.WebUI.Submission.Controllers
     public class StatementController : BaseController
     {
         readonly IStatementPresenter SubmissionPresenter;
+        readonly IGovUkCountryProvider CountryProvider;
 
         public StatementController(
             IStatementPresenter submissionPresenter,
+            IGovUkCountryProvider countryProvider,
             ILogger<StatementController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic)
             : base(logger, webService, sharedBusinessLogic)
         {
             SubmissionPresenter = submissionPresenter;
+            CountryProvider = countryProvider;
         }
 
         #region General notes
@@ -1025,21 +1029,30 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpPost("{organisationIdentifier}/{year}/highest-risk/{index}")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> HighRisk(HighRiskViewModel viewModel, string organisationIdentifier, int year, int index, BaseStatementViewModel.CommandType command, CountryTypes toRemove)
+        public async Task<IActionResult> HighRisk(HighRiskViewModel viewModel, string organisationIdentifier, int year, int index, BaseStatementViewModel.CommandType command, string toRemove)
         {
             viewModel.Index = index;
 
-            if (toRemove != CountryTypes.Unknown)
+            if (!string.IsNullOrEmpty(toRemove))
             {
                 SetNavigationUrl(viewModel);
-                if (!viewModel.TryRemoveCountry(toRemove))
+                var country = CountryProvider.FindByReference(toRemove);
+                if (country != null && viewModel.CountryReferences.Contains(country.FullReference))
+                    viewModel.CountryReferences.Remove(country.FullReference);
+                else
                     ModelState.AddModelError(4702);
                 return View(viewModel);
             }
             else if (command == BaseStatementViewModel.CommandType.AddCountry)
             {
                 SetNavigationUrl(viewModel);
-                if (!viewModel.TryAddSelectedCountry())
+                var country = CountryProvider.Find(viewModel.SelectedCountry);
+                if (country != null && !viewModel.CountryReferences.Contains(country.FullReference))
+                {
+                    viewModel.CountryReferences.Add(country.FullReference);
+                    viewModel.SelectedCountry = null;
+                }
+                else
                     ModelState.AddModelError(4701, nameof(HighRiskViewModel.SelectedCountry));
                 return View(viewModel);
             }
@@ -1109,6 +1122,18 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             //Otherwise return the view using the populated ViewModel
             return View(viewModel);
         }
+
+        [HttpPost("{organisationIdentifier}/{year}/submission-complete")]
+        [PreventDuplicatePost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmissionComplete()
+        {
+            //TODO: this needs to redirect user to the external gov.uk feedback page once we have it
+            var returnUrl = Url.Action("SatisfactionSurvey", "Shared");
+
+            return await LogoutUser(returnUrl);
+        }
+
 
         #endregion
     }

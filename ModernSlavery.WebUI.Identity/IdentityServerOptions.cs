@@ -22,12 +22,26 @@ namespace ModernSlavery.WebUI.Identity
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
         }
 
+        public string PublicOrigin { get; set; }=null;
+        public bool ShowPII { get; set; }
+        public string DefaultSigninUri { get; set; }="/";
+        public string DefaultSignoutUri { get; set; }="/";
+
         public Client[] Clients { get; set; }
+        
 
         public void Validate()
         {
             var exceptions = new List<Exception>();
 
+            if (!string.IsNullOrWhiteSpace(PublicOrigin))
+            {
+                PublicOrigin = PublicOrigin.TrimEnd('/', '\\',' ');
+                if (!Uri.TryCreate(PublicOrigin, UriKind.Absolute, out Uri publicOriginUri))
+                    exceptions.Add(new ConfigurationErrorsException($"Invalid Uri {nameof(PublicOrigin)}='{PublicOrigin}' in configuration"));
+                else if (publicOriginUri.PathAndQuery!="/")
+                    exceptions.Add(new ConfigurationErrorsException($"Invalid path in Uri {nameof(PublicOrigin)}='{PublicOrigin}' in configuration"));
+            }
             exceptions.AddRange(CheckClientSecrets());
 
             exceptions.AddRange(CheckClientUri());
@@ -72,14 +86,31 @@ namespace ModernSlavery.WebUI.Identity
             if (Clients != null)
                 for (var i = 0; i < Clients.Length; i++)
                 {
+
                     var client = Clients[i];
                     if (!client.ClientUri.IsUrl()) yield return new ConfigurationErrorsException($"Invalid Uri in configuration 'IdentityServer:Clients:{i}:ClientUri'");
 
                     if (client.RedirectUris != null)
+                    {
+                        if (DefaultSigninUri != null && !client.RedirectUris.Contains(DefaultSigninUri, StringComparer.OrdinalIgnoreCase))
+                                client.RedirectUris.Add(DefaultSigninUri);
+
+                        if (DefaultSignoutUri != null && !client.RedirectUris.Contains(DefaultSignoutUri, StringComparer.OrdinalIgnoreCase))
+                            client.RedirectUris.Add(DefaultSignoutUri);
+
                         client.RedirectUris = client.RedirectUris.Select(uri => RootUri(uri, client.ClientUri)).ToList();
+                    }
 
                     if (client.PostLogoutRedirectUris != null)
+                    {
+                        if (DefaultSignoutUri != null && !client.PostLogoutRedirectUris.Contains(DefaultSignoutUri, StringComparer.OrdinalIgnoreCase))
+                            client.PostLogoutRedirectUris.Add(DefaultSignoutUri);
+
                         client.PostLogoutRedirectUris = client.PostLogoutRedirectUris.Select(uri => RootUri(uri, client.ClientUri)).ToList();
+                    }
+
+                    if (DefaultSigninUri != null) DefaultSigninUri = RootUri(DefaultSigninUri, client.ClientUri);
+                    if (DefaultSignoutUri != null) DefaultSignoutUri = RootUri(DefaultSignoutUri, client.ClientUri);
                 }
         }
 

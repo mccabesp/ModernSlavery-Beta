@@ -58,6 +58,9 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         [HttpGet("~/session-expired")]
         public async Task<IActionResult> SessionExpired()
         {
+            //Clear the session
+            Session.Clear();
+
             if (!User.Identity.IsAuthenticated) return View("SessionExpired");
 
             return await LogoutUser(Url.Action(nameof(SessionExpired), null, null, "https"));
@@ -255,6 +258,14 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             return View("CookieDetails");
         }
 
+        #endregion
+
+        #region User Satisfaction Survey
+        [HttpGet("~/satisfaction-survey")]
+        public IActionResult SatisfactionSurvey()
+        {
+            return View("SatisfactionSurvey");
+        }
         #endregion
     }
 }

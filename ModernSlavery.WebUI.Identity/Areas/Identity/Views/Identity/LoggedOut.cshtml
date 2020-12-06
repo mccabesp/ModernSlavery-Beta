@@ -9,7 +9,7 @@
     ViewData["PageTitle"] = $"Sign out - {sharedOptions.ServiceName} - GOV.UK";   
 }
 @section Head {
-    <script type="text/javascript">
+    <script type="text/javascript" nonce="@Html.GetNonce()">
         var uri = window.location.toString();
         if (uri.indexOf("?") > 0) {
             var clean_uri = uri.substring(0, uri.indexOf("?"));

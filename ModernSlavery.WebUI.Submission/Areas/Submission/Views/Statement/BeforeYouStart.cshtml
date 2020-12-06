@@ -8,32 +8,46 @@
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-5">
             @Model.PageTitle
         </h1>
         <p class="govuk-body">
             To use this service, you will need to provide us with some basic information about your most recent modern slavery statement.
         </p>
-        <p class="govuk-body">
-            We will then ask you some additional questions about your statement. These are optional – but we strongly encourage you to complete them.
+        <p class="govuk-body govuk-!-margin-bottom-6">
+            We will then ask you some additional questions about your statement. These are optional – but we strongly encourage you to complete them. All our questions relate to the period covered by your statement.
         </p>
 
-        <span class="govuk-body govuk-!-font-weight-bold">
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+            Saving and editing your answers
+        </h2>
+        <p class="govuk-body govuk-!-margin-bottom-6">
+            You do not have to answer all our questions in one go. You can save and edit your answers as often as you like before you submit them.
+        </p>
+
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
             Publishing your answers on GOV.UK
-        </span>
-        <p class="govuk-body">
-            When you submit your answers, we will publish all the information you’ve provided on the Modern slavery statement registry on GOV.UK, along with a link to the full statement on your website. This is available for public viewing.
+        </h2>
+        <p class="govuk-body govuk-!-margin-bottom-6">
+            When you submit your answers, we will publish all the information you’ve provided as a summary of your statement on the Modern slavery statement registry on GOV.UK. This will include a link to the full statement on your website. It will be available for public viewing.
         </p>
 
-        <span class="govuk-body govuk-!-font-weight-bold">
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
             Making changes after you’ve submitted your answers
-        </span>
-        <p class="govuk-body govuk-!-padding-bottom-3 ">
-            After we’ve published your answers on the statement registry, you can still make changes and resubmit. Your updated information will then replace your original answers on the registry.
+        </h2>
+        <p class="govuk-body govuk-!-margin-bottom-6">
+            After we’ve published your answers, you can still make changes and resubmit. Your updated information will then replace your original answers on the registry. There is no time limit on changing and resubmitting your answers.
+        </p>
+
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+            What the published information will look like
+        </h2>
+        <p class="govuk-body govuk-!-margin-bottom-7">
+            You can see examples of published statement summaries on <a href="@(Url.ActionArea("Index", "Viewing", "Viewing"))" class="govuk-link">Find a modern slavery statement</a>.
         </p>
 
         <a href="@Model.ContinueUrl" class="govuk-button">
-            Continue 
+            Continue
         </a>
 
     </div>

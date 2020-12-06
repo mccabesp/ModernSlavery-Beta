@@ -43,7 +43,7 @@
     <meta property="og:image" content="/assets/public/govuk_template/assets/images/opengraph-image.png?0.12.0">
     <meta name="format-detection" content="telephone=no" />
 
-    <script type="text/javascript">
+    <script type="text/javascript" nonce="@Html.GetNonce()">
         (function () {
             if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
                 var d = document, c = "appendChild", a = d.createElement("style");
@@ -52,32 +52,32 @@
             }
         })();
     </script>
-    <link href="/assets/public/govuk_template/assets/stylesheets/govuk-template.css?0.12.0" media="screen" rel="stylesheet" type="text/css" />
-    <link href="/assets/public/govuk_template/assets/stylesheets/govuk-template-print.css?0.12.0" media="print" rel="stylesheet" type="text/css" />
-    <link href="/assets/public/govuk_template/assets/stylesheets/fonts.css?0.12.0" media="all" rel="stylesheet" type="text/css" />
+    <link asp-append-version="true" href="/assets/public/govuk_template/assets/stylesheets/govuk-template.css?0.12.0" media="screen" rel="stylesheet" type="text/css" />
+    <link asp-append-version="true" href="/assets/public/govuk_template/assets/stylesheets/govuk-template-print.css?0.12.0" media="print" rel="stylesheet" type="text/css" />
+    <link asp-append-version="true" href="/assets/public/govuk_template/assets/stylesheets/fonts.css?0.12.0" media="all" rel="stylesheet" type="text/css" />
 
-    <link rel="shortcut icon" sizes="16x16 32x32 48x48" href="/assets/images/favicon.ico" type="image/x-icon" />
-    <link rel="mask-icon" href="/assets/images/govuk-mask-icon.svg" color="blue">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/govuk-apple-touch-icon-180x180.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="/assets/images/govuk-apple-touch-icon-167x167.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/assets/images/govuk-apple-touch-icon-152x152.png">
-    <link rel="apple-touch-icon" href="/assets/images/govuk-apple-touch-icon.png">
+    <link asp-append-version="true" rel="shortcut icon" sizes="16x16 32x32 48x48" href="/assets/images/favicon.ico" type="image/x-icon" />
+    <link asp-append-version="true" rel="mask-icon" href="/assets/images/govuk-mask-icon.svg" color="blue">
+    <link asp-append-version="true" rel="apple-touch-icon" sizes="180x180" href="/assets/images/govuk-apple-touch-icon-180x180.png">
+    <link asp-append-version="true" rel="apple-touch-icon" sizes="167x167" href="/assets/images/govuk-apple-touch-icon-167x167.png">
+    <link asp-append-version="true" rel="apple-touch-icon" sizes="152x152" href="/assets/images/govuk-apple-touch-icon-152x152.png">
+    <link asp-append-version="true" rel="apple-touch-icon" href="/assets/images/govuk-apple-touch-icon.png">
 
     @RenderSection("Head", false)
 
     @if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request))
     {
-        <environment exclude="Development, DEV, TEST, QAT, PROD, PREPROD, UR">
+        <environment exclude="Development, DEV, TEST, QAT, UR">
             <!--[if !IE 8]><!-->
-            <link href="/assets/styles/app-all.min.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
+            <link asp-append-version="true" href="/assets/styles/app-all.min.css" rel="stylesheet" type="text/css" media="all" />
             <!--<![endif]-->
             <!--[if IE 8]>
-                <link href="/assets/styles/app-ie8.min.css" asp-append-version="true" rel="stylesheet" type="text/css" media="all" />
+                <link href="/assets/styles/app-ie8.min.css" rel="stylesheet" type="text/css" media="all" />
             <![endif]-->
         </environment>
-        <environment include="Development, DEV, TEST, QAT, PROD, PREPROD, UR">
+        <environment include="Development, DEV, TEST, QAT, UR">
             <!--[if !IE 8]><!-->
-            <link href="/assets/styles/app-all.css" rel="stylesheet" type="text/css" media="all" />
+            <link asp-append-version="true" href="/assets/styles/app-all.css" rel="stylesheet" type="text/css" media="all" />
             <!--<![endif]-->
             <!--[if IE 8]>
                 <link href="/assets/styles/app-ie8.css" rel="stylesheet" type="text/css" media="all" />
@@ -88,7 +88,7 @@
 <body class="@(ViewBag.bodyClasses)">
     @if (!Context.GetBrowser().ContainsI("MSIE 8"))
     {
-        <script type="text/javascript">document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+        <script type="text/javascript" nonce="@Html.GetNonce()">document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
     }
     @if (featureSwitchOptions.IsEnabled("CookiePolicyLink") && !CookieHelper.HasSeenLatestCookieMessage(Context.Request))
     {
@@ -126,47 +126,29 @@
                         {
                             <span id="proposition-name">@sharedOptions.ServiceName</span>
                         }
-                        <ul id="proposition-links">
-                            @if (featureSwitchOptions.IsEnabled("NavigationLinks"))
-                            {
-                                @if (featureSwitchOptions.IsEnabled("ReportingStepByStep"))
-                                {
-                                    <li>
-                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">Search</a>
-                                    </li>
-                                    <li>
-                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("StepByStepStandalone", "ReportingStepByStep", "Viewing"))">Guidance</a>
-                                    </li>
-                                    <li>
-                                        <a rel="track" data-track-category="Header Link Clicked" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Submit</a>
-                                    </li>
-                                }
-                                else
-                                {
-                                    <li>
-                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("SearchResults", "Viewing", "Viewing"))">Search and compare</a>
-                                    </li>
-                                    <li>
-                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("Download", "Viewing", "Viewing"))">Download</a>
-                                    </li>
-                                    <li>
-                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("ActionHub", "Overview", "Viewing"))">Close the gap</a>
-                                    </li>
-                                }}
+                    <ul id="proposition-links">
+                        @if (featureSwitchOptions.IsEnabled("NavigationLinks") && User.Identity.IsAuthenticated)
+                        {
+                                <li>
+                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("ManageOrganisations", "Submission", "Submission"))">Your organisations</a>
+                                </li>
+                                <li>
+                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("ManageAccount", "Account", "Account"))">Your details</a>
+                                </li>
+                               
+                                <li @*id="login-links"*@ class="nowrap">
+                                        <a asp-action="SignOut" asp-controller="Account" asp-area="Account">Sign out</a>
+                                </li>
+                        }
 
-                            @if (User.Identity.IsAuthenticated)
-                            {
-                                <li id="login-links" class="nowrap">
-                                    <a asp-action="SignOut" asp-controller="Account" asp-area="Account">Sign out</a>
-                                </li>
-                            }
-                            else if (!Url.IsAction("Login", "Identity", "Identity"))
-                            {
-                                <li id="login-links" class="nowrap">
-                                    <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Sign in</a>
-                                </li>
-                            }
-                        </ul>
+
+                        else if (!Url.IsAction("Login", "Identity", "Identity") && !User.Identity.IsAuthenticated)
+                        {
+                            <li id="login-links" class="nowrap">
+                                <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Sign in</a>
+                            </li>
+                        }
+                    </ul>
                     </nav>
                 </div>
             </div>
@@ -258,7 +240,7 @@
     </footer>
     <!--end footer-->
     <div id="global-app-error" class="app-error hidden"></div>
-    <script src="/assets/public/govuk_template/assets/javascripts/govuk-template.js?0.13.0" type="text/javascript"></script>
+    <script asp-append-version="true" src="/assets/public/govuk_template/assets/javascripts/govuk-template.js?0.13.0" type="text/javascript"></script>
     @RenderSection("BodyEnd", false)
 </body>
 </html>

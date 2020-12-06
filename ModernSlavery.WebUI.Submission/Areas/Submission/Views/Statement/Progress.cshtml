@@ -24,7 +24,7 @@
                 <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="500">
                     <div class="govuk-form-group @Html.SetErrorClass(model => model.ProgressMeasures, "govuk-form-group--error")">
                         <div id="progress-measures-hint" class="govuk-hint govuk-body govuk-!-margin-bottom-5">
-                            For example, do you use KPIs or goals to monitor progress, or does your statement provide updates on how you've addressed risks identified in past statements?
+                            For example, do you use key performance indicators (KPIs) to measure your performance, or have you set progress goals for your next statement?
                         </div>
                         <textarea name="ProgressMeasures" id="progress-measures" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="progress-measures-info">@(Model.ProgressMeasures)</textarea>
                     </div>

@@ -6,9 +6,9 @@ namespace ModernSlavery.Core.Extensions
 {
     public static class HttpsCertificate
     {
-        public static X509Certificate2 LoadCertificateFromThumbprint(string certThumprint)
+        public static X509Certificate2 LoadCertificateFromThumbprint(string certThumbprint)
         {
-            if (string.IsNullOrWhiteSpace(certThumprint)) throw new ArgumentNullException(nameof(certThumprint));
+            if (string.IsNullOrWhiteSpace(certThumbprint)) throw new ArgumentNullException(nameof(certThumbprint));
 
             X509Certificate2 cert = null;
             using (var certStore = new X509Store(StoreName.My, StoreLocation.CurrentUser))
@@ -16,10 +16,10 @@ namespace ModernSlavery.Core.Extensions
                 certStore.Open(OpenFlags.ReadOnly);
 
                 //Try and get a valid cert
-                var certCollection = certStore.Certificates.Find(X509FindType.FindByThumbprint, certThumprint, true);
+                var certCollection = certStore.Certificates.Find(X509FindType.FindByThumbprint, certThumbprint, true);
                 //Otherwise use an invalid cert
                 if (certCollection.Count == 0)
-                    certCollection = certStore.Certificates.Find(X509FindType.FindByThumbprint, certThumprint, false);
+                    certCollection = certStore.Certificates.Find(X509FindType.FindByThumbprint, certThumbprint, false);
 
                 if (certCollection.Count > 0) cert = certCollection[0];
 
@@ -35,12 +35,12 @@ namespace ModernSlavery.Core.Extensions
                     //Try and get a valid cert
                     var certCollection = certStore.Certificates.Find(
                         X509FindType.FindByThumbprint,
-                        certThumprint,
+                        certThumbprint,
                         true);
                     //Otherwise use an invalid cert
                     if (certCollection.Count == 0)
                         certCollection =
-                            certStore.Certificates.Find(X509FindType.FindByThumbprint, certThumprint, false);
+                            certStore.Certificates.Find(X509FindType.FindByThumbprint, certThumbprint, false);
 
                     if (certCollection.Count > 0) cert = certCollection[0];
 
@@ -48,7 +48,7 @@ namespace ModernSlavery.Core.Extensions
                 }
 
             if (cert == null)
-                throw new Exception($"Cannot find certificate with thumbprint '{certThumprint}' in local store");
+                throw new Exception($"Cannot find certificate with thumbprint '{certThumbprint}' in local store");
 
             return cert;
         }

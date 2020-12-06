@@ -36,7 +36,7 @@ namespace ModernSlavery.Hosts.Web
 
             if (string.IsNullOrWhiteSpace(ClientSecret)) exceptions.Add(new ConfigurationErrorsException($"Missing ClientSecret in configuration 'IdentityClient:ClientSecret'"));
 
-            if (AllowInvalidServerCertificates && _sharedOptions.IsProduction()) exceptions.Add(new ConfigurationErrorsException($"IdentityClient:AllowInvalidServerCertificates=true is not allowed in production environment'"));
+            //TODO Temporary workaround before go live if (AllowInvalidServerCertificates && _sharedOptions.IsProduction()) exceptions.Add(new ConfigurationErrorsException($"IdentityClient:AllowInvalidServerCertificates=true is not allowed in production environment'"));
 
             if (exceptions.Count > 0)
             {

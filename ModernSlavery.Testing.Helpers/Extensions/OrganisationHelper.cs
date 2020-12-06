@@ -12,6 +12,7 @@ using ModernSlavery.BusinessDomain.Registration;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Testing.Helpers.Classes;
 using Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi.Models;
+using Castle.Core.Internal;
 
 /// <summary>
 /// TODO: Use Business Logicfunctionality
@@ -62,6 +63,32 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             return dataRepository.GetAll<Organisation>();
         }
 
+        //public static IEnumerable<Organisation> FindAllUnusedOrgs(this BaseUITest uiTest)
+        //{
+        //    var dataRepository = uiTest.ServiceScope.GetDataRepository();
+        //    return dataRepository.GetAll<Organisation>().AsEnumerable()
+        //        .Where(
+        //        org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && 
+        //        org.LatestRegistrationUserId == null && 
+        //        org.UserOrganisations.IsNullOrEmpty() && 
+        //        !org.OrganisationName.IsAny(dataRepository.GetAll<StatementOrganisation>()));
+        //}
+
+        public static IEnumerable<Organisation> FindAllUnusedOrgs(this BaseUITest uiTest)
+        {
+            var dataRepository = uiTest.ServiceScope.GetDataRepository();
+            var groupOrgs = dataRepository.GetAll<StatementOrganisation>().AsEnumerable().Select(so => so.Organisation).ToList();
+            return dataRepository.GetAll<Organisation>()
+                .AsEnumerable()
+                .Where(org =>
+                    // presumed scope
+                    org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope)
+                    // No associated users
+                    && org.UserOrganisations.IsNullOrEmpty()
+                    // No group statements
+                    && !groupOrgs.Contains(org));
+        }
+        //(dataRepository.GetAll<StatementOrganisation>().AsEnumerable().ForEach(statement => statement.OrganisationName != org.OrganisationName)
         /// <summary>
         /// Creates a registration for a user with an organisation
         /// </summary>

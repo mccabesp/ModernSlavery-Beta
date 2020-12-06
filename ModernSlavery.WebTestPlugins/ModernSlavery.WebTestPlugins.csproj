@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProxyPlugin.cs" />
     <Compile Include="CookieManagerPlugin.cs" />
     <Compile Include="IncrementIntPlugin.cs" />
     <Compile Include="ExtractRandomTagAttribute.cs" />

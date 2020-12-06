@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.Core.Entities.StatementSummary;
+using ModernSlavery.Core.Entities.StatementSummary.V1;
 using ModernSlavery.Core.Extensions;
 using static ModernSlavery.Core.Entities.Statement;
 
@@ -108,7 +106,7 @@ namespace ModernSlavery.WebUI.Viewing.Models
         #endregion
 
         #region Statement Summary Fields
-        public StatementSummary1 Summary { get; set; }
+        public StatementSummary Summary { get; set; }
         #endregion
 
         #region Navigation Properties

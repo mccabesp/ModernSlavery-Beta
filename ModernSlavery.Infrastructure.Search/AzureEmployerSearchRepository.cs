@@ -28,9 +28,10 @@ namespace ModernSlavery.Infrastructure.Search
         private const string suggestorName = "sgOrgName";
         private const string synonymMapName = "desc-synonymmap";
         private readonly IMapper _autoMapper;
-        private readonly Lazy<Task<ISearchIndexClient>> _indexClient;
 
-        private readonly Lazy<Task<ISearchServiceClient>> _serviceClient;
+        private Lazy<Task<ISearchServiceClient>> _serviceClient;
+        private Lazy<Task<ISearchIndexClient>> _indexClient;
+
         private readonly TelemetryClient _telemetryClient;
         public readonly IAuditLogger SearchLog;
         private readonly SharedOptions _sharedOptions;
@@ -78,50 +79,62 @@ namespace ModernSlavery.Infrastructure.Search
             if (!string.IsNullOrWhiteSpace(searchOptions.AdminApiKey) && !string.IsNullOrWhiteSpace(searchOptions.QueryApiKey))
                 throw new ArgumentException($"Cannot specify both '{nameof(searchOptions.AdminApiKey)}' and '{nameof(searchOptions.QueryApiKey)}'");
 
+            SetServiceClient();
+
+            SetIndexClient();
+        }
+
+        void SetServiceClient()
+        {
             _serviceClient = new Lazy<Task<ISearchServiceClient>>(
                 async () =>
                 {
                     //Get the service client
-                    var _serviceClient = new SearchServiceClient(searchOptions.ServiceName, new SearchCredentials(searchOptions.AdminApiKey));
+                    var _serviceClient = new SearchServiceClient(_searchOptions.ServiceName, new SearchCredentials(_searchOptions.AdminApiKey));
 
                     //Ensure the index exists
                     await CreateIndexIfNotExistsAsync(_serviceClient, IndexName).ConfigureAwait(false);
 
                     return _serviceClient;
                 });
+        }
 
+        void SetIndexClient()
+        {
             _indexClient = new Lazy<Task<ISearchIndexClient>>(
                 async () =>
                 {
                     //Get the index client
-                    if (!string.IsNullOrWhiteSpace(searchOptions.AdminApiKey))
+                    if (!string.IsNullOrWhiteSpace(_searchOptions.AdminApiKey))
                     {
                         var serviceClient = await _serviceClient.Value;
                         return serviceClient.Indexes.GetClient(IndexName);
                     }
 
-                    if (!string.IsNullOrWhiteSpace(searchOptions.QueryApiKey))
-                        return new SearchIndexClient(searchOptions.ServiceName, IndexName, new SearchCredentials(searchOptions.QueryApiKey));
+                    if (!string.IsNullOrWhiteSpace(_searchOptions.QueryApiKey))
+                        return new SearchIndexClient(_searchOptions.ServiceName, IndexName, new SearchCredentials(_searchOptions.QueryApiKey));
 
                     throw new ArgumentNullException(
-                        $"You must provide '{nameof(searchOptions.AdminApiKey)}' or '{nameof(searchOptions.QueryApiKey)}'");
+                        $"You must provide '{nameof(_searchOptions.AdminApiKey)}' or '{nameof(_searchOptions.QueryApiKey)}'");
                 });
         }
+
 
         public bool Disabled { get; set; }
         public string IndexName { get; }
 
         public async Task CreateIndexIfNotExistsAsync(string indexName)
         {
-            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
-
-            var serviceClient = await _serviceClient.Value;
-            await CreateIndexIfNotExistsAsync(serviceClient, indexName);
+            await CreateIndexIfNotExistsAsync(null, indexName);
         }
 
-        private async Task CreateIndexIfNotExistsAsync(ISearchServiceClient serviceClient, string indexName)
+        private async Task CreateIndexIfNotExistsAsync(ISearchServiceClient serviceClient, string indexName=null)
         {
             if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
+
+            //Ensure we have a service client and index name
+            serviceClient = serviceClient ?? await _serviceClient.Value ?? throw new ArgumentNullException(nameof(serviceClient));
+            indexName = !string.IsNullOrWhiteSpace(indexName) ? indexName : !string.IsNullOrWhiteSpace(IndexName) ? IndexName : throw new ArgumentNullException(nameof(indexName));
 
             if (await serviceClient.Indexes.ExistsAsync(indexName)) return;
 
@@ -159,8 +172,7 @@ namespace ModernSlavery.Infrastructure.Search
             keyNameFilterFields.Add(Field.New(nameof(OrganisationSearchModel.KeyName.Key), DataType.Int32, isFilterable: true));
             keyNameFilterFields.Add(Field.New(nameof(OrganisationSearchModel.KeyName.Name), DataType.String));
             Add(Field.NewComplex(nameof(OrganisationSearchModel.Turnover),false, keyNameFilterFields));
-            Add(Field.NewComplex(nameof(OrganisationSearchModel.Sectors), true, keyNameFilterFields));
-
+            Add(Field.NewComplex(nameof(OrganisationSearchModel.StatementYears), false, keyNameFilterFields));
             Add(Field.NewComplex(nameof(OrganisationSearchModel.Sectors), true, keyNameFilterFields));
             #endregion
 
@@ -247,6 +259,30 @@ namespace ModernSlavery.Infrastructure.Search
                     });
 
             await serviceClient.Indexes.CreateAsync(index);
+        }
+
+        public async Task DeleteIndexIfExistsAsync(string indexName = null)
+        {
+            await DeleteIndexIfExistsAsync(null, indexName);
+        }
+
+        private async Task DeleteIndexIfExistsAsync(ISearchServiceClient serviceClient, string indexName=null)
+        {
+            if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
+
+            //Ensure we have a service client and index name
+            serviceClient = serviceClient ?? await _serviceClient.Value ?? throw new ArgumentNullException(nameof(serviceClient));
+            indexName = !string.IsNullOrWhiteSpace(indexName) ? indexName : !string.IsNullOrWhiteSpace(IndexName) ? IndexName : throw new ArgumentNullException(nameof(indexName));
+
+            if (!await serviceClient.Indexes.ExistsAsync(indexName)) return;
+
+            await serviceClient.Indexes.DeleteAsync(indexName);
+
+            //Recreate the service client
+            SetServiceClient();
+
+            //Recreate the index client
+            SetIndexClient();
         }
 
         public async Task AddOrUpdateDocumentsAsync(IEnumerable<OrganisationSearchModel> newRecords)
@@ -504,7 +540,5 @@ namespace ModernSlavery.Infrastructure.Search
             //Return the results
             return searchResults;
         }
-
-
     }
 }

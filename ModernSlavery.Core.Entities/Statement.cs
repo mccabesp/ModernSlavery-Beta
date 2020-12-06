@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Policy;
 using System.Text;
-using ModernSlavery.Core.Entities.StatementSummary;
 using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.Core.Entities
@@ -104,6 +103,7 @@ namespace ModernSlavery.Core.Entities
         public enum StatementTurnoverRanges : byte
         {
             //Not Provided
+            [Description("Not provided")]
             [Range(0, 0)]
             NotProvided = 0,
 
@@ -140,6 +140,7 @@ namespace ModernSlavery.Core.Entities
         public enum StatementYearRanges : byte
         {
             //Not Provided
+            [Description("Not provided")]
             [Range(0, 0)]
             NotProvided = 0,
 
@@ -163,7 +164,7 @@ namespace ModernSlavery.Core.Entities
         #endregion
 
         #region Statement Summary Fields
-        public virtual StatementSummary1 Summary { get; set; }
+        public virtual StatementSummary.V1.StatementSummary Summary { get; set; }
         #endregion
     }
 }

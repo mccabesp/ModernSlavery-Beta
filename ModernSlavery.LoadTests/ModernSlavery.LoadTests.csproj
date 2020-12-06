@@ -37,7 +37,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.LoadTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Microsoft.VisualStudio.QualityTools.LoadTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -52,6 +54,9 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Load Tests\10 min 10 users.loadtest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Load Tests\MSU increment to 1k - core.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -73,7 +78,6 @@
     <None Include="Load Tests\MSU Quick Soak2.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Scenarios\Administrator User Journey.webtest" />
     <None Include="Scenarios\Anonymous User Journey.webtest" />
     <None Include="Scenarios\Private Organisation User Journey.webtest" />
     <None Include="Scenarios\Public Organisation User Journey.webtest" />
@@ -101,7 +105,9 @@
     <None Include="Web Tests\Login.webtest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Web Tests\SubmitStatement.webtest" />
+    <None Include="Web Tests\SubmitStatement.webtest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Web Tests\VerifyEmail.webtest" />
   </ItemGroup>
   <ItemGroup>

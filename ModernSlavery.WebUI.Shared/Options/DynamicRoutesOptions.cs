@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Attributes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Options;
@@ -19,6 +21,11 @@ namespace ModernSlavery.WebUI.Shared.Options
         {
             foreach (var key in this.Keys)
             {
+                if (this[key].StartsWith('/'))
+                {
+                    endpoints.MapFallbackToPage(key, this[key]);
+                    continue;
+                }
                 var parts = this[key].SplitI(":");
                 var actionName = parts.Length > 0 ? parts[0] : null;
                 var controllerName = parts.Length > 1 ? parts[1] : null;

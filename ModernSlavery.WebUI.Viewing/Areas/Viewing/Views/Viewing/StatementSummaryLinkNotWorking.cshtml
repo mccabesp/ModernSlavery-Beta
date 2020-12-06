@@ -1,5 +1,10 @@
-﻿@{
+﻿@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+@{
     Layout = "~/Views/GdsLayout.cshtml";
+}
+
+@section BeforeMain {
+    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
 
 <div class="govuk-grid-row">

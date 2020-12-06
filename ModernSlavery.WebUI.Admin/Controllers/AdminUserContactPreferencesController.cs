@@ -7,12 +7,14 @@ using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
 using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
+    [NoCache]
     public class AdminUserContactPreferencesController : Controller
     {
         private readonly IAdminService _adminService;

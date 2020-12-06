@@ -13,26 +13,33 @@
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
 
-            <div class="govuk-form-group">
+            <div class="govuk-form-group govuk-!-margin-bottom-7">
                 <fieldset class="govuk-fieldset" aria-describedby="highest-risk-hint">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-5">
                         <h1 class="govuk-fieldset__heading">
                             @Model.PageTitle
                         </h1>
                     </legend>
 
-                    <p class="govuk-body">
-                        What did you identify as your highest modern slavery risks in your operations and supply chain during the period of the statement?
-                        Briefly describe up to 3 risks.
+                    <p class="govuk-body govuk-!-margin-bottom-6">
+                        Briefly describe up to 3 priority risks your organisation focused on during the period of the statement. You can provide more information on the following pages, including what you’re doing to manage each risk.
                     </p>
 
-                    <p id="highest-risk-hint" class="govuk-hint">
-                        For example, ‘Bangladeshi migrant workers in apparel factories in Mauritius’ or ‘Temporary construction workers building new retail premises in the UK’
+                    <h2 class="govuk-heading-m">
+                        How to describe your risks
+                    </h2>
+                    
+                    <p class="govuk-body">
+                        If possible, include details of the affected workers, the activity involved, and the location.
+                    </p>
+
+                    <p id="highest-risk-hint" class="govuk-hint govuk-!-margin-bottom-6">
+                        For example, ‘Bangladeshi migrants manufacturing clothing in Mauritius’ or ‘Temporary construction workers building retail premises in the UK.’
                     </p>
 
                     <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
                         <div class="govuk-form-group @Html.SetErrorClass(model => model.HighRisk1, "govuk-form-group--error")">
-                            <label class="govuk-label" for="high-risk-detail-1">
+                            <label class="govuk-label govuk-!-font-weight-bold" for="high-risk-detail-1">
                                 Risk
                             </label>
                             <textarea name="HighRisk1" class="govuk-textarea govuk-js-character-count" id="high-risk-detail-1" rows="5" aria-describedby="high-risk-detail-1-info">@(Model.HighRisk1)</textarea>
@@ -45,7 +52,7 @@
 
                     <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
                         <div class="govuk-form-group @Html.SetErrorClass(model => model.HighRisk2, "govuk-form-group--error")">
-                            <label class="govuk-label" for="high-risk-detail-2">
+                            <label class="govuk-label govuk-!-font-weight-bold" for="high-risk-detail-2">
                                 Risk
                             </label>
                             <textarea name="HighRisk2" class="govuk-textarea govuk-js-character-count" id="high-risk-detail-2" rows="5" aria-describedby="high-risk-detail-2-info">@(Model.HighRisk2)</textarea>
@@ -58,7 +65,7 @@
 
                     <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
                         <div class="govuk-form-group @Html.SetErrorClass(model => model.HighRisk3, "govuk-form-group--error")">
-                            <label class="govuk-label" for="high-risk-detail-3">
+                            <label class="govuk-label govuk-!-font-weight-bold" for="high-risk-detail-3">
                                 Risk
                             </label>
                             <textarea name="HighRisk3" class="govuk-textarea govuk-js-character-count" id="high-risk-detail-3" rows="5" aria-describedby="high-risk-detail-3-info">@(Model.HighRisk3)</textarea>
@@ -69,15 +76,17 @@
                         <span asp-validation-for="HighRisk3" class="govuk-error-message"></span>
                     </div>
 
-                    <div class="govuk-!-margin-bottom-2">
+                    <div class="govuk-!-margin-bottom-4">
                         or
                     </div>
-                    <div class="govuk-checkboxes__item">
-                        <input asp-for="NoRisks" class="govuk-checkboxes__input" />
-                        <label asp-for="NoRisks" class="govuk-label govuk-checkboxes__label">
-                            My organisation did not identify any modern slavery risks in its operations or supply chain during the period of the statement
-                        </label>
-                    </div>
+                   
+                        <div class="govuk-checkboxes__item">
+                            <input asp-for="NoRisks" class="govuk-checkboxes__input" />
+                            <label asp-for="NoRisks" class="govuk-label govuk-checkboxes__label govuk-!-padding-top-0">
+                                My organisation did not identify any modern slavery risks in its operations or supply chains during the period of the statement
+                            </label>
+                        </div>
+                   
                 </fieldset>
             </div>
 

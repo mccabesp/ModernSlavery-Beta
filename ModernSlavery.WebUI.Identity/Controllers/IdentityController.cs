@@ -49,6 +49,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         private readonly IAuthenticationSchemeProvider _schemeProvider;
 
         private readonly IUserRepository _userRepository;
+        private readonly IdentityServerOptions _identityServerOptions;
 
         public IdentityController(
             IIdentityServerInteractionService interaction,
@@ -56,10 +57,12 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             IAuthenticationSchemeProvider schemeProvider,
             IEventService events,
             IUserRepository userRepository,
+            IdentityServerOptions identityServerOptions,
             ILogger<IdentityController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(
             logger, webService, sharedBusinessLogic)
         {
             _userRepository = userRepository;
+            _identityServerOptions = identityServerOptions;
             _interaction = interaction;
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
@@ -134,8 +137,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         [HttpGet("sign-in")]
         public async Task<IActionResult> Login(string returnUrl)
         {
-            if (string.IsNullOrWhiteSpace(returnUrl))
-                return Redirect(SharedBusinessLogic.SharedOptions.SiteAuthority + "manage-organisations");
+            if (string.IsNullOrWhiteSpace(returnUrl))return Redirect(_identityServerOptions.DefaultSigninUri);
 
             // build a model so we know what to show on the login page
             var vm = await BuildLoginViewModelAsync(returnUrl);
@@ -305,8 +307,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         public async Task<IActionResult> Logout(string logoutId)
         {
             //If there is no logoutid then sign-out via webui
-            if (string.IsNullOrWhiteSpace(logoutId))
-                return Redirect(SharedBusinessLogic.SharedOptions.SiteAuthority + "sign-out");
+            if (string.IsNullOrWhiteSpace(logoutId))return Redirect(_identityServerOptions.DefaultSignoutUri);
 
             // build a model so the logout page knows what to display
             var vm = await BuildLogoutViewModelAsync(logoutId);

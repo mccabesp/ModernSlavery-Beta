@@ -109,6 +109,6 @@
 
   <!-- *** THIS IS REQUIRED TO DEPLY WebjobS WITH WEBUI ON AZURE *** -->
   <Target Name="PostpublishScript" AfterTargets="Publish">
-    <Exec Command="dotnet publish ..\ModernSlavery.Hosts.Webjob\ModernSlavery.Hosts.Webjob.csproj -c $(ConfigurationName) -o $(ProjectDir)$(PublishDir)App_Data\Jobs\continuous\ModernSlavery.Hosts.Webjob" />
+    <Exec Command="dotnet publish ..\ModernSlavery.Hosts.Webjob\ModernSlavery.Hosts.Webjob.csproj -c $(ConfigurationName) -o &quot;$(PublishDir)App_Data\Jobs\continuous\ModernSlavery.Hosts.Webjob&quot;" />
   </Target>
 </Project>

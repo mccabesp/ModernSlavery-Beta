@@ -40,7 +40,8 @@ namespace ModernSlavery.Core.Models
 
         public int CertExpiresWarningDays { get; set; } = 30;
 
-        public string TrustedIpDomains { get; set; }
+        public string TrustedDomainsOrIPs { get; set; }
+        private string[] _trustedDomainsOrIPs = null;
 
         public bool UseDeveloperExceptions { get; set; }
 
@@ -53,9 +54,8 @@ namespace ModernSlavery.Core.Models
         public int EmailVerificationMinResendHours { get; set; }
         public int OrganisationCodeLength { get; set; }
         public int OrganisationPageSize { get; set; }
-        public string WEBSITE_HOSTNAME { get; set; }
-
-        public string SiteAuthority => $"https://{WEBSITE_HOSTNAME}/";
+        public string EXTERNAL_HOSTNAME { get; set; }//The public internet host name
+        public string WEBSITE_HOSTNAME { get; set; }//The AzureWebsites host name
 
         public int LevenshteinDistance { get; set; } = 5;
         public int LockoutMinutes { get; set; }
@@ -102,7 +102,7 @@ namespace ModernSlavery.Core.Models
 
         public string Website_Instance_Id { get; set; }
 
-        public string CertThumprint { get; set; }
+        public string CertThumbprint { get; set; }
         public string CertFilepath { get; set; }
         public string CertPassword { get; set; }
 
@@ -113,6 +113,9 @@ namespace ModernSlavery.Core.Models
         }
 
         public string GoogleAnalyticsAccountId { get; set; }
+
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
 
         #region Environment
 
@@ -126,6 +129,10 @@ namespace ModernSlavery.Core.Models
         public bool IsDevelopment()
         {
             return IsEnvironment("Development");
+        }
+        public bool IsTest()
+        {
+            return IsEnvironment("Test");
         }
 
         public bool IsDev()
@@ -159,7 +166,6 @@ namespace ModernSlavery.Core.Models
 
         public string DownloadsLocation { get; set; }
 
-
         #endregion
 
         public void Validate()
@@ -168,10 +174,11 @@ namespace ModernSlavery.Core.Models
             //Check security settings for production environment
             if (IsProduction())
             {
-                if (string.IsNullOrWhiteSpace(DefaultEncryptionKey)) exceptions.Add(new ConfigurationErrorsException("DefaultEncryptionKey cannot be empty in Production environment"));
-                if (DefaultEncryptionKey == Encryption.DefaultEncryptionKey) exceptions.Add(new ConfigurationErrorsException("DefaultEncryptionKey cannot use default value in Production environment"));
-                if (ObfuscationSeed.IsAny(0, 127)) exceptions.Add(new ConfigurationErrorsException("ObfuscationSeed cannot use default value in Production environment"));
-                if (string.IsNullOrWhiteSpace(CertThumprint)) exceptions.Add(new ConfigurationErrorsException("CertThumprint cannot be empty in Production environment."));
+                if (string.IsNullOrWhiteSpace(TrustedDomainsOrIPs)) exceptions.Add(new ConfigurationErrorsException($"{nameof(TrustedDomainsOrIPs)} cannot be empty in Production environment"));
+                if (string.IsNullOrWhiteSpace(DefaultEncryptionKey)) exceptions.Add(new ConfigurationErrorsException($"{nameof(DefaultEncryptionKey)} cannot be empty in Production environment"));
+                if (DefaultEncryptionKey == Encryption.DefaultEncryptionKey) exceptions.Add(new ConfigurationErrorsException($"{nameof(DefaultEncryptionKey)} cannot use default value in Production environment"));
+                if (ObfuscationSeed.IsAny(0, 127)) exceptions.Add(new ConfigurationErrorsException($"{nameof(ObfuscationSeed)} cannot use default value in Production environment"));
+                if (string.IsNullOrWhiteSpace(CertThumbprint)) exceptions.Add(new ConfigurationErrorsException($"{nameof(CertThumbprint)} cannot be empty in Production environment."));
             }
 
             if (string.IsNullOrWhiteSpace(AdminEmails))
@@ -181,30 +188,46 @@ namespace ModernSlavery.Core.Models
             if (string.IsNullOrWhiteSpace(SuperAdminEmails))
                 exceptions.Add(new ConfigurationErrorsException($"Missing {nameof(SuperAdminEmails)}"));
 
-            if (string.IsNullOrWhiteSpace(ApplicationName)) exceptions.Add(new ConfigurationErrorsException($"Missing ApplicationName"));
-            if (string.IsNullOrWhiteSpace(CertFilepath) && !string.IsNullOrWhiteSpace(CertPassword)) exceptions.Add(new ConfigurationErrorsException($"Missing CertFilepath"));
-            if (!string.IsNullOrWhiteSpace(CertFilepath) && string.IsNullOrWhiteSpace(CertPassword)) exceptions.Add(new ConfigurationErrorsException($"Missing CertPassword"));
+            if (string.IsNullOrWhiteSpace(ApplicationName)) exceptions.Add(new ConfigurationErrorsException($"Missing {nameof(ApplicationName)}"));
+            if (string.IsNullOrWhiteSpace(CertFilepath) && !string.IsNullOrWhiteSpace(CertPassword)) exceptions.Add(new ConfigurationErrorsException($"Missing {nameof(CertFilepath)}"));
+            if (!string.IsNullOrWhiteSpace(CertFilepath) && string.IsNullOrWhiteSpace(CertPassword)) exceptions.Add(new ConfigurationErrorsException($"Missing {nameof(CertPassword)}"));
 
-            if (FirstReportingDeadlineYear == 0 || FirstReportingDeadlineYear > VirtualDateTime.Now.Year) exceptions.Add(new ConfigurationErrorsException($"Invalid FirstReportingDeadlineYear: {FirstReportingDeadlineYear}."));
+            if (FirstReportingDeadlineYear == 0 || FirstReportingDeadlineYear > VirtualDateTime.Now.Year) exceptions.Add(new ConfigurationErrorsException($"Invalid {nameof(FirstReportingDeadlineYear)}: {FirstReportingDeadlineYear}."));
             if (PrivateReportingDeadline == DateTime.MinValue)
-                exceptions.Add(new ConfigurationErrorsException($"Invalid PrivateReportingDeadline: {PrivateReportingDeadline}."));
+                exceptions.Add(new ConfigurationErrorsException($"Invalid {nameof(PrivateReportingDeadline)}: {PrivateReportingDeadline}."));
             else
                 while (PrivateReportingDeadline.Date.AddDays(1) < VirtualDateTime.Now)
                     PrivateReportingDeadline = new DateTime(PrivateReportingDeadline.Year + 1, PrivateReportingDeadline.Month, PrivateReportingDeadline.Day);
 
             if (PublicReportingDeadline == DateTime.MinValue)
-                exceptions.Add(new ConfigurationErrorsException($"Invalid PublicReportingDeadline: {PublicReportingDeadline}."));
+                exceptions.Add(new ConfigurationErrorsException($"Invalid {nameof(PublicReportingDeadline)}: {PublicReportingDeadline}."));
             else
                 while (PublicReportingDeadline.Date.AddDays(1) < VirtualDateTime.Now)
                     PublicReportingDeadline = new DateTime(PublicReportingDeadline.Year + 1, PublicReportingDeadline.Month, PublicReportingDeadline.Day);
 
             if (string.IsNullOrWhiteSpace(DataPath)) throw new ConfigurationErrorsException($"{nameof(DataPath)} cannot be empty");
 
+            if (!string.IsNullOrWhiteSpace(TrustedDomainsOrIPs))
+            {
+                _trustedDomainsOrIPs = TrustedDomainsOrIPs.SplitI();
+                if (_trustedDomainsOrIPs == null || _trustedDomainsOrIPs.Length == 0)
+                    throw new ConfigurationErrorsException($"{nameof(TrustedDomainsOrIPs)} cannot be empty");
+            }
+
             if (exceptions.Count > 0)
             {
                 if (exceptions.Count == 1) throw exceptions[0];
                 throw new AggregateException(exceptions);
             }
+
+
+        }
+
+        public bool IsTrustedAddress(string testIPAddress)
+        {
+            if (_trustedDomainsOrIPs == null) return true;
+            if (string.IsNullOrWhiteSpace(testIPAddress)) throw new ArgumentNullException(nameof(testIPAddress));
+            return Networking.IsTrustedAddress(testIPAddress, _trustedDomainsOrIPs);
         }
 
     }

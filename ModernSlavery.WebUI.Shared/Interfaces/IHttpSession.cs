@@ -13,5 +13,10 @@ namespace ModernSlavery.WebUI.Shared.Interfaces
         T Get<T>(string key);
         Task LoadAsync();
         Task SaveAsync();
+        //
+        // Summary:
+        //     Remove all entries from the current session, if any. The session cookie is not
+        //     removed.
+        void Clear();
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace ModernSlavery.Core.Extensions
 {
@@ -54,29 +55,56 @@ namespace ModernSlavery.Core.Extensions
             return false;
         }
 
-        public static bool IsTrustedAddress(this string hostName, string[] trustedIPdomains)
+        public static bool IsTrustedAddress(this string testIPAddress, string[] trustedIPdomains)
         {
-            if (string.IsNullOrWhiteSpace(hostName)) throw new ArgumentNullException(nameof(hostName));
+            if (string.IsNullOrWhiteSpace(testIPAddress)) throw new ArgumentNullException(nameof(testIPAddress));
 
             if (trustedIPdomains == null || trustedIPdomains.Length == 0)
                 throw new ArgumentNullException(nameof(trustedIPdomains));
 
-            if (trustedIPdomains.ContainsI(hostName)) return true;
+            return trustedIPdomains.Any(trustedHostnameOrIpAddressORCidr => IsTrustedAddress(testIPAddress, trustedHostnameOrIpAddressORCidr));
+        }
 
-            try
+        public static bool IsTrustedAddress(this string testIPAddress, string trustedHostnameOrIpAddressORCidr)
+        {
+            if (string.IsNullOrWhiteSpace(trustedHostnameOrIpAddressORCidr)) throw new ArgumentNullException(nameof(trustedHostnameOrIpAddressORCidr));
+            if (string.IsNullOrWhiteSpace(testIPAddress)) throw new ArgumentNullException(nameof(testIPAddress));
+            if (!IPAddress.TryParse(testIPAddress, out IPAddress testIP)) throw new ArgumentException($"Invalid IP Address '{testIPAddress}'",nameof(testIPAddress));
+
+            //Check if IP on local subnet
+            if (testIP.IsOnLocalSubnet()) return true;
+
+            //Check for exact domain or IP match
+            if (trustedHostnameOrIpAddressORCidr.Equals(testIPAddress,StringComparison.OrdinalIgnoreCase)) return true;
+
+            //Check for CIDR match
+            if (trustedHostnameOrIpAddressORCidr.IndexOf('/') > -1)
             {
-                var IPs = Dns.GetHostAddresses(hostName);
-                if (IPs == null || IPs.Length < 1)
-                    throw new Exception("Could not resolve host name '" + hostName + "'");
-
-                if (IPs.Any(address => trustedIPdomains.ContainsI(address.ToString()) || address.IsOnLocalSubnet()))
-                    return true;
+                var ipNetwork = CIDRToIPNetwork(trustedHostnameOrIpAddressORCidr);
+                return ipNetwork.Contains(testIP);
             }
-            catch
+
+            //Check for domain IP match
+            var trustedIPs = Dns.GetHostAddresses(trustedHostnameOrIpAddressORCidr);
+            return trustedIPs != null && trustedIPs.Any(address => address.Equals(testIP));
+        }
+
+        public static IPNetwork CIDRToIPNetwork(string cidr)
+        {
+            if (string.IsNullOrWhiteSpace(cidr)) throw new ArgumentNullException(nameof(cidr));
+            var seperatorIndex = cidr.IndexOf('/');
+
+            IPAddress ipAddress;
+            var prefixLength = 32;
+
+            if (seperatorIndex < 0)
+                ipAddress = IPAddress.Parse(cidr);
+            else
             {
+                prefixLength = int.Parse(cidr.Substring(seperatorIndex+1));
+                ipAddress = IPAddress.Parse(cidr.Substring(0, seperatorIndex));
             }
-
-            return hostName.IsOnLocalSubnet();
+            return new IPNetwork(ipAddress, prefixLength);
         }
 
         private static bool IsOnLocalSubnet(this IPAddress clientIP)

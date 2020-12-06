@@ -49,23 +49,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         #endregion
 
-        #region Initialisation
-
-        /// <summary>
-        ///     This action is only used to warm up this controller on initialisation
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("Init")]
-        public IActionResult Init()
-        {
-            if (!SharedBusinessLogic.SharedOptions.IsProduction())
-                Logger.LogInformation("Admin Controller Initialised");
-
-            return new EmptyResult();
-        }
-
-        #endregion
-
         #region Home Action
 
         [HttpGet]
@@ -97,6 +80,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var model = new DownloadViewModel();
             var downloads = new List<DownloadViewModel.Download>();
             DownloadViewModel.Download download;
+
+            //Ensure the log directory exists
+            if (!await SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(SharedBusinessLogic.SharedOptions.LogPath))
+                await SharedBusinessLogic.FileRepository.CreateDirectoryAsync(SharedBusinessLogic.SharedOptions.LogPath);
 
             #region Create Registration History
 
@@ -897,6 +884,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         private async Task UpdateCompanySicCodesAsync(DateTime updateTime)
         {
+            //Ensure the log directory exists
+            if (!await SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(SharedBusinessLogic.SharedOptions.LogPath))
+                await SharedBusinessLogic.FileRepository.CreateDirectoryAsync(SharedBusinessLogic.SharedOptions.LogPath);
+
             //Get all the bad sic records
             var files = await SharedBusinessLogic.FileRepository.GetFilesAsync(
                 SharedBusinessLogic.SharedOptions.LogPath, "BadSicLog*.csv", true);
@@ -949,6 +940,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         private async Task RecheckCompaniesAsync()
         {
+            //Ensure the log directory exists
+            if (!await SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(SharedBusinessLogic.SharedOptions.LogPath))
+                await SharedBusinessLogic.FileRepository.CreateDirectoryAsync(SharedBusinessLogic.SharedOptions.LogPath);
+
             //Get all the bad sic records
             var files = await SharedBusinessLogic.FileRepository.GetFilesAsync(
                 SharedBusinessLogic.SharedOptions.LogPath, "BadSicLog*.csv", true);

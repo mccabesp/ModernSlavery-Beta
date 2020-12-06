@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Viewing.Controllers;
-using ModernSlavery.WebUI.Viewing.Models;
 using System.Linq;
 
 namespace ModernSlavery.WebUI.Viewing.Presenters

@@ -22,4 +22,8 @@
     .buttons button.link-button {
         float: right;
     }
+
+    .autocomplete__input:not(.autocomplete__input--focused):focus {
+        outline-width: 0;
+    }
 }

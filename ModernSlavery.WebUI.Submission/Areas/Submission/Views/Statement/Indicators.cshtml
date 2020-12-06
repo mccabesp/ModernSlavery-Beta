@@ -2,8 +2,7 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model IndicatorsViewModel
-@using ModernSlavery.Core.Entities.StatementSummary;
-@using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
+@using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
@@ -30,9 +29,7 @@
                             </span>
                         </summary>
                         <div class="govuk-details__text">
-                            The International Labour Organization (ILO) has produced a list of the most common signs of forced labour.
-                            They’re based on the definition of forced labour as ‘all work or service which is extracted from any person under the menace of any penalty and for which the said person has not offered himself voluntarily.’
-                            More details and guidance are available on the ILO website, and in their publication ‘ILO indicators of forced labour’.
+                            The International Labour Organization (ILO) has produced a list of the most common signs of forced labour. They’re based on the definition of forced labour as ‘all work or service which is extracted from any person under the menace of any penalty and for which the said person has not offered himself voluntarily.’ More details and guidance are available on the ILO website, and in their publication <a href="https://www.ilo.org/global/topics/forced-labour/publications/WCMS_203832/lang--en/index.htm" target="_blank" class="govuk-link"> ILO indicators of forced labour (opens in new window)</a>.
                         </div>
                     </details>
 

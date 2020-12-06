@@ -19,12 +19,12 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
         public SystemFileRepository(StorageOptions storageOptions)
         {
             _storageOptions = storageOptions ?? throw new ArgumentNullException(nameof(storageOptions));
+
             if (string.IsNullOrWhiteSpace(storageOptions.LocalStorageRoot))
                 throw new ArgumentNullException(nameof(storageOptions.LocalStorageRoot));
 
-            var rootPath = string.IsNullOrWhiteSpace(storageOptions.LocalStorageRoot)
-                ? AppDomain.CurrentDomain.BaseDirectory
-                : FileSystem.ExpandLocalPath(storageOptions.LocalStorageRoot);
+            Directory.CreateDirectory(storageOptions.LocalStorageRoot);
+
             _rootDir = new DirectoryInfo(storageOptions.LocalStorageRoot);
         }
 

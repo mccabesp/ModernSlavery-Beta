@@ -82,10 +82,8 @@ namespace ModernSlavery.Infrastructure.Configuration
                 if (string.IsNullOrWhiteSpace(clientId) && string.IsNullOrWhiteSpace(clientSecret))
                 {
                     //Create Managed Service Identity token provider
-                    var tokenProvider = new AzureServiceTokenProvider();
-
-                    //Create the Key Vault client
                     var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                    //Create the Key Vault client
                     var kvClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
                     
                     //Add Key Vault to configuration pipeline
@@ -127,7 +125,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             var configDictionary=_appConfig.ResolveVariableNames();
 
             //Dump the settings to the console
-            if (_appConfig.GetValueOrDefault("DUMP_SETTINGS", false))
+            if (_appConfig.GetValueOrDefault("TestOptions:DUMP_SETTINGS", false))
             {
                 var dumpPath = Path.Combine(_appConfig["Filepaths:LogFiles"], $"{_appConfig.GetApplicationName()}.SETTINGS.json");
                 Directory.CreateDirectory(Path.GetDirectoryName(dumpPath));

@@ -46,6 +46,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Reset the database - this must be after host start so seed data files are copied
             await TestWebHost.ResetDatabaseAsync();
 
+            //Reset the search indexes
+            await TestWebHost.ResetSearchIndexesAsync();
+
             //Delete all the draft files
             await TestWebHost.Services.DeleteDraftsAsync();
 

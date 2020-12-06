@@ -5,11 +5,13 @@ using System.Reflection.Metadata.Ecma335;
 using AutoMapper;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.Core.Entities.StatementSummary;
+using ModernSlavery.Core.Entities.StatementSummary.V1;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using static ModernSlavery.Core.Entities.Statement;
-using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
-using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1.StatementRisk;
+using static ModernSlavery.Core.Entities.StatementSummary.V1.IStatementSummary;
+using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
+using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary.StatementRisk;
 
 namespace ModernSlavery.Core.Models
 {
@@ -23,7 +25,7 @@ namespace ModernSlavery.Core.Models
             {
                 CreateMap<SummarySearchModel.StatementRisk, StatementRisk>().ReverseMap();
 
-                CreateMap<StatementSummary1, SummarySearchModel>();
+                CreateMap<StatementSummary, SummarySearchModel>();
 
                 CreateMap<OrganisationSearchModel, OrganisationSearchModel>();
             }
@@ -97,7 +99,7 @@ namespace ModernSlavery.Core.Models
 
                 #region Risk Location Fields
 
-                public List<KeyName> Countries { get; set; } = new List<KeyName>();
+                public List<StringKeyName> Countries { get; set; } = new List<StringKeyName>();
                 #endregion
             }
 
@@ -130,12 +132,13 @@ namespace ModernSlavery.Core.Models
             {
                 public AutoMapperProfile() : base()
                 {
-                    CreateMap<KeyName, SectorTypes>().ConvertUsing(s => s == null ? default : (SectorTypes)s.Key);
+                    // make not nullable!
                     CreateMap<KeyName, SectorTypes?>().ConvertUsing(s => s == null ? (SectorTypes?)null : (SectorTypes)s.Key);
-                    CreateMap<KeyName, StatementTurnoverRanges>().ConvertUsing(s => s == null ? default : (StatementTurnoverRanges)s.Key);
+                    CreateMap<KeyName, SectorTypes>().ConvertUsing(s => s == null ? default : (SectorTypes)s.Key);
                     CreateMap<KeyName, StatementTurnoverRanges?>().ConvertUsing(s => s == null ? (StatementTurnoverRanges?)null : (StatementTurnoverRanges)s.Key);
-                    CreateMap<KeyName, StatementYearRanges>().ConvertUsing(s => s == null ? default: (StatementYearRanges)s.Key);
+                    CreateMap<KeyName, StatementTurnoverRanges>().ConvertUsing(s => s == null ? default : (StatementTurnoverRanges)s.Key);
                     CreateMap<KeyName, StatementYearRanges?>().ConvertUsing(s => s == null ? (StatementYearRanges?)null : (StatementYearRanges)s.Key);
+                    CreateMap<KeyName, StatementYearRanges>().ConvertUsing(s => s == null ? default : (StatementYearRanges)s.Key);
                     CreateMap<KeyName, SectorTypeIndex.SectorType>().ConvertUsing<SectorConverter>();
 
                     CreateMap<KeyName, PolicyTypes>().ConvertUsing(s => s == null ? PolicyTypes.Unknown : (PolicyTypes)s.Key);
@@ -146,16 +149,15 @@ namespace ModernSlavery.Core.Models
                     CreateMap<KeyName, RiskSourceTypes>().ConvertUsing(s => s == null ? RiskSourceTypes.Unknown : (RiskSourceTypes)s.Key);
                     CreateMap<KeyName, SupplyChainTierTypes>().ConvertUsing(s => s == null ? SupplyChainTierTypes.Unknown : (SupplyChainTierTypes)s.Key);
                     CreateMap<KeyName, RiskTargetTypes>().ConvertUsing(s => s == null ? RiskTargetTypes.Unknown : (RiskTargetTypes)s.Key);
-                    CreateMap<KeyName, CountryTypes>().ConvertUsing(s => s == null ? CountryTypes.Unknown : (CountryTypes)s.Key);
                     CreateMap<KeyName, IndicatorTypes>().ConvertUsing(s => s == null ? IndicatorTypes.Unknown : (IndicatorTypes)s.Key);
                     CreateMap<KeyName, RemediationTypes>().ConvertUsing(s => s == null ? RemediationTypes.Unknown : (RemediationTypes)s.Key);
 
-                    CreateMap<SectorTypes, KeyName>().ConvertUsing(s => s==default ? null :  new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<StatementTurnoverRanges, KeyName>().ConvertUsing(s => s == default ? null: new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<StatementYearRanges, KeyName>().ConvertUsing(s => s == default ? null: new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<SectorTypes, KeyName>().ConvertUsing(s => s == default ? null : new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<StatementTurnoverRanges, KeyName>().ConvertUsing(s => s == default ? null : new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<StatementYearRanges, KeyName>().ConvertUsing(s => s == default ? null : new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<SectorTypeIndex.SectorType, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s.Id, Name = s.Description });
 
-                    CreateMap<PolicyTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
+                    CreateMap<PolicyTypes, KeyName>().ConvertUsing(s => s == default ? null : new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<TrainingTargetTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<PartnerTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<SocialAuditTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
@@ -163,7 +165,6 @@ namespace ModernSlavery.Core.Models
                     CreateMap<RiskSourceTypes, KeyName>().ConvertUsing(s => s == default ? null : new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<SupplyChainTierTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<RiskTargetTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
-                    CreateMap<CountryTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<IndicatorTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                     CreateMap<RemediationTypes, KeyName>().ConvertUsing(s => new KeyName { Key = (int)s, Name = s.GetEnumDescription() });
                 }
@@ -191,6 +192,51 @@ namespace ModernSlavery.Core.Models
             public override bool Equals(object obj)
             {
                 var target = obj as KeyName;
+                return target != null && target.Key == Key;
+            }
+
+            public override int GetHashCode()
+            {
+                return Key.GetHashCode();
+            }
+        }
+
+        [Serializable]
+        public class StringKeyName
+        {
+            #region Automapper
+            public class AutoMapperProfile : Profile
+            {
+                public AutoMapperProfile() : base()
+                {
+                    CreateMap<StringKeyName, GovUkCountry>().ConvertUsing<CountryConverter>();
+
+                    CreateMap<GovUkCountry, StringKeyName>().ConvertUsing(s => new StringKeyName { Key = s.FullReference, Name = s.Name });
+                }
+
+                public class CountryConverter : ITypeConverter<StringKeyName, GovUkCountry>
+                {
+                    readonly IGovUkCountryProvider CountryProvider;
+
+                    public CountryConverter(IGovUkCountryProvider countryProvider)
+                    {
+                        CountryProvider = countryProvider;
+                    }
+
+                    public GovUkCountry Convert(StringKeyName source, GovUkCountry destination, ResolutionContext context)
+                    {
+                        return CountryProvider.FindByReference(source.Key);
+                    }
+                }
+            }
+            #endregion
+
+            public string Key { get; set; }
+            public string Name { get; set; }
+
+            public override bool Equals(object obj)
+            {
+                var target = obj as StringKeyName;
                 return target != null && target.Key == Key;
             }
 

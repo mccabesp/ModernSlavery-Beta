@@ -1,23 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.Core.Entities.StatementSummary;
+using ModernSlavery.Core.Entities.StatementSummary.V1;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes.UrlHelper;
 using static ModernSlavery.Core.Entities.Statement;
-using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
+using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
 
 namespace ModernSlavery.WebUI.Shared.Models
 {
     [Serializable()]
     [XmlType("StatementSummary")]
-    public class StatementSummaryViewModel: IStatementSummary1
+    public class StatementSummaryViewModel: IStatementSummary
     {
         #region Automapper
         public class AutoMapperProfile : Profile
@@ -28,6 +29,7 @@ namespace ModernSlavery.WebUI.Shared.Models
                 CreateMap<OrganisationSearchModel, StatementSummaryViewModel>()
                     .ForMember(d => d.StatementSummaryUrl, opt => opt.Ignore())
                     .ForMember(d => d.BackUrl, opt => opt.Ignore())
+                    .ForMember(d => d.GroupSubmission, opt => opt.MapFrom(s => s.GroupSubmission))
                     .ForMember(d => d.Policies, opt => opt.MapFrom(s=>s.Summary.Policies))
                     .ForMember(d => d.OtherPolicies, opt => opt.MapFrom(s=>s.Summary.OtherPolicies))
                     .ForMember(d => d.TrainingTargets, opt => opt.MapFrom(s=>s.Summary.TrainingTargets))

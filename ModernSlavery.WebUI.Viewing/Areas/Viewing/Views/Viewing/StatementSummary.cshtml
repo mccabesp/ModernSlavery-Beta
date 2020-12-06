@@ -1,5 +1,4 @@
-﻿@using ModernSlavery.Core.Classes.StatementTypeIndexes
-@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+﻿@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
 @{
     //Required for variables in Sitemap taghelpers
     Layout = "~/Views/GdsLayout.cshtml";
@@ -45,7 +44,7 @@
         <p class="govuk-body govuk-!-font-size-24">
             Read a summary of this organisation’s modern slavery statement, or link to the full statement on the organisation’s website.
             The summary does not replace the full statement.
-            @if (Model.GroupSubmission)
+            @if (Model.GroupSubmission==true)
             {
                 <text>This statement covers a
                     <a class="govuk-link"
@@ -79,10 +78,10 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-        <div class="app-statement-summary_url" data-statement-url="@Model.StatementUrl">
+        <div class="app-statement-summary_url">
 
             <div class="app-statement-summary_url-link-working">
-                <a class="govuk-link" target="_blank"
+                <a class="govuk-link"
                    asp-controller="Viewing"
                    asp-action="StatementSummaryUrl"
                    asp-route-organisationIdentifier="@Model.ParentOrganisationId"
@@ -340,7 +339,7 @@
                     {
                         <li>
                             @policy.GetEnumDescription()
-                            @if (policy== Core.Entities.StatementSummary.IStatementSummary1.PolicyTypes.Other)
+                            @if (policy== Core.Entities.StatementSummary.V1.StatementSummary.PolicyTypes.Other)
                             {
                                 <br>
                                 <p class="app-statement-summary_free-text">@Model.OtherPolicies</p>

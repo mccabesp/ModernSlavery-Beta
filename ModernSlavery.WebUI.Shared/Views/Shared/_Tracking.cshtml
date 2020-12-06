@@ -5,87 +5,92 @@
 
 @inject JavaScriptSnippet snippet
 @inject SharedOptions sharedOptions
-@inject TestOptions testOptions;  
+@inject TestOptions testOptions;
 @inject ApplicationInsightsOptions appInsightsOptions
 @{
     var cookieSettings = CookieHelper.GetCookieSettingsCookie(Context.Request);
 }
 
-<script type="text/javascript">
-    function initialiseGoogleAnalytics() {
-        (function(i, s, o, g, r, a, m) {
-            i['GoogleAnalyticsObject'] = r;
-            i[r] = i[r] ||
-                function() {
-                    (i[r].q = i[r].q || []).push(arguments);
-                }, i[r].l = 1 * new Date();
-            a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0];
-            a.async = 1;
-            a.src = g;
-            m.parentNode.insertBefore(a, m);
-        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+@*this is for the GA initialisation and sending page views*@
 
-        ga('set', 'anonymizeIp', true);
+<script type="text/javascript" nonce="@Html.GetNonce()">
+            function initialiseGoogleAnalytics() {
+                (function(i, s, o, g, r, a, m) {
+                    i['GoogleAnalyticsObject'] = r;
+                    i[r] = i[r] ||
+                        function() {
+                            (i[r].q = i[r].q || []).push(arguments);
+                        }, i[r].l = 1 * new Date();
+                    a = s.createElement(o),
+                        m = s.getElementsByTagName(o)[0];
+                    a.async = 1;
+                    a.src = g;
+                    m.parentNode.insertBefore(a, m);
+                })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
-    }
+                ga('set', 'anonymizeIp', true);
 
-    function sendGpgPageView() {
-        // Setup tracking to the GPG Google Analytics account
-        ga('create', '@(sharedOptions.GoogleAnalyticsAccountId)', 'auto');
+            }
 
-        // Track the current page view using the GPG Google Analytics account
-        ga('send', 'pageview');
-    }
+            function sendMSUPageView() {
+                // Setup tracking to the MSU Google Analytics account
+                ga('create', '@(sharedOptions.GoogleAnalyticsAccountId)', 'auto');
 
-    function sendGovUkPageView() {
-        // Setup tracking to the GDS Google Analytics shared tracking account
-        ga('create', 'UA-145652997-1', 'auto', 'govuk_shared', { 'allowLinker': true });
-        ga('govuk_shared.require', 'linker');
-        ga('govuk_shared.linker.set', 'anonymizeIp', true);
-        ga('govuk_shared.linker:autoLink', ['www.gov.uk']);
+                // Track the current page view using the MSU Google Analytics account
+                ga('send', 'pageview');
+            }
 
-        // Track the current page view using the GDS Google Analytics shared tracking account
-        ga('govuk_shared.send', 'pageview');
-    }
+            function sendGovUkPageView() {
+                // Setup tracking to the GDS Google Analytics shared tracking account
+                ga('create', 'UA-145652997-1', 'auto', 'govuk_shared', { 'allowLinker': true });
+                ga('govuk_shared.require', 'linker');
+                ga('govuk_shared.linker.set', 'anonymizeIp', true);
+                ga('govuk_shared.linker:autoLink', ['www.gov.uk']);
 
-    function deleteGoogleAnalyticsCookies() {
-        function deleteCookie(cookieName) {
-            document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                // Track the current page view using the GDS Google Analytics shared tracking account
+                ga('govuk_shared.send', 'pageview');
+            }
+
+            function deleteGoogleAnalyticsCookies() {
+                function deleteCookie(cookieName) {
+                    document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                }
+
+                deleteCookie('_ga');
+                deleteCookie('_gid');
+                deleteCookie('_gat');
+                deleteCookie('_gat_govuk_shared');
         }
 
-        deleteCookie('_ga');
-        deleteCookie('_gid');
-        deleteCookie('_gat');
-    }
-
-    @if (cookieSettings.GoogleAnalyticsMSU || cookieSettings.GoogleAnalyticsGovUk || testOptions.ForceGoogleAnalyticsTracking)
-    {
-        @:initialiseGoogleAnalytics();
-    }
-    else
-    {
-        @:deleteGoogleAnalyticsCookies();
-    }
-    @if (cookieSettings.GoogleAnalyticsMSU || testOptions.ForceGoogleAnalyticsTracking)
-    {
-        @:sendGpgPageView();
-    }
-    @if ((cookieSettings.GoogleAnalyticsGovUk || testOptions.ForceGoogleAnalyticsTracking) && sharedOptions.SendGoogleAnalyticsDataToGovUk)
-    {
-        @:sendGovUkPageView();
-    }
+            @if (cookieSettings.GoogleAnalyticsMSU || ((cookieSettings.GoogleAnalyticsGovUk || testOptions.ForceGoogleAnalyticsTracking) && sharedOptions.SendGoogleAnalyticsDataToGovUk))
+            {
+                @:initialiseGoogleAnalytics();
+            }
+            else
+            {
+                @:deleteGoogleAnalyticsCookies();
+            }
+            @if (cookieSettings.GoogleAnalyticsMSU || testOptions.ForceGoogleAnalyticsTracking)
+            {
+                @:sendMSUPageView();
+            }
+            @if ((cookieSettings.GoogleAnalyticsGovUk || testOptions.ForceGoogleAnalyticsTracking) && sharedOptions.SendGoogleAnalyticsDataToGovUk)
+            {
+                @:sendGovUkPageView();
+            }
 </script>
 
 @if ((cookieSettings.ApplicationInsights || testOptions.ForceApplicationInsightsTracking) &&
-  snippet != null &&
-  !string.IsNullOrWhiteSpace(appInsightsOptions.InstrumentationKey))
+snippet != null &&
+!string.IsNullOrWhiteSpace(appInsightsOptions.InstrumentationKey))
 {
-    @Html.Raw(snippet.FullScript)
+    <script type="text/javascript" nonce="@Html.GetNonce()">
+        @Html.Raw(snippet.ScriptBody)
+    </script>
 }
 else
 {
-    <script>
+    <script type="text/javascript" nonce="@Html.GetNonce()">
         @* Delete Application Insights cookies *@
         (() => {
             function deleteCookie(cookieName) {

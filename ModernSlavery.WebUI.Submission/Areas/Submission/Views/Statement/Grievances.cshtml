@@ -2,8 +2,7 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model GrievancesViewModel
-@using ModernSlavery.Core.Entities.StatementSummary;
-@using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
+@using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
@@ -28,10 +27,9 @@
                         Select all that apply
                     </div>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var grievanceType in Enums.GetValuesExcept<GrievanceMechanismTypes>(GrievanceMechanismTypes.Unknown, GrievanceMechanismTypes.Other))
+                        @foreach (var grievanceType in Enums.GetValuesExcept<GrievanceMechanismTypes>(GrievanceMechanismTypes.Unknown))
                         {
                             var value = (int)grievanceType;
-                            var isOther = grievanceType == GrievanceMechanismTypes.Other;
                             var isNone = grievanceType == GrievanceMechanismTypes.None;
 
                             if (isNone)
@@ -47,18 +45,6 @@
                                     @grievanceType.GetEnumDescription()
                                 </label>
                             </div>
-                            @*@if (grievanceType == IStatementSummary1.GrievanceMechanismTypes.Other)
-                            {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherGrievanceMechanisms, "govuk-form-group--error")" id="grievance-conditional-@((int)grievanceType)">
-                                    <div class="govuk-form-group">
-                                        <label class="govuk-label" for="other">
-                                            Please specify
-                                        </label>
-                                        <input asp-for="OtherGrievanceMechanisms" class="govuk-input" spellcheck="false">
-                                        <span asp-validation-for="OtherGrievanceMechanisms" class="govuk-error-message"></span>
-                                    </div>
-                                </div>
-                            }*@
                         }
                     </div>
                 </fieldset>

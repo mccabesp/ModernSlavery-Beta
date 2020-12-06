@@ -272,6 +272,16 @@
             </reference>
           </references>
         </layer>
+        <layer Id="6abd578f-3001-4b11-8311-5c8f79038f07" name="Identity">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="493992a5-0051-44dd-8899-04e1438ed34e" direction="Forward">
+              <layerMoniker Id="a78bb6a7-e6bb-4662-a404-aeebefc5acb6" />
+            </dependencyFromLayerToLayer>
+            <dependencyFromLayerToLayer Id="58566b4a-bc50-4490-b975-83594339d9bc" direction="Forward">
+              <layerMoniker Id="1917c8ec-7994-4066-ae2d-0f305af94299" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+        </layer>
       </childLayers>
     </layer>
     <layer Id="1acbd5d9-66f0-433c-aba6-516bafc4fda4" name="Infrastructure">
@@ -403,6 +413,9 @@
         <dependencyFromLayerToLayer Id="02af6780-c5e8-4660-a2be-53c8d4284979" direction="Forward">
           <layerMoniker Id="490d3608-97a1-4658-a182-3d2fa5d0fff1" />
         </dependencyFromLayerToLayer>
+        <dependencyFromLayerToLayer Id="73881c50-57a4-4ade-9ee7-f76ad1010c09" direction="Forward">
+          <layerMoniker Id="82c3e69d-4e34-49e7-ac07-5b75183ffc93" />
+        </dependencyFromLayerToLayer>
       </dependencyToLayers>
       <childLayers>
         <layer Id="20d6c119-84eb-47d2-b89b-afbcaee5540c" name="Web">
@@ -410,16 +423,6 @@
             <reference Id="f04cd4bf-99ad-4970-a675-d7ff160a70f4" name="ModernSlavery.Hosts.Web">
               <ArtifactNode Label="ModernSlavery.Hosts.Web" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Hosts.Web)" />
               <ExpandedNode Id="(Namespace=ModernSlavery.Hosts.Web)" Label="ModernSlavery.Hosts.Web" Category="CodeSchema_Namespace">
-                <LinkCategory Ref="Represents" />
-              </ExpandedNode>
-            </reference>
-          </references>
-        </layer>
-        <layer Id="5c387664-d60a-4249-a575-ad6bd95a674e" name="IdServer">
-          <references>
-            <reference Id="35c6f2b8-d1e6-4705-adb1-2bb7158e00e3" name="ModernSlavery.Hosts.IdServer">
-              <ArtifactNode Label="ModernSlavery.Hosts.IdServer" Category="CodeSchema_Namespace" Id="(Namespace=ModernSlavery.Hosts.IdServer)" />
-              <ExpandedNode Id="(Namespace=ModernSlavery.Hosts.IdServer)" Label="ModernSlavery.Hosts.IdServer" Category="CodeSchema_Namespace">
                 <LinkCategory Ref="Represents" />
               </ExpandedNode>
             </reference>
@@ -435,6 +438,16 @@
             </reference>
           </references>
         </layer>
+      </childLayers>
+    </layer>
+    <layer Id="82c3e69d-4e34-49e7-ac07-5b75183ffc93" name="WebApi">
+      <dependencyToLayers>
+        <dependencyFromLayerToLayer Id="a20fd3f6-6993-4d70-927f-e9ac14865ec5" direction="Forward">
+          <layerMoniker Id="490d3608-97a1-4658-a182-3d2fa5d0fff1" />
+        </dependencyFromLayerToLayer>
+      </dependencyToLayers>
+      <childLayers>
+        <layer Id="ed323682-3a7d-4b43-a76c-cb3b994a22ac" name="Public" />
       </childLayers>
     </layer>
   </layers>

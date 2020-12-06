@@ -23,7 +23,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class TurnoverViewModel : BaseStatementViewModel
     {
-        public override string PageTitle => "What was your turnover or budget during the financial year the statement relates to?";
+        public override string PageTitle => "What was your turnover during the financial year the statement relates to?";
 
         public StatementTurnoverRanges? Turnover { get; set; }
 

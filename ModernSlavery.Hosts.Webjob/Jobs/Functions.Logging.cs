@@ -54,7 +54,13 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     throw new ArgumentException("Invalid Log Level", nameof(LogLevel));
             }
 
-            var DailyPath = Path.Combine(
+            //Ensure the directory exists
+            var DailyPath = Path.Combine(Path.GetPathRoot(FilePath),Path.GetDirectoryName(FilePath));
+
+            if (!await _fileRepository.GetDirectoryExistsAsync(DailyPath).ConfigureAwait(false))
+                await _fileRepository.CreateDirectoryAsync(DailyPath).ConfigureAwait(false);
+
+            DailyPath = Path.Combine(
                 Path.GetPathRoot(FilePath),
                 Path.GetDirectoryName(FilePath),
                 Path.GetFileNameWithoutExtension(FilePath) + "_" + VirtualDateTime.Now.ToString("yyMMdd") +
@@ -121,7 +127,14 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             //Calculate the daily log file path
             var LogRoot = _sharedOptions.LogPath;
             var FilePath = Path.Combine(LogRoot, wrapper.ApplicationName, wrapper.FileName);
-            var DailyPath = Path.Combine(
+
+            //Ensure the directory exists
+            var DailyPath = Path.Combine(Path.GetPathRoot(FilePath), Path.GetDirectoryName(FilePath));
+
+            if (!await _fileRepository.GetDirectoryExistsAsync(DailyPath).ConfigureAwait(false))
+                await _fileRepository.CreateDirectoryAsync(DailyPath).ConfigureAwait(false);
+
+            DailyPath = Path.Combine(
                 Path.GetPathRoot(FilePath),
                 Path.GetDirectoryName(FilePath),
                 Path.GetFileNameWithoutExtension(FilePath) + "_" + VirtualDateTime.Now.ToString("yyMMdd") +

@@ -5,6 +5,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
@@ -13,6 +14,7 @@ using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Classes.UrlHelper;
@@ -22,6 +24,7 @@ using Extensions = ModernSlavery.WebUI.Shared.Classes.Extensions.Extensions;
 
 namespace ModernSlavery.WebUI.Shared.Controllers
 {
+    [NoCache]
     public class BaseController : Controller
     {
         #region Dependencies
@@ -135,6 +138,16 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             return false;
         }
 
+        [AllowAnonymous]
+        [HttpGet("/[controller]/Init")]
+        public IActionResult Init()
+        {
+            if (!SharedBusinessLogic.SharedOptions.IsProduction())
+                Logger.LogInformation($"Controller {AreaName}/{ControllerName} Initialised");
+            
+            return new EmptyResult();
+        }
+
         [NonAction]
         public async Task<IActionResult> LogoutUser(string redirectUrl = null)
         {
@@ -145,6 +158,9 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 OriginalUser = null;
                 return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
             }
+
+            //Clear the session
+            Session.Clear();
 
             //otherwise actually logout
             if (string.IsNullOrWhiteSpace(redirectUrl)) return SignOut("Cookies", "oidc");
@@ -376,9 +392,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         public virtual User CurrentUser => VirtualUser;
 
-        public bool IsTrustedIP =>
-            string.IsNullOrWhiteSpace(SharedBusinessLogic.SharedOptions.TrustedIpDomains) ||
-            UserHostAddress.IsTrustedAddress(SharedBusinessLogic.SharedOptions.TrustedIpDomains.SplitI());
+        public bool IsTrustedIP => SharedBusinessLogic.SharedOptions.IsTrustedAddress(UserHostAddress);
 
         public bool IsAdministrator => SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser);
         public bool IsSuperAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(CurrentUser);
@@ -647,6 +661,8 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         public string ActionName => ControllerContext.RouteData.Values["action"].ToString();
 
         public string ControllerName => ControllerContext.RouteData.Values["controller"].ToString();
+
+        public string AreaName => ControllerContext.RouteData.Values.ContainsKey("area") ? ControllerContext.RouteData.Values["area"].ToString() : null;
 
         public string LastAction
         {

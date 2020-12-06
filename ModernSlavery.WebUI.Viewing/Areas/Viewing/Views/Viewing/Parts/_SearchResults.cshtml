@@ -25,14 +25,14 @@
                             </p>
                             <p class="govuk-body govuk-!-margin-bottom-2">
                                 <span class="grey-text">Included in group statement for</span>
-                                <span class="blue-header govuk-!-font-weight-bold address">@Html.ActionLink(organisation.ParentName, "StatementSummary", "Viewing", new { organisationIdentifier, year = organisation.SubmissionDeadlineYear })</span>
+                                <span class="blue-header govuk-!-font-weight-bold address">@Html.ActionLink(organisation.ParentName, "StatementSummary", "Viewing", new { organisationIdentifier, year = organisation.SubmissionDeadlineYear }, new { name = "orgLink" })</span>
                                 <span class="blue-header govuk-!-font-weight-bold small"> (@(organisation.SubmissionDeadlineYear-1) to @(organisation.SubmissionDeadlineYear))</span>
                             </p>
                         }
                         else
                         {
                             <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold blue-header">
-                                @Html.ActionLink(organisation.OrganisationName, "StatementSummary", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId), year = organisation.SubmissionDeadlineYear })
+                                @Html.ActionLink(organisation.OrganisationName, "StatementSummary", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId), year = organisation.SubmissionDeadlineYear },new {name="orgLink"})
                                 <span class="small"> (@organisation.SubmissionDeadlineYear)</span>
 
                             </p>

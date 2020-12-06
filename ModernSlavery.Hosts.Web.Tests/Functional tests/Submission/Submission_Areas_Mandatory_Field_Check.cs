@@ -8,7 +8,7 @@ namespace ModernSlavery.Hosts.Web.Tests
     [TestFixture]
 
 
-    public class Submission_Areas_Mandatory_Field_Check : Private_Registration_Success
+    public class Submission_Areas_Mandatory_Field_Check: Private_Registration_Success
     {
         const string _email = Create_Account.roger_email+"1213232";
         [Test, Order(41)]

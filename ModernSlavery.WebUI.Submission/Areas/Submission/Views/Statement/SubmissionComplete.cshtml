@@ -2,6 +2,7 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model SubmissionCompleteViewModel
+@inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
@@ -9,20 +10,31 @@
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
 
-            <div class="govuk-panel govuk-panel--confirmation">
+            <div class="govuk-panel govuk-panel--confirmation govuk-!-margin-bottom-9">
                 <h1 class="govuk-panel__title">
                     @Model.PageTitle
                 </h1>
             </div>
-            <div>
-                <div class="govuk-panel">
-                    You have submitted your modern slavery statement<br /> for @(Model.ReportingDeadlineYear)
-                </div>
+
+
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-2">What happens next</h2>
+
+            <p class="govuk-body">The information you've submitted is now published on the Modern slavery statement registry.</p>
+
+            <div class="govuk-!-margin-bottom-4">
+                <a rel="track" data-track-category="pageElementInteraction" href="@Url.ActionArea("StatementSummary", "Viewing", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = Model.SubmissionDeadline.Year, returnUrl = Model.ContinueUrl})">View your published statement summary on the registry</a>
             </div>
 
-            <a href="@Model.ContinueUrl" class="govuk-button govuk-!-margin-right-1">Manage organisation</a>
-            <a asp-action="SignOut" asp-controller="Account" asp-area="Account" class="govuk-button govuk-button--secondary">Finish and sign out</a>
-        }
+            <p class="govuk-body">If you want to make changes, you can edit the published information and resubmit it.</p>
+
+            <p class="govuk-body govuk-!-margin-bottom-7">Take 30 seconds to give us some feedback.</p>
+
+            
+            <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" value="Continue">
+                Sign out and give feedback
+            </button>
+
+             }
 
     </div>
 </div>

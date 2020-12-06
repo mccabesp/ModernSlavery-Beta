@@ -2,9 +2,11 @@
     Layout = "/Views/GdsLayout.cshtml";
 }
 @model HighRiskViewModel
-@using ModernSlavery.Core.Entities.StatementSummary;
-@using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
-@using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1.StatementRisk;
+@using ModernSlavery.Core.Entities.StatementSummary.V1;
+@using ModernSlavery.Core.Interfaces;
+@inject IGovUkCountryProvider CountryProvider
+
+@using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary.StatementRisk;
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
@@ -17,15 +19,11 @@
             @Html.HiddenFor(m => m.Submitted);
             @Html.HiddenFor(m => m.TotalRisks);
             @Html.HiddenFor(m => m.Description);
-            @for (int i = 0; i < Model.Countries.Count; i++)
-            {
-                @Html.HiddenFor(model => Model.Countries[i])
-            }
 
-            <h1 class="govuk-heading-l">
+            <h1 class="govuk-heading-l govuk-!-margin-bottom-5">
                 @Model.PageTitle
             </h1>
-            <div class="govuk-details__text govuk-!-margin-bottom-4">
+            <div class="govuk-inset-text govuk-!-margin-bottom-7">
                 <div class="risk-description-edit">
                     <a href="@Model.BackUrl">Edit</a>
                 </div>
@@ -34,7 +32,7 @@
                 </div>
             </div>
 
-            <div class="govuk-form-group">
+            <div class="govuk-form-group govuk-!-margin-bottom-5">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                         <h2 class="govuk-fieldset__heading">
@@ -70,13 +68,13 @@
                                                 var isNone = tier == SupplyChainTierTypes.None;
                                                 if (isNone)
                                                 {
-                                                    <div>
+                                                    <div class="govuk-!-margin-bottom-4 govuk-!-margin-left-2">
                                                         or
                                                     </div>
                                                 }
                                                 <div class="govuk-checkboxes__item">
                                                     <input name="SupplyChainTiers" class="govuk-checkboxes__input" id="tier-@tierValue" value="@tierValue" type="checkbox" data-mutually-exclusive-group="@isNone.ToString()" checked="@(Model.SupplyChainTiers.Contains(tier))">
-                                                    <label class="govuk-label govuk-checkboxes__label" for="tier-@tierValue">
+                                                    <label class="govuk-label govuk-checkboxes__label govuk-!-font-weight-bold" for="tier-@tierValue">
                                                         @tier.GetEnumDescription()
                                                     </label>
                                                     @if (!isNone)
@@ -123,7 +121,7 @@
                 </fieldset>
             </div>
 
-            <div class="govuk-form-group">
+            <div class="govuk-form-group govuk-!-margin-bottom-5">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                         <h2 class="govuk-fieldset__heading">
@@ -158,44 +156,30 @@
                 </fieldset>
             </div>
 
-            <div class="govuk-form-group">
+            <div class="govuk-form-group govuk-!-margin-bottom-5">
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
                         <h2 class="govuk-fieldset__heading">
                             In which country?
                         </h2>
                     </legend>
-                    <div>
-                        @if (Model.Countries.Any())
-                        {
-                            <table class="govuk-table">
-                                <tbody class="govuk-table__body">
-                                    @foreach (var item in Model.Countries)
-                                    {
-                                        <tr class="govuk-table__row">
-                                            <td class="govuk-table__cell">@item.GetEnumDescription()</td>
-                                            <td class="govuk-table__cell buttons">
-                                                <button class="link-button" type="submit" name="toRemove" value="@((int)item)">Remove</button>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                    </div>
+
+                    <partial name="Parts/_RiskCountries" model="Model" />
+
                     <div class="govuk-grid-row">
-                        @* this input should have an associated label *@
                         <div class="govuk-grid-column-one-half">
-                            <input asp-for="SelectedCountry" class="govuk-input" type="text">
+                            <select class="govuk-select" asp-for="SelectedCountry" asp-items="new SelectList(CountryProvider.GetAll(), nameof(GovUkCountry.FullReference), nameof(GovUkCountry.Name))">
+                                <option value="" disabled selected>Select a country</option>
+                            </select>
                         </div>
                         <div class="govuk-grid-column-one-half">
-                            <button class="govuk-button govuk-button--secondary" type="submit" name="command" value="@BaseStatementViewModel.CommandType.AddCountry">Add</button>
+                            <button id="add-country-button" class="govuk-button govuk-button--secondary" type="submit" name="command" value="@BaseStatementViewModel.CommandType.AddCountry">Add</button>
                         </div>
                     </div>
                 </fieldset>
             </div>
 
-            <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="500">
+            <div class="govuk-character-count govuk-!-margin-bottom-7" data-module="govuk-character-count" data-maxlength="500">
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.ActionsOrPlans, "govuk-form-group--error")">
                     <label class="govuk-label govuk-label--m" for="more-detail">
                         Tell us about your actions or plans to address this risk
@@ -219,3 +203,106 @@
     </div>
 
 </div>
+@section AfterLoadedCompiledScripts {
+    <script type="text/javascript" nonce="@Html.GetNonce()">
+        (function ($) {
+            "use strict";
+
+            var selectElement = document.getElementById('SelectedCountry');
+
+            openregisterLocationPicker({
+                selectElement: selectElement,
+                url: '/assets/json/location-autocomplete-graph.json',
+                // override onconfirm to disable the add button until item selected
+                onConfirm: function (result) {
+                    var requestedOption = Array.prototype.filter.call(selectElement.options, o => o.innerText === (result && result.name))[0];
+                    if (requestedOption) {
+                        requestedOption.selected = true;
+
+                        if (document.getElementById("country-line-" + requestedOption.value) == null)
+                            $('#add-country-button').prop('disabled', false);
+                    }
+                }
+            });
+
+            var removeButtonClickHandler = function (e) {
+                e.preventDefault();
+
+                var table = $(e.target).parents('table');
+
+                // remove row from document
+                $(e.target).parents('tr').remove();
+
+                if (table.find('tr').length == 0)
+                    table.hide();
+                else {
+                    // Re-index the hidden input on each row so the server side isnt confused by the indexing
+                    table.find('tr').each(function (i, e) {
+                        var hiddenInput = $(e).find('input[type=hidden]')
+                        hiddenInput.prop('id', 'CountryReferences_' + i + '_');
+                        hiddenInput.prop('name', 'CountryReferences[' + i + ']');
+                    });
+                }
+
+                return false;
+            }
+
+            var addButtonClickHandler = function (e) {
+                e.preventDefault();
+
+                if (selectElement.selectedOptions.length == 0 || selectElement.selectedOptions[0].disabled) {
+                    // nothing selected, show error
+                    return false;
+                }
+
+                var option = selectElement.selectedOptions[0];
+                var reference = option.value;
+                var rows = $('#selected-countries tr');
+
+                if (rows.length == 0) {
+                    // show the table
+                    $('#selected-countries table').show();
+                }
+                else if (document.getElementById("country-line-" + reference) != null) {
+                    // already in table
+                    // show error
+                    return false;
+                }
+
+                var name = option.innerText;
+                var index = rows.length;
+
+                var newRow = "<tr id='country-line-" + reference + "' class='govuk-table__row'>" +
+                    "<td class='govuk-table__cell'>" + name + "</td>" +
+                    "<td class='govuk-table__cell buttons'>" +
+                    "<button class='link-button' type='submit' name='toRemove' value='" + reference + "'>Remove</button>" +
+                    "<input id='CountryReferences_" + index + "_' name='CountryReferences[" + index + "]' type='hidden' value='" + reference + "'>" +
+                    "</td>" +
+                    "</tr>";
+
+                $('#selected-countries table tbody').append(newRow);
+
+                // clear selected from autocomplete
+                // taken from https://github.com/alphagov/accessible-autocomplete/issues/334#issuecomment-621356224 03/12/2020
+                var $enhancedElement = $(selectElement).parent().find('input')
+                $enhancedElement.val('');
+                $(selectElement).val('');
+
+                $enhancedElement.click();
+                $enhancedElement.focus();
+                $enhancedElement.blur();
+
+                $('#add-country-button').prop('disabled', true);
+
+                return false;
+            }
+
+            $('#add-country-button').prop('disabled', true);
+
+            $(document).on("click", '#selected-countries tr button[name=toRemove]', removeButtonClickHandler)
+
+            $('#add-country-button').click(addButtonClickHandler);
+
+        }(jQuery));
+    </script>
+}

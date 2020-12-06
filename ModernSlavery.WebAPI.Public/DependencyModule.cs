@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Autofac;
 using AutoFixture;
 using Microsoft.AspNetCore.Builder;
@@ -9,10 +10,8 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.WebAPI.Public.Classes;
-using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.Core.Models;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace ModernSlavery.WebAPI.Public
@@ -20,13 +19,14 @@ namespace ModernSlavery.WebAPI.Public
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;
+        private readonly SharedOptions _sharedOptions;
+
         public DependencyModule(
-            ILogger<DependencyModule> logger
-        //TODO Add any required IOptions here
-        )
+            ILogger<DependencyModule> logger,
+            SharedOptions sharedOptions)
         {
             _logger = logger;
-            //TODO set any required local IOptions here
+            _sharedOptions = sharedOptions;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -40,6 +40,13 @@ namespace ModernSlavery.WebAPI.Public
             services.AddSwaggerGen(options =>
             {
                 options.ExampleFilters();
+
+                // DataContractAttribute.Name is not honored for some reason, so we have to override it
+                options.CustomSchemaIds(type =>
+                {
+                    var dataContractAttribute = type.GetCustomAttribute<DataContractAttribute>();
+                    return dataContractAttribute != null && dataContractAttribute.Name != null ? dataContractAttribute.Name : type.Name;
+                });
 
                 options.DocInclusionPredicate((docName, apiDesc) =>
                 {
@@ -84,18 +91,25 @@ namespace ModernSlavery.WebAPI.Public
         {
             var app = lifetimeScope.Resolve<IApplicationBuilder>();
 
+            string documentName = "V1";
+
+            if (_sharedOptions.UseDeveloperExceptions)
+                app.UseDeveloperExceptionPage();
+
+            app.UseDeveloperExceptionPage();
+
             //Configure dependencies here
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger(options=> 
             { 
-                options.RouteTemplate = "Api/{documentName}/ModernSlaverySummaryApi.json";
+                options.RouteTemplate = "/Api/{documentName}/ModernSlaverySummaryApi.json";
             });
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(options => 
             {
-                options.SwaggerEndpoint("/Api/V1/ModernSlaverySummaryApi.json", "Modern Slavery Statement Summary API");
+                options.SwaggerEndpoint($"{documentName}/ModernSlaverySummaryApi.json", "Modern Slavery Statement Summary API");
                 options.RoutePrefix = "Api";
                 options.InjectStylesheet("/Api/ModernSlaverySummaryApi.css");
                 //options.InjectJavascript("/assets/javascripts/jquery-1.11.3.min.js");

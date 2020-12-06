@@ -39,6 +39,7 @@ Errors:
         var selectors = options.selectors;
         this.onRefresh = options.onRefresh;
         this.onError = options.onError;
+        this.beforeAjax = options.beforeAjax;
 
         if (selectors == null || selectors == "undefined") selectors = ["[data-js-url]"];
         this.bindEvents(selectors, this);
@@ -57,6 +58,9 @@ Errors:
         //Disable to prevent double click
         $(e).prop("disabled", true);
         var sourceSelector = "#" + escape(e.currentTarget.id);
+
+        if (beforeAjax) beforeAjax(e.target);
+
         //Get the url to call
         var partialUrl = $(e.target).attr("data-js-url");
 

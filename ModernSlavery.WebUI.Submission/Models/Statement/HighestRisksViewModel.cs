@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.Core.Entities.StatementSummary;
+using ModernSlavery.Core.Entities.StatementSummary.V1;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using System;
 using System.Collections.Generic;
@@ -27,7 +27,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .AfterMap((s, d) =>
                 {
                     //Clear all risks if no risks selected
-                    if (s.NoRisks)s.HighRisk1 = s.HighRisk2 = s.HighRisk3 = null;
+                    if (s.NoRisks) s.HighRisk1 = s.HighRisk2 = s.HighRisk3 = null;
 
                     //Create or clear each risk description
                     foreach (var pars in new[] { (s.HighRisk1, 0), (s.HighRisk2, 1), (s.HighRisk3, 2) })
@@ -39,14 +39,14 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                         var risk = d.Summary.Risks.Count <= index ? null : d.Summary.Risks[index];
                         if (risk == null)
                         {
-                            risk = new IStatementSummary1.StatementRisk();
+                            risk = new StatementSummary.StatementRisk();
                             d.Summary.Risks.Add(risk);
                         }
 
                         //Clearing the associated details when the description is cleared
                         if (string.IsNullOrWhiteSpace(description))
                         {
-                            risk.LikelySource = IStatementSummary1.StatementRisk.RiskSourceTypes.Unknown;
+                            risk.LikelySource = StatementSummary.StatementRisk.RiskSourceTypes.Unknown;
                             risk.OtherLikelySource = null;
                             risk.Targets.Clear();
                             risk.OtherTargets = null;
@@ -68,7 +68,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class HighestRisksViewModel : BaseStatementViewModel
     {
-        public override string PageTitle => "Tell us about your highest risks";
+        public override string PageTitle => "Tell us about your modern slavery risks";
 
         [MaxLength(200)]
         public string HighRisk1 { get; set; }
@@ -106,7 +106,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (!string.IsNullOrWhiteSpace(HighRisk1) || !string.IsNullOrWhiteSpace(HighRisk2) || !string.IsNullOrWhiteSpace(HighRisk3))
             {
                 if (!string.IsNullOrWhiteSpace(HighRisk1) && !string.IsNullOrWhiteSpace(HighRisk2) && !string.IsNullOrWhiteSpace(HighRisk3)) return Status.Complete;
-                    return Status.InProgress;
+                return Status.InProgress;
             }
 
             return Status.Incomplete;

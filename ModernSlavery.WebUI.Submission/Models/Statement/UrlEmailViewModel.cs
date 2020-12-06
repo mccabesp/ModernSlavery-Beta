@@ -61,7 +61,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override Status GetStatus()
         {
-            if (!string.IsNullOrWhiteSpace(StatementUrl) || !string.IsNullOrWhiteSpace(StatementUrl)) return Status.Complete;
+            if (!string.IsNullOrWhiteSpace(StatementUrl) || !string.IsNullOrWhiteSpace(StatementEmail)) return Status.Complete;
             return Status.Incomplete;
         }
 

@@ -18,6 +18,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
     [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
+    [NoCache]
     public class AdminOrganisationScopeController : Controller
     {
         private readonly IAdminService _adminService;

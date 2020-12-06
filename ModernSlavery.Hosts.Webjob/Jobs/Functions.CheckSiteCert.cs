@@ -19,20 +19,20 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 if (_sharedOptions.CertExpiresWarningDays > 0)
                 {
                     //Get the cert thumbprint
-                    var certThumprint = _sharedOptions.CertThumprint.SplitI(";")
+                    var certThumbprint = _sharedOptions.CertThumbprint.SplitI(";")
                         .FirstOrDefault();
 
-                    if (!string.IsNullOrWhiteSpace(certThumprint))
+                    if (!string.IsNullOrWhiteSpace(certThumbprint))
                     {
                         //Load the cert from the thumprint
-                        var cert = HttpsCertificate.LoadCertificateFromThumbprint(certThumprint);
+                        var cert = HttpsCertificate.LoadCertificateFromThumbprint(certThumbprint);
 
                         var expires = cert.GetExpirationDateString().ToDateTime();
                         if (expires < VirtualDateTime.UtcNow)
                         {
                             await _messenger.SendMsuMessageAsync(
                                 "GPG - WEBSITE CERTIFICATE EXPIRED",
-                                $"The website certificate for '{_sharedOptions.WEBSITE_HOSTNAME}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.").ConfigureAwait(false);
+                                $"The website certificate for '{_sharedOptions.EXTERNAL_HOSTNAME}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.").ConfigureAwait(false);
                         }
                         else
                         {
@@ -42,7 +42,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 .CertExpiresWarningDays))
                                 await _messenger.SendMsuMessageAsync(
                                     "GPG - WEBSITE CERTIFICATE EXPIRING",
-                                    $"The website certificate for '{_sharedOptions.WEBSITE_HOSTNAME}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.").ConfigureAwait(false);
+                                    $"The website certificate for '{_sharedOptions.EXTERNAL_HOSTNAME}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.").ConfigureAwait(false);
                         }
                     }
                 }

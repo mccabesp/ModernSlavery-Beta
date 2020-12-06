@@ -11,6 +11,11 @@ namespace ModernSlavery.WebUI.GDSDesignSystem
 {
     public static class GovUkHtmlHelperExtensions
     {
+        public static string GetNonce(this IHtmlHelper htmlHelper)
+        {
+            return htmlHelper.ViewContext.HttpContext.Items["nonce"].ToString();
+        }
+
         public static IHtmlContent GovUkBackLink(
             this IHtmlHelper htmlHelper,
             BackLinkViewModel backLinkViewModel)

@@ -14,7 +14,6 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public class DownloadableFileController : BaseController
     {
         private readonly IDownloadableFileBusinessLogic _downloadableFileBusinessLogic;
@@ -35,7 +34,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         [HttpGet("admin/downloadfile")]
         [AllowOnlyTrustedDomains]
-        [ResponseCache(CacheProfileName = "Download")]
         public async Task<IActionResult> DownloadFile(string p)
         {
             IActionResult result;
@@ -101,6 +99,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var logsPathToProcess = string.IsNullOrWhiteSpace(fp)
                 ? Path.Combine(SharedBusinessLogic.SharedOptions.LogPath, subfolderName).Replace("\\", "/")
                 : fp;
+
+            //Ensure the log directory exists
+            if (!await SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(logsPathToProcess))
+                await SharedBusinessLogic.FileRepository.CreateDirectoryAsync(logsPathToProcess);
 
             var listOfDownloadableItems =
                 await _downloadableFileBusinessLogic.GetListOfDownloadableItemsFromPathAsync(logsPathToProcess);

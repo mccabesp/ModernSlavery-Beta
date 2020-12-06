@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
-using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
-using ModernSlavery.Core.Entities.StatementSummary;
+using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
 using ModernSlavery.BusinessDomain.Shared.Models;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -55,7 +54,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override Status GetStatus()
         {
-            if (!Indicators.Any() || Indicators.Contains(IndicatorTypes.None))
+            // nothing entered, ensure this triggers incomplete
+            if (!Indicators.Any() && !Remediations.Any())
+                return Status.Incomplete;
+
+            if (Indicators.Contains(IndicatorTypes.None))
                 return Status.Complete;
 
             else if (Remediations.Any())

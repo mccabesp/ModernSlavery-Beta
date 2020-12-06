@@ -3,13 +3,13 @@
  * DOCUMENTATION: https://github.com/alphagov/govuk_frontend_toolkit/blob/master/docs/analytics.md
  */
 
-(function(global) {
+(function (global) {
     "use strict";
 
     var $ = global.jQuery;
     var GOVUK = global.GOVUK || {};
 
-    var GoogleAnalyticsUniversalTracker = function(trackingId, fieldsObject) {
+    var GoogleAnalyticsUniversalTracker = function (trackingId, fieldsObject) {
         function configureProfile() {
             // https://developers.google.com/analytics/devguides/collection/analyticsjs/command-queue-reference#create
             sendToGa("create", trackingId, fieldsObject);
@@ -28,24 +28,51 @@
         function stripLocationPII() {
             sendToGa("set", "location", stripEmailAddressesFromString(window.location.href));
         }
+        // https://developers.google.com/analytics/devguides/collection/analyticsjs/pages
+        function trackPageview(path, title, options) {
+            var pageviewObject;
+
+            if (typeof path === "string") {
+                pageviewObject = { page: path };
+            }
+
+            if (typeof title === "string") {
+                pageviewObject = pageviewObject || {};
+                pageviewObject.title = title;
+            }
+
+            // Set an options object for the pageview (e.g. transport, sessionControl)
+            // https://developers.google.com/analytics/devguides/collection/analyticsjs/field-reference#transport
+            if (typeof options === "object") {
+                pageviewObject = $.extend(pageviewObject || {}, options);
+            }
+
+            if (!$.isEmptyObject(pageviewObject)) {
+                sendToGa("send", "pageview", pageviewObject);
+            } else {
+                sendToGa("send", "pageview");
+            }
+        };
+
 
         // Support legacy cookieDomain param
         if (typeof fieldsObject === "string") {
             fieldsObject = { cookieDomain: fieldsObject };
         }
 
-        configureProfile();
-        anonymizeIp();
+        // configureProfile();
+        // anonymizeIp();
         disableAdTracking();
         stripLocationPII();
+        //trackPageview();
     };
 
-    GoogleAnalyticsUniversalTracker.load = function() {
+    GoogleAnalyticsUniversalTracker.load = function () {
         /* eslint-disable */
-        (function(i, s, o, g, r, a, m) {
+        (function (i, s, o, g, r, a, m) {
             i["GoogleAnalyticsObject"] = r;
             i[r] = i[r] ||
-                function() {
+                function () {
                     (i[r].q = i[r].q || []).push(arguments)
                 }, i[r].l = 1 * new Date();
             a = s.createElement(o),
@@ -58,7 +85,7 @@
     };
 
     // https://developers.google.com/analytics/devguides/collection/analyticsjs/pages
-    GoogleAnalyticsUniversalTracker.prototype.trackPageview = function(path, title, options) {
+    GoogleAnalyticsUniversalTracker.prototype.trackPageview = function (path, title, options) {
         var pageviewObject;
 
         if (typeof path === "string") {
@@ -83,8 +110,10 @@
         }
     };
 
+
+
     // https://developers.google.com/analytics/devguides/collection/analyticsjs/events
-    GoogleAnalyticsUniversalTracker.prototype.trackEvent = function(category, action, options) {
+    GoogleAnalyticsUniversalTracker.prototype.trackEvent = function (category, action, options) {
         options = options || {};
         var value;
         var evt = {
@@ -130,7 +159,7 @@
       target – Specifies the target of a social interaction.
                This value is typically a URL but can be any text.
     */
-    GoogleAnalyticsUniversalTracker.prototype.trackSocial = function(network, action, target, options) {
+    GoogleAnalyticsUniversalTracker.prototype.trackSocial = function (network, action, target, options) {
         var trackingOptions = {
             'hitType': "social",
             'socialNetwork': network,
@@ -149,7 +178,7 @@
      name      - name for the tracker
      domain    - the domain to track
     */
-    GoogleAnalyticsUniversalTracker.prototype.addLinkedTrackerDomain = function(trackerId, name, domain) {
+    GoogleAnalyticsUniversalTracker.prototype.addLinkedTrackerDomain = function (trackerId, name, domain) {
         sendToGa("create",
             trackerId,
             "auto",
@@ -168,7 +197,7 @@
     };
 
     // https://developers.google.com/analytics/devguides/collection/analyticsjs/custom-dims-mets
-    GoogleAnalyticsUniversalTracker.prototype.setDimension = function(index, value) {
+    GoogleAnalyticsUniversalTracker.prototype.setDimension = function (index, value) {
         sendToGa("set", "dimension" + index, String(value));
     };
 

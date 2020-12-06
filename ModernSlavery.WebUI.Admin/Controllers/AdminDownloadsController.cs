@@ -7,12 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
+    [NoCache]
     public class AdminDownloadsController : Controller
     {
         private readonly IAdminService _adminService;

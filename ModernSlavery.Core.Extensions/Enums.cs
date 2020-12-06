@@ -36,8 +36,6 @@ namespace ModernSlavery.Core.Extensions
         /// <returns></returns>
         public static string GetEnumDescription<T>(this T value) where T : Enum
         {
-            if (value==null || value.Equals(default(T))) throw new ArgumentNullException(nameof(value));
-
             var description = value.GetAttribute<DescriptionAttribute>()?.Description;
             if (string.IsNullOrWhiteSpace(description)) description=value.GetAttribute<DisplayAttribute>()?.Description;
             if (string.IsNullOrWhiteSpace(description)) description= value.ToString();

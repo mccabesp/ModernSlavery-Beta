@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "GPGadmin")]
     [Route("admin")]
+    [NoCache]
     public class AdminSearchController : Controller
     {
         private readonly IAdminService _adminService;

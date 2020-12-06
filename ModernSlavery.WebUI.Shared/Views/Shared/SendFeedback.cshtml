@@ -31,7 +31,7 @@
                             </h1>
                         </legend>
                         <div class="govuk-radios">
-                            @foreach (var reason in Enums.GetValues<WhyVisitSite>())
+                            @foreach (var reason in Enums.GetValues<WhyVisitSite>().Where(x => x != WhyVisitSite.Unknown))
                             {
                                 <div class="govuk-radios__item">
                                     <input class="govuk-radios__input" id="WhyVisit-@(reason)" name="WhyVisitMSUSite" type="radio" value="@(reason)" checked="@(Model.WhyVisitMSUSite == reason)">
@@ -53,7 +53,7 @@
                             </h1>
                         </legend>
                         <div class="govuk-radios">
-                            @foreach (var reason in Enums.GetValues<HowEasyIsThisServiceToUse>())
+                            @foreach (var reason in Enums.GetValues<HowEasyIsThisServiceToUse>().Where(x=> x != HowEasyIsThisServiceToUse.Unknown))
                             {
                                 <div class="govuk-radios__item">
                                     <input class="govuk-radios__input" id="HowEasy-@(reason)" name="HowEasyIsThisServiceToUse" type="radio" value="@(reason)" checked="@(Model.HowEasyIsThisServiceToUse == reason)">

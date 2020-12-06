@@ -2,7 +2,7 @@
  * Copied from https://github.com/alphagov/govuk_frontend_toolkit/blob/master/javascripts/govuk/analytics/analytics.js
  * Also see https://github.com/alphagov/govuk_frontend_toolkit/blob/master/docs/analytics.md
  */
-(function(global) {
+(function (global) {
     "use strict";
 
     var GOVUK = global.GOVUK || {};
@@ -13,7 +13,7 @@
     // For usage and initialisation see:
     // https://github.com/alphagov/govuk_frontend_toolkit/blob/master/docs/analytics.md#create-an-analytics-tracker
 
-    var Analytics = function(config) {
+    var Analytics = function (config) {
         this.stripDatePII = false;
         if (typeof config.stripDatePII !== "undefined") {
             this.stripDatePII = (config.stripDatePII === true);
@@ -41,12 +41,12 @@
         }
     };
 
-    var PIISafe = function(value) {
+    var PIISafe = function (value) {
         this.value = value;
     };
     Analytics.PIISafe = PIISafe;
 
-    Analytics.prototype.stripPII = function(value) {
+    Analytics.prototype.stripPII = function (value) {
         if (typeof value === "string") {
             return this.stripPIIFromString(value);
         } else if (Object.prototype.toString.call(value) === "[object Array]" ||
@@ -59,7 +59,7 @@
         }
     };
 
-    Analytics.prototype.stripPIIFromString = function(string) {
+    Analytics.prototype.stripPIIFromString = function (string) {
         var stripped = string.replace(EMAIL_PATTERN, "[email]");
         if (this.stripDatePII === true) {
             stripped = stripped.replace(DATE_PATTERN, "[date]");
@@ -70,7 +70,7 @@
         return stripped;
     };
 
-    Analytics.prototype.stripPIIFromObject = function(object) {
+    Analytics.prototype.stripPIIFromObject = function (object) {
         if (object instanceof Analytics.PIISafe) {
             return object.value;
         } else {
@@ -83,7 +83,7 @@
         }
     };
 
-    Analytics.prototype.stripPIIFromArray = function(array) {
+    Analytics.prototype.stripPIIFromArray = function (array) {
         for (var i = 0, l = array.length; i < l; i++) {
             var elem = array[i];
 
@@ -92,7 +92,7 @@
         return array;
     };
 
-    Analytics.prototype.sendToTrackers = function(method, args) {
+    Analytics.prototype.sendToTrackers = function (method, args) {
         for (var i = 0, l = this.trackers.length; i < l; i++) {
             var tracker = this.trackers[i];
             var fn = tracker[method];
@@ -103,12 +103,15 @@
         }
     };
 
-    Analytics.load = function() {
-        GOVUK.GoogleAnalyticsUniversalTracker.load();
+    Analytics.load = function () {
+        //not initialising here as this is done in the head of each page in tracking.html
+        //as per the documentation https://developers.google.com/analytics/devguides/collection/analyticsjs        
+        //GOVUK.GoogleAnalyticsUniversalTracker.load();
+
         GOVUK.GOVUKTracker.load();
     };
 
-    Analytics.prototype.defaultPathForTrackPageview = function(location) {
+    Analytics.prototype.defaultPathForTrackPageview = function (location) {
         // Get the page path including querystring, but ignoring the anchor
         // as per default behaviour of GA (see: https://developers.google.com/analytics/devguides/collection/analyticsjs/pages#overview)
         // we ignore the possibility of there being campaign variables in the
@@ -117,7 +120,7 @@
         return this.stripPIIFromString(location.href.substring(location.origin.length).split("#")[0]);
     };
 
-    Analytics.prototype.trackPageview = function(path, title, options) {
+    Analytics.prototype.trackPageview = function (path, title, options) {
         arguments[0] = arguments[0] || this.defaultPathForTrackPageview(window.location);
         if (arguments.length === 0) {
             arguments.length = 1
@@ -131,11 +134,11 @@
       options.value – Values must be non-negative. Useful to pass counts
       options.nonInteraction – Prevent event from impacting bounce rate
     */
-    Analytics.prototype.trackEvent = function(category, action, options) {
+    Analytics.prototype.trackEvent = function (category, action, options) {
         this.sendToTrackers("trackEvent", this.stripPII(arguments));
     };
 
-    Analytics.prototype.trackShare = function(network, options) {
+    Analytics.prototype.trackShare = function (network, options) {
         this.sendToTrackers("trackSocial", this.stripPII([network, "share", global.location.pathname, options]));
     };
 
@@ -143,14 +146,14 @@
       The custom dimension index must be configured within the
       Universal Analytics profile
      */
-    Analytics.prototype.setDimension = function(index, value) {
+    Analytics.prototype.setDimension = function (index, value) {
         this.sendToTrackers("setDimension", this.stripPII(arguments));
     };
 
     /*
      Add a beacon to track a page in another GA account on another domain.
      */
-    Analytics.prototype.addLinkedTrackerDomain = function(trackerId, name, domain) {
+    Analytics.prototype.addLinkedTrackerDomain = function (trackerId, name, domain) {
         this.sendToTrackers("addLinkedTrackerDomain", arguments);
     };
 

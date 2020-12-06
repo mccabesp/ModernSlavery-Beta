@@ -46,12 +46,6 @@ namespace ModernSlavery.Infrastructure.Hosts
             switch (dataProtectionOptions.Type.ToLower())
             {
                 case "redis":
-                    if (string.IsNullOrWhiteSpace(options.CacheOptions.AzureConnectionString))
-                        throw new Exception("Cannot 'DistributedCache:AzureConnectionString'");
-
-                    if (string.IsNullOrWhiteSpace(dataProtectionOptions.KeyName))
-                        throw new Exception("Invalid or missing setting 'DataProtection:KeyName'");
-
                     var redis = ConnectionMultiplexer.Connect(options.CacheOptions.AzureConnectionString);
                     options.Services.AddDataProtection(options =>
                     {
@@ -60,14 +54,6 @@ namespace ModernSlavery.Infrastructure.Hosts
                     break;
                 case "blob":
                     //Use blob storage to persist data protection keys equivalent to old MachineKeys
-                    if (string.IsNullOrWhiteSpace(options.CacheOptions.AzureConnectionString))
-                        throw new Exception("Cannot 'DistributedCache:AzureConnectionString'");
-
-                    if (string.IsNullOrWhiteSpace(dataProtectionOptions.Container))
-                        throw new Exception("Invalid or missing setting 'DataProtection:Container'");
-
-                    if (string.IsNullOrWhiteSpace(dataProtectionOptions.KeyFilepath))
-                        throw new Exception("Invalid or missing setting 'DataProtection:KeyFilePath'");
 
                     //Get or create the container automatically
                     var storageAccount = CloudStorageAccount.Parse(options.CacheOptions.AzureConnectionString);
@@ -149,6 +135,9 @@ namespace ModernSlavery.Infrastructure.Hosts
                     "Cookies",
                     options =>
                     {
+                        options.Cookie.IsEssential = true;
+                        options.Cookie.SecurePolicy =  Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+                        options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
                         options.AccessDeniedPath = "/Error/403"; //Show forbidden error page
                     });
             return services;

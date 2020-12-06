@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Xml;
 using Autofac;
+using IdentityServer4;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Logging;
 using Microsoft.Net.Http.Headers;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
@@ -76,8 +75,7 @@ namespace ModernSlavery.Hosts.Web
             //Allow creation of a static http context anywhere
             services.AddHttpContextAccessor();
 
-            var mvcBuilder = services.AddControllersWithViews(
-                options =>
+            var mvcBuilder = services.AddControllersWithViews(options =>
                 {
                     options.OutputFormatters.Add(new CsvMediaTypeFormatter());
                     options.OutputFormatters.Add(new XmlMediaTypeFormatter());
@@ -93,7 +91,7 @@ namespace ModernSlavery.Hosts.Web
                     options.Filters.Add<ErrorHandlingFilter>();
                     options.Filters.Add<HttpExceptionFilter>(); 
                     options.Filters.Add<ViewModelResultFilter>(); 
-                });
+                }).AddXmlSerializerFormatters().AddXmlDataContractSerializerFormatters();
 
             mvcBuilder.AddApplicationPart<WebAPI.Public.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Identity.DependencyModule>();
@@ -111,8 +109,7 @@ namespace ModernSlavery.Hosts.Web
             if (Debugger.IsAttached && _sharedOptions.IsDevelopment()) mvcBuilder.AddApplicationPartsRuntimeCompilation();
 
             //Log all the application parts when in development
-            if (_sharedOptions.IsDevelopment())
-                services.AddHostedService<ApplicationPartsLogger>();
+            if (_sharedOptions.IsDevelopment())services.AddHostedService<ApplicationPartsLogger>();
 
             // Add controllers, taghelpers, views as services so attribute dependencies can be resolved in their contructors
             mvcBuilder.AddControllersAsServices();
@@ -121,17 +118,16 @@ namespace ModernSlavery.Hosts.Web
 
             // Set the default resolver to use Pascalcase instead of the default camelCase which may break Ajaz responses
             mvcBuilder.AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-                options.JsonSerializerOptions.PropertyNamingPolicy = null;
-            });
+                {
+                    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                    options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                });
 
-            mvcBuilder.AddDataAnnotationsLocalization(
-                    options =>
-                    {
-                        options.DataAnnotationLocalizerProvider =
-                            DataAnnotationLocalizerProvider.DefaultResourceHandler;
-                    });
+            mvcBuilder.AddDataAnnotationsLocalization(options =>
+                {
+                    options.DataAnnotationLocalizerProvider =
+                        DataAnnotationLocalizerProvider.DefaultResourceHandler;
+                });
 
             //Add antiforgery token by default to forms
             services.AddAntiforgery();
@@ -139,28 +135,37 @@ namespace ModernSlavery.Hosts.Web
             services.AddRazorPages();
 
             //Add services needed for sessions
-            services.AddSession(
-                o =>
+            services.AddSession(options =>
                 {
-                    o.Cookie.IsEssential = true; //This is required otherwise session will not load
-                    o.Cookie.SecurePolicy =
+                    options.Cookie.IsEssential = true; //This is required otherwise session will not load
+                    options.Cookie.SecurePolicy =
                         CookieSecurePolicy.Always; //Equivalent to <httpCookies requireSSL="true" /> from Web.Config
-                    o.Cookie.HttpOnly = false; //Always use https cookies
-                    o.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
-                    o.Cookie.Domain =
-                        _sharedOptions.WEBSITE_HOSTNAME
-                            .BeforeFirst(":"); //Domain cannot be an authority and contain a port number
-                    o.IdleTimeout =
-                        TimeSpan.FromMinutes(_sharedOptions
-                            .SessionTimeOutMinutes); //Equivalent to <sessionState timeout="20"> from old Web.config
+                    options.Cookie.HttpOnly = false; //Always use https cookies
+                    options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
+                    options.Cookie.Domain = _sharedOptions.EXTERNAL_HOSTNAME.BeforeFirst(":"); //Domain cannot be an authority and contain a port number
+                    options.IdleTimeout = TimeSpan.FromMinutes(_sharedOptions.SessionTimeOutMinutes); //Equivalent to <sessionState timeout="20"> from old Web.config
                 });
 
             //Add the distributed cache and data protection
-            services.AddDistributedCache(_distributedCacheOptions)
-                .AddDataProtection(_dataProtectionOptions);
+            services.AddDistributedCache(_distributedCacheOptions).AddDataProtection(_dataProtectionOptions);
 
             //This may now be required 
             services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
+
+            // configure the application cookie
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.IsEssential = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
+            });
+
+            services.ConfigureExternalCookie(options =>
+            {
+                options.Cookie.IsEssential = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
+            });
 
             #region Configure Identity Client
             //Configure the services required for authentication by IdentityServer
@@ -204,8 +209,6 @@ namespace ModernSlavery.Hosts.Web
             app.UseMiddleware<ExceptionMiddleware>();
             if (_sharedOptions.UseDeveloperExceptions)
             {
-                IdentityModelEventSource.ShowPII = true;
-
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }
@@ -224,7 +227,12 @@ namespace ModernSlavery.Hosts.Web
             app.UseSession(); //Must be before UseMvC or any middleware which requires session
             app.UseAuthentication(); //Ensure the OIDC IDentity Server authentication services execute on each http request - Must be before UseMVC
             app.UseAuthorization();
-            app.UseCookiePolicy();
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                MinimumSameSitePolicy =  Microsoft.AspNetCore.Http.SameSiteMode.Strict,
+                Secure = CookieSecurePolicy.Always
+            });
+
             app.UseMiddleware<MaintenancePageMiddleware>(_sharedOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
             app.UseMiddleware<StickySessionMiddleware>(_testOptions.StickySessions); //Enable/Disable sticky sessions based on  
             app.UseMiddleware<SecurityHeaderMiddleware>(); //Add/remove security headers from all responses

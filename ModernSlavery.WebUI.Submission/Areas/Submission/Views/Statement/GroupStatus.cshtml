@@ -46,21 +46,17 @@
 
             <details class="govuk-details" data-module="govuk-details">
                 <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">Read about group statements and individual statements</span>
+                    <span class="govuk-details__summary-text">Read about statements for organisations in a group</span>
                 </summary>
                 <div class="govuk-details__text">
-                    <p>
-                        <b>Group statements for organisations in a group</b><br />
-                        Where several organisations in a group (for example, a parent organisation and one or more subsidiaries) are required to publish a statement, they can agree to produce a combined group statement on behalf of all relevant organisations in the group. The statement must cover the steps that all relevant organisations have taken to tackle modern slavery risks in their business and supply chain.
+                    <p class="govuk-body">
+                        <span class="govuk-!-font-weight-bold">Group statements for organisations in a group</span><br />
+                        Where several organisations in a group (for example, a parent organisation and one or more subsidiaries) are required to publish a statement, they can agree to produce a combined group statement on behalf of all relevant organisations in the group. The statement must cover the steps that all relevant organisations have taken to tackle modern slavery risks in their operations and supply chain.
                     </p>
-                    <p>
-                        <b>Individual statements for organisations in a group</b><br />
+                    <p class="govuk-body">
+                        <span class="govuk-!-font-weight-bold">Individual statements for organisations in a group</span><br />
                         If there is no combined group statement, each organisation in the group that is required to publish a statement must produce its own individual statement.
-                    </p>
-                    <p>
-                        <b>If your organisation is not part of a group</b><br />
-                        Organisations that are not part of a group must produce individual statements if they are required to publish one (or want to produce one voluntarily).
-                    </p>
+                    </p>                   
                 </div>
             </details>
 
@@ -68,7 +64,7 @@
                 <fieldset class="govuk-fieldset">
                     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                         <h2 class="govuk-fieldset__heading">
-                            The @Model.ReportingDeadlineYear modern slavery statement for @(Model.OrganisationName) covers:
+                            @(Model.OrganisationName)'s statement (@Model.ReportingDeadlineYear) covers:
                         </h2>
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">

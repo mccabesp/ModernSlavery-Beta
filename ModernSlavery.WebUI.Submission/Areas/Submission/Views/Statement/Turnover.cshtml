@@ -15,21 +15,29 @@
             @Html.AntiForgeryToken();
             @Html.HiddenFor(m => m.Submitted);
 
-            <div class="govuk-form-group">
+            <div class="govuk-form-group  govuk-!-margin-bottom-7">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-!-margin-bottom-5">
                         <h1 class="govuk-fieldset__heading">
                             @Model.PageTitle
                         </h1>
                     </legend>
+
+                    <p class="govuk-body">
+                        If your statement is for a group, include the total turnover for all the organisations in the group.
+                    </p>
+
+                    <p class="govuk-body govuk-!-margin-bottom-5">
+                        If you’re a public body, base your answer on your organisation’s budget.
+                    </p>
                     <details class="govuk-details" data-module="govuk-details">
                         <summary class="govuk-details__summary">
                             <span class="govuk-details__summary-text">
-                                Read about how to calculate turnover or budget for groups
+                                Read guidance on how to calculate turnover
                             </span>
                         </summary>
                         <div class="govuk-details__text">
-                            If your statement is for a group, you should include the total turnover or budget of all the organisations in the group – regardless of where they are located or carry out their business.
+                            Advice on calculating your turnover or budget, including for charities and investment trusts, is available in the government’s <a href="https://www.gov.uk/guidance/publish-an-annual-modern-slavery-statement#who-needs-to-publish-a-statement" class="govuk-link" target="_blank">guidance on publishing a statement (opens in new window)</a>.
                         </div>
                     </details>
 

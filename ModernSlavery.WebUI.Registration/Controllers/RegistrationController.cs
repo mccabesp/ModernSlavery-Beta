@@ -42,19 +42,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
         #endregion
 
-        #region Initialisation
-
-        /// <summary>
-        ///     This action is only used to warm up this controller on initialisation
-        /// </summary>
-        [HttpGet("Init")]
-        public IActionResult Init()
-        {
-            return new EmptyResult();
-        }
-
-        #endregion
-
         #region Session & Cache Properties
 
         private int LastPrivateSearchRemoteTotal => Session["LastPrivateSearchRemoteTotal"].ToInt32();

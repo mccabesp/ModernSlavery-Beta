@@ -1,16 +1,19 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
+using ModernSlavery.WebAPI.Models;
+using ModernSlavery.WebUI.Shared.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
-using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1.StatementRisk;
+using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
+using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary.StatementRisk;
 
 namespace ModernSlavery.WebAPI.Public.Classes
 {
@@ -36,7 +39,33 @@ namespace ModernSlavery.WebAPI.Public.Classes
         /// <param name="context"></param>
         /// <param name="selectedEncoding"></param>
         /// <returns></returns>
-        public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
+        public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
+        {
+            Type type = GetTypeOf(context.Object);
+            if (type == typeof(StatementSummaryDownloadModel))
+                await WriteResponseBodyStatementSummaryAsync(context, selectedEncoding);
+            else
+                await WriteResponseBodyGenericAsync(context, selectedEncoding);
+        }
+
+        private async Task WriteResponseBodyStatementSummaryAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
+        {
+            StringBuilder csv = new StringBuilder();
+
+            var properties = typeof(StatementSummaryDownloadModel).GetProperties().ToList();
+
+            csv.AppendLine(string.Join(",", properties.Select(x => x.Name)));
+
+            foreach (var item in (IEnumerable<StatementSummaryDownloadModel>)context.Object)
+            {
+                var values = properties.Select(p => AddQuotes(ConvertToText(p.GetValue(item, null)) ?? string.Empty));
+
+                csv.AppendLine(string.Join(",", values));
+            }
+            await WriteText(context, csv.ToString(), selectedEncoding,true);
+        }
+
+        private async Task WriteResponseBodyGenericAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
         {
             StringBuilder csv = new StringBuilder();
             Type type = GetTypeOf(context.Object);
@@ -71,7 +100,21 @@ namespace ModernSlavery.WebAPI.Public.Classes
                 }
                 csv.AppendLine(string.Join(",", values));
             }
-            return context.HttpContext.Response.WriteAsync(csv.ToString(), selectedEncoding);
+
+            await WriteText(context, csv.ToString(), selectedEncoding, true);
+        }
+
+        private async Task WriteText(OutputFormatterWriteContext context, string text, Encoding selectedEncoding, bool includeByteOrderMark=false)
+        {
+            //Write the BOM
+            if (includeByteOrderMark)
+            {
+                var preamble = selectedEncoding.GetPreamble();
+                await context.HttpContext.Response.Body.WriteAsync(preamble, 0, preamble.Length);
+            }
+
+            //Write the text
+            await context.HttpContext.Response.WriteAsync(text, selectedEncoding);
         }
 
         private static IEnumerable<string> ConvertToText(IEnumerable list)
@@ -91,6 +134,10 @@ namespace ModernSlavery.WebAPI.Public.Classes
             {
                 case string text:
                     return text;
+                case bool boolValue:
+                    return boolValue ? "Yes" : "No";
+                case DateTime dateValue:
+                    return dateValue.ToShortDateString();
                 case AddressModel addressModel:
                     return addressModel.GetFullAddress(Environment.NewLine);
                 case SectorTypeIndex.SectorType sectorType:

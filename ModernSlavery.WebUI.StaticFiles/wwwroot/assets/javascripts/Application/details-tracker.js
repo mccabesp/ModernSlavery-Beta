@@ -1,13 +1,13 @@
-(function(global) {
+(function (global) {
     "use strict";
 
     var $ = global.jQuery;
     var GOVUK = global.GOVUK || {};
 
     GOVUK.analyticsPlugins = GOVUK.analyticsPlugins || {};
-    GOVUK.analyticsPlugins.detailsTracker = function(options) {
+    GOVUK.analyticsPlugins.detailsTracker = function (options) {
         options = options || {};
-        var detailsSelector = options.selector || "summary[aria-expanded]"; // find summary elements with aria-expanded
+        var detailsSelector = options.selector || "summary[class='govuk-details__summary']";//summary[aria-expanded]"; // find summary elements with aria-expanded
         var detailsCategory = options.category || "Details Clicked";
 
         if (detailsSelector) {
@@ -16,11 +16,17 @@
 
         function trackDetails(evt) {
             var $summary = getSummaryFromEvent(evt);
+
+            //dont need to track collapse as well
+            if ($summary.closest("details").attr("open") != null) {
+                return;
+            }
+
             var evtOptions = { transport: "beacon" };
             var summaryText = $.trim($summary.text());
 
             if (summaryText) {
-                evtOptions.label = $summary.data("track-label") || summaryText;
+                evtOptions.label = ($summary.data("track-label") || summaryText) + " link clicked";
             }
 
             var $details = $summary.closest("details");

@@ -32,6 +32,8 @@ namespace ModernSlavery.Core
         {
             builder.RegisterType<ReportingDeadlineHelper>().As<IReportingDeadlineHelper>().SingleInstance();
 
+            builder.RegisterType<GovUkCountryProvider>().As<IGovUkCountryProvider>().SingleInstance();
+
             //Register some singletons
             builder.RegisterType<InternalObfuscator>().As<IObfuscator>().SingleInstance()
                 .WithParameter("seed", _sharedOptions.ObfuscationSeed);

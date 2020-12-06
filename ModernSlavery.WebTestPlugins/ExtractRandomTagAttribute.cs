@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace ModernSlavery.WebTestPlugins
 {
     [DisplayName("Extract Attribute by random match of attribute")]
-    [Description("Extract the inner text of a random tag which matches an attribute value.")]
+    [Description("Extract an attribute value of a random tag which matches an attribute value.")]
     public class ExtractRandomAttribute : ExtractionRule
     {
         DisplayNameAttribute x;

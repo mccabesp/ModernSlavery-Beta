@@ -7,14 +7,17 @@ using System.Reflection;
 using System.Threading.Tasks;
 using EFCore.BulkExtensions;
 using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient.AlwaysEncrypted.AzureKeyVaultProvider;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Azure.KeyVault;
 
 namespace ModernSlavery.Infrastructure.Database
 {
@@ -28,15 +31,18 @@ namespace ModernSlavery.Infrastructure.Database
         private readonly TestOptions _testOptions;
         private static bool _migrationEnsured;
         public bool MigrationsApplied { get; }
+        //private static bool _encryptionInitialised;
 
         public DatabaseContext(SharedOptions sharedOptions, TestOptions testOptions, DatabaseOptions databaseOptions)
         {
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
-            _testOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions));
             _databaseOptions = databaseOptions ?? throw new ArgumentNullException(nameof(databaseOptions));
 
             if (!string.IsNullOrWhiteSpace(_databaseOptions.ConnectionString))
                 ConnectionString = _databaseOptions.ConnectionString;
+
+            //TODO: Not tested or fully implemented yet
+            //    InitializeAzureKeyVaultProvider();
 
             if (databaseOptions.GetIsMigrationApp())
                 MigrationsApplied=EnsureMigrated();
@@ -58,7 +64,6 @@ namespace ModernSlavery.Infrastructure.Database
 
             return lastAppliedMigration == lastDefinedMigration;
         }
-
 
 
         public async Task<int> SaveChangesAsync()
@@ -142,8 +147,9 @@ namespace ModernSlavery.Infrastructure.Database
         {
             if (!optionsBuilder.IsConfigured)
             {
+#if DEBUG
                 #region On local development machines add migration version to database name
-                if (_sharedOptions.IsDevelopment())
+                if (_sharedOptions.IsDevelopment() || _sharedOptions.IsTest())
                 {
                     var connectionString = new SqlConnectionStringBuilder(ConnectionString);
                     if (connectionString.DataSource.ContainsI("(localdb"))
@@ -154,7 +160,7 @@ namespace ModernSlavery.Infrastructure.Database
                     }
                 }
                 #endregion
-
+#endif
                 //Setup the SQL server with automatic retry on failure
                 optionsBuilder.UseSqlServer(ConnectionString, options => options.EnableRetryOnFailure());
             }
@@ -163,36 +169,39 @@ namespace ModernSlavery.Infrastructure.Database
             optionsBuilder.UseLazyLoadingProxies();
         }
 
-        /// <summary>
-        ///     https://stackoverflow.com/questions/564366/convert-generic-list-enumerable-to-datatable
-        /// </summary>
-        /// <param name="listOfOrganisationsToConvert"></param>
-        /// <returns></returns>
-        private DataTable ConvertToDataTable<TEntity>(IEnumerable<TEntity> listOfOrganisationsToConvert)
-            where TEntity : class
-        {
-            var table = new DataTable();
+        #region Column Encryption
+        //private bool _encryptionInitialised=false;
+        //private void InitializeAzureKeyVaultProvider()
+        //{
+        //    if (_encryptionInitialised) return;
+        //    SqlColumnEncryptionAzureKeyVaultProvider azureKeyVaultProvider;
+        //    if (!string.IsNullOrWhiteSpace(_sharedOptions.ClientId) || !string.IsNullOrWhiteSpace(_sharedOptions.ClientSecret))
+        //    {
+        //        azureKeyVaultProvider = new SqlColumnEncryptionAzureKeyVaultProvider(GetToken);
+        //    }
+        //    else
+        //    {
+        //        var azureServiceTokenProvider = new AzureServiceTokenProvider();
+        //        azureKeyVaultProvider = new SqlColumnEncryptionAzureKeyVaultProvider(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+        //    }
 
-            table.Columns.Add("OrganisationId", typeof(int));
-            table.Columns.Add("SecurityCode", typeof(string));
-            table.Columns.Add("SecurityCodeExpiryDateTime", typeof(DateTime));
-            table.Columns.Add("SecurityCodeCreatedDateTime", typeof(DateTime));
+        //    var providers = new Dictionary<string, SqlColumnEncryptionKeyStoreProvider>();
+        //    providers.Add(SqlColumnEncryptionAzureKeyVaultProvider.ProviderName, azureKeyVaultProvider);
+        //    SqlConnection.RegisterColumnEncryptionKeyStoreProviders(providers);
+        //    _encryptionInitialised = true;
+        //}
 
-            foreach (var item in listOfOrganisationsToConvert)
-            {
-                var itemObject = (object) item;
-                var orgObject = itemObject as Organisation;
+        //private async Task<string> GetToken(string authority, string resource, string scope)
+        //{
+        //    var appCredentials = new ClientCredential(_sharedOptions.ClientId, _sharedOptions.ClientSecret);
+        //    var context = new AuthenticationContext(authority, TokenCache.DefaultShared);
 
-                if (orgObject != null)
-                    table.Rows.Add(
-                        orgObject.OrganisationId,
-                        orgObject.SecurityCode,
-                        orgObject.SecurityCodeExpiryDateTime,
-                        orgObject.SecurityCodeCreatedDateTime);
-            }
+        //    var result = await context.AcquireTokenAsync(resource, appCredentials);
+        //    if (result == null) throw new InvalidOperationException("Failed to obtain the access token");
 
-            return table;
-        }
+        //    return result.AccessToken;
+        //}
+        #endregion
 
         #region Tables
 

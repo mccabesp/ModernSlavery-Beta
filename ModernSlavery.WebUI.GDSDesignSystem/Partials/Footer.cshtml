@@ -20,7 +20,7 @@
                                     @if (!string.IsNullOrEmpty(link.Text) && !string.IsNullOrEmpty(link.Href))
                                     {
                                         <li class="govuk-footer__list-item">
-                                            <a class="govuk-footer__link" href="@(link.Href)">
+                                            <a rel="track" data-track-category="pageElementInteraction" class="govuk-footer__link" href="@(link.Href)">
                                                 @*@(Html.Raw( Model.Attributes != null ? string.Join(" ", Model.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) : "" ))*@
                                                 @(link.Text)
                                             </a>
@@ -46,7 +46,7 @@
                             @foreach (var link in Model.MetaNavigation.Links)
                             {
                                 <li class="govuk-footer__inline-list-item">
-                                    <a class="govuk-footer__link" href="@(link.Href)">
+                                    <a  rel="track" data-track-category="pageElementInteraction" class="govuk-footer__link" href="@(link.Href)">
                                         @*@(Html.Raw( Model.Attributes != null ? string.Join(" ", Model.Attributes.Select(a => a.Key + "=\"" + a.Value + "\"")) : "" ))*@
                                         @(link.Text)
                                     </a>

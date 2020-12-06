@@ -58,12 +58,20 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
         private IEnumerable<Organisation> LookupSearchableOrganisations(params Organisation[] organisations)
         {
+            //Show all organisations even if they havent submitted a statement
+            if (SearchOptions.IncludeUnsubmitted)
+                return organisations.Where(
+                    o => o.Status == OrganisationStatuses.Active
+                         && o.OrganisationScopes.Any(
+                                 sc => sc.Status == ScopeRowStatuses.Active
+                                       && (sc.ScopeStatus == ScopeStatuses.InScope ||
+                                           sc.ScopeStatus == ScopeStatuses.PresumedInScope)));
+
+            //Show include organisations who have submitted a statement
             return organisations.Where(
                 o => o.Status == OrganisationStatuses.Active
-                     && o.OrganisationScopes.Any(
-                             sc => sc.Status == ScopeRowStatuses.Active
-                                   && (sc.ScopeStatus == ScopeStatuses.InScope ||
-                                       sc.ScopeStatus == ScopeStatuses.PresumedInScope)));
+                     && o.Statements.Any(s => s.Status == StatementStatuses.Submitted)
+                     && o.OrganisationScopes.Any(sc => sc.Status == ScopeRowStatuses.Active && (sc.ScopeStatus == ScopeStatuses.InScope || sc.ScopeStatus == ScopeStatuses.PresumedInScope)));
         }
 
         public async Task RefreshSearchDocumentsAsync()
@@ -229,7 +237,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
 
             var parentStatementModel = new OrganisationSearchModel
             {
-                GroupSubmission = submittedStatement == null ? false : submittedStatement.StatementOrganisations.Any(),
+                GroupSubmission = submittedStatement == null ? (bool?)null : submittedStatement.StatementOrganisations.Any(),
 
                 StatementUrl = submittedStatement?.StatementUrl,
                 StatementEmail = submittedStatement?.StatementEmail,
@@ -396,7 +404,6 @@ namespace ModernSlavery.BusinessDomain.Viewing
             IEnumerable<byte> turnovers,
             IEnumerable<short> sectors = null,
             IEnumerable<int> deadlineYears = null,
-            bool submittedOnly = true,
             bool returnFacets = false,
             bool returnAllFields = false,
             int currentPage = 1,
@@ -481,9 +488,6 @@ namespace ModernSlavery.BusinessDomain.Viewing
                 var deadlineQuery = deadlineYears.Select(x => $"{nameof(OrganisationSearchModel.SubmissionDeadlineYear)} eq {x}");
                 queryFilter.Add($"({string.Join(" or ", deadlineQuery)})");
             }
-
-            //Only show submitted organisations
-            if (submittedOnly) queryFilter.Add($"{nameof(OrganisationSearchModel.StatementId)} ne null");
 
             string filter = string.Join(" and ", queryFilter);
             #endregion

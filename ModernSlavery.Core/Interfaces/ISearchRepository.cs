@@ -11,10 +11,17 @@ namespace ModernSlavery.Core.Interfaces
         public string IndexName { get; }
 
         /// <summary>
+        ///     Delete the default index if it already exists
+        /// </summary>
+        /// <returns>The existing or new index</returns>
+        Task DeleteIndexIfExistsAsync(string indexName = null);
+
+        /// <summary>
         ///     Create the default index if it doesnt already exist
         /// </summary>
         /// <returns>The existing or new index</returns>
         Task CreateIndexIfNotExistsAsync(string indexName);
+
 
         /// <summary>
         ///     Adds all new records to index

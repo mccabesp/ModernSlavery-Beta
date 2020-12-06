@@ -48,6 +48,8 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Folder Include="wwwroot\assets\pagestyles\" />
+    <Folder Include="wwwroot\assets\pagescripts\" />
     <Folder Include="wwwroot\NewFolder\" />
     <Folder Include="wwwroot\swagger\" />
   </ItemGroup>

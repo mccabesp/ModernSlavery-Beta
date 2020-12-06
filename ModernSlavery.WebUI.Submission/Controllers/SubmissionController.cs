@@ -33,15 +33,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             _statementBusinessLogic = statementBusinessLogic;
         }
 
-        [HttpGet("Init")]
-        public IActionResult Init()
-        {
-            if (!SharedBusinessLogic.SharedOptions.IsProduction())
-                Logger.LogInformation("Submit Controller Initialised");
-
-            return new EmptyResult();
-        }
-
         [Authorize]
         [HttpGet("~/manage-organisations")]
         public async Task<IActionResult> ManageOrganisations()

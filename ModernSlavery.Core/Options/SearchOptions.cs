@@ -19,6 +19,9 @@ namespace ModernSlavery.Core.Options
         public bool Disabled { get; set; }
         public bool CacheResults { get; set; }
 
+        //Whether to search only for submitted statements or all organisations
+        public bool IncludeUnsubmitted { get; set; }
+
         public int BatchSize { get; set; } = MaxBatchSize;
 
         public void Validate() 

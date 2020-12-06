@@ -9,6 +9,7 @@ using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -41,6 +42,7 @@ namespace ModernSlavery.WebUI.Identity
             var identityServer = services.AddIdentityServer(
                     options =>
                     {
+                        if (!string.IsNullOrWhiteSpace(_identityServerOptions.PublicOrigin))options.PublicOrigin = _identityServerOptions.PublicOrigin;
                         options.Events.RaiseSuccessEvents = true;
                         options.Events.RaiseFailureEvents = true;
                         options.Events.RaiseErrorEvents = true;
@@ -58,8 +60,8 @@ namespace ModernSlavery.WebUI.Identity
                 .AddResourceOwnerValidator<CustomResourceOwnerPasswordValidator>();
                 //.AddProfileService<CustomProfileService>();
 
-            if (!string.IsNullOrWhiteSpace(_sharedOptions.CertThumprint))
-                identityServer.AddSigningCredential(LoadCertificate(_sharedOptions.CertThumprint, _sharedOptions.CertExpiresWarningDays));
+            if (!string.IsNullOrWhiteSpace(_sharedOptions.CertThumbprint))
+                identityServer.AddSigningCredential(LoadCertificate(_sharedOptions.CertThumbprint, _sharedOptions.CertExpiresWarningDays));
             else if (!string.IsNullOrWhiteSpace(_sharedOptions.CertFilepath) && !string.IsNullOrWhiteSpace(_sharedOptions.CertPassword))
                 identityServer.AddSigningCredential(LoadCertificate(_sharedOptions.CertFilepath, _sharedOptions.CertPassword, _sharedOptions.CertExpiresWarningDays));
             else
@@ -80,6 +82,9 @@ namespace ModernSlavery.WebUI.Identity
             //Add configuration here
             var app = lifetimeScope.Resolve<IApplicationBuilder>();
             app.UseIdentityServer();
+
+            IdentityModelEventSource.ShowPII = _identityServerOptions.ShowPII || _sharedOptions.UseDeveloperExceptions;
+
         }
 
         public void RegisterModules(IList<Type> modules)
@@ -87,21 +92,21 @@ namespace ModernSlavery.WebUI.Identity
 
         }
 
-        private X509Certificate2 LoadCertificate(string certThumprint, int certExpiresWarningDays)
+        private X509Certificate2 LoadCertificate(string certThumbprint, int certExpiresWarningDays)
         {
-            if (string.IsNullOrWhiteSpace(certThumprint)) throw new ArgumentNullException(nameof(certThumprint));
+            if (string.IsNullOrWhiteSpace(certThumbprint)) throw new ArgumentNullException(nameof(certThumbprint));
 
             //Load the site certificate
-            var cert = HttpsCertificate.LoadCertificateFromThumbprint(certThumprint);
+            var cert = HttpsCertificate.LoadCertificateFromThumbprint(certThumbprint);
 
             var expires = cert.GetExpirationDateString().ToDateTime();
             var remainingTime = expires - VirtualDateTime.Now;
             if (expires < VirtualDateTime.UtcNow)
-                _logger.LogError($"Certificate '{cert.FriendlyName}' from thumbprint '{certThumprint}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
+                _logger.LogError($"Certificate '{cert.FriendlyName}' from thumbprint '{certThumbprint}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
             else if (expires < VirtualDateTime.UtcNow.AddDays(certExpiresWarningDays))
-                _logger.LogWarning($"Certificate '{cert.FriendlyName}' from thumbprint '{certThumprint}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
+                _logger.LogWarning($"Certificate '{cert.FriendlyName}' from thumbprint '{certThumbprint}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
             else
-                _logger.LogInformation($"Successfully loaded certificate '{cert.FriendlyName}' from thumbprint '{certThumprint}' and expires '{cert.GetExpirationDateString()}'");
+                _logger.LogInformation($"Successfully loaded certificate '{cert.FriendlyName}' from thumbprint '{certThumbprint}' and expires '{cert.GetExpirationDateString()}'");
 
             return cert;
         }

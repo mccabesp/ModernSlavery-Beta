@@ -1,0 +1,24 @@
+﻿@using ModernSlavery.Core.Interfaces
+@inject IGovUkCountryProvider CountryProvider
+
+@model HighRiskViewModel
+
+<div id="selected-countries">
+    <table class="govuk-table" @(Model.CountryReferences.Any() ? "style='display:none'" : "")>
+        <tbody class="govuk-table__body">
+            @for (int i = 0; i < Model.CountryReferences.Count; i++)
+            {
+                var reference = Model.CountryReferences[i];
+                var country = CountryProvider.FindByReference(reference);
+                <tr id="country-line-@country.FullReference" class="govuk-table__row">
+                    <td class="govuk-table__cell">@country.Name</td>
+                    <td class="govuk-table__cell buttons">
+
+                        <button class="link-button" type="submit" name="toRemove" value="@country.FullReference">Remove</button>
+                        @Html.HiddenFor(model => Model.CountryReferences[i])
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,18 +1,18 @@
 /*
  * Copied from https://github.com/alphagov/govuk_frontend_toolkit/blob/master/javascripts/govuk/analytics/external-link-tracker.js
  */
-(function(global) {
+(function (global) {
     "use strict";
 
     var $ = global.jQuery;
     var GOVUK = global.GOVUK || {};
 
     GOVUK.analyticsPlugins = GOVUK.analyticsPlugins || {};
-    GOVUK.analyticsPlugins.externalLinkTracker = function(options) {
+    GOVUK.analyticsPlugins.externalLinkTracker = function (options) {
         options = options || {};
         var externalLinkUploadCustomDimension = options.externalLinkUploadCustomDimension;
         var currentHost = GOVUK.analyticsPlugins.externalLinkTracker.getHostname();
-        var externalLinkSelector = 'a[href^="http"]:not(a[href*="' + currentHost + '"])';
+        var externalLinkSelector = 'a[href^="https"]:not(a[href*="' + currentHost + '"])';
 
         $("body").on("click", externalLinkSelector, trackClickEvent);
 
@@ -23,7 +23,7 @@
             var linkText = $.trim($link.text());
 
             if (linkText) {
-                options.label = linkText;
+                options.label = linkText + " link clicked";
             }
 
             if (externalLinkUploadCustomDimension !== undefined) {
@@ -51,7 +51,7 @@
         }
     };
 
-    GOVUK.analyticsPlugins.externalLinkTracker.getHostname = function() {
+    GOVUK.analyticsPlugins.externalLinkTracker.getHostname = function () {
         return global.location.hostname;
     };
 

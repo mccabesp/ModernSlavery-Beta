@@ -176,6 +176,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     Statement = statement,
                     OrganisationName = groupOrganisation.OrganisationName,
                     OrganisationId = groupOrganisation.OrganisationId,
+                    Organisation = groupOrganisation.OrganisationId > 0 ? _organisationBusinessLogic.DataRepository.Get<Organisation>(groupOrganisation.OrganisationId) : null,
                     Included = groupOrganisation.Included
                 };
                 statement.StatementOrganisations.Add(statementOrganisation);

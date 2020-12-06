@@ -106,5 +106,10 @@ namespace ModernSlavery.WebUI.Shared.Classes
             _httpContextAccessor.HttpContext.Session.Remove(key);
             Dirty = true;
         }
+
+        public void Clear()
+        {
+            _httpContextAccessor.HttpContext.Session.Clear();
+        }
     }
 }

@@ -27,7 +27,7 @@
 }
 @if (Model.OverrideWithJavascript)
 {
-    <script>
+    <script type="text/javascript" nonce="@Html.GetNonce()">
         document.getElementById('back-link')
             .addEventListener('click',
                 function(event) {

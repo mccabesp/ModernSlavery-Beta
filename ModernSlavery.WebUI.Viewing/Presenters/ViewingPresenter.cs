@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.BusinessDomain.Viewing;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
@@ -16,11 +13,8 @@ using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Core.Models;
-using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Viewing.Models;
-using static ModernSlavery.BusinessDomain.Shared.Models.StatementModel;
 using static ModernSlavery.Core.Entities.Statement;
 
 namespace ModernSlavery.WebUI.Viewing.Presenters
@@ -97,7 +91,6 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
                 searchQuery.Turnovers,
                 searchQuery.Sectors,
                 searchQuery.Years,
-                true,
                 false,
                 false,
                 searchQuery.PageNumber,

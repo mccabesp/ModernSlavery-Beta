@@ -4,7 +4,7 @@
     Layout = "~/Views/DfeTemplate.cshtml";
     ViewBag.Title = "Administration: " + Model.Filename;
 }
-<style type="text/css">
+<style type="text/css" nonce="@Html.GetNonce()">
     #content { max-width: 98% !important; }
 </style>
 <main id="content" role="main" style="clear: both;">
@@ -75,7 +75,7 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript">
+    <script type="text/javascript" nonce="@Html.GetNonce()">
         $(document).ready(function() {
             $('.double-scroll').doubleScroll({ resetOnWindowResize: true });
         });

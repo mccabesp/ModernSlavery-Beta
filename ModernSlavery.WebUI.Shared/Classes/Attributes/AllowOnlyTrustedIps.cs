@@ -16,22 +16,18 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var sharedOptions = (SharedOptions) context.HttpContext.RequestServices.GetService(typeof(SharedOptions));
-            var trustedIPDomains = sharedOptions?.TrustedIpDomains.SplitI();
-            if (trustedIPDomains != null && trustedIPDomains.Any())
+            var userHostAddress = context.HttpContext.GetUserHostAddress();
+            if (string.IsNullOrWhiteSpace(userHostAddress) || !sharedOptions.IsTrustedAddress(userHostAddress))
             {
-                var userHostAddress = context.HttpContext.GetUserHostAddress();
-                if (string.IsNullOrWhiteSpace(userHostAddress) || !userHostAddress.IsTrustedAddress(trustedIPDomains))
-                {
-                    LogAttempt(context, sharedOptions.TrustedIpDomains, userHostAddress);
-                    context.Result = new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-                    return;
-                }
+                LogAttempt(context, sharedOptions.TrustedDomainsOrIPs, userHostAddress);
+                context.Result = new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+                return;
             }
 
             base.OnActionExecuting(context);
         }
 
-        private void LogAttempt(ActionExecutingContext context, string trustedIPDomains, string userHostAddress)
+        private void LogAttempt(ActionExecutingContext context, string trustedDomainsOrIPs, string userHostAddress)
         {
             try
             {
@@ -47,7 +43,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 
                 var forbiddingReasonMessagePart = string.IsNullOrWhiteSpace(userHostAddress)
                     ? "since it was not possible to read its host address information"
-                    : $"for address {userHostAddress} as it is not part of the trusted ips '{trustedIPDomains}'";
+                    : $"for address {userHostAddress} as it is not part of the trusted ips '{trustedDomainsOrIPs}'";
 
                 logger.LogWarning($"Access to {controllerMessagePart} was forbidden {forbiddingReasonMessagePart}");
             }

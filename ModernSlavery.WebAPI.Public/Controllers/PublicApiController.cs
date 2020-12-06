@@ -51,8 +51,8 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <param name="searchQuery">The parameters of the search</param>
         /// <returns>A list of statement summaries matching the search criteria</returns>
         [HttpGet("SearchStatementSummaries")]
-        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryViewModel>))]
-        public async IAsyncEnumerable<StatementSummaryViewModel> SearchStatementSummariesAsync([FromQuery] SearchQueryModel searchQuery)
+        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryDownloadModel>))]
+        public async IAsyncEnumerable<StatementSummaryDownloadModel> SearchStatementSummariesAsync([FromQuery] SearchQueryModel searchQuery)
         {
             //Ensure search service is enabled
             if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable,"Service is disabled");
@@ -71,7 +71,6 @@ namespace ModernSlavery.WebAPI.Public.Controllers
                 searchQuery.Years,
                 false,
                 false,
-                true,
                 searchQuery.PageNumber,
                 searchQuery.PageSize);
 
@@ -80,7 +79,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
 
             // build the result view model
             foreach (var organisationSearchModel in searchResults.Results)
-                yield return _mapper.Map<StatementSummaryViewModel>(organisationSearchModel);
+                yield return _mapper.Map<StatementSummaryDownloadModel>(organisationSearchModel);
         }
 
         /// <summary>
@@ -89,8 +88,8 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <param name="years">The list of years to include (if empty returns all reporting years)</param>
         /// <returns>A list of statement summaries for the specified years (or all years)</returns>
         [HttpGet("ListStatementSummaries")]
-        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryViewModel>))]
-        public async IAsyncEnumerable<StatementSummaryViewModel> ListStatementSummariesAsync([FromQuery] params int[] years)
+        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryDownloadModel>))]
+        public async IAsyncEnumerable<StatementSummaryDownloadModel> ListStatementSummariesAsync([FromQuery] params int[] years)
         {
             //Ensure search service is enabled
             if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable, "Service is disabled");
@@ -103,15 +102,15 @@ namespace ModernSlavery.WebAPI.Public.Controllers
 
             //Set the results for a download if browser accepts mime types of "application/*"
             if (years.Count()>1)
-                SetDownloadDisposition($"StatementSummaries{years[0]}-{years[years.Length - 1].ToString().Substring(2)}");
+                SetDownloadDisposition($"StatementSummaries-{years[0]}-{years[years.Length - 1].ToString().Substring(2)}");
             else if (years.Any())
-                SetDownloadDisposition($"StatementSummaries{years[0]}");
+                SetDownloadDisposition($"StatementSummary-{years[0]}");
             else
                 SetDownloadDisposition($"StatementSummaries");
 
             // build the result view model
             foreach (var organisationSearchModel in organisationSearchModels)
-                yield return _mapper.Map<StatementSummaryViewModel>(organisationSearchModel);
+                yield return _mapper.Map<StatementSummaryDownloadModel>(organisationSearchModel);
         }
 
         /// <summary>
@@ -122,8 +121,8 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <param name="extension">The file type to return (i.e., 'json', 'csv' or 'xml')</param>
         /// <returns></returns>
         [HttpGet("StatementSummaries{fromYear}-{toYear}.{extension}")]
-        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryViewModel>))]
-        public async IAsyncEnumerable<StatementSummaryViewModel> ListStatementSummariesAsync(int fromYear, int toYear, string extension)
+        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryDownloadModel>))]
+        public async IAsyncEnumerable<StatementSummaryDownloadModel> ListStatementSummariesAsync(int fromYear, int toYear, string extension)
         {
             //Ensure search service is enabled
             if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable, "Service is disabled");
@@ -162,8 +161,8 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <param name="extension">The file type to return (i.e., 'json', 'csv' or 'xml')</param>
         /// <returns></returns>
         [HttpGet("StatementSummaries{year}.{extension}")]
-        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryViewModel>))]
-        public async IAsyncEnumerable<StatementSummaryViewModel> ListStatementSummariesAsync(int year, string extension)
+        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryDownloadModel>))]
+        public async IAsyncEnumerable<StatementSummaryDownloadModel> ListStatementSummariesAsync(int year, string extension)
         {
             //Ensure search service is enabled
             if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable, "Service is disabled");
@@ -198,7 +197,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <param name="year">The year of the submitted statement</param>
         /// <returns>A list of group statement summaries for the specified organisation and year</returns>
         [HttpGet("GetStatementSummary")]
-        public async Task<StatementSummaryViewModel> GetStatementSummaryAsync([FromQuery] string parentOrganisationId, int year)
+        public async Task<StatementSummaryDownloadModel> GetStatementSummaryAsync([FromQuery] string parentOrganisationId, int year)
         {
             //Ensure search service is enabled
             if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable, "Service is disabled");
@@ -216,7 +215,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
             SetDownloadDisposition($"StatementSummary-{parentOrganisationId}-{year}");
 
             // build the result view model
-            return _mapper.Map<StatementSummaryViewModel>(organisationSearchModel);
+            return _mapper.Map<StatementSummaryDownloadModel>(organisationSearchModel);
         }
 
         /// <summary>
@@ -226,8 +225,8 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <param name="year">The year of the submitted statement</param>
         /// <returns>A list of group statement summaries for the specified organisation and year</returns>
         [HttpGet("ListGroupStatementSummaries")]
-        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryViewModel>))]
-        public async IAsyncEnumerable<StatementSummaryViewModel> ListGroupStatementSummariesAsync([FromQuery] string parentOrganisationId, int year)
+        [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryDownloadModel>))]
+        public async IAsyncEnumerable<StatementSummaryDownloadModel> ListGroupStatementSummariesAsync([FromQuery] string parentOrganisationId, int year)
         {
             //Ensure search service is enabled
             if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable, "Service is disabled");
@@ -246,7 +245,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
 
             // build the result view model
             foreach (var organisationSearchModel in organisationSearchModels)
-                yield return _mapper.Map<StatementSummaryViewModel>(organisationSearchModel);
+                yield return _mapper.Map<StatementSummaryDownloadModel>(organisationSearchModel);
         }
 
         //Sets the content disposition for a download if browser accepting application/* mime type

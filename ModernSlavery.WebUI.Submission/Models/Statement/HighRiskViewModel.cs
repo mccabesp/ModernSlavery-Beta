@@ -1,16 +1,18 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.Core.Entities.StatementSummary;
+using ModernSlavery.Core.Entities.StatementSummary.V1;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
-using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1;
-using static ModernSlavery.Core.Entities.StatementSummary.IStatementSummary1.StatementRisk;
+using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
+using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary.StatementRisk;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -29,22 +31,37 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.OtherLikelySource, opt => opt.MapFrom((s, d) => s.Summary.Risks[d.Index].OtherLikelySource))
                 .ForMember(d => d.ActionsOrPlans, opt => opt.MapFrom((s, d) => s.Summary.Risks[d.Index].ActionsOrPlans))
                 .ForMember(d => d.SupplyChainTiers, opt => opt.MapFrom((s, d) => new List<SupplyChainTierTypes>(s.Summary.Risks[d.Index].SupplyChainTiers)))
-                .ForMember(d => d.Countries, opt => opt.MapFrom((s, d) => new List<CountryTypes>(s.Summary.Risks[d.Index].Countries)));
+                .ForMember(d => d.CountryReferences, opt => opt.MapFrom((s, d) => new List<string>(s.Summary.Risks[d.Index].Countries.Select(c => c.FullReference))));
 
             CreateMap<HighRiskViewModel, StatementModel>(MemberList.None)
                 .ForMember(d => d.OrganisationId, opt => opt.Ignore())
                 .ForMember(d => d.OrganisationName, opt => opt.Ignore())
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
-                .AfterMap((s, d) =>
-                {
-                    d.Summary.Risks[s.Index].Targets = new SortedSet<RiskTargetTypes>(s.Targets);
-                    d.Summary.Risks[s.Index].OtherTargets = s.Targets.Contains(RiskTargetTypes.Other) ? s.OtherTargets : null;
-                    d.Summary.Risks[s.Index].LikelySource = s.LikelySource;
-                    d.Summary.Risks[s.Index].OtherLikelySource = s.LikelySource == RiskSourceTypes.Other ? s.OtherLikelySource : null;
-                    d.Summary.Risks[s.Index].ActionsOrPlans = s.ActionsOrPlans;
-                    d.Summary.Risks[s.Index].SupplyChainTiers = s.LikelySource == RiskSourceTypes.SupplyChains ? s.SupplyChainTiers.ToList() : null;
-                    d.Summary.Risks[s.Index].Countries = new SortedSet<CountryTypes>(s.Countries);
-                });
+                .ConvertUsing<RiskConverter>();
+        }
+
+        public class RiskConverter : ITypeConverter<HighRiskViewModel, StatementModel>
+        {
+            readonly IGovUkCountryProvider CountryProvider;
+
+            public RiskConverter(IGovUkCountryProvider countryProvider)
+            {
+                CountryProvider = countryProvider;
+            }
+
+            public StatementModel Convert(HighRiskViewModel source, StatementModel destination, ResolutionContext context)
+            {
+                destination.Summary.Risks[source.Index].Targets = new SortedSet<RiskTargetTypes>(source.Targets);
+                destination.Summary.Risks[source.Index].OtherTargets = source.Targets.Contains(RiskTargetTypes.Other) ? source.OtherTargets : null;
+                destination.Summary.Risks[source.Index].LikelySource = source.LikelySource;
+                destination.Summary.Risks[source.Index].OtherLikelySource = source.LikelySource == RiskSourceTypes.Other ? source.OtherLikelySource : null;
+                destination.Summary.Risks[source.Index].ActionsOrPlans = source.ActionsOrPlans;
+                destination.Summary.Risks[source.Index].SupplyChainTiers = source.LikelySource == RiskSourceTypes.SupplyChains ? source.SupplyChainTiers.ToList() : null;
+                var countries = source.CountryReferences.Select(r => CountryProvider.FindByReference(r)).ToList();
+                destination.Summary.Risks[source.Index].Countries = new SortedSet<GovUkCountry>(countries);
+
+                return destination;
+            }
         }
     }
 
@@ -83,47 +100,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         [IgnoreMap]
         public string SelectedCountry { get; set; }
 
-        public List<CountryTypes> Countries { get; set; } = new List<CountryTypes>();
-
-        public bool TryAddSelectedCountry()
-        {
-            if (string.IsNullOrWhiteSpace(SelectedCountry))
-                return false;
-
-            var countries = Enums.GetValuesExcept<CountryTypes>(CountryTypes.Unknown)
-                .Select(c => new { value = c, description = c.GetEnumDescription() });
-
-            var options = countries.Where(c => c.description.Equals(SelectedCountry, StringComparison.OrdinalIgnoreCase));
-
-            if (options.Count() != 1)
-                return false;
-
-            var option = options.Single();
-
-            if (Countries.Contains(option.value))
-                return false;
-
-            Countries.Add(option.value);
-            SelectedCountry = null;
-            return true;
-        }
-
-        public bool TryRemoveCountry(CountryTypes countryType)
-        {
-            if (Countries.Contains(countryType))
-            {
-                Countries.Remove(countryType);
-                return true;
-            }
-
-            return false;
-        }
+        public List<string> CountryReferences { get; set; } = new List<string>();
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
 
-            //TODO: Double check error numbers are all correct - I just copied and pasted for now
             if (LikelySource == RiskSourceTypes.Other && string.IsNullOrWhiteSpace(OtherLikelySource))
                 validationResults.AddValidationError(4700, nameof(OtherLikelySource));
 

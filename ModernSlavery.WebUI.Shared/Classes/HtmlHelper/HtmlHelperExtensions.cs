@@ -30,7 +30,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelper
             return (SharedOptions)htmlHelper.ViewContext.HttpContext.RequestServices.GetService(typeof(SharedOptions));
         }
 
-
         public static async Task<IHtmlContent> PartialModelAsync<T>(this IHtmlHelper htmlHelper, T viewModel)
         {
             // extract the parial path from the model class attr

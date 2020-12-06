@@ -28,14 +28,14 @@ namespace ModernSlavery.BusinessDomain.Account
 
         public bool IsSuperAdministrator(User user)
         {
-            if (IsAdministrator(user))return false;
+            if (!IsAdministrator(user))return false;
 
             return user.EmailAddress.LikeAny(_sharedOptions.SuperAdminEmails.SplitI(";"));
         }
 
         public bool IsDatabaseAdministrator(User user)
         {
-            if (IsAdministrator(user)) return false;
+            if (!IsAdministrator(user)) return false;
 
             return user.EmailAddress.LikeAny(_sharedOptions.DatabaseAdminEmails.SplitI(";"));
         }
