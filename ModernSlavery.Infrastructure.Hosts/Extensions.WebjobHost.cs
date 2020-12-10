@@ -28,7 +28,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             genericHost.HostBuilder.ConfigureWebJobs(webJobsBuilder =>
             {
                 //Add filter to prevent logging of file not found 404 errors
-                webJobsBuilder.AddFileNotFoundTelemetryFilter();
+                //webJobsBuilder.AddFileNotFoundTelemetryFilter();
 
                 webJobsBuilder.AddAzureStorageCoreServices();
                 webJobsBuilder.AddAzureStorage(

@@ -47,7 +47,6 @@ namespace ModernSlavery.Core
         public const string RegistrationLog = "MSU-RegistrationLog.csv";
         public const string SubmissionLog = "MSU-SubmissionLog.csv";
         public const string EmailSendLog = "MSU-EmailSendLog.csv";
-        public const string StannpSendLog = "MSU-StannpSendLog.csv";
         public const string SearchLog = "MSU-searchLog.csv";
         public const string UserLog = "MSU-UserLog.csv";
         public const string ImportPrivateOrganisations = "MSU-ImportPrivateOrganisations.csv";
@@ -68,7 +67,6 @@ namespace ModernSlavery.Core
         public const string ExecuteWebJob = "execute-webjob";
         public const string SendEmail = "send-email";
         public const string SendNotifyEmail = "send-notify-email";
-        public const string LogEvent = "log-event";
         public const string LogRecord = "log-record";
     }
 

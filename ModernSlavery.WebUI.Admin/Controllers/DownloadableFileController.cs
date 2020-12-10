@@ -64,49 +64,5 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         #endregion
-
-        [HttpGet("admin/WebsiteLogs")]
-        public async Task<IActionResult> WebsiteLogs(string fp)
-        {
-            var downloadViewModelToReturn = await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.Hosts.Web");
-            return View("WebsiteLogs", downloadViewModelToReturn);
-        }
-
-        [HttpGet("admin/WebjobLogs")]
-        public async Task<IActionResult> WebjobLogs(string fp)
-        {
-            var downloadViewModelToReturn =
-                await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.Hosts.Webjob");
-            return View("WebjobLogs", downloadViewModelToReturn);
-        }
-
-        [HttpGet("admin/IdentityLogs")]
-        public async Task<IActionResult> IdentityLogs(string fp)
-        {
-            var downloadViewModelToReturn =
-                await FetchDownloadablesFromSubfolderAsync(fp, "ModernSlavery.Hosts.IdServer");
-            return View("IdentityLogs", downloadViewModelToReturn);
-        }
-
-        private async Task<IEnumerable<IDownloadableItem>> FetchDownloadablesFromSubfolderAsync(string fp,
-            string subfolderName)
-        {
-            //var logsPathToProcess = string.IsNullOrEmpty(fp)
-            //    ? Path.Combine(SharedBusinessLogic.SharedOptions.LogPath, subfolderName)
-            //    : fp;
-
-            // Storage explorer, we DO want to change
-            var logsPathToProcess = string.IsNullOrWhiteSpace(fp)
-                ? Path.Combine(SharedBusinessLogic.SharedOptions.LogPath, subfolderName).Replace("\\", "/")
-                : fp;
-
-            //Ensure the log directory exists
-            if (!await SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(logsPathToProcess))
-                await SharedBusinessLogic.FileRepository.CreateDirectoryAsync(logsPathToProcess);
-
-            var listOfDownloadableItems =
-                await _downloadableFileBusinessLogic.GetListOfDownloadableItemsFromPathAsync(logsPathToProcess);
-            return listOfDownloadableItems;
-        }
     }
 }

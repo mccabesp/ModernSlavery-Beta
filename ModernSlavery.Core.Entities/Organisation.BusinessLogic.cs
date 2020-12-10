@@ -421,18 +421,18 @@ namespace ModernSlavery.Core.Entities
         {
             if (status == Status && details == StatusDetails) return null;
 
+            StatusDate = VirtualDateTime.Now;
             var organisationStatus = new OrganisationStatus
             {
                 OrganisationId = OrganisationId,
                 Status = status,
-                StatusDate = VirtualDateTime.Now,
+                StatusDate = StatusDate,
                 StatusDetails = details,
                 ByUserId = byUserId
             };
             OrganisationStatuses.Add(organisationStatus);
 
             Status = status;
-            StatusDate = VirtualDateTime.Now;
             StatusDetails = details;
             return organisationStatus;
         }

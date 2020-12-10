@@ -321,7 +321,7 @@ namespace ModernSlavery.Infrastructure.Configuration
             {
                 if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
                 if (keyStack.Contains(key)) throw new Exception($"Circular configuration variable '$({key})'");
-
+                
                 if (!string.IsNullOrWhiteSpace(text))
                 {
                     keyStack.Add(key);
@@ -332,8 +332,8 @@ namespace ModernSlavery.Infrastructure.Configuration
 
                         if (dictionary.ContainsKey(varName))
                         {
-                            newText = ResolveVariableNames(dictionary[varName], varName);
-                            newText = text.Replace(m.Groups[0].Value, newText, StringComparison.OrdinalIgnoreCase);
+                            var replacementValue = ResolveVariableNames(dictionary[varName], varName);
+                            newText = newText.Replace(m.Groups[0].Value, replacementValue, StringComparison.OrdinalIgnoreCase);
                         }
                         else
                             badKeys.Add(varName);

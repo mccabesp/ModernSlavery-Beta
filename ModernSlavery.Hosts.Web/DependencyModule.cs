@@ -103,6 +103,9 @@ namespace ModernSlavery.Hosts.Web
             mvcBuilder.AddApplicationPart<WebUI.Shared.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.GDSDesignSystem.DependencyModule>();
 
+            //Add the header forwarding when behind gateway/firewall
+            if (!string.IsNullOrWhiteSpace(_sharedOptions.GatewayHosts))services.AddForwardedHeaders(_sharedOptions.GatewayHosts.SplitI());
+
             // we need to explicitly set AllowRecompilingViewsOnFileChange because we use a custom environment "Development" for Development dev 
             // https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-compilation?view=aspnetcore-3.1#runtime-compilation
             // However this doesnt work on razor class/component libraries so we instead use this workaround 
@@ -205,7 +208,12 @@ namespace ModernSlavery.Hosts.Web
             var app = lifetimeScope.Resolve<IApplicationBuilder>();
             var hostApplicationLifetime = lifetimeScope.Resolve<IHostApplicationLifetime>();
 
-            lifetimeScope.UseLogEventQueueLogger();
+            //User the header forwarding when behind gateway/firewall
+            if (!string.IsNullOrWhiteSpace(_sharedOptions.GatewayHosts))app.UseForwardedHeaders();
+
+            //Add header debugging
+            if (_sharedOptions.DebugHeaders) app.UseMiddleware<DebugHeadersMiddleware>();
+
             app.UseMiddleware<ExceptionMiddleware>();
             if (_sharedOptions.UseDeveloperExceptions)
             {
@@ -217,6 +225,7 @@ namespace ModernSlavery.Hosts.Web
                 app.UseExceptionHandler("/error/500");
                 app.UseStatusCodePagesWithReExecute("/error/{0}");
             }
+
 
             //app.UseHttpsRedirection(); This always causes redirect to https://localhost from http://localhost:5000
             //app.UseResponseCompression(); //Disabled to use IIS compression which has better performance (see https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-2.1)

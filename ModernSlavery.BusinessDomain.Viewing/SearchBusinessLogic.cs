@@ -217,9 +217,15 @@ namespace ModernSlavery.BusinessDomain.Viewing
         /// <returns>The list of fully populated search index documents</returns>
         private IEnumerable<OrganisationSearchModel> CreateOrganisationSearchModels(Organisation organisation)
         {
-            foreach (var reportingDeadline in _reportingDeadlineHelper.GetReportingDeadlines(organisation.SectorType))
+            var reportingDeadlines = SearchOptions.IncludeUnsubmitted 
+                ? _reportingDeadlineHelper.GetReportingDeadlines(organisation.SectorType)
+                : organisation.Statements.Where(s=>s.Status==StatementStatuses.Submitted).Select(s=>s.SubmissionDeadline).ToList();
+
+            foreach (var reportingDeadline in reportingDeadlines)
+            {
                 foreach (var organisationSearchModel in CreateOrganisationSearchModels(organisation, reportingDeadline.Year))
                     yield return organisationSearchModel;
+            }
         }
 
         /// <summary>

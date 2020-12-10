@@ -88,7 +88,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         {
             var reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(org.SectorType, year);
             var statement = await GetPrimaryStatementForYear(org, year);
-            var latestScope = await _scopeLogic.GetScopeByReportingDeadlineOrLatestAsync(org.OrganisationId, reportingDeadline);
+            var latestScope = await _scopeLogic.GetScopeByReportingDeadlineOrLatestAsync(org, reportingDeadline);
             var address = org.LatestAddress;
 
             var record = new OrganisationsFileModel

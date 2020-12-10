@@ -48,15 +48,16 @@ namespace ModernSlavery.Infrastructure.Telemetry
         {
             var dependency = item as DependencyTelemetry;
 
-            if (dependency == null) return true;
-
-            if (!string.IsNullOrWhiteSpace(dependency?.Context?.Operation?.Name)
+            if (dependency != null && !string.IsNullOrWhiteSpace(dependency?.Context?.Operation?.Name)
                 && dependency.Target.EndsWithI(HostName)
                 && dependency.Name.StartsWithI(OperationName)
                 && ResultCodes.Any(rc => rc.EqualsI(dependency.ResultCode)))
+            {
                 dependency.Success = true;
+                return false;
+            }
 
-            return dependency.Success != true;
+            return true;
         }
     }
 }

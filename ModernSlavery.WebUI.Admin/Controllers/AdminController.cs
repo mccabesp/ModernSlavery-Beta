@@ -163,61 +163,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             downloads = new List<DownloadViewModel.Download>();
 
-            files = await SharedBusinessLogic.FileRepository.GetFilesAsync(SharedBusinessLogic.SharedOptions.LogPath,
-                "SubmissionLog*.csv", true);
-            if (!files.Any())
-            {
-                var logRecords = new List<SubmissionLogModel>();
-
-                //Create the first log file
-                foreach (var statement in SharedBusinessLogic.DataRepository.GetAll<Statement>().OrderBy(r => r.StatusDate))
-                {
-                    var status = await SharedBusinessLogic.DataRepository.GetAll<StatementStatus>()
-                        .FirstOrDefaultAsync(
-                            rs => rs.StatementId == statement.StatementId && rs.Status == statement.Status &&
-                                  rs.StatusDate == statement.StatusDate);
-
-                    //Log the submission
-                    if (status == null)
-                        Logger.LogError(
-                            $"Could not find status '{statement.Status}' for return '{statement.StatementId}' at '{statement.StatusDate}' while creating return history");
-                    else
-                        logRecords.Add(
-                            new SubmissionLogModel
-                            {
-                                StatusDate = statement.Created,
-                                Status = StatementStatuses.Submitted,
-                                Details = "",
-                                Sector = statement.Organisation.SectorType,
-                                StatementId = statement.StatementId,
-                                AccountingDate = statement.SubmissionDeadline.ToShortDateString(),
-                                OrganisationId = statement.OrganisationId,
-                                OrganisationName = statement.Organisation.OrganisationName,
-                                Address = statement.Organisation.LatestAddress?.GetAddressString(
-                                    "," + Environment.NewLine),
-                                CompanyNumber = statement.Organisation.CompanyNumber,
-                                SicCodes = statement.Organisation.GetSicCodeIdsString(statement.StatusDate,
-                                    "," + Environment.NewLine),
-                                StatementUrl = statement.StatementUrl,
-                                ApprovingPerson = statement.ApprovingPerson,
-                                UserFirstname = status.ByUser.Firstname,
-                                UserLastname = status.ByUser.Lastname,
-                                UserJobtitle = status.ByUser.JobTitle,
-                                UserEmail = status.ByUser.EmailAddress,
-                                ContactFirstName = status.ByUser.ContactFirstName,
-                                ContactLastName = status.ByUser.ContactLastName,
-                                ContactJobTitle = status.ByUser.ContactJobTitle,
-                                ContactOrganisation = status.ByUser.ContactOrganisation,
-                                ContactPhoneNumber = status.ByUser.ContactPhoneNumber
-                            });
-                }
-
-                if (logRecords.Count > 0) await _adminService.LogSubmission(logRecords.OrderBy(l => l.StatusDate));
-
-                //Get the files again
-                files = await SharedBusinessLogic.FileRepository.GetFilesAsync(
-                    SharedBusinessLogic.SharedOptions.LogPath, "SubmissionLog*.csv", true);
-            }
+            files = await SharedBusinessLogic.FileRepository.GetFilesAsync(SharedBusinessLogic.SharedOptions.LogPath,"SubmissionLog*.csv", true);
 
             foreach (var filePath in files)
             {

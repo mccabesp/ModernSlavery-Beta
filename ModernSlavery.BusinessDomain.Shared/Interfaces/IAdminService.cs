@@ -15,7 +15,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         IShortCodesRepository ShortCodesRepository { get; }
         IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
         ISearchBusinessLogic SearchBusinessLogic { get; set; }
-        ISubmissionBusinessLogic SubmissionBusinessLogic { get; }
+        IStatementBusinessLogic StatementBusinessLogic { get; }
         IUserRepository UserRepository { get; }
         IPagedRepository<OrganisationRecord> PrivateSectorRepository { get; }
         IPagedRepository<OrganisationRecord> PublicSectorRepository { get; }

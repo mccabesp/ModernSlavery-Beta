@@ -26,8 +26,6 @@ namespace ModernSlavery.Infrastructure.Logging
         public void ConfigureContainer(ContainerBuilder builder)
         {
             // Register queues (without key filtering)
-            builder.Register(c => new LogEventQueue(_storageOptions.AzureConnectionString, c.Resolve<IFileRepository>()))
-                .SingleInstance();
             builder.Register(c => new LogRecordQueue(_storageOptions.AzureConnectionString, c.Resolve<IFileRepository>()))
                 .SingleInstance();
 

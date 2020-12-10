@@ -3,6 +3,7 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,6 +12,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
     public interface IStatementBusinessLogic
     {
+        // Submission
+        IAuditLogger SubmissionLog { get; }
+
         /// <summary>
         /// Returns the summary information for a statement and its draft
         /// </summary>

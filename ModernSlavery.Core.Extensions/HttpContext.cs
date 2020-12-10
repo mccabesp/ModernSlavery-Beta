@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -150,7 +151,11 @@ namespace ModernSlavery.Core.Extensions
 
         public static string GetUserHostAddress(this HttpContext context)
         {
-            return context.Features.Get<IHttpConnectionFeature>()?.RemoteIpAddress?.ToString();
+            var remoteIpAddress = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();//The the forwarded IP first
+            if (string.IsNullOrWhiteSpace(remoteIpAddress)) remoteIpAddress = context.Connection.RemoteIpAddress?.ToString();
+            //Obsolete: if (string.IsNullOrWhiteSpace(remoteIpAddress)) remoteIpAddress = context.Features.Get<IHttpConnectionFeature>()?.RemoteIpAddress?.ToString();
+            remoteIpAddress=remoteIpAddress?.BeforeFirst(":");//This is because application gateway adds port number onto IP address
+            return remoteIpAddress;
         }
 
         #region Cookies

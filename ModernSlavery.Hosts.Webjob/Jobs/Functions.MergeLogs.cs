@@ -31,10 +31,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 #region WebServer Logs
 
                 var webServerlogPath = Path.Combine(_sharedOptions.LogPath, "ModernSlavery.Hosts.Web");
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "ErrorLog"));
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "DebugLog"));
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "WarningLog"));
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webServerlogPath, "InfoLog"));
                 actions.Add(MergeCsvLogsAsync<BadSicLogModel>(log, webServerlogPath, "BadSicLog"));
                 actions.Add(MergeCsvLogsAsync<SubmissionLogModel>(log, webServerlogPath, "SubmissionLog"));
                 actions.Add(MergeCsvLogsAsync<RegisterLogModel>(log, webServerlogPath, "RegistrationLog"));
@@ -43,26 +39,10 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                 #endregion
 
-                #region IdentityServer Logs
-
-                var identityServerlogPath = Path.Combine(_sharedOptions.LogPath,"ModernSlavery.Hosts.IdServer");
-                
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "ErrorLog"));
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "DebugLog"));
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "WarningLog"));
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, identityServerlogPath, "InfoLog"));
-
-                #endregion
-
                 #region Webjob Logs
 
                 var webJoblogPath = Path.Combine(_sharedOptions.LogPath, "ModernSlavery.Hosts.WebJob");
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "ErrorLog"));
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "DebugLog"));
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "WarningLog"));
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "InfoLog"));
                 actions.Add(MergeCsvLogsAsync<EmailSendLogModel>(log, webJoblogPath, "EmailSendLog"));
-                actions.Add(MergeCsvLogsAsync<LogEntryModel>(log, webJoblogPath, "StannpSendLog"));
                 actions.Add(MergeCsvLogsAsync<ManualChangeLogModel>(log, webJoblogPath, "ManualChangeLog"));
 
                 #endregion

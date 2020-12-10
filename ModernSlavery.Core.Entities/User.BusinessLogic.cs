@@ -54,18 +54,18 @@ namespace ModernSlavery.Core.Entities
         {
             //ByUser must be an object and not the id itself otherwise a foreign key exception is thrown with EF core due to being unable to resolve the ByUserId
             if (status == Status && details == StatusDetails) return;
+            StatusDate = VirtualDateTime.Now;
 
             UserStatuses.Add(
                 new UserStatus
                 {
                     User = this,
                     Status = status,
-                    StatusDate = VirtualDateTime.Now,
+                    StatusDate = StatusDate,
                     StatusDetails = details,
                     ByUser = byUser
                 });
             Status = status;
-            StatusDate = VirtualDateTime.Now;
             StatusDetails = details;
         }
 

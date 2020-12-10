@@ -1,17 +1,14 @@
 ﻿using Autofac;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Configuration;
 using System.Collections.Generic;
-using Autofac.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using ModernSlavery.Infrastructure.Logging;
 using System.IO;
-using ModernSlavery.Core.Extensions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
+using System;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
@@ -62,6 +59,23 @@ namespace ModernSlavery.Infrastructure.Hosts
             using var innerScope = lifetimeScope.BeginLifetimeScope(b => b.RegisterInstance(appBuilder).SingleInstance().ExternallyOwned());
 
             dependencyBuilder.ConfigureHost(innerScope);
+        }
+
+        public static void AddForwardedHeaders(this IServiceCollection services, params string[] allowedHosts)
+        {
+            if (allowedHosts == null || allowedHosts.Length == 0) throw new ArgumentNullException(nameof(allowedHosts));
+
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+
+                options.KnownNetworks.Clear(); //its loopback by default
+                options.KnownProxies.Clear();
+                //options.ForwardedHostHeaderName = "X-Original-Host"; //This is for Application Gateway
+
+                // Put your front door FQDN here and any other hosts that will send headers you want respected
+                options.AllowedHosts = new List<string>(allowedHosts);
+            });
         }
 
     }

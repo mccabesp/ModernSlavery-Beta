@@ -56,6 +56,8 @@ namespace ModernSlavery.Core.Models
         public int OrganisationPageSize { get; set; }
         public string EXTERNAL_HOSTNAME { get; set; }//The public internet host name
         public string WEBSITE_HOSTNAME { get; set; }//The AzureWebsites host name
+        public string GatewayHosts { get; set; }
+        public bool DebugHeaders { get; set; }
 
         public int LevenshteinDistance { get; set; } = 5;
         public int LockoutMinutes { get; set; }
@@ -101,6 +103,7 @@ namespace ModernSlavery.Core.Models
         public bool SendGoogleAnalyticsDataToGovUk { get; set; }
 
         public string Website_Instance_Id { get; set; }
+        
 
         public string CertThumbprint { get; set; }
         public string CertFilepath { get; set; }
@@ -227,7 +230,8 @@ namespace ModernSlavery.Core.Models
         {
             if (_trustedDomainsOrIPs == null) return true;
             if (string.IsNullOrWhiteSpace(testIPAddress)) throw new ArgumentNullException(nameof(testIPAddress));
-            return Networking.IsTrustedAddress(testIPAddress, _trustedDomainsOrIPs);
+            var trusted=Networking.IsTrustedAddress(testIPAddress, _trustedDomainsOrIPs);
+            return trusted;
         }
 
     }

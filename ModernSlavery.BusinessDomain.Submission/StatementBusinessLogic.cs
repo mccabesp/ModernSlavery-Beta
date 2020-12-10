@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Autofac.Features.AttributeFilters;
+using AutoMapper;
 using Microsoft.AspNetCore.Server.IIS.Core;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
@@ -8,6 +9,8 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models.LogModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -28,8 +31,11 @@ namespace ModernSlavery.BusinessDomain.Submission
         private readonly IOrganisationBusinessLogic _organisationBusinessLogic;
         private readonly ISearchBusinessLogic _searchBusinessLogic;
         private readonly IMapper _mapper;
+        public IAuditLogger SubmissionLog { get; }
 
-        public StatementBusinessLogic(ILogger<StatementBusinessLogic> logger, SubmissionOptions submissionOptions, ISharedBusinessLogic sharedBusinessLogic, IOrganisationBusinessLogic organisationBusinessLogic, ISearchBusinessLogic searchBusinessLogic, IMapper mapper)
+        public StatementBusinessLogic(ILogger<StatementBusinessLogic> logger, SubmissionOptions submissionOptions, ISharedBusinessLogic sharedBusinessLogic, IOrganisationBusinessLogic organisationBusinessLogic, ISearchBusinessLogic searchBusinessLogic, IMapper mapper,
+            [KeyFilter(Filenames.SubmissionLog)]
+            IAuditLogger submissionLog)
         {
             _logger = logger;
             _submissionOptions = submissionOptions;
@@ -37,6 +43,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             _organisationBusinessLogic = organisationBusinessLogic;
             _searchBusinessLogic = searchBusinessLogic;
             _mapper = mapper;
+            SubmissionLog = submissionLog;
         }
 
         #region Private Methods
@@ -740,8 +747,12 @@ namespace ModernSlavery.BusinessDomain.Submission
                     }
                 });
 
+            //Add update to submission log
+            await SubmissionLog.WriteAsync(SubmissionLogModel.Create(newStatement));
+
             //Update the search indexes
             await _searchBusinessLogic.RefreshSearchDocumentsAsync(newStatement.Organisation, newStatement.SubmissionDeadline.Year);
+
 
             return new Outcome<StatementErrors>();
         }

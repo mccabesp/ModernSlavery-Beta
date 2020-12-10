@@ -8,10 +8,7 @@ using ModernSlavery.Core.Interfaces;
 namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
     public interface ISubmissionBusinessLogic
-    {
-        // Submission
-        IAuditLogger SubmissionLog { get; }
-        
+    {        
         /// <summary>
         ///     Gets the latest submitted return for the specified organisation id and snapshot year
         /// </summary>

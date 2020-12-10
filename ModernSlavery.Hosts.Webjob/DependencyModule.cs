@@ -90,8 +90,6 @@ namespace ModernSlavery.Hosts.Webjob
         {  
             var applicationLifetime = lifetimeScope.Resolve<IHostApplicationLifetime>();
 
-            lifetimeScope.UseLogEventQueueLogger();
-
             var config = lifetimeScope.Resolve<IConfiguration>();
             var fileRepository = lifetimeScope.Resolve<IFileRepository>();
             var sharedOptions = lifetimeScope.Resolve<SharedOptions>();

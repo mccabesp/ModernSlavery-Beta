@@ -43,8 +43,6 @@ namespace ModernSlavery.Core.Models
 
                 if (Name.Contains("emailSendLog", StringComparison.OrdinalIgnoreCase)) return "Email Send Log";
 
-                if (Name.Contains("stannpSendLog", StringComparison.OrdinalIgnoreCase)) return "Stannp Send Log";
-
                 if (Name.Contains("debugLog", StringComparison.OrdinalIgnoreCase)) return "Debug Log from system";
 
                 return null;
@@ -76,8 +74,6 @@ namespace ModernSlavery.Core.Models
                 if (Name.Contains("userLog", StringComparison.OrdinalIgnoreCase)) return "User Activity Log";
 
                 if (Name.Contains("emailSendLog", StringComparison.OrdinalIgnoreCase)) return "Email Send Log";
-
-                if (Name.Contains("stannpSendLog", StringComparison.OrdinalIgnoreCase)) return "Stannp Send Log";
 
                 if (Name.Contains("debugLog", StringComparison.OrdinalIgnoreCase)) return "Debug Log from system";
 
@@ -117,9 +113,6 @@ namespace ModernSlavery.Core.Models
 
                 if (Name.Contains("emailSendLog", StringComparison.OrdinalIgnoreCase))
                     return "Log of sent email messages via Gov Notify or SendGrid.";
-
-                if (Name.Contains("stannpSendLog", StringComparison.OrdinalIgnoreCase))
-                    return "Log of sent PIN Letters to Stannp.com.";
 
                 if (Name.Contains("debugLog", StringComparison.OrdinalIgnoreCase)) return "Debug information";
 

@@ -38,18 +38,17 @@ namespace ModernSlavery.Core.Entities
         public void SetStatus(StatementStatuses status, long byUserId, string details = null)
         {
             if (status == Status && details == StatusDetails) return;
-
+            StatusDate = VirtualDateTime.Now;
             Statuses.Add(
                 new StatementStatus
                 {
                     StatementId = StatementId,
                     Status = status,
-                    StatusDate = VirtualDateTime.Now,
+                    StatusDate = StatusDate,
                     StatusDetails = details,
                     ByUserId = byUserId
                 });
             Status = status;
-            StatusDate = VirtualDateTime.Now;
             StatusDetails = details;
         }
 

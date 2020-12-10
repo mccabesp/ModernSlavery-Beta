@@ -21,27 +21,5 @@ namespace ModernSlavery.Infrastructure.Logging
                 .SingleInstance()
                 .WithParameter("fileName", fileName);
         }
-
-        /// <summary>
-        ///     Adds the LogEvent queue as logging provider to the application
-        /// </summary>
-        /// <param name="factory"></param>
-        public static ILoggerFactory UseLogEventQueueLogger(this ILifetimeScope lifetimeScope)
-        {
-            var loggerFactory = lifetimeScope.Resolve<ILoggerFactory>();
-
-            // Resolve filter options
-            var filterOptions = lifetimeScope.Resolve<IOptions<LoggerFilterOptions>>();
-
-            // Resolve the keyed queue from autofac
-            var logEventQueue = lifetimeScope.Resolve<LogEventQueue>();
-
-            var configuration = lifetimeScope.Resolve<IConfiguration>();
-
-            // Create the logging provider
-            loggerFactory.AddProvider(new EventLoggerProvider(logEventQueue, filterOptions.Value, configuration.GetApplicationName()));
-
-            return loggerFactory;
-        }
     }
 }

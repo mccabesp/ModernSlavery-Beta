@@ -18,15 +18,11 @@ namespace ModernSlavery.BusinessDomain.Submission
     public class SubmissionBusinessLogic : ISubmissionBusinessLogic
     {
         private readonly ISharedBusinessLogic _sharedBusinessLogic;
-        public IAuditLogger SubmissionLog { get; }
 
         public SubmissionBusinessLogic(
-            ISharedBusinessLogic sharedBusinessLogic,
-            [KeyFilter(Filenames.SubmissionLog)] 
-            IAuditLogger submissionLog)
+            ISharedBusinessLogic sharedBusinessLogic)
         {
             _sharedBusinessLogic = sharedBusinessLogic;
-            SubmissionLog = submissionLog;
         }
 
 

@@ -10,13 +10,11 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
 {
     public class ExceptionMiddleware
     {
-        private readonly IConfiguration _config; //ms
         private readonly ILogger _logger;
         private readonly RequestDelegate _next;
 
-        public ExceptionMiddleware(RequestDelegate next, IConfiguration config, ILogger<ExceptionMiddleware> logger)
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
-            _config = config;
             _logger = logger;
             _next = next;
         }
@@ -31,11 +29,11 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"{ex.Message}");
-                await HandleExceptionAsync(httpContext, ex);
+                await HandleExceptionAsync(httpContext);
             }
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private static Task HandleExceptionAsync(HttpContext context)
         {
             context.Response.ContentType = "text/plain";
             context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
