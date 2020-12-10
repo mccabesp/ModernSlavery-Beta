@@ -49,37 +49,38 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("organisation-type")]
-        public async Task<IActionResult> OrganisationType(OrganisationViewModel model)
+        public async Task<IActionResult> OrganisationType(string registrationType)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
             //Make sure we can load organisations from session
-            var m = UnstashModel<OrganisationViewModel>();
-            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-
-            model.Organisations = m.Organisations;
+            var organisationViewModel = UnstashModel<OrganisationViewModel>();
+            if (organisationViewModel == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             ModelState.Clear();
 
-            if (model.RegistrationType.Equals("fasttrack"))
-                return RedirectToAction(nameof(FastTrack));
-            else if (model.RegistrationType.Equals("private"))
-                model.SectorType = SectorTypes.Private;
-            else if (model.RegistrationType.Equals("public"))
-                model.SectorType = SectorTypes.Public;
-            else
+            switch (registrationType?.ToLower())
             {
-                // either it is fast track, or sectortype mut be set
-                AddModelError(3005, "RegistrationType");
-                this.SetModelCustomErrors<OrganisationViewModel>();
-                return View("OrganisationType", model);
+                case "fasttrack":
+                    return RedirectToAction(nameof(FastTrack));
+                case "private":
+                    organisationViewModel.SectorType = SectorTypes.Private;
+                    break;
+                case "public":
+                    organisationViewModel.SectorType = SectorTypes.Public;
+                    break;
+                default: 
+                    // either it is fast track, or sectortype mut be set
+                    AddModelError(3005, "RegistrationType");
+                    this.SetModelCustomErrors<OrganisationViewModel>();
+                    return View("OrganisationType", organisationViewModel);
             }
 
             CompaniesHouseFailures = 0;
 
-            StashModel(model);
+            StashModel(organisationViewModel);
             return RedirectToAction("OrganisationSearch");
         }
 
@@ -113,7 +114,14 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             StashModel(model);
 
-            return View("OrganisationSearch", model);
+            var searchViewModel = new OrganisationSearchViewModel
+            {
+                SearchText = model.SearchText,
+                Organisations = model.Organisations,
+                SectorType=model.SectorType,
+                LastPrivateSearchRemoteTotal=model.LastPrivateSearchRemoteTotal
+            };
+            return View("OrganisationSearch", searchViewModel);
         }
 
         /// <summary>
@@ -123,44 +131,40 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("organisation-search")]
-        public async Task<IActionResult> OrganisationSearch(OrganisationViewModel model)
+        public async Task<IActionResult> OrganisationSearch(OrganisationSearchViewModel searchViewModel)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            ModelState.Include("SearchText");
             if (!ModelState.IsValid)
             {
-                this.SetModelCustomErrors<OrganisationViewModel>();
-                return View("OrganisationSearch", model);
+                this.SetModelCustomErrors<OrganisationSearchViewModel>();
+                return View("OrganisationSearch", searchViewModel);
             }
 
             //Make sure we can load organisations from session
-            var m = UnstashModel<OrganisationViewModel>();
-            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
+            var organisationViewModel = UnstashModel<OrganisationViewModel>();
+            if (organisationViewModel == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
+            organisationViewModel.SearchText = searchViewModel.SearchText.TrimI();
+            organisationViewModel.IsManualRegistration = true;
+            organisationViewModel.BackAction = "OrganisationSearch";
+            organisationViewModel.SelectedOrganisationIndex = -1;
+            organisationViewModel.OrganisationName = null;
+            organisationViewModel.CompanyNumber = null;
+            organisationViewModel.Address1 = null;
+            organisationViewModel.Address2 = null;
+            organisationViewModel.Address3 = null;
+            organisationViewModel.Country = null;
+            organisationViewModel.Postcode = null;
+            organisationViewModel.PoBox = null;
 
-            model.Organisations = m.Organisations;
-            model.IsManualRegistration = true;
-            model.BackAction = "OrganisationSearch";
-            model.SelectedOrganisationIndex = -1;
-            model.OrganisationName = null;
-            model.CompanyNumber = null;
-            model.Address1 = null;
-            model.Address2 = null;
-            model.Address3 = null;
-            model.Country = null;
-            model.Postcode = null;
-            model.PoBox = null;
-
-            model.SearchText = model.SearchText.TrimI();
-
-            switch (model.SectorType)
+            switch (organisationViewModel.SectorType)
             {
                 case SectorTypes.Private:
                     try
                     {
-                        model.Organisations = await _registrationService.PrivateSectorRepository.SearchAsync(model.SearchText, 1, SharedBusinessLogic.SharedOptions.OrganisationPageSize);
+                        organisationViewModel.Organisations = await _registrationService.PrivateSectorRepository.SearchAsync(organisationViewModel.SearchText, 1, SharedBusinessLogic.SharedOptions.OrganisationPageSize);
                     }
                     catch (Exception ex)
                     {
@@ -169,19 +173,19 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         CompaniesHouseFailures++;
                         if (CompaniesHouseFailures < 3)
                         {
-                            model.Organisations?.Results?.Clear();
-                            StashModel(model);
+                            organisationViewModel.Organisations?.Results?.Clear();
+                            StashModel(organisationViewModel);
                             ModelState.AddModelError(1141);
-                            return View(model);
+                            return View(organisationViewModel);
                         }
 
-                        await _registrationService.SharedBusinessLogic.SendEmailService.SendMsuMessageAsync("GPG - COMPANIES HOUSE ERROR", $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}");
+                        await _registrationService.SharedBusinessLogic.SendEmailService.SendMsuMessageAsync("GPG - COMPANIES HOUSE ERROR", $"Cant search using Companies House API for query '{organisationViewModel.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}");
                         return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                     }
 
                     break;
                 case SectorTypes.Public:
-                    model.Organisations = await _registrationService.PublicSectorRepository.SearchAsync(model.SearchText, 1, SharedBusinessLogic.SharedOptions.OrganisationPageSize);
+                    organisationViewModel.Organisations = await _registrationService.PublicSectorRepository.SearchAsync(organisationViewModel.SearchText, 1, SharedBusinessLogic.SharedOptions.OrganisationPageSize);
 
                     break;
 
@@ -190,7 +194,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             ModelState.Clear();
-            model.LastPrivateSearchRemoteTotal = LastPrivateSearchRemoteTotal;
+            organisationViewModel.LastPrivateSearchRemoteTotal = LastPrivateSearchRemoteTotal;
             if (LastPrivateSearchRemoteTotal == -1)
             {
                 CompaniesHouseFailures++;
@@ -202,10 +206,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 CompaniesHouseFailures = 0;
             }
 
-            StashModel(model);
+            StashModel(organisationViewModel);
 
             //Search again if no results
-            if (model.Organisations.Results.Count < 1) return View("OrganisationSearch", model);
+            if (organisationViewModel.Organisations.Results.Count < 1) return View("OrganisationSearch", organisationViewModel);
 
             //Go to step 5 with results
             if (Request.Query["fail"].ToBoolean())
@@ -260,7 +264,15 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             StashModel(model);
 
-            return View("ChooseOrganisation", model);
+            var searchViewModel = new OrganisationSearchViewModel
+            {
+                SearchText = model.SearchText,
+                Organisations = model.Organisations,
+                SectorType = model.SectorType,
+                LastPrivateSearchRemoteTotal = model.LastPrivateSearchRemoteTotal
+            };
+
+            return View("ChooseOrganisation", searchViewModel);
         }
 
 
@@ -271,42 +283,45 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("choose-organisation")]
-        public async Task<IActionResult> ChooseOrganisation(OrganisationViewModel model, string command)
+        public async Task<IActionResult> ChooseOrganisation(OrganisationSearchViewModel searchViewModel, string command)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
             //Make sure we can load organisations from session
-            var m = UnstashModel<OrganisationViewModel>();
-            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
+            var organisationViewModel = UnstashModel<OrganisationViewModel>();
+            if (organisationViewModel == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-            model.Organisations = m.Organisations;
+            //Restore the lost settings
+            searchViewModel.Organisations = organisationViewModel.Organisations;
+            searchViewModel.SectorType = organisationViewModel.SectorType;
+            searchViewModel.LastPrivateSearchRemoteTotal = organisationViewModel.LastPrivateSearchRemoteTotal;
 
-            var nextPage = m.Organisations.CurrentPage;
+            var nextPage = organisationViewModel.Organisations.CurrentPage;
 
-            model.SelectedOrganisationIndex = -1;
-            model.OrganisationName = null;
-            model.CompanyNumber = null;
-            model.Address1 = null;
-            model.Address2 = null;
-            model.Address3 = null;
-            model.Country = null;
-            model.Postcode = null;
-            model.PoBox = null;
-            model.IsManualAuthorised = false;
-            model.IsManualAddress = false;
+            organisationViewModel.SelectedOrganisationIndex = -1;
+            organisationViewModel.OrganisationName = null;
+            organisationViewModel.CompanyNumber = null;
+            organisationViewModel.Address1 = null;
+            organisationViewModel.Address2 = null;
+            organisationViewModel.Address3 = null;
+            organisationViewModel.Country = null;
+            organisationViewModel.Postcode = null;
+            organisationViewModel.PoBox = null;
+            organisationViewModel.IsManualAuthorised = false;
+            organisationViewModel.IsManualAddress = false;
 
             var doSearch = false;
             ModelState.Include("SearchText");
             if (command == "search")
             {
-                model.SearchText = model.SearchText.TrimI();
+                organisationViewModel.SearchText = searchViewModel.SearchText.TrimI();
 
                 if (!ModelState.IsValid)
                 {
-                    this.SetModelCustomErrors<OrganisationViewModel>();
-                    return View("ChooseOrganisation", model);
+                    this.SetModelCustomErrors<OrganisationSearchViewModel>();
+                    return View("ChooseOrganisation", searchViewModel);
                 }
 
                 nextPage = 1;
@@ -314,7 +329,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
             else if (command == "pageNext")
             {
-                if (nextPage >= model.Organisations.PageCount) throw new Exception("Cannot go past last page");
+                if (nextPage >= organisationViewModel.Organisations.PageCount) throw new Exception("Cannot go past last page");
 
                 nextPage++;
                 doSearch = true;
@@ -329,7 +344,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             else if (command.StartsWithI("page_"))
             {
                 var page = command.AfterFirst("page_").ToInt32();
-                if (page < 1 || page > model.Organisations.PageCount) throw new Exception("Invalid page selected");
+                if (page < 1 || page > organisationViewModel.Organisations.PageCount) throw new Exception("Invalid page selected");
 
                 if (page != nextPage)
                 {
@@ -340,12 +355,12 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             if (doSearch)
             {
-                switch (model.SectorType)
+                switch (organisationViewModel.SectorType)
                 {
                     case SectorTypes.Private:
                         try
                         {
-                            model.Organisations = await _registrationService.PrivateSectorRepository.SearchAsync(model.SearchText, nextPage, SharedBusinessLogic.SharedOptions.OrganisationPageSize);
+                            organisationViewModel.Organisations = await _registrationService.PrivateSectorRepository.SearchAsync(organisationViewModel.SearchText, nextPage, SharedBusinessLogic.SharedOptions.OrganisationPageSize);
                         }
                         catch (Exception ex)
                         {
@@ -354,17 +369,20 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                             CompaniesHouseFailures++;
                             if (CompaniesHouseFailures < 3)
                             {
-                                model.Organisations?.Results?.Clear();
-                                StashModel(model);
+                                organisationViewModel.Organisations?.Results?.Clear();
+                                StashModel(organisationViewModel);
                                 ModelState.AddModelError(1141);
-                                return View(model);
+                                searchViewModel.Organisations = organisationViewModel.Organisations;
+                                searchViewModel.SectorType = organisationViewModel.SectorType;
+                                searchViewModel.LastPrivateSearchRemoteTotal = organisationViewModel.LastPrivateSearchRemoteTotal;
+                                return View("ChooseOrganisation", searchViewModel);
                             }
 
-                            await _registrationService.SharedBusinessLogic.SendEmailService.SendMsuMessageAsync("GPG - COMPANIES HOUSE ERROR", $"Cant search using Companies House API for query '{model.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}");
+                            await _registrationService.SharedBusinessLogic.SendEmailService.SendMsuMessageAsync("GPG - COMPANIES HOUSE ERROR", $"Cant search using Companies House API for query '{organisationViewModel.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}");
                             return View("CustomError", WebService.ErrorViewModelFactory.Create(1140));
                         }
 
-                        model.LastPrivateSearchRemoteTotal = LastPrivateSearchRemoteTotal;
+                        organisationViewModel.LastPrivateSearchRemoteTotal = LastPrivateSearchRemoteTotal;
                         if (LastPrivateSearchRemoteTotal == -1)
                         {
                             CompaniesHouseFailures++;
@@ -379,7 +397,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         break;
 
                     case SectorTypes.Public:
-                        model.Organisations = await _registrationService.PublicSectorRepository.SearchAsync(model.SearchText, nextPage, SharedBusinessLogic.SharedOptions.OrganisationPageSize);
+                        organisationViewModel.Organisations = await _registrationService.PublicSectorRepository.SearchAsync(organisationViewModel.SearchText, nextPage, SharedBusinessLogic.SharedOptions.OrganisationPageSize);
                         break;
 
                     default:
@@ -387,31 +405,38 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 }
 
                 ModelState.Clear();
-                StashModel(model);
+                StashModel(organisationViewModel);
 
                 //Go back if no results
-                if (model.Organisations.Results.Count < 1) return RedirectToAction("OrganisationSearch");
+                if (organisationViewModel.Organisations.Results.Count < 1) return RedirectToAction("OrganisationSearch");
 
                 //Otherwise show results
-                return View("ChooseOrganisation", model);
+                //Restore the lost settings
+                searchViewModel.Organisations = organisationViewModel.Organisations;
+                searchViewModel.SectorType = organisationViewModel.SectorType;
+                searchViewModel.LastPrivateSearchRemoteTotal = organisationViewModel.LastPrivateSearchRemoteTotal;
+                return View("ChooseOrganisation", searchViewModel);
             }
 
             if (command.StartsWithI("organisation_"))
             {
                 var organisationIndex = command.AfterFirst("organisation_").ToInt32();
-                var organisation = model.Organisations.Results[organisationIndex];
+                var organisation = organisationViewModel.Organisations.Results[organisationIndex];
 
                 //Ensure organisations from companies house have a sector
-                if (organisation.SectorType == SectorTypes.Unknown) organisation.SectorType = model.SectorType.Value;
+                if (organisation.SectorType == SectorTypes.Unknown) organisation.SectorType = organisationViewModel.SectorType.Value;
 
                 //Make sure user is fully registered for one private org before registering another 
-                if (model.SectorType == SectorTypes.Private
+                if (searchViewModel.SectorType == SectorTypes.Private
                     && VirtualUser.UserOrganisations.Any()
                     && !VirtualUser.UserOrganisations.Any(uo => uo.PINConfirmedDate != null))
                 {
                     AddModelError(3022);
                     this.SetModelCustomErrors<OrganisationViewModel>();
-                    return View("ChooseOrganisation", model);
+                    searchViewModel.Organisations = organisationViewModel.Organisations;
+                    searchViewModel.SectorType = organisationViewModel.SectorType;
+                    searchViewModel.LastPrivateSearchRemoteTotal = organisationViewModel.LastPrivateSearchRemoteTotal;
+                    return View("ChooseOrganisation", searchViewModel);
                 }
 
                 //Get the organisation from the database
@@ -438,9 +463,9 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     }
 
                     //Make sure the found organisation is of the correct sector type
-                    if (org.SectorType != model.SectorType)
+                    if (org.SectorType != organisationViewModel.SectorType)
                         return View("CustomError",
-                            WebService.ErrorViewModelFactory.Create(model.SectorType == SectorTypes.Private
+                            WebService.ErrorViewModelFactory.Create(organisationViewModel.SectorType == SectorTypes.Private
                                 ? 1146
                                 : 1147));
 
@@ -452,7 +477,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     {
                         AddModelError(userOrg.PINConfirmedDate == null ? 3021 : 3020);
                         this.SetModelCustomErrors<OrganisationViewModel>();
-                        return View("ChooseOrganisation", model);
+                        searchViewModel.Organisations = organisationViewModel.Organisations;
+                        searchViewModel.SectorType = organisationViewModel.SectorType;
+                        searchViewModel.LastPrivateSearchRemoteTotal = organisationViewModel.LastPrivateSearchRemoteTotal;
+                        return View("ChooseOrganisation", searchViewModel);
                     }
 
                     //Ensure there isnt another pending registeration for this organisation
@@ -466,43 +494,49 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     organisation.OrganisationId = org.OrganisationId;
                 }
 
-                model.SelectedOrganisationIndex = organisationIndex;
+                organisationViewModel.SelectedOrganisationIndex = organisationIndex;
 
 
                 //Make sure the organisation has an address
                 if (organisation.SectorType == SectorTypes.Public)
                 {
-                    model.IsManualRegistration = false;
-                    model.IsSelectedAuthorised = organisation.IsAuthorised(VirtualUser.EmailAddress);
-                    if (!model.IsSelectedAuthorised || !organisation.HasAnyAddress())
+                    organisationViewModel.IsManualRegistration = false;
+                    organisationViewModel.IsSelectedAuthorised = organisation.IsAuthorised(VirtualUser.EmailAddress);
+                    if (!organisationViewModel.IsSelectedAuthorised || !organisation.HasAnyAddress())
                     {
-                        model.IsManualAddress = true;
-                        model.AddressReturnAction = nameof(ChooseOrganisation);
-                        StashModel(model);
+                        organisationViewModel.IsManualAddress = true;
+                        organisationViewModel.AddressReturnAction = nameof(ChooseOrganisation);
+                        StashModel(organisationViewModel);
                         return RedirectToAction("AddAddress");
                     }
                 }
                 else if (organisation.SectorType == SectorTypes.Private && !organisation.HasAnyAddress())
                 {
-                    model.AddressReturnAction = nameof(ChooseOrganisation);
-                    model.IsManualRegistration = false;
-                    model.IsManualAddress = true;
-                    StashModel(model);
+                    organisationViewModel.AddressReturnAction = nameof(ChooseOrganisation);
+                    organisationViewModel.IsManualRegistration = false;
+                    organisationViewModel.IsManualAddress = true;
+                    StashModel(organisationViewModel);
                     return RedirectToAction("AddAddress");
                 }
 
-                model.IsManualRegistration = false;
-                model.IsManualAddress = false;
-                model.AddressReturnAction = null;
+                organisationViewModel.IsManualRegistration = false;
+                organisationViewModel.IsManualAddress = false;
+                organisationViewModel.AddressReturnAction = null;
             }
 
             ModelState.Clear();
 
             //If we havend selected one the reshow same view
-            if (model.SelectedOrganisationIndex < 0) return View("ChooseOrganisation", model);
+            if (organisationViewModel.SelectedOrganisationIndex < 0) 
+            {
+                searchViewModel.Organisations = organisationViewModel.Organisations;
+                searchViewModel.SectorType = organisationViewModel.SectorType;
+                searchViewModel.LastPrivateSearchRemoteTotal = organisationViewModel.LastPrivateSearchRemoteTotal;
+                return View("ChooseOrganisation", searchViewModel); 
+            }
 
-            model.ConfirmReturnAction = nameof(ChooseOrganisation);
-            StashModel(model);
+            organisationViewModel.ConfirmReturnAction = nameof(ChooseOrganisation);
+            StashModel(organisationViewModel);
             //If private sector add organisation address
             return RedirectToAction(nameof(ConfirmOrganisation));
         }
@@ -534,106 +568,65 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             model.IsManualAddress = false;
             StashModel(model);
 
-            return View("AddOrganisation", model);
+            var addOrganisationViewModel = new AddOrganisationViewModel
+            {
+                OrganisationName = model.OrganisationName,
+                CompanyNumber=model.CompanyNumber,
+                CharityNumber=model.CharityNumber,
+                MutualNumber=model.MutualNumber,
+                NoReference=model.NoReference,
+                OtherName=model.OtherName,
+                OtherValue=model.OtherValue,
+            };
+            return View("AddOrganisation", addOrganisationViewModel);
         }
 
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("add-organisation")]
-        public async Task<IActionResult> AddOrganisation(OrganisationViewModel model)
+        public async Task<IActionResult> AddOrganisation(AddOrganisationViewModel addOrganisationViewModel)
         {
             //Ensure user has completed the registration process
 
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            //Make sure we can load organisations from session
-            var m = UnstashModel<OrganisationViewModel>();
-            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-
-            model.Organisations = m.Organisations;
-
             //Exclude the address details
             var excludes = new HashSet<string>();
-            excludes.AddRange(
-                nameof(model.Address1),
-                nameof(model.Address2),
-                nameof(model.Address3),
-                nameof(model.City),
-                nameof(model.County),
-                nameof(model.Country),
-                nameof(model.Postcode),
-                nameof(model.PoBox));
 
-            //Exclude the contact details
-            excludes.AddRange(
-                nameof(model.ContactFirstName),
-                nameof(model.ContactLastName),
-                nameof(model.ContactJobTitle),
-                nameof(model.ContactEmailAddress),
-                nameof(model.ContactPhoneNumber));
-
-            //Exclude the SIC Codes
-            excludes.Add(nameof(model.SicCodeIds));
-
-            //Exclude the SIC Codes
-            excludes.Add(nameof(model.DUNSNumber));
-
-            if (model.NoReference)
+            if (addOrganisationViewModel.NoReference)
             {
                 excludes.AddRange(
-                    nameof(model.CompanyNumber),
-                    nameof(model.CharityNumber),
-                    nameof(model.MutualNumber),
-                    nameof(model.OtherName),
-                    nameof(model.OtherValue));
-                if (!string.IsNullOrWhiteSpace(model.CompanyNumber)
-                    || !string.IsNullOrWhiteSpace(model.CharityNumber)
-                    || !string.IsNullOrWhiteSpace(model.MutualNumber)
-                    || !string.IsNullOrWhiteSpace(model.OtherName)
-                    || !string.IsNullOrWhiteSpace(model.OtherValue))
+                    nameof(addOrganisationViewModel.CompanyNumber),
+                    nameof(addOrganisationViewModel.CharityNumber),
+                    nameof(addOrganisationViewModel.MutualNumber),
+                    nameof(addOrganisationViewModel.OtherName),
+                    nameof(addOrganisationViewModel.OtherValue));
+                if (addOrganisationViewModel.ContainsReference)
                     ModelState.AddModelError("", "You must clear all your reference fields");
             }
-            else if (!string.IsNullOrWhiteSpace(model.CompanyNumber)
-                     || !string.IsNullOrWhiteSpace(model.CharityNumber)
-                     || !string.IsNullOrWhiteSpace(model.MutualNumber)
-                     || !string.IsNullOrWhiteSpace(model.OtherName)
-                     || !string.IsNullOrWhiteSpace(model.OtherValue))
+            else if (addOrganisationViewModel.ContainsReference)
             {
-                if (string.IsNullOrWhiteSpace(model.CompanyNumber)) excludes.Add(nameof(model.CompanyNumber));
+                if (string.IsNullOrWhiteSpace(addOrganisationViewModel.CompanyNumber)) excludes.Add(nameof(addOrganisationViewModel.CompanyNumber));
 
-                if (string.IsNullOrWhiteSpace(model.CharityNumber)) excludes.Add(nameof(model.CharityNumber));
+                if (string.IsNullOrWhiteSpace(addOrganisationViewModel.CharityNumber)) excludes.Add(nameof(addOrganisationViewModel.CharityNumber));
 
-                if (string.IsNullOrWhiteSpace(model.MutualNumber)) excludes.Add(nameof(model.MutualNumber));
+                if (string.IsNullOrWhiteSpace(addOrganisationViewModel.MutualNumber)) excludes.Add(nameof(addOrganisationViewModel.MutualNumber));
 
-                if (string.IsNullOrWhiteSpace(model.OtherName))
+                if (string.IsNullOrWhiteSpace(addOrganisationViewModel.OtherName))
                 {
-                    if (model.OtherName.ReplaceI(" ")
-                        .EqualsI("CompanyNumber", "CompanyNo", "CompanyReference", "CompanyRef"))
-                        ModelState.AddModelError(nameof(model.OtherName),
-                            "Cannot user Company Number as an Other reference");
-                    else if (model.OtherName.ReplaceI(" ")
-                        .EqualsI("CharityNumber", "CharityNo", "CharityReference", "CharityRef"))
-                        ModelState.AddModelError(nameof(model.OtherName),
-                            "Cannot user Charity Number as an Other reference");
-                    else if (model.OtherName.ReplaceI(" ")
-                        .EqualsI(
-                            "MutualNumber",
-                            "MutualNo",
-                            "MutualReference",
-                            "MutualRef",
-                            "MutualPartnsershipNumber",
-                            "MutualPartnsershipNo",
-                            "MutualPartnsershipReference",
-                            "MutualPartnsershipRef"))
-                        ModelState.AddModelError(nameof(model.OtherName),
-                            "Cannot user Mutual Partnership Number as an Other reference");
+                    if (addOrganisationViewModel.OtherName.ReplaceI(" ").EqualsI("CompanyNumber", "CompanyNo", "CompanyReference", "CompanyRef"))
+                        ModelState.AddModelError(nameof(addOrganisationViewModel.OtherName),"Cannot user Company Number as an Other reference");
+                    else if (addOrganisationViewModel.OtherName.ReplaceI(" ").EqualsI("CharityNumber", "CharityNo", "CharityReference", "CharityRef"))
+                        ModelState.AddModelError(nameof(addOrganisationViewModel.OtherName),"Cannot user Charity Number as an Other reference");
+                    else if (addOrganisationViewModel.OtherName.ReplaceI(" ").EqualsI("MutualNumber","MutualNo","MutualReference","MutualRef","MutualPartnsershipNumber","MutualPartnsershipNo","MutualPartnsershipReference","MutualPartnsershipRef"))
+                        ModelState.AddModelError(nameof(addOrganisationViewModel.OtherName),"Cannot user Mutual Partnership Number as an Other reference");
 
-                    if (string.IsNullOrWhiteSpace(model.OtherValue))
+                    if (string.IsNullOrWhiteSpace(addOrganisationViewModel.OtherValue))
                     {
-                        excludes.Add(nameof(model.OtherName));
-                        excludes.Add(nameof(model.OtherValue));
+                        excludes.Add(nameof(addOrganisationViewModel.OtherName));
+                        excludes.Add(nameof(addOrganisationViewModel.OtherValue));
                     }
                 }
             }
@@ -642,109 +635,121 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             ModelState.Exclude(excludes.ToArray());
             if (!ModelState.IsValid)
             {
-                this.SetModelCustomErrors<OrganisationViewModel>();
-                return View("AddOrganisation", model);
+                this.SetModelCustomErrors<AddOrganisationViewModel>();
+                return View("AddOrganisation", addOrganisationViewModel);
             }
+
+            //Make sure we can load organisations from session
+            var organisationViewModel = UnstashModel<OrganisationViewModel>();
+            if (organisationViewModel == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
+
+            organisationViewModel.OrganisationName = addOrganisationViewModel.OrganisationName;
+            organisationViewModel.CompanyNumber = addOrganisationViewModel.CompanyNumber;
+            organisationViewModel.CharityNumber = addOrganisationViewModel.CharityNumber;
+            organisationViewModel.MutualNumber = addOrganisationViewModel.MutualNumber;
+            organisationViewModel.NoReference = addOrganisationViewModel.NoReference;
+            organisationViewModel.OtherName = addOrganisationViewModel.OtherName;
+            organisationViewModel.OtherValue = addOrganisationViewModel.OtherValue;
 
             //Check the company doesnt already exist
             IEnumerable<long> results;
             var orgIds = new HashSet<long>();
             var orgIdrefs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            if (!model.NoReference)
+            if (!organisationViewModel.NoReference)
             {
-                if (!string.IsNullOrWhiteSpace(model.CompanyNumber))
+                if (!string.IsNullOrWhiteSpace(organisationViewModel.CompanyNumber))
                 {
                     results = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                        .Where(o => o.CompanyNumber == model.CompanyNumber)
+                        .Where(o => o.CompanyNumber == organisationViewModel.CompanyNumber)
                         .Select(o => o.OrganisationId);
                     if (results.Any())
                     {
-                        orgIdrefs.Add(nameof(model.CompanyNumber));
+                        orgIdrefs.Add(nameof(organisationViewModel.CompanyNumber));
                         orgIds.AddRange(results);
                     }
                 }
 
-                if (!string.IsNullOrWhiteSpace(model.CharityNumber))
+                if (!string.IsNullOrWhiteSpace(organisationViewModel.CharityNumber))
                 {
                     results = SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>()
                         .Where(
                             r => r.ReferenceName.ToLower() == nameof(OrganisationViewModel.CharityNumber).ToLower()
-                                 && r.ReferenceValue.ToLower() == model.CharityNumber.ToLower())
+                                 && r.ReferenceValue.ToLower() == organisationViewModel.CharityNumber.ToLower())
                         .Select(r => r.OrganisationId);
                     if (results.Any())
                     {
-                        orgIdrefs.Add(nameof(model.CharityNumber));
+                        orgIdrefs.Add(nameof(organisationViewModel.CharityNumber));
                         orgIds.AddRange(results);
                     }
                 }
 
-                if (!string.IsNullOrWhiteSpace(model.MutualNumber))
+                if (!string.IsNullOrWhiteSpace(organisationViewModel.MutualNumber))
                 {
                     results = SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>()
                         .Where(
                             r => r.ReferenceName.ToLower() == nameof(OrganisationViewModel.MutualNumber).ToLower()
-                                 && r.ReferenceValue.ToLower() == model.MutualNumber.ToLower())
+                                 && r.ReferenceValue.ToLower() == organisationViewModel.MutualNumber.ToLower())
                         .Select(r => r.OrganisationId);
                     if (results.Any())
                     {
-                        orgIdrefs.Add(nameof(model.MutualNumber));
+                        orgIdrefs.Add(nameof(organisationViewModel.MutualNumber));
                         orgIds.AddRange(results);
                     }
                 }
 
-                if (!string.IsNullOrWhiteSpace(model.OtherName) && !string.IsNullOrWhiteSpace(model.OtherValue))
+                if (!string.IsNullOrWhiteSpace(organisationViewModel.OtherName) && !string.IsNullOrWhiteSpace(organisationViewModel.OtherValue))
                 {
-                    if (model.IsDUNS)
+                    if (organisationViewModel.IsDUNS)
                     {
                         results = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                            .Where(r => r.DUNSNumber.ToLower() == model.OtherValue.ToLower())
+                            .Where(r => r.DUNSNumber.ToLower() == organisationViewModel.OtherValue.ToLower())
                             .Select(r => r.OrganisationId);
                         if (results.Any())
                         {
-                            orgIdrefs.Add(nameof(model.OtherName));
+                            orgIdrefs.Add(nameof(organisationViewModel.OtherName));
                             orgIds.AddRange(results);
                         }
                     }
 
                     results = SharedBusinessLogic.DataRepository.GetAll<OrganisationReference>()
                         .Where(
-                            r => r.ReferenceName.ToLower() == model.OtherName.ToLower()
-                                 && r.ReferenceValue.ToLower() == model.OtherValue.ToLower())
+                            r => r.ReferenceName.ToLower() == organisationViewModel.OtherName.ToLower()
+                                 && r.ReferenceValue.ToLower() == organisationViewModel.OtherValue.ToLower())
                         .Select(r => r.OrganisationId);
                     if (results.Any())
                     {
-                        orgIdrefs.Add(nameof(model.OtherName));
+                        orgIdrefs.Add(nameof(organisationViewModel.OtherName));
                         orgIds.AddRange(results);
                     }
                 }
             }
 
-            model.MatchedReferenceCount = orgIds.Count;
+            organisationViewModel.MatchedReferenceCount = orgIds.Count;
 
             //Only show orgs matching names when none matching references
-            if (model.MatchedReferenceCount == 0)
+            if (organisationViewModel.MatchedReferenceCount == 0)
             {
-                var orgName = model.OrganisationName.ToLower().ReplaceI("limited", "").ReplaceI("ltd", "");
+                var orgName = organisationViewModel.OrganisationName.ToLower().ReplaceI("limited", "").ReplaceI("ltd", "");
                 results = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
                     .Where(o => o.OrganisationName.Contains(orgName))
                     .Select(o => o.OrganisationId);
                 if (results.Any()) orgIds.AddRange(results);
 
 
-                results = _registrationService.OrganisationBusinessLogic.SearchOrganisations(model.OrganisationName, 49)
+                results = _registrationService.OrganisationBusinessLogic.SearchOrganisations(organisationViewModel.OrganisationName, 49)
                     .Select(o => o.OrganisationId);
                 if (results.Any()) orgIds.AddRange(results);
             }
 
-            model.IsManualRegistration = true;
-            model.ManualOrganisationIndex = -1;
-            model.NameSource = VirtualUser.EmailAddress;
+            organisationViewModel.IsManualRegistration = true;
+            organisationViewModel.ManualOrganisationIndex = -1;
+            organisationViewModel.NameSource = VirtualUser.EmailAddress;
 
             if (!orgIds.Any())
             {
-                model.AddressReturnAction = nameof(AddOrganisation);
-                StashModel(model);
+                organisationViewModel.AddressReturnAction = nameof(AddOrganisation);
+                StashModel(organisationViewModel);
                 return RedirectToAction("AddAddress");
             }
 
@@ -753,27 +758,27 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     o => o.OrganisationName,
                     o => orgIds.Contains(o.OrganisationId));
 
-            model.ManualOrganisations = organisations.Select(o => _registrationService.OrganisationBusinessLogic.CreateOrganisationRecord(o)).ToList();
+            organisationViewModel.ManualOrganisations = organisations.Select(o => _registrationService.OrganisationBusinessLogic.CreateOrganisationRecord(o)).ToList();
 
             //Ensure exact match shown at top
-            if (model.ManualOrganisations != null && model.ManualOrganisations.Count > 1)
+            if (organisationViewModel.ManualOrganisations != null && organisationViewModel.ManualOrganisations.Count > 1)
             {
-                var index = model.ManualOrganisations.FindIndex(e => e.OrganisationName.EqualsI(model.OrganisationName));
+                var index = organisationViewModel.ManualOrganisations.FindIndex(e => e.OrganisationName.EqualsI(organisationViewModel.OrganisationName));
                 if (index > 0)
                 {
-                    model.ManualOrganisations.Insert(0, model.ManualOrganisations[index]);
-                    model.ManualOrganisations.RemoveAt(index + 1);
+                    organisationViewModel.ManualOrganisations.Insert(0, organisationViewModel.ManualOrganisations[index]);
+                    organisationViewModel.ManualOrganisations.RemoveAt(index + 1);
                 }
             }
 
-            if (model.MatchedReferenceCount == 1)
+            if (organisationViewModel.MatchedReferenceCount == 1)
             {
-                model.ManualOrganisationIndex = 0;
-                StashModel(model);
-                return await SelectOrganisation(VirtualUser, model, model.ManualOrganisationIndex, nameof(AddOrganisation));
+                organisationViewModel.ManualOrganisationIndex = 0;
+                StashModel(organisationViewModel);
+                return await SelectOrganisation(VirtualUser, organisationViewModel, organisationViewModel.ManualOrganisationIndex, nameof(AddOrganisation));
             }
 
-            StashModel(model);
+            StashModel(organisationViewModel);
             return RedirectToAction("SelectOrganisation");
         }
 
@@ -1021,8 +1026,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             #endregion
 
-            StashModel(model);
-
             #region Populate the view model
 
             model = model.GetClone();
@@ -1081,6 +1084,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             #endregion
+            StashModel(model);
 
             return View(nameof(ConfirmOrganisation), model);
         }
@@ -1092,7 +1096,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("confirm-organisation")]
-        public async Task<IActionResult> ConfirmOrganisation(OrganisationViewModel model, string command = null)
+        public async Task<IActionResult> ConfirmOrganisation(ConfirmOrganisationViewModel confirmOrganisationViewModel, string command = null)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -1111,28 +1115,30 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             #region Load the organisations from session
 
-            var m = UnstashModel<OrganisationViewModel>();
-            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
+            var organisationViewModel = UnstashModel<OrganisationViewModel>();
+            if (organisationViewModel == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-            model.Organisations = m.Organisations;
-            model.ManualOrganisations = m.ManualOrganisations;
+            if(!organisationViewModel.IsUkAddress.HasValue && !organisationViewModel.IsManualRegistration){
+                organisationViewModel.IsUkAddress = confirmOrganisationViewModel.IsUkAddress;
+            }
+
             if (!command.EqualsI("confirm"))
             {
-                m.AddressReturnAction = nameof(ConfirmOrganisation);
-                m.IsWrongAddress = true;
-                m.IsManualRegistration = false;
-                m.AddressSource = null;
-                m.Address1 = null;
-                m.Address2 = null;
-                m.Address3 = null;
-                m.City = null;
-                m.County = null;
-                m.Country = null;
-                m.PoBox = null;
-                m.Postcode = null;
-                m.IsUkAddress = null;
-                m.SectorType = model.SectorType;
-                StashModel(m);
+                organisationViewModel.AddressReturnAction = nameof(ConfirmOrganisation);
+                organisationViewModel.IsWrongAddress = true;
+                organisationViewModel.IsManualRegistration = false;
+                organisationViewModel.AddressSource = null;
+                organisationViewModel.Address1 = null;
+                organisationViewModel.Address2 = null;
+                organisationViewModel.Address3 = null;
+                organisationViewModel.City = null;
+                organisationViewModel.County = null;
+                organisationViewModel.Country = null;
+                organisationViewModel.PoBox = null;
+                organisationViewModel.Postcode = null;
+                organisationViewModel.IsUkAddress = null;
+                organisationViewModel.SectorType = organisationViewModel.SectorType;
+                StashModel(organisationViewModel);
                 return RedirectToAction("AddAddress");
             }
 
@@ -1142,12 +1148,12 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             UserOrganisation userOrg;
             try
             {
-                userOrg = await SaveRegistrationAsync(VirtualUser, model);
+                userOrg = await SaveRegistrationAsync(VirtualUser, organisationViewModel);
             }
             catch (Exception ex)
             {
                 //This line is to help diagnose object reference not found exception raised at this point 
-                Logger.LogWarning(ex, Core.Extensions.Json.SerializeObject(m));
+                Logger.LogWarning(ex, Core.Extensions.Json.SerializeObject(organisationViewModel));
                 throw;
             }
 
@@ -1157,7 +1163,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             PendingFasttrackCodes = null;
 
             //Save the model state
-            StashModel(model);
+            StashModel(organisationViewModel);
 
             //Select the organisation
             ReportingOrganisationId = userOrg.OrganisationId;
@@ -1168,27 +1174,27 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var authorised = false;
             var hasAddress = false;
             OrganisationRecord organisation = null;
-            if (!model.IsManualRegistration)
+            if (!organisationViewModel.IsManualRegistration)
             {
-                organisation = model.GetManualOrganisation();
+                organisation = organisationViewModel.GetManualOrganisation();
                 if (organisation != null)
                 {
-                    authorised = model.IsManualAuthorised;
+                    authorised = organisationViewModel.IsManualAuthorised;
                     hasAddress = organisation.HasAnyAddress();
                 }
                 else
                 {
-                    organisation = model.GetSelectedOrganisation();
-                    authorised = model.IsSelectedAuthorised;
+                    organisation = organisationViewModel.GetSelectedOrganisation();
+                    authorised = organisationViewModel.IsSelectedAuthorised;
                     if (organisation != null) hasAddress = organisation.HasAnyAddress();
                 }
             }
 
-            var sector = organisation == null ? model.SectorType : organisation.SectorType;
+            var sector = organisation == null ? organisationViewModel.SectorType : organisation.SectorType;
 
             //If manual registration then show confirm receipt
-            if (model.IsManualRegistration ||
-                model.IsManualAddress && (sector == SectorTypes.Private || !authorised || hasAddress))
+            if (organisationViewModel.IsManualRegistration ||
+                organisationViewModel.IsManualAddress && (sector == SectorTypes.Private || !authorised || hasAddress))
             {
                 var reviewCode = Encryption.EncryptQuerystring(
                     userOrg.UserId + ":" + userOrg.OrganisationId + ":" + VirtualDateTime.Now.ToSmallDateTime());
@@ -1197,7 +1203,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
 
             //If public sector or fasttracked then we are complete
-            if (sector == SectorTypes.Public || model.IsFastTrackAuthorised)
+            if (sector == SectorTypes.Public || organisationViewModel.IsFastTrackAuthorised)
             {
                 //Log the registration
                 await _registrationService.RegistrationLog.WriteAsync(
@@ -1236,7 +1242,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
 
             //If private sector then send the pin
-            if (model.IsUkAddress.HasValue && model.IsUkAddress.Value) return RedirectToAction("PINSent");
+            if (organisationViewModel.IsUkAddress.HasValue && organisationViewModel.IsUkAddress.Value) return RedirectToAction("PINSent");
 
             return RedirectToAction("RequestReceived");
         }

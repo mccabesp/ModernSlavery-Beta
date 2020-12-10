@@ -12,9 +12,6 @@
         @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken();
-
-            @Html.HiddenFor(m => m.SearchText);
-
             @await Html.GovUkValidationSummaryAsync();
 
             <h1 class="govuk-heading-l">

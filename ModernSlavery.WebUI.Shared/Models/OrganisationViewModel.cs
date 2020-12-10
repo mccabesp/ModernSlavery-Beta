@@ -13,7 +13,7 @@ using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 namespace ModernSlavery.WebUI.Shared.Models
 {
     [Serializable]
-    public class OrganisationViewModel:BaseViewModel
+    public class OrganisationViewModel
     {
         public bool PINExpired;
         public bool PINSent;
@@ -22,11 +22,11 @@ namespace ModernSlavery.WebUI.Shared.Models
         public string AddressReturnAction { get; set; }
 
         public bool IsManualRegistration { get; set; }
-        [Secured] public bool IsManualAuthorised { get; set; }
-        [Secured] public bool IsSelectedAuthorised { get; set; }
-        [Secured] public bool IsFastTrackAuthorised { get; set; }
-        [Secured] public bool IsSecurityCodeExpired { get; set; }
-        [Secured] public bool IsRegistered { get; set; }
+        public bool IsManualAuthorised { get; set; }
+        public bool IsSelectedAuthorised { get; set; }
+        public bool IsFastTrackAuthorised { get; set; }
+        public bool IsSecurityCodeExpired { get; set; }
+        public bool IsRegistered { get; set; }
         public bool IsManualAddress { get; set; }
         public string RegisteredAddress { get; set; }
         public bool IsWrongAddress { get; set; }
@@ -256,54 +256,6 @@ namespace ModernSlavery.WebUI.Shared.Models
                 return Organisations.Results[SelectedOrganisationIndex];
 
             return null;
-        }
-
-        public int OrganisationStartIndex
-        {
-            get
-            {
-                if (Organisations == null || Organisations.Results == null || Organisations.Results.Count < 1) return 1;
-
-                return Organisations.CurrentPage * Organisations.PageSize - Organisations.PageSize + 1;
-            }
-        }
-
-        public int OrganisationEndIndex
-        {
-            get
-            {
-                if (Organisations == null || Organisations.Results == null || Organisations.Results.Count < 1) return 1;
-
-                return OrganisationStartIndex + Organisations.Results.Count - 1;
-            }
-        }
-
-        public int PagerStartIndex
-        {
-            get
-            {
-                if (Organisations == null || Organisations.PageCount <= 5) return 1;
-
-                if (Organisations.CurrentPage < 4) return 1;
-
-                if (Organisations.CurrentPage + 2 > Organisations.PageCount) return Organisations.PageCount - 4;
-
-                return Organisations.CurrentPage - 2;
-            }
-        }
-
-        public int PagerEndIndex
-        {
-            get
-            {
-                if (Organisations == null) return 1;
-
-                if (Organisations.PageCount <= 5) return Organisations.PageCount;
-
-                if (PagerStartIndex + 4 > Organisations.PageCount) return Organisations.PageCount;
-
-                return PagerStartIndex + 4;
-            }
         }
 
         #endregion

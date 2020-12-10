@@ -12,8 +12,6 @@
         @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
-            @Html.HiddenFor(model => model.RegistrationType)
-
             @await Html.GovUkValidationSummaryAsync();
 
             <h1 class="govuk-heading-large">

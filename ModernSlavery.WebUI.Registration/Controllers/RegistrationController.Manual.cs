@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
+using ModernSlavery.WebUI.Registration.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
@@ -45,98 +46,78 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 model.Postcode = organisation.PostCode;
             }
 
-            return View(nameof(AddAddress), model);
+            var addAddressViewModel = new AddAddressViewModel
+            {
+                AddressReturnAction = model.AddressReturnAction,
+                Address1 = model.Address1,
+                Address2 = model.Address2,
+                Address3 = model.Address3,
+                Postcode = model.Postcode
+            }; 
+            return View(nameof(AddAddress), addAddressViewModel);
         }
 
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("add-address")]
-        public async Task<IActionResult> AddAddress(OrganisationViewModel model)
+        public async Task<IActionResult> AddAddress(AddAddressViewModel addAddressViewModel)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            //Make sure we can load organisations from session
-            var m = UnstashModel<OrganisationViewModel>();
-            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-
-            model.Organisations = m.Organisations;
-            model.ManualOrganisations = m.ManualOrganisations;
-
-            //Exclude the contact details
-            var excludes = new HashSet<string>();
-            excludes.AddRange(
-                nameof(model.ContactFirstName),
-                nameof(model.ContactLastName),
-                nameof(model.ContactJobTitle),
-                nameof(model.ContactEmailAddress),
-                nameof(model.ContactPhoneNumber));
-
-            //Exclude the organisation details
-            excludes.AddRange(
-                nameof(model.OrganisationName),
-                nameof(model.CompanyNumber),
-                nameof(model.CharityNumber),
-                nameof(model.MutualNumber),
-                nameof(model.OtherName),
-                nameof(model.OtherValue));
-
-            //Exclude the search
-            excludes.AddRange(nameof(model.SearchText));
-
-            //Exclude the SIC Codes
-            excludes.Add(nameof(model.SicCodeIds));
-
-            //Exclude the SIC Codes
-            excludes.Add(nameof(model.DUNSNumber));
-
-            //Check model is valid
-            ModelState.Exclude(excludes.ToArray());
             if (!ModelState.IsValid)
             {
-                this.SetModelCustomErrors<OrganisationViewModel>();
-                return View(nameof(AddAddress), model);
+                this.SetModelCustomErrors<AddAddressViewModel>();
+                return View(nameof(AddAddress), addAddressViewModel);
             }
 
-            var sector = model.SectorType;
+            //Make sure we can load organisations from session
+            var organisationViewModel = UnstashModel<OrganisationViewModel>();
+            if (organisationViewModel == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
+
+            organisationViewModel.Address1 = addAddressViewModel.Address1;
+            organisationViewModel.Address2 = addAddressViewModel.Address2;
+            organisationViewModel.Address3 = addAddressViewModel.Address3;
+            organisationViewModel.Postcode = addAddressViewModel.Postcode;
+
             var authorised = false;
             OrganisationRecord organisationRecord = null;
-            if (!model.IsManualRegistration)
+            if (!organisationViewModel.IsManualRegistration)
             {
-                organisationRecord = model.GetManualOrganisation();
+                organisationRecord = organisationViewModel.GetManualOrganisation();
 
                 if (organisationRecord != null)
                 {
-                    authorised = model.IsManualAuthorised;
+                    authorised = organisationViewModel.IsManualAuthorised;
                 }
                 else
                 {
-                    organisationRecord = model.GetSelectedOrganisation();
-                    authorised = model.IsSelectedAuthorised;
+                    organisationRecord = organisationViewModel.GetSelectedOrganisation();
+                    authorised = organisationViewModel.IsSelectedAuthorised;
                 }
             }
 
             //Set the address source to the user or original source if unchanged
-            if (organisationRecord != null && model.GetAddressModel().Equals(organisationRecord))
-                model.AddressSource = organisationRecord.AddressSource;
+            if (organisationRecord != null && organisationViewModel.GetAddressModel().Equals(organisationRecord))
+                organisationViewModel.AddressSource = organisationRecord.AddressSource;
             else
-                model.AddressSource = VirtualUser.EmailAddress;
+                organisationViewModel.AddressSource = VirtualUser.EmailAddress;
 
-            if (model.IsWrongAddress) model.IsManualAddress = true;
+            if (organisationViewModel.IsWrongAddress) organisationViewModel.IsManualAddress = true;
 
             //When doing manual address only and user is already authorised redirect to confirm page
-            if (model.IsManualAddress && sector == SectorTypes.Public && authorised && !organisationRecord.HasAnyAddress())
+            if (organisationViewModel.IsManualAddress && organisationViewModel.SectorType == SectorTypes.Public && authorised && !organisationRecord.HasAnyAddress())
             {
                 //We don't need contact info if there is no address only when there is an address
-                model.ConfirmReturnAction = nameof(AddAddress);
-                StashModel(model);
+                organisationViewModel.ConfirmReturnAction = nameof(AddAddress);
+                StashModel(organisationViewModel);
                 return RedirectToAction(nameof(ConfirmOrganisation));
             }
 
             //When manual registration
-            StashModel(model);
+            StashModel(organisationViewModel);
             return RedirectToAction("AddContact");
         }
 
@@ -180,76 +161,57 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (string.IsNullOrWhiteSpace(model.ContactPhoneNumber))
                 model.ContactPhoneNumber = VirtualUser.ContactPhoneNumber;
 
-            return View("AddContact", model);
+            var addContactViewModel = new AddContactViewModel
+            {
+
+                ContactFirstName = model.ContactFirstName,
+                ContactLastName = model.ContactLastName,
+                ContactJobTitle = model.ContactJobTitle, 
+                ContactEmailAddress = model.ContactEmailAddress,
+                ContactPhoneNumber= model.ContactPhoneNumber
+            };
+
+            return View("AddContact", addContactViewModel);
         }
 
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("add-contact")]
-        public async Task<IActionResult> AddContact(OrganisationViewModel model)
+        public async Task<IActionResult> AddContact(AddContactViewModel addContactViewModel)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            //Make sure we can load organisation from session
-            var m = UnstashModel<OrganisationViewModel>();
-            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-
-            model.Organisations = m.Organisations;
-            model.ManualOrganisations = m.ManualOrganisations;
-
-            //Exclude the organisation details
-            var excludes = new HashSet<string>();
-            excludes.AddRange(
-                nameof(model.OrganisationName),
-                nameof(model.CompanyNumber),
-                nameof(model.CharityNumber),
-                nameof(model.MutualNumber),
-                nameof(model.OtherName),
-                nameof(model.OtherValue));
-
-            //Exclude the address details
-            excludes.AddRange(
-                nameof(model.Address1),
-                nameof(model.Address2),
-                nameof(model.Address3),
-                nameof(model.City),
-                nameof(model.County),
-                nameof(model.Country),
-                nameof(model.Postcode),
-                nameof(model.PoBox));
-
-            //Exclude the search
-            excludes.AddRange(nameof(model.SearchText));
-
-            //Exclude the SIC Codes
-            excludes.Add(nameof(model.SicCodeIds));
-
-            //Exclude the SIC Codes
-            excludes.Add(nameof(model.DUNSNumber));
-
-            //Check model is valid
-            ModelState.Exclude(excludes.ToArray());
             if (!ModelState.IsValid)
             {
-                this.SetModelCustomErrors<OrganisationViewModel>();
-                return View("AddContact", model);
+                this.SetModelCustomErrors<AddContactViewModel>();
+                return View("AddContact", addContactViewModel);
             }
 
-            //Whenever doing a manual address change redirect to confirm page
-            if (model.IsManualAddress)
-            {
-                if (string.IsNullOrWhiteSpace(model.ConfirmReturnAction))
-                    model.ConfirmReturnAction = nameof(AddContact);
+            //Make sure we can load organisation from session
+            var organisationViewModel = UnstashModel<OrganisationViewModel>();
+            if (organisationViewModel == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
-                StashModel(model);
+            organisationViewModel.ContactFirstName=addContactViewModel.ContactFirstName;
+            organisationViewModel.ContactLastName = addContactViewModel.ContactLastName;
+            organisationViewModel.ContactJobTitle = addContactViewModel.ContactJobTitle;
+            organisationViewModel.ContactEmailAddress = addContactViewModel.ContactEmailAddress;
+            organisationViewModel.ContactPhoneNumber = addContactViewModel.ContactPhoneNumber;
+
+            //Whenever doing a manual address change redirect to confirm page
+            if (organisationViewModel.IsManualAddress)
+            {
+                if (string.IsNullOrWhiteSpace(organisationViewModel.ConfirmReturnAction))
+                    organisationViewModel.ConfirmReturnAction = nameof(AddContact);
+
+                StashModel(organisationViewModel);
                 return RedirectToAction(nameof(ConfirmOrganisation));
             }
 
-            model.ConfirmReturnAction = nameof(AddContact);
-            StashModel(model);
+            organisationViewModel.ConfirmReturnAction = nameof(AddContact);
+            StashModel(organisationViewModel);
             return RedirectToAction(nameof(ConfirmOrganisation));
         }
 

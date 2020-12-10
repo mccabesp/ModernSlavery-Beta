@@ -2,7 +2,7 @@
     Layout = "~/Views/GdsLayout.cshtml";
     ViewBag.Title = "Search for your organisation - Modern Slavery reporting service";
 }
-@model OrganisationViewModel
+@model OrganisationSearchViewModel
 @section BeforeMain {
     <a class="govuk-back-link" href="@Url.Action("OrganisationType")">Back</a>
 }
@@ -12,10 +12,6 @@
         @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
-            @Html.HiddenFor(m => m.SectorType)
-            @Html.HiddenFor(model => model.RegistrationType)
-            @Html.HiddenFor(m => m.IsManualRegistration)
-
             @await Html.GovUkValidationSummaryAsync()
             <h1 class="govuk-heading-l">
                 Find your organisation

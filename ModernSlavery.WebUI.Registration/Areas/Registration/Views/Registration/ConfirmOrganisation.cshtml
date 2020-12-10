@@ -24,58 +24,6 @@
         @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
-
-            @Html.HiddenFor(m => m.SearchText)
-            @Html.HiddenFor(m => m.SelectedOrganisationIndex)
-            @Html.HiddenFor(m => m.CompanyNumber)
-            @Html.HiddenFor(model => model.CharityNumber)
-            @Html.HiddenFor(model => model.MutualNumber)
-            @Html.HiddenFor(model => model.OtherName)
-            @Html.HiddenFor(model => model.OtherValue)
-
-            @Html.HiddenFor(m => m.SectorType)
-            @Html.HiddenFor(model => model.RegistrationType)
-
-            @Html.HiddenFor(model => model.NoReference)
-
-            @Html.HiddenFor(model => model.BackAction)
-            @Html.HiddenFor(model => model.AddressReturnAction)
-            @Html.HiddenFor(model => model.ConfirmReturnAction)
-
-            @Html.HiddenFor(model => model.OrganisationName)
-            @Html.HiddenFor(model => model.NameSource)
-            @Html.HiddenFor(model => model.AddressSource)
-            @Html.HiddenFor(model => model.SicSource)
-            @Html.HiddenFor(model => model.SicCodeIds)
-
-            @Html.HiddenFor(model => model.Address1)
-            @Html.HiddenFor(model => model.Address2)
-            @Html.HiddenFor(model => model.Address3)
-            @Html.HiddenFor(model => model.City)
-            @Html.HiddenFor(model => model.County)
-            @Html.HiddenFor(model => model.Country)
-            @Html.HiddenFor(model => model.Postcode)
-            @Html.HiddenFor(model => model.PoBox)
-            @if (Model.IsUkAddress.HasValue)
-            {
-                @Html.HiddenFor(model => model.IsUkAddress)
-            }
-
-            @Html.HiddenFor(model => model.ContactFirstName)
-            @Html.HiddenFor(model => model.ContactLastName)
-            @Html.HiddenFor(model => model.ContactJobTitle)
-            @Html.HiddenFor(model => model.ContactEmailAddress)
-            @Html.HiddenFor(model => model.ContactPhoneNumber)
-
-            @Html.HiddenFor(model => model.IsManualAddress)
-            @Html.HiddenFor(model => model.ManualOrganisationIndex)
-            @Html.HiddenFor(model => model.MatchedReferenceCount)
-
-            @Html.HiddenFor(model => model.IsManualRegistration)
-            @Html.HiddenSecuredFor(model => model.IsManualAuthorised)
-            @Html.HiddenSecuredFor(model => model.IsSelectedAuthorised)
-            @Html.HiddenSecuredFor(model => model.IsFastTrackAuthorised)
-
             @await Html.GovUkValidationSummaryAsync()
             <h1 class="govuk-heading-l">
                 Confirm your organisation’s details
