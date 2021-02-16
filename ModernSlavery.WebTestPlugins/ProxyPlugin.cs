@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Net;
 using Microsoft.VisualStudio.TestTools.WebTesting;
 
@@ -28,7 +26,7 @@ namespace ModernSlavery.WebTestPlugins
         public override void PreWebTest(object sender, PreWebTestEventArgs e)
         {
             if (!Enabled) return;
-            var proxy=string.IsNullOrWhiteSpace(ContextParamSource) || !e.WebTest.Context.ContainsKey(ContextParamSource) ? null : e.WebTest.Context[ContextParamSource].ToString();
+            var proxy=string.IsNullOrWhiteSpace(ContextParamSource) || !e.WebTest.Context.ContainsKey(ContextParamSource) ? null : e.WebTest.Context[ContextParamSource]?.ToString();
             if (string.IsNullOrWhiteSpace(proxy)) return;
             e.WebTest.WebProxy = new WebProxy(proxy,BypassOnLocal);
         }

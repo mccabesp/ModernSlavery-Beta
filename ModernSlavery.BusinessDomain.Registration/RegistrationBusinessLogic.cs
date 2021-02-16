@@ -15,7 +15,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         private readonly IRegistrationLogger RegistrationLog;
 
         public RegistrationBusinessLogic(
-            IDataRepository dataRepository, 
+            IDataRepository dataRepository,
             IRegistrationLogger registrationLog)
         {
             DataRepository = dataRepository ?? throw new ArgumentNullException(nameof(dataRepository));
@@ -24,34 +24,31 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public async Task RemoveRetiredUserRegistrationsAsync(User userToRetire, User actionByUser)
         {
+            // get all latest registrations assigned to this user or latest registration is null
+            var latestRegistrationsByUser = userToRetire.UserOrganisations.Where(uo => uo.Organisation.LatestRegistration == null || uo.Organisation.LatestRegistration.UserId == userToRetire.UserId).ToList();
+
             // remove all the user registrations associated with the organisation
             userToRetire.UserOrganisations.ForEach(uo => uo.Organisation.UserOrganisations.Remove(uo));
 
-            // get all latest registrations assigned to this user or latest registration is null
-            var latestRegistrationsByUser = userToRetire.UserOrganisations
-                .Where(
-                    uo => uo.Organisation.LatestRegistration == null ||
-                          uo.Organisation.LatestRegistration.UserId == userToRetire.UserId);
-
             // update those latest registrations
-            latestRegistrationsByUser.ForEach(
-                async userOrgToUnregister =>
-                {
-                    var sourceOrg = userOrgToUnregister.Organisation;
+            foreach (var userOrgToUnregister in latestRegistrationsByUser)
+            {
+                var sourceOrg = userOrgToUnregister.Organisation;
 
-                    // update latest registration (if one exists)
-                    var newLatestReg = sourceOrg.GetLatestRegistration();
-                    if (newLatestReg != null) sourceOrg.LatestRegistration = newLatestReg;
+                // update latest registration (if one exists)
+                var newLatestReg = sourceOrg.GetLatestRegistration();
+                if (newLatestReg != null) sourceOrg.LatestRegistration = newLatestReg;
 
                     // log unregistered via closed account
-                    await RegistrationLog.LogUserAccountClosedAsync(userOrgToUnregister, actionByUser.EmailAddress);
+                    await RegistrationLog.LogUserAccountClosedAsync(userOrgToUnregister, actionByUser.EmailAddress).ConfigureAwait(false);
 
-                    // Remove user organisation
-                    DataRepository.Delete(userOrgToUnregister);
-                });
+                // Remove user organisation
+                DataRepository.Delete(userOrgToUnregister);
+            }
 
             // save changes to database
-            await DataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync().ConfigureAwait(false);
+
         }
 
         public async Task RemoveRegistrationAsync(UserOrganisation userOrgToUnregister, User actionByUser)
@@ -76,16 +73,16 @@ namespace ModernSlavery.BusinessDomain.Registration
             // log record
             if (userOrgToUnregister.UserId == actionByUser.UserId)
                 // unregistered self
-                await RegistrationLog.LogUnregisteredSelfAsync(userOrgToUnregister, actionByUser.EmailAddress);
+                await RegistrationLog.LogUnregisteredSelfAsync(userOrgToUnregister, actionByUser.EmailAddress).ConfigureAwait(false);
             else
                 // unregistered by someone else
-                await RegistrationLog.LogUnregisteredAsync(userOrgToUnregister, actionByUser.EmailAddress);
+                await RegistrationLog.LogUnregisteredAsync(userOrgToUnregister, actionByUser.EmailAddress).ConfigureAwait(false);
 
             // Remove user organisation
             DataRepository.Delete(userOrgToUnregister);
 
             // Save changes to database
-            await DataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync().ConfigureAwait(false);
         }
     }
 }

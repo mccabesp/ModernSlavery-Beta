@@ -3,7 +3,7 @@
 @model RemoveOrganisationModel
 @{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Remove organisation reason - Modern Slavery reporting service";
+    Title = "Remove organisation reason";
     var controller = ViewData["Controller"] as BaseController;
     var userId = Obfuscator.DeObfuscate(Model.EncUserId).ToInt64();
 }

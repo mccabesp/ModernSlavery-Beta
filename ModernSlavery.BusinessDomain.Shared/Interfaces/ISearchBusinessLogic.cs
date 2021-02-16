@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
@@ -97,5 +98,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="submissionDeadlineYears">The specified reporting years (return all if empty)</param>
         /// <returns>List of submitted statement summary documents</returns>
         Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsAsync(IEnumerable<int> submissionDeadlineYears = null);
+        Task<IEnumerable<OrganisationSearchModel>> ListSearchDocumentsByTimestampAsync(DateTime? startDate = null, DateTime? endDate = null);
     }
 }

@@ -17,11 +17,12 @@ namespace ModernSlavery.Core.Options
         public int MaxResponseCompanies { get; set; } = 400;
         public int MaxApiCallsPerFiveMins { get; set; } = 600;//The maximum allowed updates in a 5 min interval per ApiKey
         public int UpdateHours { get; set; } = 24;//How often to check for updates
-
+        public RetryPolicyTypes RetryPolicy { get; set; } = RetryPolicyTypes.None;
         public void Validate()
         {
             var exceptions = new List<Exception>();
             if (string.IsNullOrWhiteSpace(ApiKey) || GetApiKeys().Length==0) exceptions.Add(new ConfigurationErrorsException("CompaniesHouse:ApiKey cannot be empty"));
+            if (RetryPolicy == RetryPolicyTypes.None) exceptions.Add(new ConfigurationErrorsException("CompaniesHouse:RetryPolicy must be Linear or Exponential"));
             if (string.IsNullOrWhiteSpace(ApiServer)) exceptions.Add(new ConfigurationErrorsException("CompaniesHouse:ApiServer cannot be empty"));
 
             if (exceptions.Count > 0)

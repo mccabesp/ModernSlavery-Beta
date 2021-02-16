@@ -35,7 +35,7 @@ namespace ModernSlavery.Infrastructure.Messaging
 
             if (GovNotifyEmailProvider.Enabled)
             {
-                result = await TrySendGovNotifyEmailAsync(emailAddress, templateId, model);
+                result = await TrySendGovNotifyEmailAsync(emailAddress, templateId, model).ConfigureAwait(false);
 
                 if (result != null)
                     // gov notify provider succeeded 
@@ -43,7 +43,7 @@ namespace ModernSlavery.Infrastructure.Messaging
             }
 
             // gov notify provider failed so trying the smtp provider
-            result = await TrySendSmtpEmail(emailAddress, templateId, model);
+            result = await TrySendSmtpEmail(emailAddress, templateId, model).ConfigureAwait(false);
 
             return result;
         }
@@ -52,7 +52,7 @@ namespace ModernSlavery.Infrastructure.Messaging
         {
             try
             {
-                var result = await GovNotifyEmailProvider.SendEmailAsync(emailAddress, templateId, model);
+                var result = await GovNotifyEmailProvider.SendEmailAsync(emailAddress, templateId, model).ConfigureAwait(false);
                 if (result.Status.EqualsI("created", "sending", "delivered") == false)
                     throw new Exception($"Unexpected status '{result.Status}' returned");
 
@@ -63,7 +63,7 @@ namespace ModernSlavery.Infrastructure.Messaging
                         Subject = result.EmailSubject,
                         Recipients = result.EmailAddress,
                         Server = result.Server
-                    });
+                    }).ConfigureAwait(false);
 
                 return result;
             }
@@ -83,7 +83,7 @@ namespace ModernSlavery.Infrastructure.Messaging
                         Subject = "GPG - GOV NOTIFY ERROR",
                         MessageBody =
                             $"Could not send email to Gov Notify using {emailAddress} due to following error:\n\n{ex.GetDetailsText()}.\n\nWill attempting to resend email using SMTP."
-                    });
+                    }).ConfigureAwait(false);
             }
 
             return null;
@@ -93,7 +93,7 @@ namespace ModernSlavery.Infrastructure.Messaging
         {
             try
             {
-                var result = await SmtpEmailProvider.SendEmailAsync(emailAddress, templateId, model);
+                var result = await SmtpEmailProvider.SendEmailAsync(emailAddress, templateId, model).ConfigureAwait(false);
 
                 await EmailSendLog.WriteAsync(
                     new EmailSendLogModel
@@ -102,7 +102,7 @@ namespace ModernSlavery.Infrastructure.Messaging
                         Subject = result.EmailSubject,
                         Recipients = result.EmailAddress,
                         Server = result.Server
-                    });
+                    }).ConfigureAwait(false);
 
                 return result;
             }

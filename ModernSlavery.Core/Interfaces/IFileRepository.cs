@@ -8,7 +8,7 @@ namespace ModernSlavery.Core.Interfaces
 {
     public interface IFileRepository
     {
-        string RootDir { get; }
+        string RootPath { get; }
 
         Task<IEnumerable<string>> GetDirectoriesAsync(string directoryPath, string searchPattern = null,
             bool recursive = false);

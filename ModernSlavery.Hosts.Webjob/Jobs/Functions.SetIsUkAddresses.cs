@@ -18,8 +18,11 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             RunningJobs.Add(nameof(SetIsUkAddressesAsync));
             try
             {
-                var addresses = _dataRepository.GetAll<OrganisationAddress>().Where(a => a.IsUkAddress == null);
-                foreach (var org in addresses) await SetIsUkAddressAsync(org);
+                var addresses = _dataRepository.GetAll<OrganisationAddress>().Where(a => a.IsUkAddress == null && a.PostCode != null && a.PostCode != "").ToList();
+
+                foreach (var address in addresses) await SetIsUkAddressAsync(address).ConfigureAwait(false);
+
+                await _dataRepository.BulkUpdateAsync(addresses);
 
                 log.LogDebug($"Executed Webjob {nameof(SetIsUkAddressesAsync)} successfully");
             }
@@ -45,10 +48,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             if (string.IsNullOrWhiteSpace(address.PostCode)) throw new ArgumentNullException(nameof(address.PostCode));
 
             //Check if the address is a valid UK postcode
-            address.IsUkAddress = await _postCodeChecker.IsValidPostcode(address.PostCode);
-
-            //Save the address
-            await _dataRepository.SaveChangesAsync();
+            address.IsUkAddress = await _postCodeChecker.CheckPostcodeAsync(address.PostCode).ConfigureAwait(false);
         }
     }
 }

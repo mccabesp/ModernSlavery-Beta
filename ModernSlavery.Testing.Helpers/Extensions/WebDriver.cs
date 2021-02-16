@@ -49,7 +49,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             var content = webDriver.PageSource;
 
             IDocument document = await BrowsingContext.New()
-                .OpenAsync(ResponseFactory, CancellationToken.None);
+                .OpenAsync(ResponseFactory, CancellationToken.None).ConfigureAwait(false);
             return (IHtmlDocument)document;
 
             void ResponseFactory(VirtualResponse htmlResponse)

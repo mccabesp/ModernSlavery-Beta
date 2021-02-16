@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace ModernSlavery.Core.Extensions
 {
     public static class Text
     {
-        public const string NumberChars = "1234567890";
-        public const string UpperCaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        public static string LowerCaseChars = UpperCaseChars.ToLower();
+        public const string NumberChars = "0123456789";
+        public const string UpperAlphaChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        public const string LowerAlphaChars = "abcdefghijklmnopqrstuvwxyz";
+        public const string AlphaNumericChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        public const string UpperAlphaNumericChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        public const string LowerAlphaNumericChars = "0123456789abcdefghijklmnopqrstuvwxyz";
 
         public static bool IsNumber(this string input)
         {
@@ -132,6 +136,14 @@ namespace ModernSlavery.Core.Extensions
             return trimChars == null || trimChars.Length == 0 ? source.Trim() : source.Trim(trimChars);
         }
 
+        public static string TrimNonLettersOrDigits(this string source)
+        {
+            if (string.IsNullOrEmpty(source)) return source;
+            var trimChars = new HashSet<char>(source.Where(ch=>!char.IsLetterOrDigit(ch)));
+
+            return source.TrimI(trimChars.ToArray());
+        }
+
         public static string TrimSuffix(this string source, string suffix)
         {
             if (source.EndsWith(suffix, StringComparison.CurrentCultureIgnoreCase))
@@ -211,7 +223,7 @@ namespace ModernSlavery.Core.Extensions
             if (string.IsNullOrWhiteSpace(newLineChars)) newLineChars = Environment.NewLine;
 
             text = text.Replace(newLineChars, "\n");
-            var args = text.SplitI("\n");
+            var args = text.SplitI('\n');
             return args.Length;
         }
 
@@ -542,7 +554,7 @@ namespace ModernSlavery.Core.Extensions
 
         public static void WriteLine(this StringWriter writer, Color color, string text, string tagName = "span")
         {
-            writer.WriteLine($"<{tagName} style=\"color:{ColorTranslator.ToHtml(color)}\">{text}</{tagName}>");
+            writer.WriteLine($"<{tagName} style=\"color:{ColorTranslator.ToHtml(color)}\">{WebUtility.HtmlEncode(text)}</{tagName}>");
         }
 
         public static string ToAbbr(this string s, string separator = "", int minLength = 3,
@@ -550,7 +562,7 @@ namespace ModernSlavery.Core.Extensions
         {
             if (string.IsNullOrWhiteSpace(s)) return s;
 
-            var wordList = s.ToLower().SplitI(" .-;:_,&+[]{}<>()").ToList();
+            var wordList = s.ToLower().SplitI(" .-;:_,&+[]{}<>()".ToCharArray()).ToList();
 
             if (excludeWords != null && excludeWords.Length > 0)
                 wordList = wordList.Except(excludeWords, StringComparer.OrdinalIgnoreCase).ToList();

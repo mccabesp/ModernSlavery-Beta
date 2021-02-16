@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using System.Net;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
@@ -42,17 +43,15 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             {
                 //Log non-exception events
                 var statusCodeData = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
-                if (statusCodeData != null)
-
+                if (statusCodeData != null && errorCode.Between(400, 599))
                 {
-                    if (errorCode == 404 || errorCode == 405)
-                        Logger.LogWarning($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
-                    else if (errorCode >= 400)
+                    if (errorCode >= 500)
                         Logger.LogError($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
+                    else
+                        Logger.LogWarning($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
                 }
             }
 
-            Response.StatusCode = errorCode;
             return View("CustomError", model);
         }
 
@@ -60,8 +59,16 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         [HttpGet("/error/service-unavailable")]
         public IActionResult ServiceUnavailable()
         {
-            var model = WebService.ErrorViewModelFactory.Create(1119);
-            Response.StatusCode = 503;
+            var model = WebService.ErrorViewModelFactory.Create(503);
+            return View("CustomError", model);
+        }
+
+        [Route("/{*url}", Order = int.MaxValue)]
+        public IActionResult CatchAll()
+        {
+            var errorCode = (int)HttpStatusCode.NotFound;
+            var model = WebService.ErrorViewModelFactory.Create(errorCode);
+            Logger.LogWarning($"HttpStatusCode {404}, Path: {HttpContext.GetUri().PathAndQuery}");
             return View("CustomError", model);
         }
     }

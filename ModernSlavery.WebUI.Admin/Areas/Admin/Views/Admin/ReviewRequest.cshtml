@@ -1,8 +1,8 @@
 ﻿@{
     Layout = "~/Views/DfeTemplate.cshtml";
-    ViewBag.Title = "Review new registration request - Modern Slavery reporting service";
+    Title = "Review new registration request";
 }
-@model OrganisationViewModel
+@model ReviewOrganisationViewModel
 
 <div class="breadcrumbs dynamic-content default-content" style="display: block;">
     <ol>
@@ -109,7 +109,7 @@
                             Address to register
                         </td>
                         <td>
-                            @Html.Raw(Model.GetFullAddress().Replace(",", ",<br/>"))
+                            @Html.Linebreak(Model.GetAddressList(), ",")
                         </td>
                         <td></td>
                     </tr>
@@ -120,37 +120,12 @@
                                 Current address
                             </td>
                             <td>
-                                @Html.Raw(Model.RegisteredAddress.Replace(",", ",<br/>"))
+                                @Html.Linebreak(Model.RegisteredAddress, ", ", ",")
                             </td>
                             <td></td>
                         </tr>
                     }
-                    @if (ViewBag.NoDUNS)
-                    {
-                        <tr>
-                            <td>
-                                DUNS number<span class="optional">(Optional)</span>
-                            </td>
-                            <td>
-                                @Html.ValidationMessageFor(model => model.DUNSNumber, "", new { id = "DUNSNumberError", @class = "error-message" })
-                                @Html.CustomEditorFor(model => model.DUNSNumber, new { @class = "form-control" })
-                            </td>
-                            <td></td>
-                        </tr>
-                    }
-                    else
-                    {
-                        <tr>
-                            <td>
-                                DUNS number
-                            </td>
-                            <td>
-                                @Html.HiddenFor(model => model.DUNSNumber)
-                                @Html.DisplayFor(model => model.DUNSNumber)
-                            </td>
-                            <td></td>
-                        </tr>
-                    }
+                    
                     <tr>
                         <td colspan="3">
                             <br>
@@ -159,6 +134,8 @@
                     </tr>
 
                     @await Html.PartialAsync("DisplayReference", new { name = "Company number", value = Model.CompanyNumber, defaultValue = "" })
+
+                    @await Html.PartialAsync("DisplayReference", new { name = "DUNS number", value = Model.DUNSNumber, defaultValue = "" })
 
                     @await Html.PartialAsync("DisplayReference", new { name = "Charity number", value = Model.CharityNumber, defaultValue = "" })
 

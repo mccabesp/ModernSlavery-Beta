@@ -1,9 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-
     <!--
     When in Development mode StaticWebAssetBasePath is obtained from "**\obj\**\staticwebassets\ModernSlavery.Hosts.Web.StaticWebAssets.xml" 
     In production this will normally default to '_content/ModernSlavery.WebUI.assets/' under wwwroot . This ensures files are looked for in the wwwRoot\
@@ -16,24 +13,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram" Link="DependencyValidation1.layerdiagram">
-      <Visible>False</Visible>
-    </AdditionalFiles>
-    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
-    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="BuildBundlerMinifier" Version="3.2.449" />
     <PackageReference Include="BuildWebCompiler" Version="1.12.405" />
-    <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.11.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
   </ItemGroup>
-
 
   <ItemGroup>
     <Content Remove="wwwroot\**" />
@@ -47,13 +34,6 @@
     </Content>
   </ItemGroup>
   
-  <ItemGroup>
-    <Folder Include="wwwroot\assets\pagestyles\" />
-    <Folder Include="wwwroot\assets\pagescripts\" />
-    <Folder Include="wwwroot\NewFolder\" />
-    <Folder Include="wwwroot\swagger\" />
-  </ItemGroup>
-
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="npm install&#xD;&#xA;npm rebuild&#xD;&#xA;" />
   </Target>

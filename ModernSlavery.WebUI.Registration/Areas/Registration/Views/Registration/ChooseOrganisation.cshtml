@@ -1,158 +1,178 @@
 ﻿@{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Choose your organisation - Modern Slavery reporting service";
+    Title = "Choose your organisation";
 }
 @model OrganisationSearchViewModel
 @section BeforeMain {
-    @Html.ActionLink("Back", "OrganisationSearch", null, null, new { @class = "govuk-back-link" })    
+    @Html.ActionLink("Back", "OrganisationSearch", null, null, new { @class = "govuk-back-link" })
 }
-@*<input type="submit" style="display: none" name="command" value="search">*@
+
 <div class="govuk-grid-row choose-organisation">
-    <div class="govuk-grid-column-full">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
-        {
-            @Html.AntiForgeryToken()
-            @await Html.GovUkValidationSummaryAsync()
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+    {
+        @Html.AntiForgeryToken()
+        @await Html.GovUkValidationSummaryAsync()
 
-            <div class="govuk-grid-column-two-thirds">
-                <h1 class="govuk-heading-l">
-                    <span>Choose your organisation</span>
-                </h1>
-                @Html.ValidationMessageFor(model => model.SearchText, null, new { @class = "govuk-error-message" })
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl govuk-!-margin-bottom-5">Find your organisation</h1>
+            @Html.ValidationMessageFor(model => model.SearchText, null, new { @class = "govuk-error-message" })
 
-                <div class="gov-uk-c-searchbar">
-                    <div class="gov-uk-l-searchbar__table">
-                        <div class="gov-uk-l-searchbar__cell">
-                            @Html.CustomEditorFor(model => model.SearchText, new { @class = "gov-uk-c-searchbar__input", aria_label = "Search", placeholder = Model.SectorType == SectorTypes.Public ? "Organisation name" : "Organisation name or company no" })
-                        </div>
-                        <div class="gov-uk-l-searchbar__cell">
-                            <button class="gov-uk-c-searchbar__submit gov-uk-c-searchbar__submit--blue" id="NextStep" name="command" value="search" title="Search">Search</button>
-                        </div>
+            <label for="SearchText" class="govuk-hint">
+                Organisation name or company number
+            </label>
+
+            <div class="gov-uk-c-searchbar">
+                <div class="gov-uk-l-searchbar__table">
+                    <div class="gov-uk-l-searchbar__cell">
+                        @Html.CustomEditorFor(model => model.SearchText, new { @class = "gov-uk-c-searchbar__input", id = "SearchText", aria_label = "Search", placeholder = Model.SectorType == SectorTypes.Public ? "Organisation name" : "Organisation name or company no" })
+                    </div>
+                    <div class="gov-uk-l-searchbar__cell">
+                        <button class="gov-uk-c-searchbar__submit gov-uk-c-searchbar__submit--blue" id="NextStep" name="command" value="search" title="Search">Search</button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="govuk-grid-column-full ">
-                @if (!string.IsNullOrWhiteSpace(Model.SearchText))
+        <div class="govuk-grid-column-full ">
+            @if (Model.SectorType == SectorTypes.Private)
+            {
+                <div class="govuk-!-width-two-thirds govuk-!-margin-top-5">
+                    <div class="govuk-warning-text">
+                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                        <strong class="govuk-warning-text__text">
+                            <span class="govuk-warning-text__assistive">Warning</span>
+                            If your organisation’s headquarters are outside the UK, it may not appear in the search results.
+                            In this case, you’ll need to <a class="govuk-link" asp-controller="Registration" asp-action="AddOrganisation">provide us with its details</a>.
+                        </strong>
+                    </div>
+
+                    <h2 class="govuk-heading-m govuk-!-font-weight-regular">Select your organisation</h2>
+
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                Can't find your organisation?
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            If your organisation is registered at Companies House, entering the company number will bring up its details.
+                            <br>
+                            <br>
+                            If your organisation is not listed in the search results you’ll need to <a class="govuk-link" asp-controller="Registration" asp-action="AddOrganisation">provide us with its details</a>.
+                        </div>
+                    </details>
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.SearchText))
+            {
+                if (Model.Organisations == null || Model.Organisations.Results.Count < 1)
                 {
-                    if (Model.Organisations == null || Model.Organisations.Results.Count < 1)
+                    <div class="govuk-form-group">
+                        <h2 class="govuk-heading-m">0 organisations found that match your search</h2>
+                        <span>Please try:</span>
+                        <ul class="govuk-list govuk-list--bullet">
+                            <li>searching again using different organisation name</li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    if (Model.SectorType == SectorTypes.Private)
                     {
-                        <div class="govuk-form-group">
-                            <h2 class="govuk-heading-m">0 organisations found that match your search</h2>
-                            <span>Please try:</span>
-                            <ul class="govuk-list govuk-list--bullet">
-                                <li>searching again using different organisation name</li>
-                            </ul>
+                        if (Model.LastPrivateSearchRemoteTotal == -1)
+                        {
+                            <div class="govuk-inset-text">
+                                <div class="govuk-body govuk-!-font-weight-bold"><span class="govuk-error-message" style="display: inline">There was a problem searching the Companies&nbsp;House service. </span><br />If you cant find your organisation below, please use the search button to try again.</div>
+                            </div>
+                        }
+                        else if (Model.Organisations.VirtualRecordTotal != Model.Organisations.ActualRecordTotal)
+                        {
+                            <div class="govuk-inset-text">
+                                <div class="govuk-body govuk-!-font-weight-bold">Showing @Model.Organisations.VirtualRecordTotal.ToString("N0") of @Model.Organisations.ActualRecordTotal.ToString("N0") results. Refine your search or enter your company number.</div>
+                            </div>
+                        }
+                    }
+                    <table class="search govuk-table govuk-!-font-size-16" summary="A list organisations that match your search">
+                        <thead class="govuk-table__head">
+                            <tr class="govuk-table__row">
+                                <th scope="col" class="govuk-table__header">Organisation name and registered address</th>
+                                @if (Model.SectorType == SectorTypes.Private)
+                                {
+                                    <th scope="col" class="govuk-table__header">Registered number</th>
+                                }
+
+                                <td class="govuk-table__header">&nbsp;</td>
+
+                            </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                            @for (var i = 0; i < Model.Organisations.Results.Count; i++)
+                            {
+                                <tr class="govuk-table__row" style="background-color: @(Model.Organisations.Results[i].OrganisationId > 0 ? "inherit" : "#E6F1FA")">
+                                    <td class="govuk-table__cell">
+                                        @Model.Organisations.Results[i].OrganisationName
+                                        <span class="govuk-!-font-size-14">@Model.Organisations.Results[i].GetFullAddress()</span>
+                                    </td>
+                                    @if (Model.SectorType == SectorTypes.Private)
+                                    {
+                                        <td class="govuk-table__cell">
+                                            @Model.Organisations.Results[i].CompanyNumber
+                                        </td>
+                                    }
+                                    <td class="govuk-table__cell">
+                                        @*Must have id btnSelect for load testing*@
+                                        <button type="submit" class="link-button govuk-link govuk-!-font-size-16" id="btnSelect" name="command" value="organisation_@i">Choose&nbsp;organisation</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    if (Model.Organisations.Results.Count > 1)
+                    {
+                        <div class="pager">
+                            <div class="pager-controls">
+                                @if (Model.Organisations.CurrentPage > 1)
+                                {
+                                    <button type="submit" class="link-button govuk-link" name="command" value="pagePrev">Previous</button>
+                                }
+                                @if (Model.Organisations.VirtualPageCount > 1)
+                                {
+                                    <ul class="pager-items">
+                                        @for (var i = Model.PagerStartIndex; i <= Model.PagerEndIndex; i++)
+                                        {
+                                            if (i == Model.Organisations.CurrentPage)
+                                            {
+                                                <li>
+                                                    <b>@i</b>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    <button type="submit" class="link-button govuk-link" name="command" value="page_@i">@i</button>
+                                                </li>
+                                            }
+                                        }
+                                    </ul>
+                                }
+                                @if (Model.Organisations.CurrentPage < Model.Organisations.VirtualPageCount)
+                                {
+                                    <button type="submit" class="link-button govuk-link" name="command" value="pageNext">Next</button>
+                                }
+                            </div>
+                            @* Keep TotalRecords span here for load testing *@
+                            <div class="pager-summary">Showing @Model.OrganisationStartIndex – @Model.OrganisationEndIndex of <span id="TotalRecords">@Model.Organisations.VirtualRecordTotal</span> organisations</div>
                         </div>
                     }
                     else
                     {
-                        <br>
-                        if (Model.SectorType == SectorTypes.Private)
-                        {
-                            if (Model.LastPrivateSearchRemoteTotal == -1)
-                            {
-                                <div class="govuk-inset-text">
-                                    <div class="govuk-body govuk-!-font-weight-bold"><span class="govuk-error-message" style="display: inline">There was a problem searching the Companies&nbsp;House service. </span><br />If you cant find your organisation below, please use the search button to try again.</div>
-                                </div>
-                            }
-                            else if (Model.Organisations.VirtualRecordTotal != Model.Organisations.ActualRecordTotal)
-                            {
-                                <div class="govuk-inset-text">
-                                    <div class="govuk-body govuk-!-font-weight-bold">Showing @Model.Organisations.VirtualRecordTotal.ToString("N0") of @Model.Organisations.ActualRecordTotal.ToString("N0") results. Refine your search or enter your company number.</div>
-                                </div>
-                            }
-                            <p class="govuk-body govuk-!-width-two-thirds">Choose your organisation and we'll send an activation PIN to its registered address. Only organisations registered at Companies House are listed here.</p>
-                        }
-                        else
-                        {
-
-                        }
-                        <table class="search govuk-table govuk-!-font-size-16" summary="A list organisations that match your search">
-                            <thead class="govuk-table__head">
-                                <tr class="govuk-table__row">
-                                    <th scope="col" class="govuk-table__header">Organisation name and registered address</th>
-                                    @if (Model.SectorType == SectorTypes.Private)
-                                    {
-                                        <th scope="col" class="govuk-table__header">Registered number</th>
-                                    }
-
-                                    <th scope="col" class="govuk-table__header">&nbsp;</th>
-
-                                </tr>
-                            </thead>
-                            <tbody class="govuk-table__body">
-                                @for (var i = 0; i < Model.Organisations.Results.Count; i++)
-                                {
-                                    <tr class="govuk-table__row" style="background-color: @(Model.Organisations.Results[i].OrganisationId > 0 ? "inherit" : "#E6F1FA")">
-                                        <td class="govuk-table__cell">
-                                            @Model.Organisations.Results[i].OrganisationName
-                                            <span class="govuk-!-font-size-14">@Model.Organisations.Results[i].GetFullAddress()</span>
-                                        </td>
-                                        @if (Model.SectorType == SectorTypes.Private)
-                                        {
-                                            <td class="govuk-table__cell">
-                                                @Model.Organisations.Results[i].CompanyNumber
-                                            </td>
-                                        }
-                                        <td class="govuk-table__cell">
-                                            <button type="submit" class="link-button govuk-link govuk-!-font-size-16" id="btnSelect" name="command" value="organisation_@i">Choose&nbsp;organisation</button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-
-                        if (Model.Organisations.Results.Count > 1)
-                        {
-                            <div class="pager">
-                                <div class="pager-controls">
-                                    @if (Model.Organisations.CurrentPage > 1)
-                                    {
-                                        <button type="submit" class="link-button govuk-link" name="command" value="pagePrev">Previous</button>
-                                    }
-                                    @if (Model.Organisations.PageCount > 1)
-                                    {
-                                        <ul class="pager-items">
-                                            @for (var i = Model.PagerStartIndex; i <= Model.PagerEndIndex; i++)
-                                            {
-                                                if (i == Model.Organisations.CurrentPage)
-                                                {
-                                                    <li>
-                                                        <b>@i</b>
-                                                    </li>
-                                                }
-                                                else
-                                                {
-                                                    <li>
-                                                        <button type="submit" class="link-button govuk-link" name="command" value="page_@i">@i</button>
-                                                    </li>
-                                                }
-                                            }
-                                        </ul>
-                                    }
-                                    @if (Model.Organisations.CurrentPage < Model.Organisations.PageCount)
-                                    {
-                                        <button type="submit" class="link-button govuk-link" name="command" value="pageNext">Next</button>
-                                    }
-                                </div>
-                                <div class="pager-summary">Showing @Model.OrganisationStartIndex – @Model.OrganisationEndIndex of <span id="TotalRecords">@Model.Organisations.VirtualRecordTotal</span> organisations</div>
-                            </div>
-                        }
+                        @* Keep TotalRecords span here for load testing *@
+                        <span id="TotalRecords" style="display:none">@Model.Organisations.VirtualRecordTotal</span>
                     }
                 }
-                <br />
-                <details class="govuk-details" data-module="govuk-details">
-                    <summary class="govuk-details__summary">
-                        <span class="govuk-deatils__summary-text">Can't find your organisation?</span>
-                    </summary>
-                    <div class="govuk-details__text" id="details-content-0">
-                        @Html.ActionLink("Tell us about your organisation", "AddOrganisation")
-                    </div>
-                </details>
-
-            </div>
-
-        }
-    </div>
-    </div>
+            }
+        </div>
+    }
+</div>

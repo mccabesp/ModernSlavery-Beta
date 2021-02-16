@@ -53,10 +53,11 @@ namespace ModernSlavery.BusinessDomain.Registration
                 {"company", companyName},
                 {"pin", pin},
                 {"returnurl", returnUrl},
-                {"expires", pinExpiryDate.ToString("d MMMM yyyy")}
+                {"expires", pinExpiryDate.ToString("d MMMM yyyy")},
+                {"Environment", _sharedOptions.IsProduction() ? "" : $"[{_sharedOptions.Environment}] "}
             };
 
-            return await _govNotifyApi.SendLetterAsync(templateId, personalisation);
+            return await _govNotifyApi.SendLetterAsync(templateId, personalisation).ConfigureAwait(false);
         }
 
         public List<string> GetAddressInFourLineFormat(Organisation organisation)

@@ -13,7 +13,7 @@
 //            //Run preconditions to fill out submission up to monitoring progress page
 //            LoginAs<RogerReporter>();
 
-//            ExpectHeader("Select an organisation");
+//            ExpectHeader("Register or select organisations you want to add statements for");
 
 //            Click(Submission.OrgName_Blackpool);
 

@@ -1,0 +1,37 @@
+﻿@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+
+<div class="statement-section-two-thirds" id="statement-period">
+    <h2 class="govuk-heading-m">
+        Statement period and sign-off details
+    </h2>
+    @if (Model.StatementStartDate.HasValue && Model.StatementEndDate.HasValue)
+    {
+        <p class="govuk-body">
+            The statement covers the following period:
+            <br />
+            @Model.StatementStartDate.Value.ToString("d MMMM yyyy") to @Model.StatementEndDate.Value.ToString("d MMMM yyyy")
+        </p>
+    }
+    else
+    {
+        <p class="govuk-body">
+            The organisation did not tell us which period the statement covers.
+        </p>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.ApprovingPerson))
+    {
+        <p class="govuk-body">
+            The statement was signed off by:
+            <br />
+            @Model.ApprovingPerson, on @Model.ApprovedDate.Value.ToString("d MMMM yyyy")
+        </p>
+    }
+    else
+    {
+        <p class="govuk-body">
+            The organisation did not tell us name of the director (or equivalent) that signed off the statement.
+        </p>
+    }
+
+</div>

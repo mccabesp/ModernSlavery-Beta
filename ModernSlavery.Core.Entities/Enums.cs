@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ModernSlavery.Core.Entities
@@ -51,7 +52,6 @@ namespace ModernSlavery.Core.Entities
     {
         Unknown = 0,
         PinInPost = 1,
-        EmailDomain = 2,
         Manual = 3,
         Fasttrack = 4
     }

@@ -20,6 +20,9 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'DebugLocal' ">
+    <OutputPath>bin\DebugLocal\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Validate Include="DependencyValidation1.layerdiagram">
       <SubType>Content</SubType>
@@ -70,6 +73,11 @@
       <Name>ModernSlavery.WebUI.Viewing</Name>
       <Project>{75a179df-be22-4a01-bb04-6ae10c377e2b}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="GlobalSuppressions.cs">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\ArchitectureTools\Microsoft.VisualStudio.TeamArchitect.ModelingProject.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

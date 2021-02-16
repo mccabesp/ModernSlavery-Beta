@@ -1,19 +1,22 @@
-﻿using ModernSlavery.Core.Entities;
-using ModernSlavery.WebUI.GDSDesignSystem;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ModernSlavery.Core.Entities;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {
     public class ChangeOrganisationNameViewModel : GovUkViewModel
     {
         // Not mapped, only used for displaying information in the views
+        [BindNever] 
         public Organisation Organisation { get; set; }
 
         public ManuallyChangeOrganisationNameViewModelActions Action { get; set; }
 
         [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a name")]
+        [Text]
         public string Name { get; set; }
 
         [GovUkValidateRequired(ErrorMessageIfMissing =
@@ -21,6 +24,7 @@ namespace ModernSlavery.WebUI.Admin.Models
         public AcceptCompaniesHouseName? AcceptCompaniesHouseName { get; set; }
 
         [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a reason for this change")]
+        [Text]
         public string Reason { get; set; }
     }
 

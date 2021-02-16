@@ -32,11 +32,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task Mandatory_Fields()
         {
             ClickText("Register an organisation");
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
             ExpectHeader("Registration Options");
 
             ClickLabel("Public Sector Organisation");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             Click("Continue");
 
             ExpectHeader("Find your organisation");
@@ -44,7 +44,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             SetXPath("//input[@id='SearchText']").To(RegistrationTestData.OrgName_Blackpool);
             Click("Search");
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             ExpectRow("Organisation name and registered address");
             ExpectRow(That.Contains, RegistrationTestData.OrgName_Blackpool);
@@ -55,7 +55,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
             ClickButton(That.Contains, "Choose");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Address of the organisation you're reporting for");
             ExpectText("Enter the correspondence address for the organisation whose Modern Slavery statement you’re reporting.");
 
@@ -66,7 +66,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             AtField("Postcode").Expect(RegistrationTestData.PostCode_Blackpool);
 
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Your contact details");
             ExpectText("Please enter your contact details. The Government Equalities Office may contact you to confirm your registration.");
 
@@ -86,7 +86,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ClearField("Telephone");
 
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             Expect("Please enter your first name");
             Expect("Please enter your last name");
             Expect("Please enter your email address");

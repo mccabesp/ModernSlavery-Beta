@@ -27,22 +27,22 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //HostHelper.ResetDbScope();
             org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(30)]
         public async Task SearchForOrg()
         {
             Goto("/");
-            await GoToPrivateRegistrationPage();
-            await SearchForOrganisation();
+            await GoToPrivateRegistrationPage().ConfigureAwait(false);
+            await SearchForOrganisation().ConfigureAwait(false);
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(31)]
 
         public async Task SelectDuplicateOrg() { 
             AtRow(That.Contains, org.OrganisationName).Click(What.Contains, "Choose");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
         [Test, Order(32)]
@@ -51,7 +51,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Expect("There is a problem");
             Expect("You are already registered for this organisation");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
      

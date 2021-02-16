@@ -54,7 +54,7 @@ namespace ModernSlavery.Core.Classes
         {
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            var content = await fileRepository.ReadAsync(filePath);
+            var content = await fileRepository.ReadAsync(filePath).ConfigureAwait(false);
             return ReadCSV<T>(content,validateHeaders);
         }
 
@@ -142,22 +142,22 @@ namespace ModernSlavery.Core.Classes
                 }
 
                 //Save CSV to storage
-                await fileRepository.WriteAsync(filePath, tempfile);
+                await fileRepository.WriteAsync(filePath, tempfile).ConfigureAwait(false);
 
-                size = await fileRepository.GetFileSizeAsync(filePath);
+                size = await fileRepository.GetFileSizeAsync(filePath).ConfigureAwait(false);
 
 
                 //Set the count in the metadata file
                 var count = 0;
                 foreach (var item in records) count++;
 
-                await fileRepository.SetMetaDataAsync(filePath, "RecordCount", count.ToString());
+                await fileRepository.SetMetaDataAsync(filePath, "RecordCount", count.ToString()).ConfigureAwait(false);
 
                 //Delete the old file if it exists
                 if (!string.IsNullOrWhiteSpace(oldfilePath)
-                    && await fileRepository.GetFileExistsAsync(oldfilePath)
+                    && await fileRepository.GetFileExistsAsync(oldfilePath).ConfigureAwait(false)
                     && !filePath.EqualsI(oldfilePath))
-                    await fileRepository.DeleteFileAsync(oldfilePath);
+                    await fileRepository.DeleteFileAsync(oldfilePath).ConfigureAwait(false);
             }
             finally
             {
@@ -222,7 +222,7 @@ namespace ModernSlavery.Core.Classes
 
                 using (var writer = new CsvWriter(textWriter, config))
                 {
-                    if (!await fileRepository.GetFileExistsAsync(filePath))
+                    if (!await fileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
                     {
                         for (var c = 0; c < table.Columns.Count; c++) writer.WriteField(table.Columns[c].ColumnName);
 
@@ -244,20 +244,20 @@ namespace ModernSlavery.Core.Classes
                 var appendString = textWriter.ToString().Trim();
                 if (!string.IsNullOrWhiteSpace(appendString))
                 {
-                    await fileRepository.AppendAsync(filePath, appendString + Environment.NewLine);
+                    await fileRepository.AppendAsync(filePath, appendString + Environment.NewLine).ConfigureAwait(false);
 
                     //Increase the count in the metadata file
-                    var metaData = await fileRepository.GetMetaDataAsync(filePath, "RecordCount");
+                    var metaData = await fileRepository.GetMetaDataAsync(filePath, "RecordCount").ConfigureAwait(false);
                     var count = metaData.ToInt32();
                     count += records.Count();
-                    await fileRepository.SetMetaDataAsync(filePath, "RecordCount", count.ToString());
+                    await fileRepository.SetMetaDataAsync(filePath, "RecordCount", count.ToString()).ConfigureAwait(false);
                 }
             }
         }
 
         public static async Task AppendCsvRecordAsync<T>(this IFileRepository fileRepository, string filePath, T record)
         {
-            await AppendCsvRecordsAsync(fileRepository, filePath, new[] {record});
+            await AppendCsvRecordsAsync(fileRepository, filePath, new[] {record}).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -282,17 +282,17 @@ namespace ModernSlavery.Core.Classes
             if (!localExists) throw new FileNotFoundException($"File '{localPath}' does not exist");
 
             //Create the remote directory if it doesnt already exist
-            if (!await fileRepository.GetDirectoryExistsAsync(remotePath))
-                await fileRepository.CreateDirectoryAsync(remotePath);
+            if (!await fileRepository.GetDirectoryExistsAsync(remotePath).ConfigureAwait(false))
+                await fileRepository.CreateDirectoryAsync(remotePath).ConfigureAwait(false);
 
             //Check if the remote file exists
             remotePath = Path.Combine(remotePath, fileName);
-            var remoteExists = await fileRepository.GetFileExistsAsync(remotePath);
+            var remoteExists = await fileRepository.GetFileExistsAsync(remotePath).ConfigureAwait(false);
 
             //Dont overwrite if remote is newer than local unless explicit override set
             if (remoteExists)
             {
-                var remoteLastWriteTime = await fileRepository.GetLastWriteTimeAsync(remotePath);
+                var remoteLastWriteTime = await fileRepository.GetLastWriteTimeAsync(remotePath).ConfigureAwait(false);
                 var localLastWriteTime = File.GetLastWriteTime(localPath); 
                 if (remoteLastWriteTime >= localLastWriteTime && !OverwriteIfNewer) return false;
             }
@@ -300,7 +300,7 @@ namespace ModernSlavery.Core.Classes
             //Overwrite remote 
             var localContent = File.ReadAllBytes(localPath);
             if (localContent.Length == 0) return false;            
-            await fileRepository.WriteAsync(remotePath, localContent);
+            await fileRepository.WriteAsync(remotePath, localContent).ConfigureAwait(false);
             return true;
         }
 

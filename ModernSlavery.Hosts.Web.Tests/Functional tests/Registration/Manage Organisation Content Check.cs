@@ -33,7 +33,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task CheckPageContentsManageOrganisations()
         {
 
-            ExpectHeader("Select an organisation");
+            ExpectHeader("Register or select organisations you want to add statements for");
 
             Expect("Use this page to access your registered organisations or to register a new organisation.");
 
@@ -58,7 +58,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect(What.Contains, "create a better service.");
             Expect(What.Contains, "Take part in our survey and make your voice heard.");
             Expect("Complete our survey");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

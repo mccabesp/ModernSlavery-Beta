@@ -1,0 +1,70 @@
+﻿@using static Core.Entities.StatementSummary.V1.StatementSummary;
+
+@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel;
+
+<div class="govuk-!-margin-top-8 govuk-grid-column-two-thirds">
+    <h3 class="govuk-heading-m">
+        Social audits
+    </h3>
+
+    <div class="govuk-body">
+        We asked the organisation to tell us about any social audits it used to look for signs of modern slavery.
+    </div>
+
+    <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+                What are social audits?
+            </span>
+        </summary>
+        <div class="govuk-details__text">
+            A social audit is a review of an organisation’s working practices from the point of view of social responsibility, and should include an evaluation of working conditions in the organisation’s operations and supply chains.
+            By their nature, audits of supplier workplaces represent a snapshot in time.
+        </div>
+    </details>
+</div>
+
+@if (Model.SocialAudits.Contains(SocialAuditTypes.None))
+{
+    <div class="govuk-grid-column-two-thirds">
+        <div class="nothing-included">
+            <div class="nothing-included__label">Organisation’s response</div>
+            <strong class="govuk-tag govuk-tag--blue nothing-included__tag">
+                The organisation told us it did not carry out any social audits during the period of the statement.
+            </strong>
+        </div>
+    </div>
+}
+else if (Model.SocialAudits.Any())
+{
+    <div class="govuk-grid-column-full">
+        <div class="app-question-list">
+            <div class="app-question-list__header">
+                <div class="app-question-list__column app-question-list__name">
+                    Social audits we asked about
+                </div>
+                <div class="app-question-list__column app-question-list__response">
+                    Organisation’s response
+                </div>
+            </div>
+            @foreach (var socialAudit in Enums.GetValuesExcept<SocialAuditTypes>(SocialAuditTypes.Unknown, SocialAuditTypes.None))
+            {
+                <div class="app-question-list__item">
+                    <div class="app-question-list__column app-question-list__name">
+                        @socialAudit.GetEnumDescription()
+                    </div>
+                    <div class="app-question-list__column app-question-list__response">
+                        <span class="app-question-list__response-label">
+                            Organisation’s response:
+                        </span>
+                        <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.SocialAudits.Contains(socialAudit) ? "Yes" : "No")</strong>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <partial name="Parts/StatementSummary/_NoResponse" />
+}

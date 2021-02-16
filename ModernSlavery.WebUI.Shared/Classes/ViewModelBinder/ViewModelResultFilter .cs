@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Shared.Models;
 using System;

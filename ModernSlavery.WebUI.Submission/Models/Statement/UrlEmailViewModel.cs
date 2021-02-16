@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -30,7 +31,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
     {
         public override string PageTitle => "Provide a link to the modern slavery statement on your organisation's website";
 
-        [Url]
+        [AbsoluteUrl]
         [MaxLength(256)]
         public string StatementUrl { get; set; }
 

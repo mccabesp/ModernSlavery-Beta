@@ -7,7 +7,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
     public interface ICompaniesHouseService
     {
-        OrganisationAddress CreateOrganisationAddressFromCompaniesHouseAddress(CompaniesHouseAddress companiesHouseAddress);
+        Task<OrganisationAddress> CreateOrganisationAddressFromCompaniesHouseAddressAsync(CompaniesHouseAddress companiesHouseAddress);
 
         Task UpdateOrganisationsAsync();
         Task UpdateOrganisationAsync(Organisation organisation);

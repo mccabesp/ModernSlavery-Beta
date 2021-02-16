@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -137,7 +138,7 @@ namespace ModernSlavery.Core.Extensions
             try
             {
                 url = "http://ipinfo.io/ip";
-                response = await Web.WebRequestAsync(Web.HttpMethods.Get, url);
+                response = await Web.WebRequestAsync(Web.HttpMethods.Get, url).ConfigureAwait(false);
                 if (!string.IsNullOrWhiteSpace(response) && !response.StartsWith("127.0.0.1"))
                 {
                     return response.Trim();
@@ -148,7 +149,7 @@ namespace ModernSlavery.Core.Extensions
             try
             {
                 url = "https://myexternalip.com/raw";
-                response = await Web.WebRequestAsync(Web.HttpMethods.Get,url);
+                response = await Web.WebRequestAsync(Web.HttpMethods.Get,url).ConfigureAwait(false);
                 if (!string.IsNullOrWhiteSpace(response) && !response.StartsWith("127.0.0.1"))
                 {
                     return response.Trim();
@@ -159,7 +160,7 @@ namespace ModernSlavery.Core.Extensions
             try
             {
                 url = "http://ipv4bot.whatismyipaddress.com/";
-                response = await Web.WebRequestAsync(Web.HttpMethods.Get, url);
+                response = await Web.WebRequestAsync(Web.HttpMethods.Get, url).ConfigureAwait(false);
                 if (!string.IsNullOrWhiteSpace(response) && !response.StartsWith("127.0.0.1"))
                 {
                     return response.Trim();
@@ -170,7 +171,7 @@ namespace ModernSlavery.Core.Extensions
             try
             {
                 url = "http://checkip.dyndns.org";
-                response = await Web.WebRequestAsync(Web.HttpMethods.Get, url);
+                response = await Web.WebRequestAsync(Web.HttpMethods.Get, url).ConfigureAwait(false);
                 if (!string.IsNullOrWhiteSpace(response))
                 {
                     string[] parts = response.Split(':');
@@ -187,6 +188,21 @@ namespace ModernSlavery.Core.Extensions
             catch { }
 
             return null;
+        }
+
+        /// <summary>
+        /// Setup a connection lease for HttpClient
+        /// </summary>
+        /// <param name="httpClient">The HttpClient to setup the connection lease</param>
+        /// <param name="baseAddress">the base address of Uniform Resource Identifier (URI) of the Internet resource used when sending requests</param>
+        /// <param name="connectionLeaseTimeout">The number of milliseconds after which an active System.Net.ServicePoint connection is closed. Defaults to 60 Seconds</param>
+        public static void SetupConnectionLease(this HttpClient httpClient, string baseAddress, int connectionLeaseTimeout=60000)
+        {
+            if (string.IsNullOrWhiteSpace(baseAddress)) throw new ArgumentNullException(nameof(baseAddress));
+            httpClient.BaseAddress = new Uri(baseAddress);
+            httpClient.DefaultRequestHeaders.Clear();
+            httpClient.DefaultRequestHeaders.ConnectionClose = false;
+            ServicePointManager.FindServicePoint(httpClient.BaseAddress).ConnectionLeaseTimeout = connectionLeaseTimeout;
         }
     }
 }

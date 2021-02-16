@@ -105,6 +105,8 @@ namespace ModernSlavery.Core.Models
 
             public List<StatementRisk> Risks { get; set; } = new List<StatementRisk>();
 
+            public bool NoRisks { get; set; }
+
             #endregion
 
             #region Forced Labour Fields
@@ -286,6 +288,7 @@ namespace ModernSlavery.Core.Models
         #region Group Organisation Fields
         public bool? GroupSubmission { get; set; }
         public string ParentName { get; set; }
+        public int? GroupOrganisationCount { get; set; }
         public long? ChildOrganisationId { get; set; }
         public long? ChildStatementOrganisationId { get; set; }
         #endregion

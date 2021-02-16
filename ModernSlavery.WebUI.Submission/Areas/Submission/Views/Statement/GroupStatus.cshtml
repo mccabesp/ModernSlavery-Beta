@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model GroupStatusViewModel
 @section BeforeMain{
@@ -33,7 +34,7 @@
 
                             </li>
                         </ul>
-                                              
+
                     </div>
                 </div>
             }
@@ -54,9 +55,13 @@
                         Where several organisations in a group (for example, a parent organisation and one or more subsidiaries) are required to publish a statement, they can agree to produce a combined group statement on behalf of all relevant organisations in the group. The statement must cover the steps that all relevant organisations have taken to tackle modern slavery risks in their operations and supply chain.
                     </p>
                     <p class="govuk-body">
+                        <span class="govuk-!-font-weight-bold">How to answer questions about your group statement</span><br />
+                        Different organisations within the group may have taken different steps based on their circumstances. When answering questions on our service on behalf of a group, your answers should reflect the steps taken by any of the organisations in your group.
+                    </p>
+                    <p class="govuk-body">
                         <span class="govuk-!-font-weight-bold">Individual statements for organisations in a group</span><br />
                         If there is no combined group statement, each organisation in the group that is required to publish a statement must produce its own individual statement.
-                    </p>                   
+                    </p>
                 </div>
             </details>
 
@@ -68,21 +73,21 @@
                         </h2>
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                         <div class="govuk-radios__item ">
-                                <input asp-for="GroupSubmission" value="false" id="GroupSubmission_False" checked="@(Model.GroupSubmission==false)" class="govuk-radios__input" type="radio">
-                                <label class="govuk-label govuk-radios__label" for="GroupSubmission_False">
-                                    A single organisation
-                                </label>
-                            </div>
-                        <div class="govuk-radios__item">                               
-                                <input asp-for="GroupSubmission" value="true" id="GroupSubmission_True" checked="@(Model.GroupSubmission==true)" class="govuk-radios__input" type="radio">
-                                <label class="govuk-label govuk-radios__label" for="GroupSubmission_True">
-                                    A group of organisations
-                                </label>
-                            </div>
-                        </div>                
+                        <div class="govuk-radios__item ">
+                            <input asp-for="GroupSubmission" value="false" id="GroupSubmission_False" checked="@(Model.GroupSubmission==false)" class="govuk-radios__input" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="GroupSubmission_False">
+                                A single organisation
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input asp-for="GroupSubmission" value="true" id="GroupSubmission_True" checked="@(Model.GroupSubmission==true)" class="govuk-radios__input" type="radio">
+                            <label class="govuk-label govuk-radios__label" for="GroupSubmission_True">
+                                A group of organisations
+                            </label>
+                        </div>
+                    </div>
 
-</fieldset>
+                </fieldset>
             </div>
 
             <button class="govuk-button govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="command" value="@BaseStatementViewModel.CommandType.Continue">

@@ -60,20 +60,20 @@ namespace ModernSlavery.Infrastructure.Messaging
                 var results = await SendDistributionEmailAsync(
                     parameters.RecipientEmailAddress,
                     emailTemplate.TemplateId,
-                    parameters);
+                    parameters).ConfigureAwait(false);
 
                 return results.FirstOrDefault();
             }
 
             // send email using the provider implementation
-            return await SendEmailAsync(parameters.RecipientEmailAddress, emailTemplate.TemplateId, parameters);
+            return await SendEmailAsync(parameters.RecipientEmailAddress, emailTemplate.TemplateId, parameters).ConfigureAwait(false);
         }
 
         public virtual async Task<List<SendEmailResult>> SendDistributionEmailAsync<TModel>(string emailAddresses,
             string templateId,
             TModel model)
         {
-            var emailList = emailAddresses.SplitI(";").ToList();
+            var emailList = emailAddresses.SplitI(';').ToList();
             emailList = emailList.RemoveI("sender", "recipient");
             if (emailList.Count == 0) throw new ArgumentNullException(nameof(emailList));
 
@@ -85,7 +85,7 @@ namespace ModernSlavery.Infrastructure.Messaging
             foreach (var emailAddress in emailList)
                 try
                 {
-                    var result = await SendEmailAsync(emailAddress, templateId, model);
+                    var result = await SendEmailAsync(emailAddress, templateId, model).ConfigureAwait(false);
 
                     await EmailSendLog.WriteAsync(
                         new EmailSendLogModel
@@ -96,7 +96,7 @@ namespace ModernSlavery.Infrastructure.Messaging
                             Server = result.Server,
                             Username = result.ServerUsername,
                             Details = result.EmailMessagePlainText
-                        });
+                        }).ConfigureAwait(false);
 
                     successCount++;
 

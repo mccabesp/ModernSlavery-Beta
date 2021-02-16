@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<WebTest Name="SubmitStatement" Id="e291433d-34ee-4484-b97b-6ba49b9f58d0" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="SubmitStatement.9ab92680-74a7-457e-9093-10b01a80b5e1.rec.webtestresult" ResultsLocale="">
+<WebTest Name="SubmitStatement" Id="e291433d-34ee-4484-b97b-6ba49b9f58d0" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="60" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="SubmitStatement.9ab92680-74a7-457e-9093-10b01a80b5e1.rec.webtestresult" ResultsLocale="">
   <Items>
-    <Request Method="GET" Guid="76d9e178-5910-4259-914e-7f4251fccc47" Version="1.1" Url="{{WebServer}}/manage-organisations" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="76d9e178-5910-4259-914e-7f4251fccc47" Version="1.1" Url="{{WebServer}}/manage-organisations" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractText, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="OrganisationIdentifier" DisplayName="Extract Text" Description="Extract text from the response and place it into the test context.">
           <RuleParameters>
@@ -42,7 +42,7 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="GET" Guid="e52bad96-74c6-42ac-a40c-479376fc10c3" Version="1.1" Url="{{WebServer}}/manage-organisation/{{OrganisationIdentifier}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="e52bad96-74c6-42ac-a40c-479376fc10c3" Version="1.1" Url="{{WebServer}}/manage-organisation/{{OrganisationIdentifier}}" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHttpHeader, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="RedirectLocation" DisplayName="Extract HTTP Header" Description="Extract the value of an HTTP header and place it into the test context.">
           <RuleParameters>
@@ -82,7 +82,7 @@
       </ConditionalRule>
       <Then>
         <Items>
-          <Request Method="GET" Guid="77e2ce93-e84f-4adc-82cd-213202008743" Version="1.1" Url="{{WebServer}}/declare-scope/{{OrganisationIdentifier}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+          <Request Method="GET" Guid="77e2ce93-e84f-4adc-82cd-213202008743" Version="1.1" Url="{{WebServer}}/declare-scope/{{OrganisationIdentifier}}" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
             <ExtractionRules>
               <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
                 <RuleParameters>
@@ -92,18 +92,18 @@
               </ExtractionRule>
             </ExtractionRules>
           </Request>
-          <Request Method="POST" Guid="77e2ce93-e84f-4adc-82cd-213202008743" Version="1.1" Url="{{WebServer}}/declare-scope/{{OrganisationIdentifier}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/manage-organisation/{{OrganisationIdentifier}}" ReportingName="" IgnoreHttpStatusCode="False">
+          <Request Method="POST" Guid="77e2ce93-e84f-4adc-82cd-213202008743" Version="1.1" Url="{{WebServer}}/declare-scope/{{OrganisationIdentifier}}" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/manage-organisation/{{OrganisationIdentifier}}" ReportingName="" IgnoreHttpStatusCode="False">
             <FormPostHttpBody>
-              <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
-              <FormPostParameter Name="ReportingDeadline" Value="{{$HIDDEN1.ReportingDeadline}}" CorrelationBinding="" UrlEncode="True" />
-              <FormPostParameter Name="ScopeStatus" Value="InScope" CorrelationBinding="" UrlEncode="True" />
+              <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+              <FormPostParameter Name="ReportingDeadline" Value="{{$HIDDEN1.ReportingDeadline}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+              <FormPostParameter Name="ScopeStatus" Value="InScope" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
             </FormPostHttpBody>
           </Request>
         </Items>
       </Then>
       <Else />
     </Condition>
-    <Request Method="GET" Guid="e52bad96-74c6-42ac-a40c-479376fc10c3" Version="1.1" Url="{{WebServer}}/manage-organisation/{{OrganisationIdentifier}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/declare-scope/{{OrganisationIdentifier}}" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="e52bad96-74c6-42ac-a40c-479376fc10c3" Version="1.1" Url="{{WebServer}}/manage-organisation/{{OrganisationIdentifier}}" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/declare-scope/{{OrganisationIdentifier}}" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractText, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="StatementYear" DisplayName="Extract Text" Description="Extract text from the response and place it into the test context.">
           <RuleParameters>
@@ -138,10 +138,10 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="GET" Guid="43942ce4-799f-410c-90b6-a4659a639026" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/before-you-start" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False" />
-    <Request Method="GET" Guid="db2d04e2-67e0-4a92-83a1-ad68f02f1fca" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/transparency" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False" />
-    <Request Method="GET" Guid="bd394e9d-4519-4df4-93c6-0ffb4670d990" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False" />
-    <Request Method="GET" Guid="a76956ba-2c29-46f3-acb2-3c412caa0625" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/grouping" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="43942ce4-799f-410c-90b6-a4659a639026" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/before-you-start" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False" />
+    <Request Method="GET" Guid="db2d04e2-67e0-4a92-83a1-ad68f02f1fca" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/transparency" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False" />
+    <Request Method="GET" Guid="bd394e9d-4519-4df4-93c6-0ffb4670d990" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False" />
+    <Request Method="GET" Guid="a76956ba-2c29-46f3-acb2-3c412caa0625" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/grouping" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -191,15 +191,15 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="POST" Guid="859bd47c-afbe-445c-bad2-1d0101fd130f" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/grouping" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="859bd47c-afbe-445c-bad2-1d0101fd130f" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/grouping" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="GroupSubmission" Value="false" CorrelationBinding="{{FormPostParam33.GroupSubmission}}" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam34.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="GroupSubmission" Value="false" RecordedValue="" CorrelationBinding="{{FormPostParam33.GroupSubmission}}" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam34.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="67045283-28b0-45bd-9c68-ef318bcb6174" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/url-email" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="67045283-28b0-45bd-9c68-ef318bcb6174" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/url-email" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -233,7 +233,7 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="POST" Guid="234c0fa3-2da6-4e1e-aa2e-a3eb699a4027" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/url-email" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/period-covered" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="234c0fa3-2da6-4e1e-aa2e-a3eb699a4027" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/url-email" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/period-covered" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -388,14 +388,14 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="StatementUrl" Value="{{StatementUrl}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="StatementEmail" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam35.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="StatementUrl" Value="{{StatementUrl}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="StatementEmail" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam35.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="POST" Guid="6a46ead6-6a51-4bbc-b810-491f9ff5df64" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/period-covered" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/sign-off" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="6a46ead6-6a51-4bbc-b810-491f9ff5df64" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/period-covered" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/sign-off" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -495,34 +495,34 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="SubmissionDeadline" Value="{{$HIDDEN1.SubmissionDeadline}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="StatementStartDay" Value="1" CorrelationBinding="{{FormPostParam44.StatementStartDay}}" UrlEncode="True" />
-        <FormPostParameter Name="StatementStartMonth" Value="1" CorrelationBinding="{{FormPostParam45.StatementStartMonth}}" UrlEncode="True" />
-        <FormPostParameter Name="StatementStartYear" Value="{{PreviousStatementYear}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="StatementEndDay" Value="1" CorrelationBinding="{{FormPostParam46.StatementEndDay}}" UrlEncode="True" />
-        <FormPostParameter Name="StatementEndMonth" Value="1" CorrelationBinding="{{FormPostParam47.StatementEndMonth}}" UrlEncode="True" />
-        <FormPostParameter Name="StatementEndYear" Value="{{StatementYear}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam48.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="SubmissionDeadline" Value="{{$HIDDEN1.SubmissionDeadline}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="StatementStartDay" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam44.StatementStartDay}}" UrlEncode="True" />
+        <FormPostParameter Name="StatementStartMonth" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam45.StatementStartMonth}}" UrlEncode="True" />
+        <FormPostParameter Name="StatementStartYear" Value="{{PreviousStatementYear}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="StatementEndDay" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam46.StatementEndDay}}" UrlEncode="True" />
+        <FormPostParameter Name="StatementEndMonth" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam47.StatementEndMonth}}" UrlEncode="True" />
+        <FormPostParameter Name="StatementEndYear" Value="{{StatementYear}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam48.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="POST" Guid="b88dc1a5-2679-484d-8db1-778993d5e96a" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/sign-off" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="b88dc1a5-2679-484d-8db1-778993d5e96a" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/sign-off" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="StatementEndDate" Value="{{$HIDDEN1.StatementEndDate}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="SubmissionDeadline" Value="{{$HIDDEN1.SubmissionDeadline}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="ApproverFirstName" Value="Stephen" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="ApproverLastName" Value="McCabe" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="ApproverJobTitle" Value="Director" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="ApprovedDay" Value="1" CorrelationBinding="{{FormPostParam55.ApprovedDay}}" UrlEncode="True" />
-        <FormPostParameter Name="ApprovedMonth" Value="6" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="ApprovedYear" Value="{{StatementYear}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam56.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="StatementEndDate" Value="{{$HIDDEN1.StatementEndDate}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="SubmissionDeadline" Value="{{$HIDDEN1.SubmissionDeadline}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="ApproverFirstName" Value="Stephen" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="ApproverLastName" Value="McCabe" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="ApproverJobTitle" Value="Director" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="ApprovedDay" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam55.ApprovedDay}}" UrlEncode="True" />
+        <FormPostParameter Name="ApprovedMonth" Value="1" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="ApprovedYear" Value="{{StatementYear}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam56.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="a992d192-8b7a-4fcc-843d-1c68db3d7311" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/compliance" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="a992d192-8b7a-4fcc-843d-1c68db3d7311" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/compliance" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -652,26 +652,26 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="POST" Guid="7879c0a2-87f4-4991-b231-5dabc3f179bc" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/compliance" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="7879c0a2-87f4-4991-b231-5dabc3f179bc" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/compliance" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="IncludesStructure" Value="true" CorrelationBinding="{{FormPostParam57.IncludesStructure}}" UrlEncode="True" />
-        <FormPostParameter Name="StructureDetails" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="IncludesPolicies" Value="true" CorrelationBinding="{{FormPostParam58.IncludesPolicies}}" UrlEncode="True" />
-        <FormPostParameter Name="PolicyDetails" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="IncludesRisks" Value="true" CorrelationBinding="{{FormPostParam59.IncludesRisks}}" UrlEncode="True" />
-        <FormPostParameter Name="RisksDetails" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="IncludesDueDiligence" Value="true" CorrelationBinding="{{FormPostParam60.IncludesDueDiligence}}" UrlEncode="True" />
-        <FormPostParameter Name="DueDiligenceDetails" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="IncludesTraining" Value="true" CorrelationBinding="{{FormPostParam61.IncludesTraining}}" UrlEncode="True" />
-        <FormPostParameter Name="TrainingDetails" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="IncludesGoals" Value="true" CorrelationBinding="{{FormPostParam62.IncludesGoals}}" UrlEncode="True" />
-        <FormPostParameter Name="GoalsDetails" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam63.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="IncludesStructure" Value="true" RecordedValue="" CorrelationBinding="{{FormPostParam57.IncludesStructure}}" UrlEncode="True" />
+        <FormPostParameter Name="StructureDetails" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="IncludesPolicies" Value="true" RecordedValue="" CorrelationBinding="{{FormPostParam58.IncludesPolicies}}" UrlEncode="True" />
+        <FormPostParameter Name="PolicyDetails" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="IncludesRisks" Value="true" RecordedValue="" CorrelationBinding="{{FormPostParam59.IncludesRisks}}" UrlEncode="True" />
+        <FormPostParameter Name="RisksDetails" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="IncludesDueDiligence" Value="true" RecordedValue="" CorrelationBinding="{{FormPostParam60.IncludesDueDiligence}}" UrlEncode="True" />
+        <FormPostParameter Name="DueDiligenceDetails" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="IncludesTraining" Value="true" RecordedValue="" CorrelationBinding="{{FormPostParam61.IncludesTraining}}" UrlEncode="True" />
+        <FormPostParameter Name="TrainingDetails" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="IncludesGoals" Value="true" RecordedValue="" CorrelationBinding="{{FormPostParam62.IncludesGoals}}" UrlEncode="True" />
+        <FormPostParameter Name="GoalsDetails" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam63.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="28d9a24d-e696-46bd-9855-d39f859bc145" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/sectors" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="28d9a24d-e696-46bd-9855-d39f859bc145" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/sectors" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -737,7 +737,7 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="POST" Guid="068a4611-5c1c-4f64-9251-2f8d1cc5273f" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/sectors" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/turnover" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="068a4611-5c1c-4f64-9251-2f8d1cc5273f" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/sectors" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/turnover" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -812,23 +812,23 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="Sectors" Value="2" CorrelationBinding="{{FormPostParam64.Sectors}}" UrlEncode="True" />
-        <FormPostParameter Name="Sectors" Value="5" CorrelationBinding="{{FormPostParam65.Sectors}}" UrlEncode="True" />
-        <FormPostParameter Name="OtherSectors" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam66.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Sectors" Value="2" RecordedValue="" CorrelationBinding="{{FormPostParam64.Sectors}}" UrlEncode="True" />
+        <FormPostParameter Name="Sectors" Value="5" RecordedValue="" CorrelationBinding="{{FormPostParam65.Sectors}}" UrlEncode="True" />
+        <FormPostParameter Name="OtherSectors" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam66.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="POST" Guid="51c90ceb-8832-487c-adf8-c456ac47a222" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/turnover" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="51c90ceb-8832-487c-adf8-c456ac47a222" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/turnover" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="Turnover" Value="From36to60Million" CorrelationBinding="{{FormPostParam71.Turnover}}" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam72.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Turnover" Value="From36to60Million" RecordedValue="" CorrelationBinding="{{FormPostParam71.Turnover}}" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam72.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="b374d87c-b794-4fc0-91e4-5aafd7412d31" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/years" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="b374d87c-b794-4fc0-91e4-5aafd7412d31" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/years" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -878,15 +878,15 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="POST" Guid="e32deff2-d53d-4cf3-8167-28bf72dcd8ed" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/years" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="e32deff2-d53d-4cf3-8167-28bf72dcd8ed" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/years" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="StatementYears" Value="Years1To5" CorrelationBinding="{{FormPostParam73.StatementYears}}" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam74.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="StatementYears" Value="Years1To5" RecordedValue="" CorrelationBinding="{{FormPostParam73.StatementYears}}" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam74.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="0329ee15-dd18-41a1-a59d-78a38f87dcf3" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/policies" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="0329ee15-dd18-41a1-a59d-78a38f87dcf3" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/policies" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -952,17 +952,17 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="POST" Guid="3a3d003f-0cb4-487b-a695-295aae1c8653" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/policies" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="3a3d003f-0cb4-487b-a695-295aae1c8653" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/policies" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="Policies" Value="1" CorrelationBinding="{{FormPostParam75.Policies}}" UrlEncode="True" />
-        <FormPostParameter Name="Policies" Value="7" CorrelationBinding="{{FormPostParam76.Policies}}" UrlEncode="True" />
-        <FormPostParameter Name="OtherPolicies" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam77.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Policies" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam75.Policies}}" UrlEncode="True" />
+        <FormPostParameter Name="Policies" Value="7" RecordedValue="" CorrelationBinding="{{FormPostParam76.Policies}}" UrlEncode="True" />
+        <FormPostParameter Name="OtherPolicies" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam77.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="c07240e7-5d42-4de1-b48a-f9cf55143cb3" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/training" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="c07240e7-5d42-4de1-b48a-f9cf55143cb3" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/training" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -1028,17 +1028,17 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="POST" Guid="3c9e3938-e724-4523-bc99-9e0e7c13042e" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/training" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="3c9e3938-e724-4523-bc99-9e0e7c13042e" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/training" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="TrainingTargets" Value="3" CorrelationBinding="{{FormPostParam78.TrainingTargets}}" UrlEncode="True" />
-        <FormPostParameter Name="TrainingTargets" Value="7" CorrelationBinding="{{FormPostParam79.TrainingTargets}}" UrlEncode="True" />
-        <FormPostParameter Name="OtherTrainingTargets" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam80.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="TrainingTargets" Value="3" RecordedValue="" CorrelationBinding="{{FormPostParam78.TrainingTargets}}" UrlEncode="True" />
+        <FormPostParameter Name="TrainingTargets" Value="7" RecordedValue="" CorrelationBinding="{{FormPostParam79.TrainingTargets}}" UrlEncode="True" />
+        <FormPostParameter Name="OtherTrainingTargets" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam80.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="54c87712-89a6-4977-a53b-4c3c295072c7" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/partners" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="54c87712-89a6-4977-a53b-4c3c295072c7" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/partners" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -1104,7 +1104,7 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="POST" Guid="013649f0-3d9f-4414-b61e-3c2f2e6ae653" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/partners" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/social-audits" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="013649f0-3d9f-4414-b61e-3c2f2e6ae653" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/partners" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/social-audits" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -1198,14 +1198,14 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="Partners" Value="3" CorrelationBinding="{{FormPostParam81.Partners}}" UrlEncode="True" />
-        <FormPostParameter Name="Partners" Value="7" CorrelationBinding="{{FormPostParam82.Partners}}" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam83.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Partners" Value="3" RecordedValue="" CorrelationBinding="{{FormPostParam81.Partners}}" UrlEncode="True" />
+        <FormPostParameter Name="Partners" Value="7" RecordedValue="" CorrelationBinding="{{FormPostParam82.Partners}}" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam83.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="POST" Guid="c0188cbd-dca6-448b-b226-2803d98e6bf3" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/social-audits" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/grievance-mechanisms" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="c0188cbd-dca6-448b-b226-2803d98e6bf3" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/social-audits" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/grievance-mechanisms" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -1299,14 +1299,14 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="SocialAudits" Value="1" CorrelationBinding="{{FormPostParam89.SocialAudits}}" UrlEncode="True" />
-        <FormPostParameter Name="SocialAudits" Value="3" CorrelationBinding="{{FormPostParam90.SocialAudits}}" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam91.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="SocialAudits" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam89.SocialAudits}}" UrlEncode="True" />
+        <FormPostParameter Name="SocialAudits" Value="3" RecordedValue="" CorrelationBinding="{{FormPostParam90.SocialAudits}}" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam91.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="POST" Guid="944525ce-f646-422f-86c7-d7ef5a8934b5" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/grievance-mechanisms" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/other-monitoring" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="944525ce-f646-422f-86c7-d7ef5a8934b5" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/grievance-mechanisms" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/other-monitoring" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -1362,22 +1362,22 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="GrievanceMechanisms" Value="1" CorrelationBinding="{{FormPostParam97.GrievanceMechanisms}}" UrlEncode="True" />
-        <FormPostParameter Name="GrievanceMechanisms" Value="2" CorrelationBinding="{{FormPostParam98.GrievanceMechanisms}}" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam99.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="GrievanceMechanisms" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam97.GrievanceMechanisms}}" UrlEncode="True" />
+        <FormPostParameter Name="GrievanceMechanisms" Value="2" RecordedValue="" CorrelationBinding="{{FormPostParam98.GrievanceMechanisms}}" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam99.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="POST" Guid="769ca2a2-7586-4eb8-b434-55810251b59e" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/other-monitoring" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="769ca2a2-7586-4eb8-b434-55810251b59e" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/other-monitoring" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="OtherWorkConditionsMonitoring" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et neque facilisis, rhoncus lectus a, pharetra augue. Morbi quis venenatis tellus, eu vulputate massa. Vivamus dapibus ligula a ex nullam." CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam103.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="OtherWorkConditionsMonitoring" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et neque facilisis, rhoncus lectus a, pharetra augue. Morbi quis venenatis tellus, eu vulputate massa. Vivamus dapibus ligula a ex nullam." RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam103.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="4f962f01-6bc4-44aa-81b9-17e3a87fc67b" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risks" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="4f962f01-6bc4-44aa-81b9-17e3a87fc67b" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risks" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -1411,7 +1411,7 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="POST" Guid="b13e4256-f06b-4cec-bbb7-76a746b38f39" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risks" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risk/0" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="b13e4256-f06b-4cec-bbb7-76a746b38f39" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risks" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risk/0" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -1546,16 +1546,16 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="HighRisk1" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eu aliquet mi. Proin eu dui vel nibh posuere dignissim sit amet vitae quam. Cras laoreet lorem in ex malesuada, a vulputate justo eros." CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="HighRisk2" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt justo vel sodales sagittis. Duis a vulputate augue. Nam rutrum at nisl vel cursus. Mauris in velit vehicula, porta est sit vel." CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="HighRisk3" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean tempus suscipit urna. Sed iaculis commodo elit in gravida. Vestibulum maximus purus ut nulla fringilla, et blandit nisl eleifend mauris." CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam104.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="NoRisks" Value="{{$HIDDEN1.NoRisks}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="HighRisk1" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus eu aliquet mi. Proin eu dui vel nibh posuere dignissim sit amet vitae quam. Cras laoreet lorem in ex malesuada, a vulputate justo eros." RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="HighRisk2" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt justo vel sodales sagittis. Duis a vulputate augue. Nam rutrum at nisl vel cursus. Mauris in velit vehicula, porta est sit vel." RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="HighRisk3" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean tempus suscipit urna. Sed iaculis commodo elit in gravida. Vestibulum maximus purus ut nulla fringilla, et blandit nisl eleifend mauris." RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam104.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="NoRisks" Value="{{$HIDDEN1.NoRisks}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="POST" Guid="8f2a509e-36de-42b0-8677-c12eb5a62e39" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risk/0" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risk/1" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="8f2a509e-36de-42b0-8677-c12eb5a62e39" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risk/0" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risk/1" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -1690,24 +1690,24 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="TotalRisks" Value="{{$HIDDEN1.TotalRisks}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="Description" Value="{{$HIDDEN1.Description}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="LikelySource" Value="2" CorrelationBinding="{{FormPostParam128.LikelySource}}" UrlEncode="True" />
-        <FormPostParameter Name="SupplyChainTiers" Value="1" CorrelationBinding="{{FormPostParam129.SupplyChainTiers}}" UrlEncode="True" />
-        <FormPostParameter Name="SupplyChainTiers" Value="2" CorrelationBinding="{{FormPostParam130.SupplyChainTiers}}" UrlEncode="True" />
-        <FormPostParameter Name="SupplyChainTiers" Value="3" CorrelationBinding="{{FormPostParam131.SupplyChainTiers}}" UrlEncode="True" />
-        <FormPostParameter Name="OtherLikelySource" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="Targets" Value="1" CorrelationBinding="{{FormPostParam132.Targets}}" UrlEncode="True" />
-        <FormPostParameter Name="Targets" Value="4" CorrelationBinding="{{FormPostParam133.Targets}}" UrlEncode="True" />
-        <FormPostParameter Name="OtherTargets" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="SelectedCountry" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="ActionsOrPlans" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ultrices ligula elit, ut pulvinar ligula pretium ac. Phasellus viverra mattis urna aliquet mattis. Phasellus mollis est dui orci aliquam." CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam134.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="TotalRisks" Value="{{$HIDDEN1.TotalRisks}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Description" Value="{{$HIDDEN1.Description}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="LikelySource" Value="2" RecordedValue="" CorrelationBinding="{{FormPostParam128.LikelySource}}" UrlEncode="True" />
+        <FormPostParameter Name="SupplyChainTiers" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam129.SupplyChainTiers}}" UrlEncode="True" />
+        <FormPostParameter Name="SupplyChainTiers" Value="2" RecordedValue="" CorrelationBinding="{{FormPostParam130.SupplyChainTiers}}" UrlEncode="True" />
+        <FormPostParameter Name="SupplyChainTiers" Value="3" RecordedValue="" CorrelationBinding="{{FormPostParam131.SupplyChainTiers}}" UrlEncode="True" />
+        <FormPostParameter Name="OtherLikelySource" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Targets" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam132.Targets}}" UrlEncode="True" />
+        <FormPostParameter Name="Targets" Value="4" RecordedValue="" CorrelationBinding="{{FormPostParam133.Targets}}" UrlEncode="True" />
+        <FormPostParameter Name="OtherTargets" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="SelectedCountry" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="ActionsOrPlans" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ultrices ligula elit, ut pulvinar ligula pretium ac. Phasellus viverra mattis urna aliquet mattis. Phasellus mollis est dui orci aliquam." RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam134.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="POST" Guid="f05b60f8-0739-402a-991d-2aa823b8118c" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risk/1" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risk/2" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="f05b60f8-0739-402a-991d-2aa823b8118c" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risk/1" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risk/2" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -1918,41 +1918,41 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="TotalRisks" Value="{{$HIDDEN1.TotalRisks}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="Description" Value="{{$HIDDEN1.Description}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="LikelySource" Value="1" CorrelationBinding="{{FormPostParam143.LikelySource}}" UrlEncode="True" />
-        <FormPostParameter Name="OtherLikelySource" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="Targets" Value="3" CorrelationBinding="{{FormPostParam144.Targets}}" UrlEncode="True" />
-        <FormPostParameter Name="Targets" Value="4" CorrelationBinding="{{FormPostParam145.Targets}}" UrlEncode="True" />
-        <FormPostParameter Name="OtherTargets" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="SelectedCountry" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="ActionsOrPlans" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fermentum feugiat mauris, at rhoncus nisl iaculis sit amet. Nullam bibendum auctor mi, non commodo ipsum bibendum vel. Curabitur ac nullam." CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam146.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="TotalRisks" Value="{{$HIDDEN1.TotalRisks}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Description" Value="{{$HIDDEN1.Description}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="LikelySource" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam143.LikelySource}}" UrlEncode="True" />
+        <FormPostParameter Name="OtherLikelySource" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Targets" Value="3" RecordedValue="" CorrelationBinding="{{FormPostParam144.Targets}}" UrlEncode="True" />
+        <FormPostParameter Name="Targets" Value="4" RecordedValue="" CorrelationBinding="{{FormPostParam145.Targets}}" UrlEncode="True" />
+        <FormPostParameter Name="OtherTargets" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="SelectedCountry" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="ActionsOrPlans" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fermentum feugiat mauris, at rhoncus nisl iaculis sit amet. Nullam bibendum auctor mi, non commodo ipsum bibendum vel. Curabitur ac nullam." RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam146.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="POST" Guid="b0e9176f-a7fa-4665-9564-2e8f66447781" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risk/2" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="b0e9176f-a7fa-4665-9564-2e8f66447781" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/highest-risk/2" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="TotalRisks" Value="{{$HIDDEN1.TotalRisks}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="Description" Value="{{$HIDDEN1.Description}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="LikelySource" Value="2" CorrelationBinding="{{FormPostParam159.LikelySource}}" UrlEncode="True" />
-        <FormPostParameter Name="SupplyChainTiers" Value="1" CorrelationBinding="{{FormPostParam160.SupplyChainTiers}}" UrlEncode="True" />
-        <FormPostParameter Name="SupplyChainTiers" Value="2" CorrelationBinding="{{FormPostParam161.SupplyChainTiers}}" UrlEncode="True" />
-        <FormPostParameter Name="OtherLikelySource" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="Targets" Value="1" CorrelationBinding="{{FormPostParam162.Targets}}" UrlEncode="True" />
-        <FormPostParameter Name="Targets" Value="2" CorrelationBinding="{{FormPostParam163.Targets}}" UrlEncode="True" />
-        <FormPostParameter Name="Targets" Value="3" CorrelationBinding="{{FormPostParam164.Targets}}" UrlEncode="True" />
-        <FormPostParameter Name="Targets" Value="4" CorrelationBinding="{{FormPostParam165.Targets}}" UrlEncode="True" />
-        <FormPostParameter Name="OtherTargets" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="SelectedCountry" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="ActionsOrPlans" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris porta feugiat elementum. Integer venenatis neque elit, in aliquet felis euismod euismod. Pellentesque habitant morbi tristique molestie." CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam166.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="TotalRisks" Value="{{$HIDDEN1.TotalRisks}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Description" Value="{{$HIDDEN1.Description}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="LikelySource" Value="2" RecordedValue="" CorrelationBinding="{{FormPostParam159.LikelySource}}" UrlEncode="True" />
+        <FormPostParameter Name="SupplyChainTiers" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam160.SupplyChainTiers}}" UrlEncode="True" />
+        <FormPostParameter Name="SupplyChainTiers" Value="2" RecordedValue="" CorrelationBinding="{{FormPostParam161.SupplyChainTiers}}" UrlEncode="True" />
+        <FormPostParameter Name="OtherLikelySource" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Targets" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam162.Targets}}" UrlEncode="True" />
+        <FormPostParameter Name="Targets" Value="2" RecordedValue="" CorrelationBinding="{{FormPostParam163.Targets}}" UrlEncode="True" />
+        <FormPostParameter Name="Targets" Value="3" RecordedValue="" CorrelationBinding="{{FormPostParam164.Targets}}" UrlEncode="True" />
+        <FormPostParameter Name="Targets" Value="4" RecordedValue="" CorrelationBinding="{{FormPostParam165.Targets}}" UrlEncode="True" />
+        <FormPostParameter Name="OtherTargets" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="SelectedCountry" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="ActionsOrPlans" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris porta feugiat elementum. Integer venenatis neque elit, in aliquet felis euismod euismod. Pellentesque habitant morbi tristique molestie." RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam166.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="130c9a55-0749-43d4-8e6e-e816dd87b27e" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/indicators" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="130c9a55-0749-43d4-8e6e-e816dd87b27e" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/indicators" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -2034,7 +2034,7 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="POST" Guid="df550ac9-57e1-4cba-946c-034b5cb93e47" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/indicators" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/remediations" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="df550ac9-57e1-4cba-946c-034b5cb93e47" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/indicators" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/remediations" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -2147,26 +2147,26 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="Indicators" Value="1" CorrelationBinding="{{FormPostParam167.Indicators}}" UrlEncode="True" />
-        <FormPostParameter Name="Indicators" Value="3" CorrelationBinding="{{FormPostParam168.Indicators}}" UrlEncode="True" />
-        <FormPostParameter Name="Indicators" Value="5" CorrelationBinding="{{FormPostParam169.Indicators}}" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam170.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Indicators" Value="1" RecordedValue="" CorrelationBinding="{{FormPostParam167.Indicators}}" UrlEncode="True" />
+        <FormPostParameter Name="Indicators" Value="3" RecordedValue="" CorrelationBinding="{{FormPostParam168.Indicators}}" UrlEncode="True" />
+        <FormPostParameter Name="Indicators" Value="5" RecordedValue="" CorrelationBinding="{{FormPostParam169.Indicators}}" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam170.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="POST" Guid="50a1bdfa-ccc1-41d9-b241-7545a778269f" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/remediations" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="50a1bdfa-ccc1-41d9-b241-7545a778269f" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/remediations" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="Remediations" Value="2" CorrelationBinding="{{FormPostParam177.Remediations}}" UrlEncode="True" />
-        <FormPostParameter Name="Remediations" Value="3" CorrelationBinding="{{FormPostParam178.Remediations}}" UrlEncode="True" />
-        <FormPostParameter Name="Remediations" Value="6" CorrelationBinding="{{FormPostParam179.Remediations}}" UrlEncode="True" />
-        <FormPostParameter Name="OtherRemediations" Value="" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam180.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Remediations" Value="2" RecordedValue="" CorrelationBinding="{{FormPostParam177.Remediations}}" UrlEncode="True" />
+        <FormPostParameter Name="Remediations" Value="3" RecordedValue="" CorrelationBinding="{{FormPostParam178.Remediations}}" UrlEncode="True" />
+        <FormPostParameter Name="Remediations" Value="6" RecordedValue="" CorrelationBinding="{{FormPostParam179.Remediations}}" UrlEncode="True" />
+        <FormPostParameter Name="OtherRemediations" Value="" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam180.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="b99ea005-5d3b-4d3b-b1be-ab9e5740094a" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/progress" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="b99ea005-5d3b-4d3b-b1be-ab9e5740094a" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/progress" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -2200,7 +2200,7 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
     </Request>
-    <Request Method="POST" Guid="59edfe33-8b5f-41c3-9c1e-9b5ce568ce7a" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/progress" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="59edfe33-8b5f-41c3-9c1e-9b5ce568ce7a" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/progress" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHiddenFields, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="1" DisplayName="Extract Hidden Fields" Description="Extract all hidden fields from the response and place them into the test context.">
           <RuleParameters>
@@ -2275,21 +2275,21 @@
         </ExtractionRule>
       </CorrelationExtractionRules>
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="ProgressMeasures" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ac leo ac turpis mollis ultrices et non mauris. Cras laoreet purus id accumsan ornare. Curabitur justo turpis, interdum ut maximus morbi." CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Continue" CorrelationBinding="{{FormPostParam181.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="ProgressMeasures" Value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ac leo ac turpis mollis ultrices et non mauris. Cras laoreet purus id accumsan ornare. Curabitur justo turpis, interdum ut maximus morbi." RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Continue" RecordedValue="" CorrelationBinding="{{FormPostParam181.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="POST" Guid="37d82a36-84fa-44b6-a08e-520d3b7ac5cb" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/submission-complete" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="POST" Guid="37d82a36-84fa-44b6-a08e-520d3b7ac5cb" Version="1.1" Url="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/review-statement" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/statement/{{OrganisationIdentifier}}/{{StatementYear}}/submission-complete" ReportingName="" IgnoreHttpStatusCode="False">
       <FormPostHttpBody>
-        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" CorrelationBinding="" UrlEncode="True" />
-        <FormPostParameter Name="AcceptedDeclaration" Value="true" CorrelationBinding="{{FormPostParam182.AcceptedDeclaration}}" UrlEncode="True" />
-        <FormPostParameter Name="command" Value="Submit" CorrelationBinding="{{FormPostParam183.command}}" UrlEncode="True" />
-        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="Submitted" Value="{{$HIDDEN1.Submitted}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
+        <FormPostParameter Name="AcceptedDeclaration" Value="true" RecordedValue="" CorrelationBinding="{{FormPostParam182.AcceptedDeclaration}}" UrlEncode="True" />
+        <FormPostParameter Name="command" Value="Submit" RecordedValue="" CorrelationBinding="{{FormPostParam183.command}}" UrlEncode="True" />
+        <FormPostParameter Name="__RequestVerificationToken" Value="{{$HIDDEN1.__RequestVerificationToken}}" RecordedValue="" CorrelationBinding="" UrlEncode="True" />
       </FormPostHttpBody>
     </Request>
-    <Request Method="GET" Guid="e52bad96-74c6-42ac-a40c-479376fc10c3" Version="1.1" Url="{{WebServer}}/manage-organisation/{{OrganisationIdentifier}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="e52bad96-74c6-42ac-a40c-479376fc10c3" Version="1.1" Url="{{WebServer}}/manage-organisation/{{OrganisationIdentifier}}" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <CorrelationExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractFormField, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="FormPostParam31.ScopeStatus" DisplayName="" Description="">
           <RuleParameters>

@@ -246,7 +246,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             //Dont zip if we have one for today
             if (await _fileRepository.GetFileExistsAsync(logZipFilePath).ConfigureAwait(false)) return;
 
-            var zipDir = Url.UrlToDirSeparator(Path.Combine(_fileRepository.RootDir, logZipDir));
+            var zipDir = Url.UrlToDirSeparator(Path.Combine(_fileRepository.RootPath, logZipDir));
 
             using (var fileStream = new MemoryStream())
             {

@@ -66,20 +66,20 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             SignOutDeleteCookiesAndReturnToRoot(this);
 
-            await AxeHelper.CheckAccessibilityAsync(this);
-            await this.SetSecurityCode(org, new DateTime(2021, 6, 10));
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
+            await this.SetSecurityCode(org, new DateTime(2021, 6, 10)).ConfigureAwait(false);
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(22)]
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
         {
             Goto(TestData.ScopeUrl);
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(24)]
@@ -87,16 +87,16 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Set("Organisation Reference").To(org.OrganisationReference);
             Set("Security Code").To(org.SecurityCode);
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(26)]
         public async Task SubmittingIndentityFormLeadsToConfirmOrgDetails()
         {
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Confirm your organisation’s details");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(28)]
@@ -106,18 +106,18 @@ namespace ModernSlavery.Hosts.Web.Tests
             RightOfText("Organisation Reference").Expect(org.OrganisationReference);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(30)]
         public async Task ContinueonVerifyDetailsLeadsToTelUsWhy()
         {
             Click("Confirm and Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Tell us why your organisation is not required to publish a modern slavery statement");
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(32)]
@@ -129,7 +129,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Expect("Please specify");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(34)]
@@ -137,7 +137,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Set("OtherReason").To("Here are the reasons why.");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(36)]
@@ -148,16 +148,16 @@ namespace ModernSlavery.Hosts.Web.Tests
             BelowLabel("Job title").Set(The.Top).To(Create_Account.roger_job_title);
             BelowLabel("Email address").Set(The.Top).To(Create_Account.roger_email);
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(38)]
         public async Task ContinueOnTellUsWhyFormLeadsToCheckYourAnswers()
         {
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Check your answers before sending");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(39)]
@@ -178,16 +178,16 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ClickLabel("I would like to recieve a confirmation email");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(40)]
         public async Task ConfirmAndSendLeadsToConfirmationPage()
         {
             Click("Confirm and send");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Declaration complete");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         

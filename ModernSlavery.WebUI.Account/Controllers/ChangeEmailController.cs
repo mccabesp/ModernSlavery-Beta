@@ -8,6 +8,7 @@ using ModernSlavery.WebUI.Account.Interfaces;
 using ModernSlavery.WebUI.Account.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Classes.UrlHelper;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
@@ -68,7 +69,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
         }
 
         [HttpGet("change-email-pending")]
-        public async Task<IActionResult> ChangeEmailPending(string data)
+        public async Task<IActionResult> ChangeEmailPending([IgnoreText]string data)
         {
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
@@ -91,7 +92,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
         [AllowAnonymous]
         [HttpGet("verify-change-email")]
-        public async Task<IActionResult> VerifyChangeEmail(string code)
+        public async Task<IActionResult> VerifyChangeEmail([IgnoreText] string code)
         {
             // if not logged in go straight to CompleteChangeEmailAsync
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -110,7 +111,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
         }
 
         [HttpGet("complete-change-email")]
-        public async Task<IActionResult> CompleteChangeEmail(string code)
+        public async Task<IActionResult> CompleteChangeEmail([IgnoreText] string code)
         {
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;

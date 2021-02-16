@@ -41,20 +41,20 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Goto("/manage-organisations");
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             Click("Register an organisation");
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
-            ExpectHeader("Registration Options");
-
-            ClickLabel("Public Sector Organisation");
-
+            ClickLabel("No");
+            ClickLabel("Public sector organisation");
             Click("Continue");
 
-            ExpectHeader("Find your organisation");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
-            await Task.CompletedTask;
-                }
+            ExpectHeader("Find your organisation");
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
 
 
         [Test, Order(22)]
@@ -63,7 +63,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             SetXPath("//input[@id='SearchText']").To(org.OrganisationName);
             Click(The.Bottom, "Search");
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             Expect("Organisation name and registered address");
             ExpectRow(That.Contains, org.OrganisationName);
@@ -72,19 +72,19 @@ namespace ModernSlavery.Hosts.Web.Tests
             //message should not appear with single result 
             ExpectNo(What.Contains, "Showing 1-");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(24)]
 
         public async Task SelectOrg()
         {
             ClickButton(The.Top, That.Contains, "Choose");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
-            ExpectHeader("Your organisation's address");
+            ExpectHeader(That.Contains, "Your organisation’s address");
             ExpectText("Enter the correspondence address of the organisation you want to register.");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
     }

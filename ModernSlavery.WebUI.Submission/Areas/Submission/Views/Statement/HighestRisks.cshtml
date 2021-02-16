@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model HighestRisksViewModel
 @section BeforeMain {
@@ -28,7 +29,7 @@
                     <h2 class="govuk-heading-m">
                         How to describe your risks
                     </h2>
-                    
+
                     <p class="govuk-body">
                         If possible, include details of the affected workers, the activity involved, and the location.
                     </p>
@@ -79,14 +80,17 @@
                     <div class="govuk-!-margin-bottom-4">
                         or
                     </div>
-                   
+
+                    <div class="govuk-form-group @Html.SetErrorClass(model => model.NoRisks, "govuk-form-group--error")">
                         <div class="govuk-checkboxes__item">
                             <input asp-for="NoRisks" class="govuk-checkboxes__input" />
                             <label asp-for="NoRisks" class="govuk-label govuk-checkboxes__label govuk-!-padding-top-0">
                                 My organisation did not identify any modern slavery risks in its operations or supply chains during the period of the statement
                             </label>
                         </div>
-                   
+                    </div>
+                    <span asp-validation-for="NoRisks" class="govuk-error-message"></span>
+
                 </fieldset>
             </div>
 

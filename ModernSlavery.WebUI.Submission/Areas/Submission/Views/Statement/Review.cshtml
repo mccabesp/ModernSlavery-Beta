@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model ReviewViewModel
 
@@ -42,43 +43,43 @@
                     <ul class="govuk-list app-task-list__items">
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.GroupReportingUrl" aria-describedby="slavery-statement">
-                                    Organisation(s) covered by the statement
+                                <a class="govuk-link" href="@Model.GroupReportingUrl" aria-describedby="organisations-covered">
+                                    Organisations covered by the statement
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.GroupOrganisationsPages.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GroupOrganisationsPages.GetStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.GroupOrganisationsPages.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="organisations-covered">@(Model.GroupOrganisationsPages.GetStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.UrlSignOffUrl" aria-describedby="slavery-statement">
+                                <a class="govuk-link" href="@Model.UrlSignOffUrl" aria-describedby="url-signoff">
                                     Statement URL, dates and sign-off
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.GetUrlSignOffStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetUrlSignOffStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.GetUrlSignOffStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="url-signoff">@(Model.GetUrlSignOffStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.ComplianceUrl" aria-describedby="slavery-statement">
+                                <a class="govuk-link" href="@Model.ComplianceUrl" aria-describedby="recommended-areas">
                                     Recommended areas covered by the statement
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.CompliancePage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.CompliancePage.GetStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.CompliancePage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="recommended-areas">@(Model.CompliancePage.GetStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.SectorsUrl" aria-describedby="slavery-statement">
+                                <a class="govuk-link" href="@Model.SectorsUrl" aria-describedby="sectors-turnover">
                                     Your organisation's sectors and turnover
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.GetSectorTurnoverStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetSectorTurnoverStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.GetSectorTurnoverStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="sectors-turnover">@(Model.GetSectorTurnoverStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.YearsUrl" aria-describedby="slavery-statement">
+                                <a class="govuk-link" href="@Model.YearsUrl" aria-describedby="years">
                                     How many years you've been producing statements
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.YearsPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.YearsPage.GetStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.YearsPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="years">@(Model.YearsPage.GetStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                     </ul>
                 </li>
@@ -91,11 +92,11 @@
                     <ul class="govuk-list app-task-list__items">
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.PoliciesUrl" aria-describedby="Policies">
+                                <a class="govuk-link" href="@Model.PoliciesUrl" aria-describedby="policies">
                                     Policies
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.PoliciesPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.PoliciesPage.GetStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.PoliciesPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="policies">@(Model.PoliciesPage.GetStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -103,7 +104,7 @@
                                     Training
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.TrainingPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.TrainingPage.GetStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.TrainingPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="training">@(Model.TrainingPage.GetStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
@@ -111,40 +112,40 @@
                                     Monitoring working conditions
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.GetWorkingConditionsStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetWorkingConditionsStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.GetWorkingConditionsStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="monitoring-progress">@(Model.GetWorkingConditionsStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.RisksUrl" aria-describedby="monitoring-progress">
+                                <a class="govuk-link" href="@Model.RisksUrl" aria-describedby="slavery-risks">
                                     Modern slavery risks
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.GetRisksStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetRisksStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.GetRisksStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-risks">@(Model.GetRisksStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
 
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.IndicatorsUrl" aria-describedby="monitoring-progress">
+                                <a class="govuk-link" href="@Model.IndicatorsUrl" aria-describedby="indicators">
                                     Finding indicators of modern slavery
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.GetIndicatorRemediationsStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.GetIndicatorRemediationsStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.GetIndicatorRemediationsStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="indicators">@(Model.GetIndicatorRemediationsStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
 
                         <li class="app-task-list__item">
                             <span class="app-task-list__task-name">
-                                <a class="govuk-link" href="@Model.ProgressUrl" aria-describedby="monitoring-progress">
+                                <a class="govuk-link" href="@Model.ProgressUrl" aria-describedby="demonstrating-progress">
                                     Demonstrating progress
                                 </a>
                             </span>
-                            <strong class="govuk-tag @(Model.ProgressPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="slavery-statement">@(Model.ProgressPage.GetStatus().GetEnumDescription().ToUpper())</strong>
+                            <strong class="govuk-tag @(Model.ProgressPage.GetStatus()== BaseStatementViewModel.Status.Complete ? "" : "govuk-tag--grey") app-task-list__tag" id="demonstrating-progress">@(Model.ProgressPage.GetStatus().GetEnumDescription().ToUpper())</strong>
                         </li>
                     </ul>
                 </li>
             </ol>
             if (Model.CanSubmit())
             {
-                <h3 class="govuk-heading-m govuk-!-margin-bottom-2">Submit your answers</h3>
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Submit your answers</h2>
 
                 <details class="govuk-details govuk-!-margin-bottom-4" data-module="govuk-details">
                     <summary class="govuk-details__summary">
@@ -155,14 +156,14 @@
                     <div class="govuk-details__text">
                         <p class="govuk-body govuk-!-font-weight-bold">I confirm that:</p>
                         <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
-                            <li class="govuk-!-margin-bottom-3">the information I have supplied is complete and true to the best of my knowledge</li>
+                            <li class="govuk-!-margin-bottom-3">the information I have supplied is true, to the best of my knowledge, and based on the statement that was approved by the board (or equivalent) and signed-off by the relevant director (or equivalent)</li>
                             <li class="govuk-!-margin-bottom-3">I am authorised to supply this information on behalf of the organisation(s) the modern slavery statement is for</li>
                             <li class="govuk-!-margin-bottom-3">if the statement is for a group, all organisations in the group know that this statement is being submitted to the service on their behalf</li>
                         </ul>
                         <p class="govuk-body govuk-!-font-weight-bold">I understand that:</p>
                         <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
                             <li class="govuk-!-margin-bottom-3">the answers I submit will be published on GOV.UK</li>
-                            <li class="govuk-!-margin-bottom-3">my statement will be removed from the service if it is found to contain inaccuracies</li>
+                            <li class="govuk-!-margin-bottom-3">my submission may be removed from the service if it is found to contain inappropriate content</li>
                         </ul>
                     </div>
                 </details>

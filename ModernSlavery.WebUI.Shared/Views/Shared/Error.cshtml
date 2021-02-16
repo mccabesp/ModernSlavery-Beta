@@ -1,8 +1,9 @@
 ﻿@model ErrorViewModel
 @{
     Layout = "~/Views/DfeTemplate.cshtml";
-    ViewBag.Title = "ERROR: " + Model.Title;
-    ViewData["Sitemap:Route"] = "error/{errorCode?}";
+    Title = "ERROR: " + Model.Title;
+
+    if (Model.ErrorCode.Between(400, 599)) this.Context.Response.StatusCode = Model.ResponseCode;
 }
 <main id="content" role="main" errorCode="@Model.ErrorCode">
     <div class="grid-row">

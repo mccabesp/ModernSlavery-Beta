@@ -2,7 +2,7 @@
 @model OrganisationViewModel
 @{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Your organisation type - Modern Slavery reporting service";
+    Title = "Your organisation type";
 }
 @section BeforeMain {
     <a class="govuk-back-link" href="@Model.BackAction">Back</a>
@@ -14,56 +14,83 @@
             @Html.AntiForgeryToken();
             @await Html.GovUkValidationSummaryAsync();
 
-            <h1 class="govuk-heading-l">
-                Registration options
-            </h1>
-
-            <div id="SectorTypeGroup" class="govuk-form-group @Html.SetErrorClass(model => model.RegistrationType, "govuk-form-group--error")">
+            <div id="SectorTypeGroup" class="govuk-form-group organisation-type @Html.SetErrorClass(model => model.IsFastTrack, "govuk-form-group--error")">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-font-weight-regular">
-                        If you received a letter from us with an organisation reference and security code, select the following option:
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-fieldset__heading">
+                            Did you receive a letter from us?
+                        </h1>
                     </legend>
 
-                    <div class="govuk-radios">
-                        <div class="govuk-radios__item">
-                            <input class="govuk-radios__input" id="fasttrack" name="RegistrationType" type="radio" value="fasttrack">
-                            <label class="govuk-label govuk-radios__label govuk-!-font-weight-bold" for="fasttrack">
-                                Fast track
-                            </label>
-                        </div>
+                    <div class="govuk-hint">
+                        The letter includes an organisation reference and security code.
+                    </div>
 
-                        <p class="govuk-body govuk-!-margin-top-8">
-                            If you didn't receive a letter from us, you need to tell us what type of organisation you want to register.
-                        </p>
+                    <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
 
                         <div class="govuk-radios__item">
-                            <input class="govuk-radios__input" id="public" name="RegistrationType" type="radio" value="public" aria-describedby="public-hint">
-                            <label class="govuk-label govuk-radios__label govuk-!-font-weight-bold" for="public">
-                                Public sector organisation
-                            </label>
-                            <div id="public-hint" class="govuk-radios__hint">
-                                This includes most government departments, the armed forces, local authorities, NHS bodies, universities, and most schools (including academies and multi-academy trusts)
-                            </div>
+                            <input asp-for="IsFastTrack" id="IsFastTrack_True" class="govuk-radios__input" type="radio" value="true" />
+                            <label asp-for="IsFastTrack" for="IsFastTrack_True" class="govuk-label govuk-radios__label">Yes</label>
                         </div>
+
                         <div class="govuk-radios__item">
-                            <input class="govuk-radios__input" id="private" name="RegistrationType" type="radio" value="private" aria-describedby="private-hint">
-                            <label class="govuk-label govuk-radios__label govuk-!-font-weight-bold" for="private">
-                                Private or voluntary sector organisation
-                            </label>
-                            <div id="private-hint" class="govuk-radios__hint">
-                                This includes private limited companies, public limited companies, limited liability partnerships, charities, independent and private schools, and other private sector organisations
+                            <input asp-for="IsFastTrack" id="IsFastTrack_False" class="govuk-radios__input" type="radio" value="false" data-aria-controls="conditional-org-type" />
+                            <label asp-for="IsFastTrack" for="IsFastTrack_False" class="govuk-label govuk-radios__label">No</label>
+                        </div>
+
+                        <span asp-validation-for="IsFastTrack" class="govuk-error-message"></span>
+
+                        <div id="conditional-org-type" class="govuk-radios__conditional govuk-radios__conditional--hidden">
+                            <div class="govuk-form-group @Html.SetErrorClass(model => model.SectorType, "govuk-form-group--error")">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                        What type of organisation do you want to register?
+                                    </legend>
+
+                                    <div class="govuk-radios">
+
+                                        <div class="govuk-radios__item">
+                                            <input asp-for="SectorType" id="SectorType_Private" class="govuk-radios__input" type="radio" value="@SectorTypes.Private" aria-describedby="private-item-hint" />
+                                            <label asp-for="SectorType" for="SectorType_Private" class="govuk-label govuk-radios__label">Private or voluntary sector organisation</label>
+                                            <div id="private-item-hint" class="govuk-hint govuk-radios__hint">
+                                                This includes:
+                                                <ul class="govuk-list govuk-list--bullet">
+                                                    <li>private limited companies</li>
+                                                    <li>public limited companies</li>
+                                                    <li>limited liability partnerships</li>
+                                                    <li>charities</li>
+                                                    <li>private schools</li>
+                                                    <li>other private sector organisations</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div class="govuk-radios__item">
+                                            <input asp-for="SectorType" id="SectorType_Public" class="govuk-radios__input" type="radio" value="@SectorTypes.Public" aria-describedby="public-item-hint" />
+                                            <label asp-for="SectorType" for="SectorType_Public" class="govuk-label govuk-radios__label">Public sector organisation</label>
+                                            <div id="public-item-hint" class="govuk-hint govuk-radios__hint">
+                                                This includes:
+                                                <ul class="govuk-list govuk-list--bullet">
+                                                    <li>government departments and arms-length bodies</li>
+                                                    <li>police forces</li>
+                                                    <li>fire and rescue services</li>
+                                                    <li>local authorities</li>
+                                                    <li>NHS bodies</li>
+                                                    <li>other public sector organisations</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <span asp-validation-for="SectorType" class="govuk-error-message"></span>
+                                    </div>
+                                </fieldset>
                             </div>
                         </div>
                     </div>
                 </fieldset>
             </div>
-            <br />
 
             <input type="submit" class="govuk-button" value="Continue" />
-
-            <p class="govuk-body">
-                <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" class="govuk-link">Cancel</a>
-            </p>
         }
     </div>
 </div>

@@ -10,13 +10,14 @@
 
     @RenderSection("Head", false)
 
-    <environment exclude="Development, DEV, TEST, QAT, UR">
+    @if (IsRelease)
+    {
         <link asp-append-version="true" href="/assets/stylesheets/application.min.css" rel="stylesheet" type="text/css" media="all" />
-    </environment>
-    <environment include="Development, DEV, TEST, QAT, UR">
+    }
+    else
+    {
         <link asp-append-version="true" asp-href-include="/assets/stylesheets/**/*.css" asp-href-exclude="/assets/stylesheets/**/*.min.css" rel="stylesheet" type="text/css" media="all" />
-    </environment>
-
+    }
 }
 
 @RenderSection("PreMain", false)
@@ -28,13 +29,14 @@
     <script asp-append-version="true" src="/assets/javascripts/jquery-1.11.3.min.js"></script>
     <script asp-append-version="true" src="/assets/javascripts/jquery.tablesorter.min.js"></script>
 
-    <environment exclude="Development, DEV, TEST, QAT, UR">
+    @if (IsRelease)
+    {
         <script asp-append-version="true" src="/assets/javascripts/application.min.js" type="text/javascript"></script>
-    </environment>
-    <environment include="Development, DEV, TEST, QAT, UR">
+    }
+    else
+    {
         <script asp-append-version="true" asp-src-include="/assets/javascripts/**/*.js" asp-src-exclude="/assets/javascripts/**/*.min.js" type="text/javascript"></script>
-    </environment>
-
+    }
     @RenderSection("scripts", false)
 
     @{ await Html.RenderPartialAsync("_GoogleAnalyticsEventTracking"); }

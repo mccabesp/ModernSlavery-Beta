@@ -37,7 +37,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
             try
             {
-                await _companiesHouseService.UpdateOrganisationsAsync();
+                await _companiesHouseService.UpdateOrganisationsAsync().ConfigureAwait(false);
             }
             finally
             {

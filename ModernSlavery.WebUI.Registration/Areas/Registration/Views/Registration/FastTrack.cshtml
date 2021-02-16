@@ -1,40 +1,47 @@
 ﻿@model FastTrackViewModel
 @{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Find your organisation - Modern Slavery reporting service";
+    Title = "Find your organisation";
 }
 @section BeforeMain {
-    <a class="govuk-back-link"href="@Url.Action("OrganisationType")">Back</a>
+    <a class="govuk-back-link" href="@Url.Action("OrganisationType")">Back</a>
 }
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
+    <div class="govuk-grid-column-two-thirds fast-track-page">
         @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
             @(await Html.GovUkValidationSummaryAsync())
 
-
-            <h1 class="govuk-heading-l">
-                Fast track registration
-            </h1>
-
             <div class="govuk-form-group">
                 <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s govuk-!-font-weight-regular">
-                        Enter the organisation reference and security code provided in the letter we sent you.
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        <h1 class="govuk-fieldset__heading">
+                            Enter your organisation reference and security code
+                        </h1>
                     </legend>
 
+                    <p class="govuk-body">
+                        You’ll find them in the letter we sent you about the service.
+                    </p>
+
                     <div class="govuk-form-group @Html.SetErrorClass(model => model.OrganisationReference, "govuk-form-group--error")">
-                        @Html.LabelFor(model => model.OrganisationReference, new { @class = "govuk-label" })
-                        @Html.ValidationMessageFor(model => model.OrganisationReference, "", new { @class = "govuk-error-message" })
-                        @Html.CustomEditorFor(model => model.OrganisationReference, new { @class = "govuk-input govuk-!-width-one-half" })
+                        <label asp-for="OrganisationReference" class="govuk-label"></label>
+                        <div id="reference-hint" class="govuk-hint">
+                            For example, FSB8NATH
+                        </div>
+                        <span asp-validation-for="OrganisationReference" class="govuk-error-message"></span>
+                        <input asp-for="OrganisationReference" class="govuk-input govuk-!-width-one-half fast-track-input" />
                     </div>
 
                     <div class="govuk-form-group @Html.SetErrorClass(model => model.SecurityCode, "govuk-form-group--error")">
-                        @Html.LabelFor(model => model.SecurityCode, new { @class = "govuk-label" })
-                        @Html.ValidationMessageFor(model => model.SecurityCode, "", new { @class = "govuk-error-message" })
-                        @Html.CustomEditorFor(model => model.SecurityCode, new { @class = "govuk-input govuk-!-width-one-half" })
+                        <label asp-for="SecurityCode" class="govuk-label"></label>
+                        <div id="reference-hint" class="govuk-hint">
+                            For example, N8HF8Q4C
+                        </div>
+                        <span asp-validation-for="SecurityCode" class="govuk-error-message"></span>
+                        <input asp-for="SecurityCode" class="govuk-input govuk-!-width-one-half fast-track-input" />
                     </div>
 
                 </fieldset>

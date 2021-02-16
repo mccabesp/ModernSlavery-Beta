@@ -1,117 +1,134 @@
 ﻿@inject SubmissionOptions SubmissionOptions
 @inject SharedOptions sharedOptions
 @inject IWebService WebService
-@inject ModernSlavery.Core.Interfaces.IReportingDeadlineHelper ReportingDeadlineHelper
+@inject ModernSlavery.Core.Interfaces.IReportingDeadlineHelper reportingDeadlineHelper
 @inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
 @using ModernSlavery.Core.Models
 @using ModernSlavery.BusinessDomain.Shared.Models
 @model ManageOrganisationModel
 @{
-    //TODO: this page needs to be changed to GDSLayout but waiting as the page is being redesigned 
-    Layout = "~/Views/DfeTemplate.cshtml";
-    ViewBag.Title = "Manage " + Model.OrganisationName + " organisation - Modern Slavery reporting service";
+    Layout = "~/Views/GdsLayout.cshtml";
+    Title = "Manage " + Model.OrganisationName + " organisation";
 }
 
-@await Html.PartialAsync("AccountNavigation")
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">@Model.OrganisationName</h1>
 
-<div class="grid-row">
-    <div class="column-two-thirds">
-        <h1 class="heading-large">
-            <span class="heading-secondary">Reporting as @Model.OrganisationName</span>
-            Manage your modern slavery statement submissions
-        </h1>
-        <div style="margin-bottom: 20px">
-            <dl>
-                <div>
-                    <dt>
-                        <strong>Address</strong>
-                    </dt>
-                </div>
-                <div>
-                    <dt style="color: #505a5f;        font-size: 0.8em;        font-weight: lighter;">
-                        @Html.Raw(Model.LatestAddress.Replace(Environment.NewLine, "&#44;<br/>"))
-                    </dt>
-                </div>
-            </dl>
-        </div>
-    </div>
-</div>
-<div class="grid-row">
-    <div class="column-full">
-        <details>
-            <summary>
-                <span class="summary">Incorrect details</span>
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    Organisation address
+                </span>
             </summary>
-            <div class="panel panel-border-narrow">
-                <p>
-                    If you are a private or voluntary organisation and need to change your organisation name,
-                    sector information, or address you should do this via Companies House.
+            <div class="govuk-details__text">
+                @Html.Linebreak(Model.LatestAddress,Environment.NewLine,",")
+                <div>
+                    What to do if the organisation’s address is incorrect?
+                </div>
+                <div>
+                    If you are a private or voluntary organisation and need to change your organisation name, sector information, or address you should do this via Companies House.
                     Changes that you make will automatically be reflected on this site.
-                    If this information is not available on Companies House, please contact <a href="mailto:@(sharedOptions.MsuReportingEmail)" target="_blank">@sharedOptions.MsuReportingEmail</a>
-                </p>
+                    If this information is not available on Companies House, please contact <a class="govuk-link" href="mailto:modernslaverystatements@homeoffice.gov.uk">modernslaverystatements@homeoffice.gov.uk</a>
+                </div>
+            </div>
+        </details>
+
+        <p class="govuk-body govuk-!-font-size-24">
+            Use this page to manage your statements on the registry.
+            You can start or continue to provide information about your statement and submit it when you’re ready – or edit and resubmit a statement that you’ve already added.
+        </p>
+
+        <h2 class="govuk-heading-m">
+            Manage your modern slavery statements
+        </h2>
+
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    What is the statement year?
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                The statement year relates to the date by which you have to publish your modern slavery statement on your website.
+                <br>
+                For example, if you have to publish your statement by 31 March 2020, your statement year is 2020.
+                <br>
+                The statutory guidance states that you should publish your statement on your website within 6 months of your organisation’s financial year-end.
             </div>
         </details>
     </div>
 </div>
-<div class="grid-row">
-    <div class="column-full">
-        <h2 class="heading-medium">
-            Manage your submissions
-        </h2>
 
-        <div class="gpg-manage-reports">
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
 
-            <div class="gpg-manage-reports__head">
-                <div class="gpg-manage-reports__desc">
-                    Submission Year
-                </div>
-                <div class="gpg-manage-reports__desc">
-                    Required by law to publish a statement on your website?
-                </div>
-                <div class="gpg-manage-reports__desc">
-                    Status of statement published on this service
-                </div>
-                <div class="gpg-manage-reports__desc">
-                </div>
-            </div>
-            @await foreach (StatementInfoModel statementInfoModel in Model.StatementInfoModels)
-            {
-                @await Html.PartialAsync("StatementInfoViewModel", new StatementInfoViewModel(statementInfoModel, Url, ReportingDeadlineHelper, Model.OrganisationIdentifier))
-            }
+        <table class="govuk-table">
 
-        </div>
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">
+                        Year
+                    </th>
+                    <th scope="col" class="govuk-table__header">
+                        Do you have to publish a statement on your website by law?
+                    </th>
+                    <th scope="col" class="govuk-table__header">
+                        Status of statement on the registry
+                    </th>
+                    <th scope="col" class="govuk-table__header">
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody class="govuk-table__body">
+                @await foreach (StatementInfoModel statementInfoModel in Model.StatementInfoModels)
+                {
+                    <partial name="StatementInfoViewModel" model="new StatementInfoViewModel(statementInfoModel, Url, reportingDeadlineHelper, Model.OrganisationIdentifier)" />
+                    @*@await Html.PartialAsync("StatementInfoViewModel", new StatementInfoViewModel(statementInfoModel, Url, reportingDeadlineHelper, Model.OrganisationIdentifier))*@
+                }
+            </tbody>
+        </table>
 
     </div>
 </div>
 
-<div class="grid-row">
-    <div class="column-full">
-        <h2 class="heading-medium">
-            Registered users
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h2 class="govuk-heading-m">
+            Users who can add statements for this organisation
         </h2>
         @if (Model.AssociatedUserOrgs.Count == 0)
         {
             <p>
-                You are the only person registered to report for this organisation.
+                You are the only person registered to add this organisation’s modern slavery statements to the service.
             </p>
-            <p>
-                If you remove yourself:
-            </p>
-            <ul class="list list-bullet">
-                <li>You will not be able to report for this organisation</li>
-                <li>Someone else must register this organisation to report - this can take up to a week</li>
-                <li>Your account will remain open</li>
-            </ul>
+
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                        What happens if I remove myself?
+                    </span>
+                </summary>
+                <div class="govuk-details__text">
+                    If you remove yourself:
+                    <ul class="list list-bullet">
+                        <li>you will not be able to add this organisaton’s modern slavery statements to the registry</li>
+                        <li>someone else will need to register this organisation in order to add its statements to the registry; registering an organisation can take up to a week</li>
+                        <li>your account will remain open</li>
+                    </ul>
+                </div>
+            </details>
         }
         else
         {
             <p>
-                The following people are registered to report information for this organisation.
+                The following users have registered this organisation on their account and can add its modern slavery statements to the registry:
             </p>
         }
 
-        <div class="grid-row">
-            <div class="column-two-thirds">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
                 <table class="organisations-table">
                     @foreach (var assocUserOrg in Model.AssociatedUserOrgs)
                     {
@@ -121,7 +138,7 @@
                             <td style="border: none;" class="org-name">@userFullname</td>
                             <td style="border: none;">
                                 <a href="@Url.ActionArea("RemoveOrganisation","Registration", "Registration", new {orgId = Model.OrganisationIdentifier, userId = encUserId})">
-                                    Remove user
+                                    Remove
                                 </a>
                             </td>
                         </tr>
@@ -132,8 +149,8 @@
                             @Model.CurrentUserFullName <span>(You)</span>
                         </td>
                         <td style="border: none;">
-                            <a href="@Url.ActionArea("RemoveOrganisation","Registration", "Registration", new {orgId = Model.OrganisationIdentifier, userId = Model.CurrentUserIdentifier})">
-                                Remove user
+                            <a class="govuk-link" href="@Url.ActionArea("RemoveOrganisation","Registration", "Registration", new {orgId = Model.OrganisationIdentifier, userId = Model.CurrentUserIdentifier})">
+                                Remove
                             </a>
                         </td>
                     </tr>

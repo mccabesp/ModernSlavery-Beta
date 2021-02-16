@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities.StatementSummary;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
@@ -27,6 +28,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override string PageTitle => "Are there any other ways you monitored working conditions across your operations and supply chains?";
 
         [MaxLength(200)]
+        [Text] 
         public string OtherWorkConditionsMonitoring { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

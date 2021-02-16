@@ -29,7 +29,7 @@
                 @userOrg.User.ContactFullname.Coalesce(userOrg.User.Fullname) (@(userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress)))
             </td>
             <td class="govuk-table__cell">
-                <a name="ReviewLink" data-organisationidentifier="@(Obfuscator.Obfuscate(userOrg.OrganisationId))" href="@(Url.Action("ReviewRequest", new {code = userOrg.GetReviewCode()}))"
+                <a name="ReviewLink" data-organisationidentifier="@(Obfuscator.Obfuscate(userOrg.OrganisationId))@(Obfuscator.Obfuscate(userOrg.UserId))" href="@(Url.Action("ReviewRequest", new {code = userOrg.GetReviewCode()}))"
                    class="govuk-link">
                     Review
                 </a>

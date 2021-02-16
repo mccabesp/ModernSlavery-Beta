@@ -5,6 +5,7 @@ using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities.StatementSummary.V1;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using System;
 using System.Collections.Generic;
@@ -76,30 +77,40 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             Index = index;
         }
 
+        [IgnoreMap]
+        [BindNever]
+        public string EditDescriptionUrl { get; set; }
+
         public override string PageTitle => "About this risk";
 
         public int Index { get; set; } = -1;
 
         public int TotalRisks { get; set; }
 
+        [Text]
         public string Description { get; set; }
 
         public List<RiskTargetTypes> Targets { get; set; } = new List<RiskTargetTypes>();
 
+        [Text]
         public string OtherTargets { get; set; }
 
         public RiskSourceTypes LikelySource { get; set; }
 
+        [Text]
         public string OtherLikelySource { get; set; }
 
         public List<SupplyChainTierTypes> SupplyChainTiers { get; set; } = new List<SupplyChainTierTypes>();
 
-        [MaxLength(200)]
+        [MaxLength(500)]
+        [Text]
         public string ActionsOrPlans { get; set; }
 
         [IgnoreMap]
+        [IgnoreText]
         public string SelectedCountry { get; set; }
 
+        [IgnoreText]
         public List<string> CountryReferences { get; set; } = new List<string>();
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

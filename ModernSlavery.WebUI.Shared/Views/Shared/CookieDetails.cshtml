@@ -2,13 +2,13 @@
 @inject SharedOptions sharedOptions
 @{Layout = "~/Views/GdsLayout.cshtml";}
 @{
-    ViewBag.Title = $"Details about cookies on {sharedOptions.ServiceName}";
+    Title = $"Details about cookies on the {sharedOptions.ServiceName}";
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-xl">Details about cookies on @sharedOptions.ServiceName</h1>
-        <p class="govuk-body">@sharedOptions.ServiceName puts small files (known as ‘cookies’) onto your computer to collect information about how you browse the site. Find out more about the cookies we use, what they’re for and when they expire.</p>
+        <h1 class="govuk-heading-xl">Details about cookies on the @sharedOptions.ServiceName</h1>
+        <p class="govuk-body">The @sharedOptions.ServiceName puts small files (known as ‘cookies’) onto your computer to collect information about how you browse the site. Find out more about the cookies we use, what they’re for and when they expire.</p>
 
         <h2 class="govuk-heading-l">Cookies that measure website usage</h2>
         <p class="govuk-body">We use Google Analytics software (Universal Analytics) to collect anonymised information about how you use the service and GOV.UK. We do this to help make sure the site is meeting the needs of its users and to help us make improvements to the site and to government digital services.</p>
@@ -98,8 +98,8 @@
 
         <h2 class="govuk-heading-l">Strictly necessary cookies</h2>
 
-        <h3 class="govuk-heading-s">Logging into the service</h3>
-        <p class="govuk-body">To add a modern salavery statement to the registry, you have to log into the service. The following cookies are used as part of this login process.</p>
+        <h3 class="govuk-heading-s">Logging in to the service</h3>
+        <p class="govuk-body">To add a modern slavery statement to the registry, you have to log in to the service. The following cookies are used as part of this log in process.</p>
         <table class="govuk-table">
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
@@ -111,22 +111,22 @@
             <tbody class="govuk-table__body">
                 <tr class="govuk-table__row">
                     <td class="govuk-table__cell">idsrv<wbr />.session</td>
-                    <td class="govuk-table__cell">Used during the login process</td>
+                    <td class="govuk-table__cell">Used during the log in process</td>
                     <td class="govuk-table__cell">When you close your browser</td>
                 </tr>
                 <tr class="govuk-table__row">
                     <td class="govuk-table__cell">idsrv</td>
-                    <td class="govuk-table__cell">Used during the login process</td>
+                    <td class="govuk-table__cell">Used during the log in process</td>
                     <td class="govuk-table__cell">When you close your browser</td>
                 </tr>
                 <tr class="govuk-table__row">
                     <td class="govuk-table__cell">.AspNetCore<wbr />.Correlation.*</td>
-                    <td class="govuk-table__cell">Used during the login process</td>
+                    <td class="govuk-table__cell">Used during the log in process</td>
                     <td class="govuk-table__cell">15 minutes</td>
                 </tr>
                 <tr class="govuk-table__row">
                     <td class="govuk-table__cell">.AspNetCore<wbr />.OpenIdConnect.*</td>
-                    <td class="govuk-table__cell">Used during the login process</td>
+                    <td class="govuk-table__cell">Used during the log in process</td>
                     <td class="govuk-table__cell">15 minutes</td>
                 </tr>
                 <tr class="govuk-table__row">

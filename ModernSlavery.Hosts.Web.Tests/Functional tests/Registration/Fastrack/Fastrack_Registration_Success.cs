@@ -35,30 +35,23 @@ namespace ModernSlavery.Hosts.Web.Tests
             //HostHelper.ResetDbScope();
             Org = this.Find<Organisation>(org => org.LatestRegistrationUserId == null);
 
-            await this.SetSecurityCode(Org, new DateTime(2022, 01, 01));
-            await Task.CompletedTask;
+            await this.SetSecurityCode(Org, new DateTime(2022, 01, 01)).ConfigureAwait(false);
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(20)]
         public async Task GoToRegistrationPage()
         {
-           
-            
-
             Click("Register an organisation");
 
-
-            ExpectHeader("Registration Options");
-
-            ClickLabel("Fast Track");
-
+            ExpectHeader("Did you receive a letter from us?");
+            ClickLabel("Yes");
             Click("Continue");
-
             ExpectHeader("Fast track registration");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
-        [Test, Order(22)]
 
+        [Test, Order(22)]
         public async Task ContentCheck()
         {
             Set("Organisation reference").To(Org.OrganisationReference);
@@ -85,7 +78,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click("Continue");
 
-            ExpectHeader("Select an organisation");
+            ExpectHeader("Register or select organisations you want to add statements for");
 
             ExpectRow(Org.OrganisationName);
             AtRow(Org.OrganisationName).Column("Registration status").Expect("Registration Complete");

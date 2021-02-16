@@ -30,24 +30,24 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public virtual async Task<OrganisationScope> GetScopeByIdAsync(long organisationScopeId)
         {
-            return await _dataRepository.GetAsync<OrganisationScope>(organisationScopeId);
+            return await _dataRepository.GetAsync<OrganisationScope>(organisationScopeId).ConfigureAwait(false);
         }
 
         #region GetScopeByReportingDeadlineYearOrLatest
 
         public virtual async Task<OrganisationScope> GetScopeByReportingDeadlineYearOrLatestAsync(long organisationId, int reportingDeadlineYear = 0)
         {
-            var org = await _dataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == organisationId);
+            var org = await _dataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == organisationId).ConfigureAwait(false);
             if (org == null) throw new ArgumentException($"Cannot find organisation with id {organisationId}", nameof(organisationId));
 
-            return await GetScopeByReportingDeadlineYearOrLatestAsync(org, reportingDeadlineYear);
+            return await GetScopeByReportingDeadlineYearOrLatestAsync(org, reportingDeadlineYear).ConfigureAwait(false);
         }
 
         public virtual async Task<OrganisationScope> GetScopeByReportingDeadlineYearOrLatestAsync(Organisation organisation, int reportingDeadlineYear = 0)
         {
             var reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(organisation.SectorType, reportingDeadlineYear);
 
-            return await GetScopeByReportingDeadlineOrLatestAsync(organisation,reportingDeadline);
+            return await GetScopeByReportingDeadlineOrLatestAsync(organisation,reportingDeadline).ConfigureAwait(false);
         }
 
         #endregion
@@ -56,10 +56,10 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public virtual async Task<OrganisationScope> GetScopeByReportingDeadlineOrLatestAsync(long organisationId, DateTime? reportingDeadline = null)
         {
-            var org = await _dataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == organisationId);
+            var org = await _dataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == organisationId).ConfigureAwait(false);
             if (org == null) throw new ArgumentException($"Cannot find organisation with id {organisationId}", nameof(organisationId));
 
-            return await GetScopeByReportingDeadlineOrLatestAsync(org, reportingDeadline);
+            return await GetScopeByReportingDeadlineOrLatestAsync(org, reportingDeadline).ConfigureAwait(false);
         }
 
         public virtual async Task<OrganisationScope> GetScopeByReportingDeadlineOrLatestAsync(Organisation organisation, DateTime? reportingDeadline = null)
@@ -76,7 +76,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         #region GetScopeStatusByReportingDeadlineOrLatest
         public virtual async Task<ScopeStatuses> GetScopeStatusByReportingDeadlineOrLatestAsync(long organisationId, DateTime reportingDeadline)
         {
-            var latestScope = await GetScopeByReportingDeadlineOrLatestAsync(organisationId, reportingDeadline);
+            var latestScope = await GetScopeByReportingDeadlineOrLatestAsync(organisationId, reportingDeadline).ConfigureAwait(false);
             if (latestScope == null) return ScopeStatuses.Unknown;
 
             return latestScope.ScopeStatus;
@@ -84,7 +84,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public virtual async Task<ScopeStatuses> GetScopeStatusByReportingDeadlineOrLatestAsync(Organisation org, DateTime? reportingDeadline = null)
         {
-            var latestScope = await GetScopeByReportingDeadlineOrLatestAsync(org, reportingDeadline);
+            var latestScope = await GetScopeByReportingDeadlineOrLatestAsync(org, reportingDeadline).ConfigureAwait(false);
             if (latestScope == null) return ScopeStatuses.Unknown;
 
             return latestScope.ScopeStatus;
@@ -93,7 +93,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public virtual async Task<OrganisationScope> UpdateScopeStatusAsync(long existingOrgScopeId, ScopeStatuses newStatus)
         {
-            var oldScope = await _dataRepository.GetAsync<OrganisationScope>(existingOrgScopeId);
+            var oldScope = await _dataRepository.GetAsync<OrganisationScope>(existingOrgScopeId).ConfigureAwait(false);
 
             // when OrganisationScope isn't found then throw ArgumentOutOfRangeException
             if (oldScope == null)
@@ -101,7 +101,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     nameof(existingOrgScopeId),
                     $"Cannot find organisation with OrganisationScopeId: {existingOrgScopeId}");
 
-            var organisation = await _dataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == oldScope.OrganisationId);
+            var organisation = await _dataRepository.FirstOrDefaultAsync<Organisation>(o => o.OrganisationId == oldScope.OrganisationId).ConfigureAwait(false);
             // when Organisation isn't found then throw ArgumentOutOfRangeException
             if (organisation == null)
                 throw new ArgumentOutOfRangeException(
@@ -126,7 +126,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 SubmissionDeadline = oldScope.SubmissionDeadline
             };
 
-            await SaveScopeAsync(organisation, true, newScope);
+            await SaveScopeAsync(organisation, true, newScope).ConfigureAwait(false);
             return newScope;
         }
 
@@ -168,7 +168,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 SubmissionDeadline = oldOrgScope.SubmissionDeadline
             };
 
-            await SaveScopeAsync(organisation, saveToDatabase, newScope);
+            await SaveScopeAsync(organisation, saveToDatabase, newScope).ConfigureAwait(false);
 
             return new CustomResult<OrganisationScope>(newScope);
         }
@@ -176,7 +176,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         public virtual async Task SaveScopeAsync(Organisation org, bool saveToDatabase = true,
             params OrganisationScope[] newScopes)
         {
-            await SaveScopesAsync(org, newScopes, saveToDatabase);
+            await SaveScopesAsync(org, newScopes, saveToDatabase).ConfigureAwait(false);
         }
 
         public virtual async Task SaveScopesAsync(Organisation org, IEnumerable<OrganisationScope> newScopes,
@@ -204,7 +204,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             // save to db
             if (saveToDatabase)
             {
-                await _dataRepository.SaveChangesAsync();
+                await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
             }
         }
 
@@ -212,7 +212,7 @@ namespace ModernSlavery.BusinessDomain.Submission
         {
             var scopes = _dataRepository.GetAll<OrganisationScope>().Where(s => s.SubmissionDeadline.Year == year && s.Status == ScopeRowStatuses.Active);
 
-#if DEBUG
+#if DEBUG || DEBUGLOCAL
             if (Debugger.IsAttached) scopes = scopes.Take(100);
 #endif
             var records = scopes.Select(
@@ -271,28 +271,49 @@ namespace ModernSlavery.BusinessDomain.Submission
                 lastOrganisationId = scope.OrganisationId;
             }
 
-            await _dataRepository.SaveChangesAsync();
+            await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
 
             return changedOrgs;
         }
         public async Task<HashSet<Organisation>> SetPresumedScopesAsync()
         {
-            var allOrgs = await _dataRepository.ToListAsync<Organisation>();
+            var allOrgs = await _dataRepository.ToListAsync<Organisation>().ConfigureAwait(false);
             allOrgs.SelectMany(o => o.OrganisationScopes).ToList();
 
             var changedOrgs = new ConcurrentBag<Organisation>();
             var privateDeadlines = _reportingDeadlineHelper.GetReportingDeadlines(SectorTypes.Private);
             var publicDeadlines = _reportingDeadlineHelper.GetReportingDeadlines(SectorTypes.Public);
 
-            Parallel.ForEach(allOrgs, async org =>
-            {
-                if (await org.SetPresumedScopesAsync(org.SectorType== SectorTypes.Public ? publicDeadlines : privateDeadlines))
-                    changedOrgs.Add(org);
-            });
+            if (Debugger.IsAttached)
+                foreach (var org in allOrgs)
+                {
+                    if (await org.SetPresumedScopesAsync(org.SectorType == SectorTypes.Public ? publicDeadlines : privateDeadlines).ConfigureAwait(false))
+                        changedOrgs.Add(org);
+                }
+            else 
+                Parallel.ForEach(allOrgs, async org =>
+                {
+                    if (await org.SetPresumedScopesAsync(org.SectorType== SectorTypes.Public ? publicDeadlines : privateDeadlines).ConfigureAwait(false))
+                        changedOrgs.Add(org);
+                });
 
-            if (changedOrgs.Count>0) await _dataRepository.SaveChangesAsync();
+            if (changedOrgs.Count>0) await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
 
             return changedOrgs.ToHashSet();
         }
+
+        public async Task<bool> SetPresumedScopesAsync(Organisation org)
+        {
+            var deadlines = _reportingDeadlineHelper.GetReportingDeadlines(org.SectorType);
+
+            if (await org.SetPresumedScopesAsync(deadlines).ConfigureAwait(false))
+            {
+                await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
+                return true;
+            }
+
+            return false;
+        }
+
     }
 }

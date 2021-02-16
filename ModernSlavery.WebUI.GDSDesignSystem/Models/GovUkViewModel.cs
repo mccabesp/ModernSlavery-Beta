@@ -50,7 +50,12 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Models
 
         public void AddErrorFor(PropertyInfo property, string errorMessage)
         {
-            errors.Add(property.Name, errorMessage);
+            AddErrorFor(property.Name, errorMessage);
+        }
+
+        public void AddErrorFor(string propertyName, string errorMessage)
+        {
+            errors[propertyName]=errorMessage;
         }
 
         public bool HasErrorFor<TModel, TProperty>(

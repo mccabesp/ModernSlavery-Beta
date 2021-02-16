@@ -1,48 +1,40 @@
 ﻿@model DownloadViewModel
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
-    ViewBag.Title = "Administration: Impersonation";
+    Layout = "~/Views/GdsLayout.cshtml";
+    Title = "Administration: Impersonation";
+}
+@section BeforeMain {
+    <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Url.Action("Home")">Back to Adminstration home</a>   
 }
 
-<main id="content" role="main">
-    <div class="breadcrumbs dynamic-content default-content" style="display: block;">
-        <ol>
-            <li style="display: block; padding-bottom: 0; padding-top: 0.75em;">
-                &lt;
-                @Html.ActionLink("Back to Administration home", "Home")
-            </li>
-        </ol>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+        {
+            @await Html.GovUkValidationSummaryAsync()
+            @Html.AntiForgeryToken()
+            <h1 class="govuk-heading-l" style="margin-top: 0.3em;">
+                <span id="companyname">Administration</span> <br />
+                <span class="govuk-hint govuk-!-font-size-24 govuk-!-margin-top-2">Impersonation</span>
+            </h1>
+
+            <legend class="govuk-visually-hidden">Email</legend>
+            <p class="govuk-body">Enter the email address of the user you wish to impersonate.</p>
+            <fieldset class="govuk-fieldset">
+                <div class="govuk-form-group">
+                    <label for="emailAddress" class="govuk-label col-md-10">Email address</label>
+                    <div class="col-md-10">
+                        <input class="govuk-input govuk-!-width-one-half" name="emailAddress" id="emailAddress" />
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="govuk-fieldset">
+                <div class="govuk-form-group">
+                    <input id="NextStep" type="submit" class="govuk-button" value="Impersonate" />
+                </div>
+            </fieldset>
+        }
     </div>
 
-    <div class="grid-row">
-        <div class="column-two-thirds">
-            @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
-            {
-                @await Html.CustomValidationSummaryAsync()
-                @Html.AntiForgeryToken()
-                <h1 class="heading-large" style="margin-top: 0.3em;">
-                    <span id="companyname">Administration</span>
-                    <span class="heading-secondary">Impersonation</span>
-                </h1>
-
-                <legend class="visuallyhidden">Email</legend>
-                <p>Enter the email address of the user you wish to impersonate.</p>
-                <fieldset>
-                    <div class="form-group">
-                        <label for="emailAddress" class="form-label col-md-10">Email address</label>
-                        <div class="col-md-10">
-                            <input class="form-control" name="emailAddress" id="emailAddress" />
-                        </div>
-                    </div>
-                </fieldset>
-
-                <fieldset>
-                    <div class="form-group">
-                        <input id="NextStep" type="submit" class="button" value="Impersonate" />
-                    </div>
-                </fieldset>
-            }
-        </div>
-
-    </div>
-</main>
+</div>

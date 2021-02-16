@@ -50,6 +50,8 @@ namespace ModernSlavery.Core.Models
 
             if (!string.IsNullOrWhiteSpace(Country)) list.Add(Country);
 
+            if (!string.IsNullOrWhiteSpace(PostCode)) list.Add(PostCode);
+
             if (!string.IsNullOrWhiteSpace(PoBox)) list.Add(PoBox);
 
             return list;
@@ -113,10 +115,6 @@ namespace ModernSlavery.Core.Models
 
             var address = obj as AddressModel;
             if (address == null) return false;
-
-            if (obj is OrganisationAddress)
-            {
-            }
 
             if ((!string.IsNullOrWhiteSpace(Address1) || !string.IsNullOrWhiteSpace(address.Address1))
                 && Address1?.Trim() != address.Address1?.Trim())

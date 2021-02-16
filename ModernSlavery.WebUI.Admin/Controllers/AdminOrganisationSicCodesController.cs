@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
-using ModernSlavery.WebUI.Shared.Classes;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "GPGadmin")]
+    [Authorize(Roles = UserRoleNames.Admin)]
     [Route("admin")]
     public class AdminOrganisationSicCodesController : BaseController
     {
@@ -48,15 +50,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpGet("organisation/{id}/sic-codes/change")]
-        public IActionResult ChangeSicCodesGet(long id)
+        [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
+        public async Task<IActionResult> ChangeSicCodesGet(long id)
         {
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
                 try
                 {
-                    var organisationFromCompaniesHouse =
-                        companiesHouseApi.GetCompanyAsync(organisation.CompanyNumber).Result;
+                    var organisationFromCompaniesHouse =await companiesHouseApi.GetCompanyAsync(organisation.CompanyNumber);
 
                     var sicCodeIdsFromCompaniesHouse = organisationFromCompaniesHouse.SicCodes;
                     var sicCodesFromDatabase =
@@ -158,8 +160,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost("organisation/{id}/sic-codes/change")]
+        [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
         public IActionResult ChangeSicCodesPost(long id, ChangeOrganisationSicCodesViewModel viewModel)
         {
+            if (!ModelState.IsValid) return new HttpBadRequestResult();
+
             // We might need to change the value of Action before we go to the view
             // Apparently this is necessary
             // https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-from-view-model
@@ -212,6 +217,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             viewModel.ParseAndValidateParameters(Request, m => m.AcceptCompaniesHouseSicCodes);
 
+            if (!ModelState.IsValid)
+                foreach (var state in ModelState.Where(state => state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid))
+                    foreach (var error in state.Value.Errors)
+                        viewModel.AddErrorFor(state.Key, error.ErrorMessage);
+
             if (viewModel.HasAnyErrors())
             {
                 PopulateViewModelFromCompaniesHouseSicCodes(viewModel, viewModel.SicCodeIdsFromCoHo, organisation);
@@ -229,6 +239,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private IActionResult AddNewSicCode(ChangeOrganisationSicCodesViewModel viewModel, Organisation organisation)
         {
             viewModel.ParseAndValidateParameters(Request, m => m.SicCodeIdToChange);
+
+            if (!ModelState.IsValid)
+                foreach (var state in ModelState.Where(state => state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid))
+                    foreach (var error in state.Value.Errors)
+                        viewModel.AddErrorFor(state.Key, error.ErrorMessage);
 
             if (viewModel.HasAnyErrors())
             {
@@ -305,6 +320,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             Organisation organisation)
         {
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
+
+            if (!ModelState.IsValid)
+                foreach (var state in ModelState.Where(state => state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid))
+                    foreach (var error in state.Value.Errors)
+                        viewModel.AddErrorFor(state.Key, error.ErrorMessage);
 
             if (viewModel.HasAnyErrors())
             {

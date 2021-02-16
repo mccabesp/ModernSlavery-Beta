@@ -7,9 +7,23 @@
             <dt class="govuk-summary-list__key govuk-!-width-one-half">
                 @item.Name
             </dt>
-            <dd id="@item.ValueId" class="govuk-summary-list__value govuk-!-width-one-half">
-                @Html.Raw(item.Value)
-            </dd>
+            @if (item is StringCheckYourAnswer stringAnswer)
+            {
+                <dd id="@stringAnswer.ValueId" class="govuk-summary-list__value govuk-!-width-one-half">
+                    @Html.Linebreak(stringAnswer.Value)
+                </dd>
+            }
+            else if (item is ListCheckYourAnswer listAnswer)
+            {
+                <dd id="@listAnswer.ValueId" class="govuk-summary-list__value govuk-!-width-one-half">
+                    <ul class="govuk-list govuk-list--bullet">
+                        @foreach (var value in listAnswer.Values)
+                        {
+                            <li>@Html.Linebreak(value)</li>
+                        }
+                    </ul>
+                </dd>
+            }
         </div>
     }
 </dl>

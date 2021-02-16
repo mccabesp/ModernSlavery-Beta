@@ -6,6 +6,7 @@ using System.Linq;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -33,6 +34,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public List<PolicyTypes> Policies { get; set; } = new List<PolicyTypes>();
 
         [MaxLength(256)]//We need at least one validation annotation otherwise Validate wont execute
+        [Text] 
         public string OtherPolicies { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

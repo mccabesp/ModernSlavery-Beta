@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<WebTest Name="Logout" Id="ad2a6722-4678-41fc-848f-18dc51ef1346" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="WebTest2.714e1673-855c-426f-8d2e-8d14a0ecfe5c.rec.webtestresult" ResultsLocale="">
+<WebTest Name="Logout" Id="ad2a6722-4678-41fc-848f-18dc51ef1346" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="60" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="WebTest2.714e1673-855c-426f-8d2e-8d14a0ecfe5c.rec.webtestresult" ResultsLocale="">
   <Items>
-    <Request Method="GET" Guid="13f8e26d-646f-4498-8003-890f7d43d53d" Version="1.1" Url="{{WebServer}}/sign-out?delete={{DeleteAccount}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="13f8e26d-646f-4498-8003-890f7d43d53d" Version="1.1" Url="{{WebServer}}/sign-out?delete={{DeleteAccount}}" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <Headers>
         <Header Name="Referer" Value="{{WebServer}}/manage-organisations" />
       </Headers>
@@ -14,7 +14,7 @@
         </ExtractionRule>
       </ExtractionRules>
     </Request>
-    <Request Method="GET" Guid="5fedf086-6b2c-44aa-8468-081bf65da054" Version="1.1" Url="{{SignoutRedirect1}}" ThinkTime="0" Timeout="300" ParseDependentRequests="False" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="302" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="5fedf086-6b2c-44aa-8468-081bf65da054" Version="1.1" Url="{{SignoutRedirect1}}" ThinkTime="8" Timeout="60" ParseDependentRequests="False" FollowRedirects="False" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="302" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHttpHeader, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="SignoutRedirect2" DisplayName="Extract HTTP Header" Description="Extract the value of an HTTP header and place it into the test context.">
           <RuleParameters>
@@ -24,7 +24,7 @@
         </ExtractionRule>
       </ExtractionRules>
     </Request>
-    <Request Method="GET" Guid="163ae51b-f90f-4f76-8a74-e68f33844bc0" Version="1.1" Url="{{SignoutRedirect2}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
+    <Request Method="GET" Guid="163ae51b-f90f-4f76-8a74-e68f33844bc0" Version="1.1" Url="{{SignoutRedirect2}}" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="False" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False">
       <ExtractionRules>
         <ExtractionRule Classname="Microsoft.VisualStudio.TestTools.WebTesting.Rules.ExtractHttpHeader, Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" VariableName="SignoutRedirect3" DisplayName="Extract HTTP Header" Description="Extract the value of an HTTP header and place it into the test context.">
           <RuleParameters>
@@ -34,7 +34,7 @@
         </ExtractionRule>
       </ExtractionRules>
     </Request>
-    <Request Method="GET" Guid="163ae51b-f90f-4f76-8a74-e68f33844bc0" Version="1.1" Url="{{SignoutRedirect3}}" ThinkTime="0" Timeout="300" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/sign-out" ReportingName="" IgnoreHttpStatusCode="False" />
+    <Request Method="GET" Guid="163ae51b-f90f-4f76-8a74-e68f33844bc0" Version="1.1" Url="{{SignoutRedirect3}}" ThinkTime="8" Timeout="60" ParseDependentRequests="True" FollowRedirects="True" RecordResult="True" Cache="True" ResponseTimeGoal="30" Encoding="utf-8" ExpectedHttpStatusCode="0" ExpectedResponseUrl="{{WebServer}}/sign-out" ReportingName="" IgnoreHttpStatusCode="False" />
   </Items>
   <ContextParameters>
     <ContextParameter Name="WebServer" Value="https://localhost:44371" />

@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model UrlEmailViewModel
 
@@ -43,7 +44,7 @@
                     <div class="govuk-details__text">
                         <div class="govuk-form-group @Html.SetErrorClass(model => model.StatementEmail, "govuk-form-group--error")">
                             <label asp-for="StatementEmail" class="govuk-label govuk-!-font-weight-bold">Provide an email address</label>
-                            <div class="govuk-hint">If you do not have a website, provide an email address that can be used to request a copy of the statement.</div>
+                            <div class="govuk-hint">If you do not have a website, provide an email address that can be used to request a copy of the statement. It will be published on GOV.UK as part of your statement summary on the registry.</div>
                             <input asp-for="StatementEmail" class="govuk-input" spellcheck="false" inputmode="email">
                             <span asp-validation-for="StatementEmail" class="govuk-error-message"></span>
                         </div>

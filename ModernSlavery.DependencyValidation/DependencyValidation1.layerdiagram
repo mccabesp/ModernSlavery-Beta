@@ -130,6 +130,13 @@
             </reference>
           </references>
         </layer>
+        <layer Id="25a4907a-658b-4827-8213-c0b8afaaf267" name="DevOps">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="4468847d-14f7-4a17-8754-783ec79aa060" direction="Forward">
+              <layerMoniker Id="fbda123f-db54-495b-8df2-3406e8d66449" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+        </layer>
       </childLayers>
     </layer>
     <layer Id="6d4141dd-9802-416c-bc9b-865fd7959af8" name="WebUI">
@@ -282,6 +289,25 @@
             </dependencyFromLayerToLayer>
           </dependencyToLayers>
         </layer>
+        <layer Id="23312d77-db25-437b-bbc3-4bcad65e3f02" name="DevOps">
+          <dependencyToLayers>
+            <dependencyFromLayerToLayer Id="bd8272a0-5e92-414e-ad7b-d6494b63e2c5" direction="Forward">
+              <layerMoniker Id="1917c8ec-7994-4066-ae2d-0f305af94299" />
+            </dependencyFromLayerToLayer>
+            <dependencyFromLayerToLayer Id="1f6ca719-2c92-4b32-8c3b-dbf1abebc46e" direction="Forward">
+              <layerMoniker Id="a78bb6a7-e6bb-4662-a404-aeebefc5acb6" />
+            </dependencyFromLayerToLayer>
+          </dependencyToLayers>
+          <references>
+            <reference Id="046cd3ce-9560-430d-b85c-1408ef618186" name="ModernSlavery.WebUI.Registration">
+              <ArtifactNode Label="ModernSlavery.WebUI.Registration" Category="CodeSchema_Project" Id="(Assembly=../ModernSlavery.WebUI.Registration/ModernSlavery.WebUI.Registration.csproj)" />
+              <ExpandedNode Id="(Assembly=ModernSlavery.WebUI.Registration)" Label="ModernSlavery.WebUI.Registration.dll" Category="CodeSchema_Assembly">
+                <LinkCategory Ref="Produces" />
+                <LinkCategory Ref="Represents" />
+              </ExpandedNode>
+            </reference>
+          </references>
+        </layer>
       </childLayers>
     </layer>
     <layer Id="1acbd5d9-66f0-433c-aba6-516bafc4fda4" name="Infrastructure">
@@ -397,6 +423,8 @@
             </reference>
           </references>
         </layer>
+        <layer Id="2533b96b-2bab-46d7-9e51-7de5b3d381ea" name="Azure" />
+        <layer Id="b566f73c-eb26-4391-ba0f-04fd3b7bb6e7" name="Caching" />
       </childLayers>
     </layer>
     <layer Id="89eabdfd-d5cb-4dc2-9e1b-d91ebda3c4e0" name="Hosts">

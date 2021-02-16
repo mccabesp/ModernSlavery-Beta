@@ -249,7 +249,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public Status GetWorkingConditionsStatus()
         {
-            if (PartnersPage.GetStatus() == Status.Complete && SocialAuditsPage.GetStatus() == Status.Complete && GrievancesPage.GetStatus() == Status.Complete && MonitoringPage.GetStatus() == Status.Complete) return Status.Complete;
+            if (PartnersPage.GetStatus() == Status.Complete && SocialAuditsPage.GetStatus() == Status.Complete && GrievancesPage.GetStatus() == Status.Complete) return Status.Complete;
             if (PartnersPage.GetStatus() == Status.Incomplete && SocialAuditsPage.GetStatus() == Status.Incomplete && GrievancesPage.GetStatus() == Status.Incomplete && MonitoringPage.GetStatus() == Status.Incomplete) return Status.Incomplete;
             return Status.InProgress;
         }
@@ -264,7 +264,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public Status GetIndicatorRemediationsStatus()
         {
             if (IndicatorsPage.GetStatus() == Status.Complete && RemediationsPage.GetStatus() == Status.Complete) return Status.Complete;
-            if (IndicatorsPage.GetStatus() == Status.Incomplete && RemediationsPage.GetStatus() == Status.Incomplete) return Status.Incomplete;
+            if (IndicatorsPage.GetStatus() == Status.Incomplete) return Status.Incomplete;
             return Status.InProgress;
         }
 

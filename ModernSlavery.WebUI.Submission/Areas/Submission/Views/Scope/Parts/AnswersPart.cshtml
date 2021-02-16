@@ -1,17 +1,17 @@
 ﻿@model ScopingViewModel
 @{
-    var reason = Model.EnterAnswers.FriendlyReasonOptions.Count() == 1 
-        ? string.Join("", Model.EnterAnswers.FriendlyReasonOptions)
-        : "<ul><li>" + string.Join("</li><br><li>", Model.EnterAnswers.FriendlyReasonOptions) + "</li></ul>";
+    var reasonQuestion = "Reason your organisation is not required to publish a modern slavery statement on your website";
+    var reasonAnswer = Model.EnterAnswers.FriendlyReasonOptions.Count() == 1
+        ? (IAnswer)new StringCheckYourAnswer(reasonQuestion, Model.EnterAnswers.FriendlyReasonOptions.SingleOrDefault(), "ReasonAnswer")
+        : (IAnswer)new ListCheckYourAnswer(reasonQuestion, Model.EnterAnswers.FriendlyReasonOptions, "ReasonAnswer");
     var answers = !Model.UserIsRegistered
         ? new CheckYourAnswers(
-            new CheckYourAnswer("Reason your organisation is not required to publish a modern slavery statement on your website", reason, "ReasonAnswer"),
-            new CheckYourAnswer("Contact name", Model.EnterAnswers.FullName, "FullNameAnswer"),
-            new CheckYourAnswer("Job title", Model.EnterAnswers.JobTitle, "JobTitleAnswer"),
-            new CheckYourAnswer("Contact email", Model.EnterAnswers.EmailAddress, "EmailAddressAnswer")
+            reasonAnswer,
+            new StringCheckYourAnswer("Contact name", Model.EnterAnswers.FullName, "FullNameAnswer"),
+            new StringCheckYourAnswer("Job title", Model.EnterAnswers.JobTitle, "JobTitleAnswer"),
+            new StringCheckYourAnswer("Contact email", Model.EnterAnswers.EmailAddress, "EmailAddressAnswer")
             )
-        : new CheckYourAnswers(
-            new CheckYourAnswer("Reason your organisation is not required to publish a modern slavery statement on your website", reason, "ReasonAnswer"));
+        : new CheckYourAnswers(reasonAnswer);
 }
 
 @await Html.PartialModelAsync(answers)

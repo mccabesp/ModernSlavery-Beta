@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
+using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary.StatementRisk;
 
 namespace ModernSlavery.WebAPI.Models
 {
@@ -29,7 +30,7 @@ namespace ModernSlavery.WebAPI.Models
                 CreateMap<OrganisationSearchModel, StatementSummaryDownloadModel>(MemberList.None)
                     .ForMember(x => x.StatementYear, opt => opt.MapFrom(y => y.SubmissionDeadlineYear))
                     .ForMember(x => x.OrganisationName, opt => opt.MapFrom(y => y.OrganisationName))
-                    .ForMember(x => x.Address, opt => opt.MapFrom(y => y.Address.GetFullAddress(Environment.NewLine)))
+                    .ForMember(x => x.Address, opt => opt.MapFrom(y => y.Address==null ? null : y.Address.GetFullAddress(Environment.NewLine)))
                     .ForMember(x => x.SectorType, opt => opt.MapFrom(y => y.SectorType != null ? y.SectorType.Name : null))
                     .ForMember(x => x.CompanyNumber, opt => opt.MapFrom(y => y.CompanyNumber))
                     .ForMember(x => x.LastUpdated, opt => opt.MapFrom(y => y.Modified))
@@ -64,61 +65,61 @@ namespace ModernSlavery.WebAPI.Models
                     .ForMember(x => x.StatementIncludesGoals, opt => opt.MapFrom(y => y.IncludesGoals))
                     .ForMember(x => x.NoGoalsReason, opt => opt.MapFrom(y => y.GoalsDetails))
 
-                    .ForMember(x => x.OrganisationSectors, opt => opt.MapFrom(y => string.Join(", ", y.Sectors.Select(s => s.Name))))
+                    .ForMember(x => x.OrganisationSectors, opt => opt.MapFrom(y => string.Join(Environment.NewLine, y.Sectors.Select(s => s.Name))))
                     .ForMember(x => x.OtherOrganisationSector, opt => opt.MapFrom(y => y.OtherSectors))
 
                     .ForMember(x => x.Turnover, opt => opt.MapFrom(y => y.Turnover != null ? y.Turnover.Name : null))
                     .ForMember(x => x.YearsProducingStatements, opt => opt.MapFrom(y => y.StatementYears != null ? y.StatementYears.Name : null))
 
-                    .ForMember(x => x.Policies, opt => opt.MapFrom(y => y.Summary.Policies.Select(p => p.Key).Contains((int)PolicyTypes.None) ? null : string.Join(", ", y.Summary.Policies.Select(p => p.Name))))
+                    .ForMember(x => x.Policies, opt => opt.MapFrom(y => y.Summary.Policies.Select(p => p.Key).Contains((int)PolicyTypes.None) ? null : string.Join(Environment.NewLine, y.Summary.Policies.Select(p => p.Name))))
                     .ForMember(x => x.OtherPolicies, opt => opt.MapFrom(y => y.Summary.OtherPolicies))
                     .ForMember(x => x.NoPolicies, opt => opt.MapFrom(y => !y.Summary.Policies.Any() ? null : (bool?)y.Summary.Policies.Select(p => p.Key).Contains((int)PolicyTypes.None)))
 
-                    .ForMember(x => x.Training, opt => opt.MapFrom(y => y.Summary.TrainingTargets.Select(p => p.Key).Contains((int)TrainingTargetTypes.None) ? null : string.Join(", ", y.Summary.TrainingTargets.Select(p => p.Name))))
+                    .ForMember(x => x.Training, opt => opt.MapFrom(y => y.Summary.TrainingTargets.Select(p => p.Key).Contains((int)TrainingTargetTypes.None) ? null : string.Join(Environment.NewLine, y.Summary.TrainingTargets.Select(p => p.Name))))
                     .ForMember(x => x.OtherTraining, opt => opt.MapFrom(y => y.Summary.OtherTrainingTargets))
                     .ForMember(x => x.NoTraining, opt => opt.MapFrom(y => !y.Summary.TrainingTargets.Any() ? null : (bool?)y.Summary.TrainingTargets.Select(p => p.Key).Contains((int)TrainingTargetTypes.None)))
 
-                    .ForMember(x => x.WorkingConditionsEngagement, opt => opt.MapFrom(y => y.Summary.Partners.Select(p => p.Key).Contains((int)PartnerTypes.None) ? null : string.Join(", ", y.Summary.Partners.Select(p => p.Name))))
+                    .ForMember(x => x.WorkingConditionsEngagement, opt => opt.MapFrom(y => y.Summary.Partners.Select(p => p.Key).Contains((int)PartnerTypes.None) ? null : string.Join(Environment.NewLine, y.Summary.Partners.Select(p => p.Name))))
                     .ForMember(x => x.NoEngagement, opt => opt.MapFrom(y => !y.Summary.Partners.Any() ? null : (bool?)y.Summary.Partners.Select(p => p.Key).Contains((int)PartnerTypes.None)))
 
-                    .ForMember(x => x.SocialAudits, opt => opt.MapFrom(y => y.Summary.SocialAudits.Select(p => p.Key).Contains((int)SocialAuditTypes.None) ? null : string.Join(", ", y.Summary.SocialAudits.Select(p => p.Name))))
+                    .ForMember(x => x.SocialAudits, opt => opt.MapFrom(y => y.Summary.SocialAudits.Select(p => p.Key).Contains((int)SocialAuditTypes.None) ? null : string.Join(Environment.NewLine, y.Summary.SocialAudits.Select(p => p.Name))))
                     .ForMember(x => x.NoSocialAudits, opt => opt.MapFrom(y => !y.Summary.GrievanceMechanisms.Any() ? null : (bool?)y.Summary.SocialAudits.Select(p => p.Key).Contains((int)SocialAuditTypes.None)))
 
-                    .ForMember(x => x.GrievanceMechanisms, opt => opt.MapFrom(y => y.Summary.GrievanceMechanisms.Select(p => p.Key).Contains((int)GrievanceMechanismTypes.None) ? null : string.Join(", ", y.Summary.GrievanceMechanisms.Select(p => p.Name))))
+                    .ForMember(x => x.GrievanceMechanisms, opt => opt.MapFrom(y => y.Summary.GrievanceMechanisms.Select(p => p.Key).Contains((int)GrievanceMechanismTypes.None) ? null : string.Join(Environment.NewLine, y.Summary.GrievanceMechanisms.Select(p => p.Name))))
                     .ForMember(x => x.NoGrievanceMechanisms, opt => opt.MapFrom(y => !y.Summary.GrievanceMechanisms.Any() ? null : (bool?)y.Summary.GrievanceMechanisms.Select(p => p.Key).Contains((int)GrievanceMechanismTypes.None)))
 
                     .ForMember(x => x.OtherMonitoring, opt => opt.MapFrom(y => y.Summary.OtherWorkConditionsMonitoring))
 
-                    .ForMember(x => x.NoRisks, opt => opt.MapFrom(y => y.Summary.Risks.Any()))
+                    .ForMember(x => x.NoRisks, opt => opt.MapFrom(y => y.Summary.NoRisks))
 
                     .ForMember(x => x.Risk1, opt => opt.MapFrom(y => y.Summary.Risks.FirstOrDefault() == null ? null : y.Summary.Risks.FirstOrDefault().Description))
-                    .ForMember(x => x.Risk1Area, opt => opt.MapFrom(y => y.Summary.Risks.FirstOrDefault() == null && y.Summary.Risks.FirstOrDefault().LikelySource == null ? null : y.Summary.Risks.FirstOrDefault().LikelySource.Name))
-                    .ForMember(x => x.Risk1SupplyChainTier, opt => opt.MapFrom(y => y.Summary.Risks.FirstOrDefault() == null ? null : string.Join(", ", y.Summary.Risks.FirstOrDefault().SupplyChainTiers.Select(t => t.Name))))
-                    .ForMember(x => x.Risk1GroupAffected, opt => opt.MapFrom(y => y.Summary.Risks.FirstOrDefault() == null ? null : string.Join(", ", y.Summary.Risks.FirstOrDefault().Targets.Select(t => t.Name))))
+                    .ForMember(x => x.Risk1Area, opt => opt.MapFrom(y => y.Summary.Risks.FirstOrDefault() == null && y.Summary.Risks.FirstOrDefault().LikelySource == null ? null : (y.Summary.Risks.FirstOrDefault().LikelySource.Key == (int)RiskSourceTypes.Other ? y.Summary.Risks.FirstOrDefault().OtherLikelySource : y.Summary.Risks.FirstOrDefault().LikelySource.Name)))
+                    .ForMember(x => x.Risk1SupplyChainTier, opt => opt.MapFrom(y => y.Summary.Risks.FirstOrDefault() == null ? null : string.Join(Environment.NewLine, y.Summary.Risks.FirstOrDefault().SupplyChainTiers.Select(t => t.Name))))
+                    .ForMember(x => x.Risk1GroupAffected, opt => opt.MapFrom(y => y.Summary.Risks.FirstOrDefault() == null ? null : string.Join(Environment.NewLine, y.Summary.Risks.FirstOrDefault().Targets.Select(t => t.Name))))
                     .ForMember(x => x.Risk1OtherGroupAffected, opt => opt.MapFrom(y => y.Summary.Risks.FirstOrDefault() == null ? null : y.Summary.Risks.FirstOrDefault().OtherTargets))
-                    .ForMember(x => x.Risk1Location, opt => opt.MapFrom(y => y.Summary.Risks.FirstOrDefault() == null ? null : string.Join(", ", y.Summary.Risks.FirstOrDefault().Countries.Select(c => c.Name))))
-                    .ForMember(x => x.Risk1Mitigation, opt => opt.MapFrom(y => y.Summary.Risks.FirstOrDefault() == null ? null : y.Summary.Risks.FirstOrDefault().Description))
+                    .ForMember(x => x.Risk1Location, opt => opt.MapFrom(y => y.Summary.Risks.FirstOrDefault() == null ? null : string.Join(Environment.NewLine, y.Summary.Risks.FirstOrDefault().Countries.Select(c => c.Name))))
+                    .ForMember(x => x.Risk1Mitigation, opt => opt.MapFrom(y => y.Summary.Risks.FirstOrDefault() == null ? null : y.Summary.Risks.FirstOrDefault().ActionsOrPlans))
 
                     .ForMember(x => x.Risk2, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(1) == null ? null : y.Summary.Risks.ElementAtOrDefault(1).Description))
-                    .ForMember(x => x.Risk2Area, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(1) == null && y.Summary.Risks.ElementAtOrDefault(1).LikelySource == null ? null : y.Summary.Risks.ElementAtOrDefault(1).LikelySource.Name))
-                    .ForMember(x => x.Risk2SupplyChainTier, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(1) == null ? null : string.Join(", ", y.Summary.Risks.ElementAtOrDefault(1).SupplyChainTiers.Select(t => t.Name))))
-                    .ForMember(x => x.Risk2GroupAffected, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(1) == null ? null : string.Join(", ", y.Summary.Risks.ElementAtOrDefault(1).Targets.Select(t => t.Name))))
+                    .ForMember(x => x.Risk2Area, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(1) == null && y.Summary.Risks.ElementAtOrDefault(1).LikelySource == null ? null : (y.Summary.Risks.ElementAtOrDefault(1).LikelySource.Key == (int)RiskSourceTypes.Other ? y.Summary.Risks.ElementAtOrDefault(1).OtherLikelySource : y.Summary.Risks.ElementAtOrDefault(1).LikelySource.Name)))
+                    .ForMember(x => x.Risk2SupplyChainTier, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(1) == null ? null : string.Join(Environment.NewLine, y.Summary.Risks.ElementAtOrDefault(1).SupplyChainTiers.Select(t => t.Name))))
+                    .ForMember(x => x.Risk2GroupAffected, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(1) == null ? null : string.Join(Environment.NewLine, y.Summary.Risks.ElementAtOrDefault(1).Targets.Select(t => t.Name))))
                     .ForMember(x => x.Risk2OtherGroupAffected, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(1) == null ? null : y.Summary.Risks.ElementAtOrDefault(1).OtherTargets))
-                    .ForMember(x => x.Risk2Location, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(1) == null ? null : string.Join(", ", y.Summary.Risks.ElementAtOrDefault(1).Countries.Select(c => c.Name))))
-                    .ForMember(x => x.Risk2Mitigation, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(1) == null ? null : y.Summary.Risks.ElementAtOrDefault(1).Description))
+                    .ForMember(x => x.Risk2Location, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(1) == null ? null : string.Join(Environment.NewLine, y.Summary.Risks.ElementAtOrDefault(1).Countries.Select(c => c.Name))))
+                    .ForMember(x => x.Risk2Mitigation, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(1) == null ? null : y.Summary.Risks.ElementAtOrDefault(1).ActionsOrPlans))
 
                     .ForMember(x => x.Risk3, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(2) == null ? null : y.Summary.Risks.ElementAtOrDefault(2).Description))
-                    .ForMember(x => x.Risk3Area, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(2) == null && y.Summary.Risks.ElementAtOrDefault(2).LikelySource == null ? null : y.Summary.Risks.ElementAtOrDefault(2).LikelySource.Name))
-                    .ForMember(x => x.Risk3SupplyChainTier, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(2) == null ? null : string.Join(", ", y.Summary.Risks.ElementAtOrDefault(2).SupplyChainTiers.Select(t => t.Name))))
-                    .ForMember(x => x.Risk3GroupAffected, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(2) == null ? null : string.Join(", ", y.Summary.Risks.ElementAtOrDefault(2).Targets.Select(t => t.Name))))
+                    .ForMember(x => x.Risk3Area, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(2) == null && y.Summary.Risks.ElementAtOrDefault(2).LikelySource == null ? null : (y.Summary.Risks.ElementAtOrDefault(2).LikelySource.Key == (int)RiskSourceTypes.Other ? y.Summary.Risks.ElementAtOrDefault(2).OtherLikelySource : y.Summary.Risks.ElementAtOrDefault(2).LikelySource.Name)))
+                    .ForMember(x => x.Risk3SupplyChainTier, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(2) == null ? null : string.Join(Environment.NewLine, y.Summary.Risks.ElementAtOrDefault(2).SupplyChainTiers.Select(t => t.Name))))
+                    .ForMember(x => x.Risk3GroupAffected, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(2) == null ? null : string.Join(Environment.NewLine, y.Summary.Risks.ElementAtOrDefault(2).Targets.Select(t => t.Name))))
                     .ForMember(x => x.Risk3OtherGroupAffected, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(2) == null ? null : y.Summary.Risks.ElementAtOrDefault(2).OtherTargets))
-                    .ForMember(x => x.Risk3Location, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(2) == null ? null : string.Join(", ", y.Summary.Risks.ElementAtOrDefault(2).Countries.Select(c => c.Name))))
-                    .ForMember(x => x.Risk3Mitigation, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(2) == null ? null : y.Summary.Risks.ElementAtOrDefault(2).Description))
+                    .ForMember(x => x.Risk3Location, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(2) == null ? null : string.Join(Environment.NewLine, y.Summary.Risks.ElementAtOrDefault(2).Countries.Select(c => c.Name))))
+                    .ForMember(x => x.Risk3Mitigation, opt => opt.MapFrom(y => y.Summary.Risks.ElementAtOrDefault(2) == null ? null : y.Summary.Risks.ElementAtOrDefault(2).ActionsOrPlans))
 
-                    .ForMember(x => x.ILOIndicatorsInStatement, opt => opt.MapFrom(y => y.Summary.Indicators.Select(p => p.Key).Contains((int)IndicatorTypes.None) ? null : string.Join(", ", y.Summary.Indicators.Select(i => i.Name))))
+                    .ForMember(x => x.ILOIndicatorsInStatement, opt => opt.MapFrom(y => y.Summary.Indicators.Select(p => p.Key).Contains((int)IndicatorTypes.None) ? null : string.Join(Environment.NewLine, y.Summary.Indicators.Select(i => i.Name))))
                     .ForMember(x => x.NoILOIndicatorsInStatement, opt => opt.MapFrom(y => !y.Summary.Indicators.Any() ? null : (bool?)y.Summary.Indicators.Select(p => p.Key).Contains((int)IndicatorTypes.None)))
 
-                    .ForMember(x => x.ILOIndicatorsActions, opt => opt.MapFrom(y => y.Summary.Remediations.Select(p => p.Key).Contains((int)RemediationTypes.None) ? null : string.Join(", ", y.Summary.Remediations.Select(i => i.Name))))
+                    .ForMember(x => x.ILOIndicatorsActions, opt => opt.MapFrom(y => y.Summary.Remediations.Select(p => p.Key).Contains((int)RemediationTypes.None) ? null : string.Join(Environment.NewLine, y.Summary.Remediations.Select(i => i.Name))))
                     .ForMember(x => x.ILOIndicatorsNoActions, opt => opt.MapFrom(y => !y.Summary.Remediations.Any() ? null : (bool?)y.Summary.Remediations.Select(p => p.Key).Contains((int)RemediationTypes.None)))
 
                     .ForMember(x => x.DemonstrateProgress, opt => opt.MapFrom(y => y.Summary.ProgressMeasures))

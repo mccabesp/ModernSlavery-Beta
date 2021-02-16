@@ -203,8 +203,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             string resetCode = null;
             try
             {
-                resetCode = Encryption.EncryptQuerystring(VirtualUser.UserId + ":" +
-                                                          VirtualDateTime.Now.ToSmallDateTime());
+                resetCode = Encryption.Encrypt($"{VirtualUser.UserId}:{VirtualDateTime.Now.ToSmallDateTime()}", Encryption.Encodings.Base62);
                 var resetUrl = Url.Action("NewPassword", "Account", new { code = resetCode }, "https");
                 if (!await SharedBusinessLogic.SendEmailService.SendResetPasswordNotificationAsync(resetUrl,
                     VirtualUser.EmailAddress))
@@ -224,7 +223,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
         }
 
         [HttpGet("enter-new-password")]
-        public async Task<IActionResult> NewPassword(string code = null)
+        public async Task<IActionResult> NewPassword([IgnoreText]string code = null)
         {
             //Ensure user has not completed the registration process
             var result = await CheckUserRegisteredOkAsync();
@@ -247,9 +246,9 @@ namespace ModernSlavery.WebUI.Account.Controllers
             DateTime resetDate;
             try
             {
-                code = Encryption.DecryptQuerystring(code);
+                code = Encryption.Decrypt(code,Encryption.Encodings.Base62);
                 code = HttpUtility.UrlDecode(code);
-                var args = code.SplitI(":");
+                var args = code.SplitI(':');
                 if (args.Length != 2) throw new ArgumentException("Too few parameters in password reset code");
 
                 userId = args[0].ToLong();
@@ -306,8 +305,8 @@ namespace ModernSlavery.WebUI.Account.Controllers
             //Save the user to ensure UserId>0 for new status
             _accountService.UserRepository.UpdateUserPasswordUsingPBKDF2(passwordResult.User, model.Password);
 
-            VirtualUser.ResetAttempts = 0;
-            VirtualUser.ResetSendDate = null;
+            passwordResult.User.ResetAttempts = 0;
+            passwordResult.User.ResetSendDate = null;
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Send completed notification email

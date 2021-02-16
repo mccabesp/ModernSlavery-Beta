@@ -1,8 +1,8 @@
 ﻿@model ChangeOrganisationAddressViewModel
 @{Layout = "~/Views/GdsLayout.cshtml";}
 @{
-    ViewBag.Title = $"Change address - {Model.Organisation.OrganisationName} - Administration - Modern Slavery Reporting service";
-    var latestAddress = Model.Organisation.GetLatestAddress();
+    Title = $"Change address - {Model.Organisation.OrganisationName} - Administration";
+    var latestAddress = Model.Organisation.LatestAddress ?? Model.Organisation.GetLatestAddress();
 }
 
 @section BeforeMain {
@@ -184,7 +184,7 @@
                     var acceptCoHoRadio = document.getElementById(
                         '@($"GovUk_Radio_{nameof(ChangeOrganisationAddressViewModel.AcceptCompaniesHouseAddress)}_{nameof(AcceptCompaniesHouseAddress.Accept)}")');
                     var radios = document.querySelectorAll(
-                        'input[type=radio][name="@($"GovUk_Radio_{nameof(ChangeOrganisationAddressViewModel.AcceptCompaniesHouseAddress)}")"]');
+                        'input[type=radio][name="@($"{nameof(ChangeOrganisationAddressViewModel.AcceptCompaniesHouseAddress)}")"]');
 
                     function changeReasonVisibilityBasedOnCoHoAddressAcceptRadio() {
                         var reasonElement = document.getElementById('reason-for-change-container');

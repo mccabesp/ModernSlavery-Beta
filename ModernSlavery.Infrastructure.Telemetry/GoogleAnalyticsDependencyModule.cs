@@ -6,6 +6,7 @@ using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Extensions;
 using Polly;
 using Polly.Extensions.Http;
 
@@ -23,13 +24,7 @@ namespace ModernSlavery.Infrastructure.Telemetry
         public void ConfigureServices(IServiceCollection services)
         {
             //Add a dedicated httpclient for Google Analytics tracking with exponential retry policy
-            services.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), client =>
-            {
-                client.BaseAddress = GoogleAnalyticsTracker.BaseUri;
-                client.DefaultRequestHeaders.Clear();
-                client.DefaultRequestHeaders.ConnectionClose = false;
-                ServicePointManager.FindServicePoint(client.BaseAddress).ConnectionLeaseTimeout = 60 * 1000;
-            })
+            services.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), httpClient => httpClient.SetupConnectionLease(GoogleAnalyticsTracker.BaseUri.ToString()))
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10))
                 .AddPolicyHandler(
                     //see https://developers.google.com/analytics/devguides/config/mgmt/v3/errors

@@ -35,6 +35,9 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
                     {
                         //Get the header value
                         var value = _securityHeaders[key];
+
+                        if (httpContext.Response.Headers.ContainsKey(key) && !string.IsNullOrWhiteSpace(value)) continue;
+
                         //Replace all instances of the nonce
                         if (value.Contains("{nonce}", StringComparison.OrdinalIgnoreCase)) value = value.Replace("{nonce}", nonce,StringComparison.OrdinalIgnoreCase);
                         //Add the header

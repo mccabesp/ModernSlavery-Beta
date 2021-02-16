@@ -27,6 +27,8 @@ namespace ModernSlavery.Core.Options
         public bool ShowPinInPost { get; set; }
         public bool ShowEmailVerifyLink { get; set; }
         public bool LoadTesting { get; set; }
+        public bool SearchCompaniesHouse { get; set; }
+        
         public string TestPrefix { get; set; }
 
 

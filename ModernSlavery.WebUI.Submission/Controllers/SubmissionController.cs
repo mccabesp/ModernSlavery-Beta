@@ -8,6 +8,7 @@ using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
@@ -31,6 +32,14 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         {
             _SubmissionService = submissionService;
             _statementBusinessLogic = statementBusinessLogic;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Submit()
+        {
+            await TrackPageViewAsync();
+
+            return RedirectToActionPermanent(nameof(ManageOrganisations));
         }
 
         [Authorize]
@@ -70,7 +79,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         [Authorize]
         [HttpGet("~/manage-organisation/{organisationIdentifier}")]
-        public async Task<IActionResult> ManageOrganisation(string organisationIdentifier)
+        public async Task<IActionResult> ManageOrganisation([Obfuscated]string organisationIdentifier)
         {
             //Clear all the stashes
             ClearAllStashes();
@@ -116,21 +125,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 CurrentUserIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.User.UserId),
                 CurrentUserFullName = userOrg.User.Fullname,
                 OrganisationName = userOrg.Organisation.OrganisationName,
-                LatestAddress = userOrg.Organisation.LatestAddress.GetAddressString(Environment.NewLine),
+                LatestAddress = userOrg.Organisation.LatestAddress?.GetAddressString(Environment.NewLine),
                 AssociatedUserOrgs = associatedUserOrgs,
                 OrganisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(organisationId.ToString()),
                 StatementInfoModels = _statementBusinessLogic.GetStatementInfoModelsAsync(userOrg.Organisation)
             };
 
             return View(model);
-        }
-
-        [HttpGet("submit/")]
-        public async Task<IActionResult> Redirect()
-        {
-            await TrackPageViewAsync();
-
-            return RedirectToAction("EnterCalculations");
         }
     }
 }

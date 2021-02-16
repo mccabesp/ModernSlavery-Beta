@@ -2,7 +2,7 @@
 <TestSettings name="Local" id="13ee58c6-fc1e-4f2d-b380-fe80a527b73f" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Description>These are default test settings for a local test run.</Description>
   <Deployment enabled="false" />
-  <NamingScheme baseName="Local" useDefault="false" />
+  <NamingScheme baseName="Local" />
   <Execution>
     <Hosts skipUnhostableTests="false">
       <AspNet name="ASP.NET" executionType="WebDev" />

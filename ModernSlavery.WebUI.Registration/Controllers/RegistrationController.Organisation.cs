@@ -49,7 +49,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("organisation-type")]
-        public async Task<IActionResult> OrganisationType(string registrationType)
+        public async Task<IActionResult> OrganisationType(bool? isFastTrack, SectorTypes sectorType)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -59,27 +59,35 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             var organisationViewModel = UnstashModel<OrganisationViewModel>();
             if (organisationViewModel == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
+            if (VirtualUser.UserOrganisations.Any())
+                organisationViewModel.BackAction = Url.ActionArea("ManageOrganisations", "Submission", "Submission");
+
             ModelState.Clear();
 
-            switch (registrationType?.ToLower())
+            if (!isFastTrack.HasValue)
             {
-                case "fasttrack":
+                // either it is fast track, or sectortype mut be set
+                AddModelError(3034, nameof(isFastTrack));
+                return View("OrganisationType", organisationViewModel);
+            }
+            else
+            {
+                organisationViewModel.IsFastTrack = isFastTrack.Value;
+                if (isFastTrack.Value)
+                {
+                    StashModel(organisationViewModel);
                     return RedirectToAction(nameof(FastTrack));
-                case "private":
-                    organisationViewModel.SectorType = SectorTypes.Private;
-                    break;
-                case "public":
-                    organisationViewModel.SectorType = SectorTypes.Public;
-                    break;
-                default: 
+                }
+                else if (sectorType == SectorTypes.Unknown)
+                {
                     // either it is fast track, or sectortype mut be set
-                    AddModelError(3005, "RegistrationType");
-                    this.SetModelCustomErrors<OrganisationViewModel>();
+                    AddModelError(3005, nameof(sectorType));
                     return View("OrganisationType", organisationViewModel);
+                }
             }
 
             CompaniesHouseFailures = 0;
-
+            organisationViewModel.SectorType = sectorType;
             StashModel(organisationViewModel);
             return RedirectToAction("OrganisationSearch");
         }
@@ -175,8 +183,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         {
                             organisationViewModel.Organisations?.Results?.Clear();
                             StashModel(organisationViewModel);
+
+                            searchViewModel.Organisations = organisationViewModel.Organisations;
+                            searchViewModel.SectorType = organisationViewModel.SectorType;
+                            searchViewModel.LastPrivateSearchRemoteTotal = organisationViewModel.LastPrivateSearchRemoteTotal;
+
                             ModelState.AddModelError(1141);
-                            return View(organisationViewModel);
+                            return View(searchViewModel);
                         }
 
                         await _registrationService.SharedBusinessLogic.SendEmailService.SendMsuMessageAsync("GPG - COMPANIES HOUSE ERROR", $"Cant search using Companies House API for query '{organisationViewModel.SearchText}' page:'1' due to following error:\n\n{ex.GetDetailsText()}");
@@ -208,8 +221,12 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             StashModel(organisationViewModel);
 
+            searchViewModel.Organisations = organisationViewModel.Organisations;
+            searchViewModel.SectorType = organisationViewModel.SectorType;
+            searchViewModel.LastPrivateSearchRemoteTotal = organisationViewModel.LastPrivateSearchRemoteTotal;
+
             //Search again if no results
-            if (organisationViewModel.Organisations.Results.Count < 1) return View("OrganisationSearch", organisationViewModel);
+            if (organisationViewModel.Organisations.Results.Count < 1) return View("OrganisationSearch", searchViewModel);
 
             //Go to step 5 with results
             if (Request.Query["fail"].ToBoolean())
@@ -283,7 +300,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("choose-organisation")]
-        public async Task<IActionResult> ChooseOrganisation(OrganisationSearchViewModel searchViewModel, string command)
+        public async Task<IActionResult> ChooseOrganisation(OrganisationSearchViewModel searchViewModel, [IgnoreText] string command)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -329,7 +346,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             }
             else if (command == "pageNext")
             {
-                if (nextPage >= organisationViewModel.Organisations.PageCount) throw new Exception("Cannot go past last page");
+                if (nextPage >= organisationViewModel.Organisations.ActualPageCount) throw new Exception("Cannot go past last page");
 
                 nextPage++;
                 doSearch = true;
@@ -344,7 +361,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             else if (command.StartsWithI("page_"))
             {
                 var page = command.AfterFirst("page_").ToInt32();
-                if (page < 1 || page > organisationViewModel.Organisations.PageCount) throw new Exception("Invalid page selected");
+                if (page < 1 || page > organisationViewModel.Organisations.ActualPageCount) throw new Exception("Invalid page selected");
 
                 if (page != nextPage)
                 {
@@ -432,7 +449,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     && !VirtualUser.UserOrganisations.Any(uo => uo.PINConfirmedDate != null))
                 {
                     AddModelError(3022);
-                    this.SetModelCustomErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<OrganisationSearchViewModel>();
                     searchViewModel.Organisations = organisationViewModel.Organisations;
                     searchViewModel.SectorType = organisationViewModel.SectorType;
                     searchViewModel.LastPrivateSearchRemoteTotal = organisationViewModel.LastPrivateSearchRemoteTotal;
@@ -476,7 +493,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     if (userOrg != null)
                     {
                         AddModelError(userOrg.PINConfirmedDate == null ? 3021 : 3020);
-                        this.SetModelCustomErrors<OrganisationViewModel>();
+                        this.SetModelCustomErrors<OrganisationSearchViewModel>();
                         searchViewModel.Organisations = organisationViewModel.Organisations;
                         searchViewModel.SectorType = organisationViewModel.SectorType;
                         searchViewModel.LastPrivateSearchRemoteTotal = organisationViewModel.LastPrivateSearchRemoteTotal;
@@ -501,14 +518,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 if (organisation.SectorType == SectorTypes.Public)
                 {
                     organisationViewModel.IsManualRegistration = false;
-                    organisationViewModel.IsSelectedAuthorised = organisation.IsAuthorised(VirtualUser.EmailAddress);
-                    if (!organisationViewModel.IsSelectedAuthorised || !organisation.HasAnyAddress())
-                    {
                         organisationViewModel.IsManualAddress = true;
                         organisationViewModel.AddressReturnAction = nameof(ChooseOrganisation);
                         StashModel(organisationViewModel);
                         return RedirectToAction("AddAddress");
-                    }
                 }
                 else if (organisation.SectorType == SectorTypes.Private && !organisation.HasAnyAddress())
                 {
@@ -758,7 +771,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     o => o.OrganisationName,
                     o => orgIds.Contains(o.OrganisationId));
 
-            organisationViewModel.ManualOrganisations = organisations.Select(o => _registrationService.OrganisationBusinessLogic.CreateOrganisationRecord(o)).ToList();
+            organisationViewModel.ManualOrganisations = _registrationService.OrganisationBusinessLogic.CreateOrganisationRecords(organisations,false).ToList();
 
             //Ensure exact match shown at top
             if (organisationViewModel.ManualOrganisations != null && organisationViewModel.ManualOrganisations.Count > 1)
@@ -775,7 +788,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             {
                 organisationViewModel.ManualOrganisationIndex = 0;
                 StashModel(organisationViewModel);
-                return await SelectOrganisation(VirtualUser, organisationViewModel, organisationViewModel.ManualOrganisationIndex, nameof(AddOrganisation));
+                return await SelectOrganisation(VirtualUser, organisationViewModel, organisationViewModel.ManualOrganisationIndex, nameof(AddOrganisation), addOrganisationViewModel);
             }
 
             StashModel(organisationViewModel);
@@ -809,7 +822,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("select-organisation")]
-        public async Task<IActionResult> SelectOrganisation(string command)
+        public async Task<IActionResult> SelectOrganisation([IgnoreText]string command)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -833,14 +846,14 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             var organisationIndex = command.AfterFirst("organisation_").ToInt32();
 
-            return await SelectOrganisation(VirtualUser, model, organisationIndex, nameof(SelectOrganisation));
+            return await SelectOrganisation(VirtualUser, model, organisationIndex, nameof(SelectOrganisation), model);
         }
 
         [NonAction]
         protected async Task<IActionResult> SelectOrganisation(User VirtualUser,
             OrganisationViewModel model,
             int organisationIndex,
-            string returnAction)
+            string returnAction, object originalModel)
         {
             if (organisationIndex < 0) return new HttpBadRequestResult($"Invalid organisation index {organisationIndex}");
 
@@ -867,8 +880,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     !VirtualUser.UserOrganisations.Any(uo => uo.PINConfirmedDate != null))
                 {
                     AddModelError(3022);
-                    this.SetModelCustomErrors<OrganisationViewModel>();
-                    return View(returnAction, model);
+                    return View(returnAction, originalModel);
                 }
 
 
@@ -877,8 +889,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (userOrg != null)
             {
                 AddModelError(userOrg.PINConfirmedDate == null ? 3021 : 3020);
-                this.SetModelCustomErrors<OrganisationViewModel>();
-                return View(returnAction, model);
+                return View(returnAction, originalModel);
             }
 
             //If the organisation already exists in DB then use its address and not that from CoHo
@@ -887,8 +898,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             //Make sure the organisation has an address
             if (organisation.SectorType == SectorTypes.Public)
             {
-                model.IsManualAuthorised = organisation.IsAuthorised(VirtualUser.EmailAddress);
-                if (!model.IsManualAuthorised || !organisation.HasAnyAddress()) model.IsManualAddress = true;
+                if (!organisation.HasAnyAddress()) model.IsManualAddress = true;
             }
             else if (organisation.SectorType == SectorTypes.Private && !organisation.HasAnyAddress())
             {
@@ -1066,14 +1076,14 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     if (organisation.IsUkAddress.HasValue)
                         model.IsUkAddress = organisation.IsUkAddress;
                     else if (!string.IsNullOrWhiteSpace(organisation.PostCode))
-                        model.IsUkAddress = await _postcodeChecker.IsValidPostcode(organisation.PostCode)
+                        model.IsUkAddress = await _postcodeChecker.CheckPostcodeAsync(organisation.PostCode)
                             ? true
                             : (bool?)null;
                 }
                 else
                 {
                     if (!string.IsNullOrWhiteSpace(model.Postcode))
-                        model.IsUkAddress = await _postcodeChecker.IsValidPostcode(model.Postcode)
+                        model.IsUkAddress = await _postcodeChecker.CheckPostcodeAsync(model.Postcode)
                             ? true
                             : (bool?)null;
                 }
@@ -1096,7 +1106,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("confirm-organisation")]
-        public async Task<IActionResult> ConfirmOrganisation(ConfirmOrganisationViewModel confirmOrganisationViewModel, string command = null)
+        public async Task<IActionResult> ConfirmOrganisation(ConfirmOrganisationViewModel confirmOrganisationViewModel, [IgnoreText]string command = null)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -1153,12 +1163,13 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             catch (Exception ex)
             {
                 //This line is to help diagnose object reference not found exception raised at this point 
-                Logger.LogWarning(ex, Core.Extensions.Json.SerializeObject(organisationViewModel));
+                Logger.LogError(ex, Core.Extensions.Json.SerializeObject(organisationViewModel));
                 throw;
             }
 
             //Save the organisation identifier
             TempData["NewOrganisationIdentifier"] = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId);
+            TempData["NewUserIdentifier"] = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.UserId);
 
             PendingFasttrackCodes = null;
 
@@ -1185,7 +1196,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 else
                 {
                     organisation = organisationViewModel.GetSelectedOrganisation();
-                    authorised = organisationViewModel.IsSelectedAuthorised;
+                    authorised = organisationViewModel.IsFastTrackAuthorised;
                     if (organisation != null) hasAddress = organisation.HasAnyAddress();
                 }
             }
@@ -1196,8 +1207,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (organisationViewModel.IsManualRegistration ||
                 organisationViewModel.IsManualAddress && (sector == SectorTypes.Private || !authorised || hasAddress))
             {
-                var reviewCode = Encryption.EncryptQuerystring(
-                    userOrg.UserId + ":" + userOrg.OrganisationId + ":" + VirtualDateTime.Now.ToSmallDateTime());
+                var reviewCode = Encryption.Encrypt($"{userOrg.UserId}:{userOrg.OrganisationId}:{VirtualDateTime.Now.ToSmallDateTime()}", Encryption.Encodings.Base62);
 
                 return RedirectToAction("RequestReceived");
             }
@@ -1233,6 +1243,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     new CompleteViewModel
                     {
                         OrganisationId = userOrg.OrganisationId,
+                        OrganisationName = userOrg.Organisation.OrganisationName,
                         AccountingDate = _registrationService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(sector.Value)
                     });
 
@@ -1240,9 +1251,12 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 return RedirectToAction("ServiceActivated");
             }
 
-
             //If private sector then send the pin
-            if (organisationViewModel.IsUkAddress.HasValue && organisationViewModel.IsUkAddress.Value) return RedirectToAction("PINSent");
+            if (organisationViewModel.IsUkAddress.HasValue && organisationViewModel.IsUkAddress.Value)
+            {
+                var id = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId);
+                return RedirectToAction("PINSent", new { id });
+            }
 
             return RedirectToAction("RequestReceived");
         }
@@ -1273,7 +1287,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 else
                 {
                     organisationRecord = model.GetSelectedOrganisation();
-                    authorised = model.IsSelectedAuthorised;
+                    authorised = model.IsFastTrackAuthorised;
                     if (organisationRecord != null) hasAddress = organisationRecord.HasAnyAddress();
                 }
             }
@@ -1364,6 +1378,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 newName = organisationRecord.OrganisationName;
                 newNameSource = organisationRecord.NameSource;
             }
+
+            newName=newName?.Trim().Left(100);
 
             if (string.IsNullOrWhiteSpace(newName))
                 throw new Exception("Cannot save a registration with no organisation name");
@@ -1503,10 +1519,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 address.Country = newAddressModel.Country;
                 address.PostCode = newAddressModel.PostCode;
                 address.PoBox = newAddressModel.PoBox;
+                address.Trim();
                 address.IsUkAddress = newAddressModel.IsUkAddress;
                 address.Source = newAddressSource;
-                address.SetStatus(AddressStatuses.Pending,
-                    OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId);
+                address.SetStatus(AddressStatuses.Pending,OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId);
                 _registrationService.OrganisationBusinessLogic.DataRepository.Insert(address);
             }
 
@@ -1566,9 +1582,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (authorised && !model.IsManualRegistration && (!model.IsManualAddress || !hasAddress))
             {
                 //Set the user org as confirmed
-                userOrg.Method = model.IsFastTrackAuthorised
-                    ? RegistrationMethods.Fasttrack
-                    : RegistrationMethods.EmailDomain;
+                userOrg.Method = RegistrationMethods.Fasttrack;
                 userOrg.ConfirmAttempts = 0;
                 userOrg.PINConfirmedDate = now;
 

@@ -37,12 +37,12 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (organisation != null)
             {
                 var list = organisation.GetAddressList();
-                model.Address1 = list.Count > 0 ? list[0] : null;
-                model.Address2 = list.Count > 1 ? list[1] : null;
-                model.Address3 = list.Count > 2 ? list[2] : null;
-                model.City = null;
-                model.County = null;
-                model.Country = null;
+                model.Address1 = organisation.Address1;
+                model.Address2 = organisation.Address2;
+                model.Address3 = organisation.Address3;
+                model.City = organisation.City;
+                model.County = organisation.County;
+                model.Country = organisation.Country;
                 model.Postcode = organisation.PostCode;
             }
 
@@ -51,7 +51,9 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 AddressReturnAction = model.AddressReturnAction,
                 Address1 = model.Address1,
                 Address2 = model.Address2,
-                Address3 = model.Address3,
+                City = model.City,
+                County = model.County,
+                Country = model.Country,
                 Postcode = model.Postcode
             }; 
             return View(nameof(AddAddress), addAddressViewModel);
@@ -79,7 +81,11 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             organisationViewModel.Address1 = addAddressViewModel.Address1;
             organisationViewModel.Address2 = addAddressViewModel.Address2;
-            organisationViewModel.Address3 = addAddressViewModel.Address3;
+            organisationViewModel.Address3 = null;
+            organisationViewModel.City = addAddressViewModel.City;
+            organisationViewModel.County = addAddressViewModel.County;
+            organisationViewModel.Country = addAddressViewModel.Country;
+            organisationViewModel.PoBox = null;
             organisationViewModel.Postcode = addAddressViewModel.Postcode;
 
             var authorised = false;
@@ -95,7 +101,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 else
                 {
                     organisationRecord = organisationViewModel.GetSelectedOrganisation();
-                    authorised = organisationViewModel.IsSelectedAuthorised;
+                    authorised = organisationViewModel.IsFastTrackAuthorised;
                 }
             }
 

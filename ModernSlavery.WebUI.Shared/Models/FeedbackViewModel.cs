@@ -6,6 +6,7 @@ using ModernSlavery.WebUI.GDSDesignSystem;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Shared.Models
 {
@@ -19,7 +20,9 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         [Required]
         [MaxLength(2000)]
+        [Text]
         public string Details { get; set; }
+
         [EmailAddress]
         public string EmailAddress { get; set; }
         [Phone]

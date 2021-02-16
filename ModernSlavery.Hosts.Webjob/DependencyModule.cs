@@ -58,7 +58,7 @@ namespace ModernSlavery.Hosts.Webjob
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterType<DatabaseContext>().As<IDbContext>();
+            builder.RegisterType<DatabaseContext>().As<IDbContext>().InstancePerDependency();
             builder.RegisterType<SqlRepository>().As<IDataRepository>().InstancePerDependency();
 
             //Register the messaging dependencies
@@ -127,7 +127,7 @@ namespace ModernSlavery.Hosts.Webjob
                 repo.Add<TTemplate>(templateId, $"{templateConfigKey}.html");
             }
 
-            Task.WaitAll(fileRepository.PushRemoteFileAsync(Filenames.SicSectorSynonyms, sharedOptions.DataPath));
+            Task.WaitAll(fileRepository.PushRemoteFileAsync(Filenames.SicSectorSynonyms, sharedOptions.AppDataPath));
 
             applicationLifetime.ApplicationStarted.Register(
                 () =>

@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.LoadTests", "ModernSlavery.LoadTests\ModernSlavery.LoadTests.csproj", "{637D90F3-7735-45CE-B101-D9BEC62AAC19}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModernSlavery.WebTestPlugins", "ModernSlavery.WebTestPlugins\ModernSlavery.WebTestPlugins.csproj", "{944CD711-4459-444D-90F3-6C18ADF25753}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7D540BBA-708D-47B1-8192-5EDFF27CD268}"
+	ProjectSection(SolutionItems) = preProject
+		ModernSlavery.LoadTests\Azure.testsettings = ModernSlavery.LoadTests\Azure.testsettings
+		ModernSlavery.LoadTests\Local.testsettings = ModernSlavery.LoadTests\Local.testsettings
+		ModernSlavery.LoadTests\TestController.testsettings = ModernSlavery.LoadTests\TestController.testsettings
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		DebugLocal|Any CPU = DebugLocal|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{637D90F3-7735-45CE-B101-D9BEC62AAC19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{637D90F3-7735-45CE-B101-D9BEC62AAC19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{637D90F3-7735-45CE-B101-D9BEC62AAC19}.DebugLocal|Any CPU.ActiveCfg = DebugLocal|Any CPU
+		{637D90F3-7735-45CE-B101-D9BEC62AAC19}.DebugLocal|Any CPU.Build.0 = DebugLocal|Any CPU
+		{637D90F3-7735-45CE-B101-D9BEC62AAC19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{637D90F3-7735-45CE-B101-D9BEC62AAC19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{944CD711-4459-444D-90F3-6C18ADF25753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{944CD711-4459-444D-90F3-6C18ADF25753}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{944CD711-4459-444D-90F3-6C18ADF25753}.DebugLocal|Any CPU.ActiveCfg = DebugLocal|Any CPU
+		{944CD711-4459-444D-90F3-6C18ADF25753}.DebugLocal|Any CPU.Build.0 = DebugLocal|Any CPU
+		{944CD711-4459-444D-90F3-6C18ADF25753}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{944CD711-4459-444D-90F3-6C18ADF25753}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {527D595B-8663-4CBE-A010-5E83739DCD01}
+	EndGlobalSection
+EndGlobal

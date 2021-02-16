@@ -1,6 +1,6 @@
 @{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Confirm your organisation - Modern Slavery reporting service";
+    Title = "Confirm your organisation";
     var controller = ViewData["Controller"] as BaseController;
 }
 @model OrganisationViewModel
@@ -25,6 +25,7 @@
         {
             @Html.AntiForgeryToken()
             @await Html.GovUkValidationSummaryAsync()
+
             <h1 class="govuk-heading-l">
                 Confirm your organisation’s details
             </h1>
@@ -32,11 +33,12 @@
             <table class="govuk-table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header">
-                        </th>
-                        <th scope="col" class="govuk-table__header">
-                        </th>
-                        <th></th>
+                        <td class="govuk-table__header">
+                        </td>
+                        <td class="govuk-table__header">
+                        </td>
+                        <td class="govuk-table__header">
+                        </td>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">

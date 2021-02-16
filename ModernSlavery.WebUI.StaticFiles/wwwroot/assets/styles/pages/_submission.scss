@@ -26,4 +26,25 @@
     .autocomplete__input:not(.autocomplete__input--focused):focus {
         outline-width: 0;
     }
+
+    @include govuk-media-query($from: tablet) {
+        .country-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .country-input {
+            flex-grow: 1;
+            padding-right: govuk-spacing(3);
+        }
+
+        .country-button {
+            flex-grow: 0;
+        }
+    }
+
+    #SelectedCountry{
+        width:100%;
+    }
 }

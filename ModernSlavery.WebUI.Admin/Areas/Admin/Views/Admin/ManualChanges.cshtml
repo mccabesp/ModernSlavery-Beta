@@ -1,7 +1,7 @@
 ﻿@model ManualChangesViewModel
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
-    ViewBag.Title = "Administration: Manual Changes";
+    Layout = "~/Views/GdsLayout.cshtml";
+    Title = "Administration: Manual Changes";
     var options = new[]
     {
         "Please select..",
@@ -10,7 +10,6 @@
         "Retire organisations",
         "Unretire organisations",
         "Delete submissions",
-        "Fix organisation names",
         "Add organisations latest name",
         "Reset organisation to only original name",
         "Set organisation company number",
@@ -25,70 +24,76 @@
         "Expire security code",
         "Create security codes for all active and pending orgs",
         "Extend security codes for all active and pending orgs",
-        "Expire security codes for all active and pending orgs",
-        "Recreate search indexes",
-        "Update search indexes",
-        "Update GPG download data files",
-        "Fix database errors"
+        "Expire security codes for all active and pending orgs"
     };
 }
 
-<main id="content" role="main">
-    <div class="breadcrumbs dynamic-content default-content" style="display: block;">
-        <ol>
-            <li style="display: block; padding-bottom: 0; padding-top: 0.75em;">
-                &lt;
-                @Html.ActionLink("Back to administration home", "Home")
-            </li>
-        </ol>
-    </div>
+@section BeforeMain {
+    <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Url.Action("Home")">Back to Adminstration home</a>
+}
 
-    <div class="grid-row">
-        <div class="column-full">
-            @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+        {
+            @await Html.GovUkValidationSummaryAsync()
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.LastTestedCommand)
+            @Html.HiddenFor(m => m.LastTestedInput)
+
+            <h1 class="govuk-heading-l" style="margin-top: 0.3em;">
+                <span id="companyname">Administration</span> <br />
+                <span class="govuk-hint govuk-!-font-size-24 govuk-!-margin-top-2">Manual Changes</span>
+            </h1>
+
+            if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
             {
-                @await Html.CustomValidationSummaryAsync()
-                @Html.AntiForgeryToken()
-                @Html.HiddenFor(m => m.LastTestedCommand)
-                @Html.HiddenFor(m => m.LastTestedInput)
-
-                <h1 class="heading-large" style="margin-top: 0.3em;">
-                    <span id="companyname">Administration</span>
-                    <span class="heading-secondary">Manual Changes</span>
-                </h1>
-                if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
-                {
-                    <p style="color: darkgreen; font-weight: bold;">@Model.SuccessMessage</p>
-                }
-                if (Model.Tested)
-                {
-                    <p style="color: #b10e1e; font-weight: bold;">CHECK THE TEST RESULTS BELOW AND CLICK THE 'EXECUTE' BUTTON AGAIN TO IMPLEMENT THE ACTUAL CHANGES</p>
-                }
-                <h3 class="heading-small">COMMAND</h3>
-                @Html.DropDownListFor(model => Model.Command, new SelectList(options), new { @class = "form-control" })
-
-                <h3 class="heading-small">PARAMETERS</h3>
-                <p>
-                    Enter each change on a new line. Use a equal symbol ('=') to separate reference from values, for example <br /><br />
-                    'MZC3TMGQ=New Org Name Ltd' or<br />
-                    'SXAT6DGC=[Address1],[Address2],[Address3],[TownCity],[County],[Country],[PostCode]'<br />Note: ([Address1], [TownCity] and [PostCode] are required)
-                </p>
-
-                <p>@Html.TextAreaFor(model => Model.Parameters, 6, 60, new { @class = "form-control", style = "width:100%" })</p>
-
-                <h3 class="heading-small">COMMENT</h3>
-                <p>Add a comment here which will be stored against the changes</p>
-
-                <p>@Html.TextAreaFor(model => Model.Comment, 3, 60, new { @class = "form-control", style = "width:100%" })</p>
-
-                <h3 class="heading-small">RESPONSE</h3>
-                <div style="border: 2px solid #6f777b; max-height: 400px; min-height: 100px; overflow: auto;">@Html.Raw(Model.Results.ReplaceI(Environment.NewLine, "</br>"))</div>
-
-                <p>
-                    <button type="submit" class="button" role="button" onclick="if (!confirm('Are you sure you want to execute this action?')) return false;">Execute</button>
-                </p>
+                <p class="govuk-body" style="color: darkgreen; font-weight: bold;">@Model.SuccessMessage</p>
             }
-        </div>
+            if (Model.Tested)
+            {
+                <p class="govuk-body" style="color: #b10e1e; font-weight: bold;">CHECK THE TEST RESULTS BELOW AND CLICK THE 'EXECUTE' BUTTON AGAIN TO IMPLEMENT THE ACTUAL CHANGES</p>
+            }
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-!-font-weight-bold" for="Command">
+                    COMMAND
+                </label>
 
+                @Html.DropDownListFor(model => Model.Command, new SelectList(options), new { @class = "govuk-select" })
+            </div>
+
+            <h2 class="govuk-heading-s">PARAMETERS</h2>
+            <p class="govuk-body">
+                Enter each change on a new line. Use a equal symbol ('=') to separate reference from values, for example <br /><br />
+                'MZC3TMGQ=New Org Name Ltd' or<br />
+                'SXAT6DGC=[Address1],[Address2],[Address3],[TownCity],[County],[Country],[PostCode]'<br />Note: ([Address1], [TownCity] and [PostCode] are required)
+            </p>
+
+            <p class="govuk-body">@Html.TextAreaFor(model => Model.Parameters, 6, 60, new { @class = "form-control", style = "width:100%", aria_label = "Parameters" })</p>
+
+            <h2 class="govuk-heading-s">COMMENT</h2>
+            <p class="govuk-body">Add a comment here which will be stored against the changes</p>
+
+            <p class="govuk-body">@Html.TextAreaFor(model => Model.Comment, 3, 60, new { @class = "form-control", style = "width:100%", aria_label = "Comment" })</p>
+
+            <h2 class="govuk-heading-s">RESPONSE</h2>
+            <div style="border: 2px solid #6f777b; max-height: 400px; min-height: 100px; overflow: auto;">@Html.Raw(Model.Results.ReplaceI(Environment.NewLine, "</br>"))</div>
+
+            <p class="govuk-body govuk-!-margin-top-3">
+                <button type="submit" class="govuk-button" role="button" onclick="if (!confirm('Are you sure you want to execute this action?')) return false;">Execute</button>
+            </p>
+        }
     </div>
-</main>
+
+</div>
+@section AfterLoadedCompiledScripts {
+
+    <script type="text/javascript" nonce="@Html.GetNonce()">
+        $(function () {
+            "use strict";
+            jQuery(":submit").click(function () {
+                if (!confirm('Are you sure you want to execute this action?')) return false;
+            });
+        });
+    </script>
+}

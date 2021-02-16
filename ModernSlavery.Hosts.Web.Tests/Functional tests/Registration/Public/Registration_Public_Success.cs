@@ -24,35 +24,38 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //HostHelper.ResetDbScope();
             org = this.Find<Organisation>(org => org.SectorType.IsAny(SectorTypes.Public) && org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         
         [Test, Order(30)]
         public async Task ExpectAddressFields()
         {
-
-
-//            ClickButton(That.Contains, "Choose");
-            ExpectHeader("Your organisation's address");
+            //ClickButton(That.Contains, "Choose");
+            ExpectHeader(That.Contains, "Your organisation’s address");
 
             var OrgAdress = org.GetAddress(DateTime.Now);
             //fields pre-populated
-            //todo discuss address issue - RegistrationController.Manual
-            //AtField("Address 1").Expect(OrgAdress.Address1);
-            //AtField("Address 2").Expect(OrgAdress.TownCity);
-            //AtField("Address 3").Expect(OrgAdress.County);
-            //AtField("Postcode").Expect(OrgAdress.PostCode);
-            await Task.CompletedTask;
+
+            //// The "line 1 of 2" is not visible but is in the label
+            //Set("Building and street line 1 of 2").To(OrgAdress.Address1);
+            //// This label is visually hidden
+            //Set("Building and street line 2 of 2").To(OrgAdress.Address2);
+            //Set("Town or city").To(OrgAdress.TownCity);
+            //Set("County").To(OrgAdress.County);
+            //Set("Postcode or zip code").To(OrgAdress.PostCode);
+
+            await Task.CompletedTask.ConfigureAwait(false);
         }
+
         [Test, Order(31)]
         public async Task ClickingContinueNavigatesToContactDetailsPage()
         {
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             ExpectHeader("Your contact details");
             ExpectText("Enter your contact details.");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(32)]
@@ -64,25 +67,22 @@ namespace ModernSlavery.Hosts.Web.Tests
             AtField("Email address").Expect(UniqueEmail);
             AtField("Job title").Expect(Create_Account.roger_job_title);
             Set("Telephone number").To("01414453344");
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(33)]
         public async Task ClickingContinueNavigatesToOrgDetailsPage()
         {
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             ExpectHeader("Confirm your organisation’s details");
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(34)]
         public async Task ExpectOrgDetailsFields()
         {
-
             RightOfText("Organisation name").Expect(org.OrganisationName);
             //RightOfText("Registered address").Expect(org.GetAddressString(DateTime.Now));
 
@@ -90,15 +90,15 @@ namespace ModernSlavery.Hosts.Web.Tests
             RightOfText("Your name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last + " (" + Create_Account.roger_job_title+ ")");
             RightOfText("Email").Expect(UniqueEmail);
             RightOfText("Telephone").Expect("01414453344");
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
+
         [Test, Order(36)]
         public async Task ConfirmUkAddress()
         {
             ExpectHeader("Is this a UK address?");
             ClickLabel("Yes");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -106,13 +106,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingContinueNavigatesToConfirmPage()
         {
             Click("Confirm");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             //Expect("Reporting as " + Registration.OrgName_Blackpool + " " + Registration.Address3_Blackpool);
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
-
 
         [Test, Order(38)]
         public async Task ExpectConfirmationDetails()
@@ -127,8 +125,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectXPath("//a[@href='mailto:modernslaverystatements@homeoffice.gov.uk']");
             Click(The.Bottom, "Manage Organisations");
             Expect(org.OrganisationName);
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

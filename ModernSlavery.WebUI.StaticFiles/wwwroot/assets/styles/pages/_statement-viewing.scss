@@ -10,15 +10,11 @@
             color: govuk-colour("white");
         }
     }
+}
 
-    &.govuk-panel--grey {
-        color: govuk-colour("white");
-        background: #797979;
-
-        .govuk-link {
-            color: govuk-colour("white");
-        }
-    }
+.viewing-statement h2.govuk-heading-m {
+    @include govuk-font($size: 27, $weight: bold);
+    @include govuk-responsive-margin(5, "bottom");
 }
 
 .govuk-list {
@@ -35,6 +31,48 @@
     }
 }
 
+.nothing-included {
+    @include govuk-responsive-margin(2, "top");
+}
+
+.nothing-included__label {
+    @include govuk-font($size: 19, $weight: bold);
+    @include govuk-responsive-margin(2, "bottom");
+}
+
+.nothing-included__tag {
+    @include govuk-font($size: 19, $weight: bold);
+    font-family: 'Arial-BoldMT', 'Arial Bold', 'Arial';
+    text-transform: unset;
+    letter-spacing: 0;
+}
+
+.statement-section-full {
+    @extend .govuk-grid-column-full;
+    margin-top: govuk-spacing(8);
+
+    & > .govuk-grid-column-two-thirds {
+        padding-left: 0;
+    }
+
+    & > .govuk-grid-column-full {
+        padding-left: 0;
+    }
+}
+
+.statement-section-two-thirds {
+    @extend .govuk-grid-column-two-thirds;
+    margin-top: govuk-spacing(8);
+
+    & > .govuk-grid-column-two-thirds {
+        padding-left: 0;
+    }
+
+    & > .govuk-grid-column-full {
+        padding-left: 0;
+    }
+}
+
 .app-statement-summary_free-text {
     white-space: pre-line;
     margin: 0;
@@ -42,16 +80,122 @@
 
 .app-statement-summary_url {
 
-    .app-statement-summary_url-link-broken {
+    .govuk-link {
+        text-decoration: none;
+
+        &:visited, &:hover, &:active, &:focus {
+            text-decoration: none;
+        }
+    }
+
+    .link-header {
+        @include govuk-font($size: 24, $weight: bold);
+    }
+
+    .link-text {
+        @include govuk-font($size: 16);
+    }
+
+    .link-text--action {
+        text-decoration: underline;
+        font-weight: bold;
+        color: #fff;
+    }
+}
+
+.app-question-list {
+    @include govuk-media-query($from: tablet) {
+        display: table;
+        border-collapse: collapse;
+        width: 100%;
+    }
+}
+
+.app-question-list__header {
+    font-weight: bold;
+    border-bottom: 1px solid $govuk-border-colour;
+
+    .app-question-list__column:not(:first-child) {
         display: none;
     }
 
-    .app-statement-summary_url-link-working {
-        a:link {            
-            text-decoration:none;
-            p{
-                text-decoration:underline;
-            }  
+    @include govuk-media-query($from: tablet) {
+        display: table-row;
+
+        .app-question-list__column {
+            display: table-cell !important;
+        }
+    }
+}
+
+.app-question-list__item {
+    border-bottom: 1px solid $govuk-border-colour;
+
+    &:first-child {
+        border-top: 1px solid $govuk-border-colour;
+    }
+
+    @include govuk-media-query($from: tablet) {
+        display: table-row;
+    }
+}
+
+.app-question-list__column {
+    padding-top: govuk-spacing(3);
+    padding-right: govuk-spacing(5);
+    padding-bottom: govuk-spacing(3);
+
+    @include govuk-media-query($from: tablet) {
+        display: table-cell;
+    }
+}
+
+.app-question-list__name {
+    @include govuk-media-query($from: tablet) {
+
+        &.risk {
+            width: govuk-grid-width($key: one-half);
+        }
+
+        &:not(.risk) {
+            width: govuk-grid-width($key: two-thirds);
+        }
+    }
+}
+
+.app-no-response {
+    .app-no-response__label {
+        font-weight: bold;
+        margin-bottom: govuk-spacing(2);
+    }
+}
+
+.app-question-list__response {
+    .app-question-list__response-label {
+        font-weight: bold;
+    }
+
+    .app-question-list__tag {
+        padding-left: govuk-spacing(3);
+        padding-right: govuk-spacing(3);
+
+        & + .app-question-list__response-details {
+            margin-top: govuk-spacing(2);
+        }
+    }
+
+    @include govuk-media-query($from: tablet) {
+
+        &.risk {
+            width: govuk-grid-width($key: one-half);
+        }
+
+        &:not(.risk) {
+            width: govuk-grid-width($key: one-third);
+        }
+
+        .app-question-list__response-label {
+            display: none;
         }
     }
 }

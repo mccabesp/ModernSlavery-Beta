@@ -1,7 +1,7 @@
 ﻿@model ChangeOrganisationNameViewModel
 @{Layout = "~/Views/GdsLayout.cshtml";}
 @{
-    ViewBag.Title = $"Change name - {Model.Organisation.OrganisationName} - Administration - Modern Slavery Reporting service";
+    Title = $"Change name - {Model.Organisation.OrganisationName} - Administration";
 }
 
 @section BeforeMain {
@@ -113,7 +113,7 @@
                     var acceptCoHoRadio = document.getElementById(
                         '@($"GovUk_Radio_{nameof(ChangeOrganisationNameViewModel.AcceptCompaniesHouseName)}_{nameof(AcceptCompaniesHouseName.Accept)}")');
                     var radios = document.querySelectorAll(
-                        'input[type=radio][name="@($"GovUk_Radio_{nameof(ChangeOrganisationNameViewModel.AcceptCompaniesHouseName)}")"]');
+                        'input[type=radio][name="@($"{nameof(ChangeOrganisationNameViewModel.AcceptCompaniesHouseName)}")"]');
 
                     function changeReasonVisibilityBasedOnCoHoNameAcceptRadio() {
                         var reasonElement = document.getElementById('reason-for-change-container');

@@ -4,6 +4,7 @@ using AutoMapper;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -36,26 +37,32 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public bool? IncludesStructure { get; set; }
         [MaxLength(200)]
+        [Text]
         public string StructureDetails { get; set; }
 
         public bool? IncludesPolicies { get; set; }
         [MaxLength(200)]
+        [Text] 
         public string PolicyDetails { get; set; }
 
         public bool? IncludesRisks { get; set; }
         [MaxLength(200)]
+        [Text] 
         public string RisksDetails { get; set; }
 
         public bool? IncludesDueDiligence { get; set; }
         [MaxLength(200)]
+        [Text] 
         public string DueDiligenceDetails { get; set; }
 
         public bool? IncludesTraining { get; set; }
         [MaxLength(200)]
+        [Text] 
         public string TrainingDetails { get; set; }
 
         public bool? IncludesGoals { get; set; }
         [MaxLength(200)]
+        [Text] 
         public string GoalsDetails { get; set; }
 
         public override Status GetStatus()

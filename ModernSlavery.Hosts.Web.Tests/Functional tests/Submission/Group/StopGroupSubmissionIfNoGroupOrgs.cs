@@ -14,107 +14,125 @@ namespace ModernSlavery.Hosts.Web.Tests
     public class StopGroupSubmissionIfNoGroupOrgs : Submission_Complete_Mandatory_Sections
 
     {
-        
+
         public Organisation[] Organisations { get; private set; }
 
         [OneTimeSetUp]
         public async Task SetUp()
         {
-            
+
 
             Organisations = this.FindAllUnusedOrgs().ToArray();
 
             org = Organisations[0];
 
         }
-        [Test, Order(50)]
+        [Test, Order(70)]
         public async Task RegisterSecondOrg()
         {
-            await this.RegisterUserOrganisationAsync(Organisations[1].OrganisationName, UniqueEmail);
+            await this.RegisterUserOrganisationAsync(Organisations[1].OrganisationName, UniqueEmail).ConfigureAwait(false);
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
-        [Test, Order(51)]
+        [Test, Order(72)]
         public async Task NavigateToSubmissionPage()
         {
-            Click("Manage organisations");
+            Click("Your organisations");
             Click(org.OrganisationName);
             Click("Continue");
-            ExpectHeader("Review before submitting");
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
-        [Test, Order(52)]
+        [Test, Order(74)]
         public async Task EnsureSectionsAreCompleted()
         {
             //mandatory sections should be completed
-            RightOfText("Your modern slavery statement").ExpectText("Completed");
-            RightOfText("Areas covered by your modern statement").ExpectText("Completed");
-            await Task.CompletedTask;
+            var MandatorySections = new string[] {
+            "Organisations covered by the statement",
+            "Statement URL, dates and sign-off",
+            "Recommended areas covered by the statement",
+            "Your organisation", //abbereviated due to ' in string
+            "How many years you" //abbereviated due to ' in string
+            };
+
+
+
+
+            //mandaotry sections should be completed
+            foreach (var mandatorySection in MandatorySections)
+            {
+                Submission_Helper.SectionCompleteionCheck(this, true, mandatorySection);
+            }
+
+
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
-        [Test, Order(54)]
+        [Test, Order(76)]
         public async Task EnsureOptionalSectionsAreIncomplete()
         {
             //all other sections incomplete 
 
-            RightOfText("Your organisation").ExpectText("Not Completed");
-            RightOfText("Policies").ExpectText("Not Completed");
-            RightOfText("Supply chain risks and due diligence (part 1)").ExpectText("Not Completed");
-            RightOfText("Supply chain risks and due diligence (part 2)").ExpectText("Not Completed");
-            RightOfText("Training").ExpectText("Not Completed");
-            RightOfText("Monitoring progress").ExpectText("Not Completed");
-            await Task.CompletedTask;
+            var OptionalSections = new string[] {
+            "Policies",
+            "Training",
+            "Monitoring working conditions",
+            "Modern slavery risks",
+            "Finding indicators of modern slavery",
+            "Demonstrating progress"
+            };
+
+            //optional sections incomplete
+            foreach (var optionalSection in OptionalSections)
+            {
+                Submission_Helper.SectionCompleteionCheck(this, false, optionalSection);
+            }
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
-        [Test, Order(56)]
+        [Test, Order(78)]
         public async Task NavigateToConversionPage()
         {
-            Expect("Is this statement for a group of organisations?");
-            ClickText("Is this statement for a group of organisations?");
+            Click("Organisations covered by the statement");
+            ExpectHeader("Does your modern slavery statement cover a single organisation or a group of organisations?");
 
-            ExpectText(That.Contains, "If your statement is for a group of organisations, you need to ");
-            Expect(What.Contains, "specify it’s for a group");
-            ExpectText(That.Contains, "and tell us which organisations are in the group.");
-            ClickText(That.Contains, "specify it’s for a group");
-            ExpectHeader("Who is your statement for?");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
+
         }
 
-        [Test, Order(57)]
+        [Test, Order(80)]
         public async Task SelectConversionToAGroupSubmission()
         {
-            //Expect("a single organisation");
-            //Expect("a group of organisations");
-            //Click("a group of organisations");
+            ClickLabel("A group of organisations");
 
-            ExpectHeader("The 2020 modern slavery statement for " + org.OrganisationName + " covers:");
-        
-                ClickLabel("a group of organisations");
-                Click("Continue");
+            Click("Save and continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
-            await Task.CompletedTask;
+            ExpectHeader("Which organisations are included in your group statement?");
+
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
-        [Test, Order(58)]
+        [Test, Order(82)]
         public async Task IncompleteGroup()
         {
-            Expect("We need more information");
-            Expect(What.Contains, "tell us which organisations are included in your statement");
-           
-                await Task.CompletedTask;
-            }
-           
+            Click("Continue");
 
-            [Test, Order(62)]
-            public async Task ButtonNotClickable()
-            {
-            ExpectXPath("//button[@disabled = 'disabled' and contains(text(), 'Submit')]");
-                await Task.CompletedTask;
-            }
-                 
+            await Task.CompletedTask.ConfigureAwait(false);
         }
+
+
+        [Test, Order(84)]
+        public async Task ButtonNotClickable()
+        {
+            ExpectButton("Save as draft");
+            ExpectNoButton("Submit for publication");
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
+    }
 }

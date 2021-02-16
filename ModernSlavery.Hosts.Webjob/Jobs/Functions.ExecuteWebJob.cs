@@ -33,18 +33,6 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 case "UpdateFile":
                     await UpdateFileAsync(log, parameters["filePath"], parameters["action"]).ConfigureAwait(false);
                     break;
-                case "UpdateOrganisationSearch":
-                    await UpdateOrganisationSearchAsync(log, parameters["userEmail"], true).ConfigureAwait(false);
-                    break;
-                case "UpdateDownloadFiles":
-                    await UpdateDownloadFilesAsync(log, parameters["userEmail"], true).ConfigureAwait(false);
-                    break;
-                case "TakeSnapshot":
-                    await TakeSnapshotAsync(log).ConfigureAwait(false);
-                    break;
-                case "FixOrganisationsNames":
-                    await FixOrganisationsNamesAsync(log, parameters["userEmail"], parameters["comment"]).ConfigureAwait(false);
-                    break;
                 default:
                     var inputs = new Dictionary<string, object> { { "timer", null }, { "log", log } };
                     foreach (string key in parameters.Keys)

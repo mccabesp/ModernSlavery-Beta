@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model SubmissionCompleteViewModel
 @inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
@@ -22,7 +23,7 @@
             <p class="govuk-body">The information you've submitted is now published on the Modern slavery statement registry.</p>
 
             <div class="govuk-!-margin-bottom-4">
-                <a rel="track" data-track-category="pageElementInteraction" href="@Url.ActionArea("StatementSummary", "Viewing", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = Model.SubmissionDeadline.Year, returnUrl = Model.ContinueUrl})">View your published statement summary on the registry</a>
+                <a class="govuk-link" rel="track" data-track-category="pageElementInteraction" href="@Url.ActionArea("StatementSummary", "Viewing", "Viewing", new { organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = Model.SubmissionDeadline.Year, returnUrl = Model.ContinueUrl})">View your published statement summary on the registry</a>
             </div>
 
             <p class="govuk-body">If you want to make changes, you can edit the published information and resubmit it.</p>

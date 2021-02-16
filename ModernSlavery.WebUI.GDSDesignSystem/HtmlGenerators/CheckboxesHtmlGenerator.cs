@@ -64,7 +64,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 
             var checkboxesViewModel = new CheckboxesViewModel
             {
-                Name = $"GovUk_Checkbox_{propertyName}",
+                Name = propertyName,
                 IdPrefix = $"GovUk_{propertyName}",
                 Items = checkboxes,
                 Fieldset = fieldsetOptions,

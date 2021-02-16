@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.BusinessDomain.DevOps.Testing;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {

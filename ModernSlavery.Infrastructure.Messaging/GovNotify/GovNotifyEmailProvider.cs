@@ -35,10 +35,10 @@ namespace ModernSlavery.Infrastructure.Messaging.GovNotify
             var sendRequest = new SendEmailRequest { EmailAddress = emailAddress, TemplateId = templateId, Personalisation = parameters.GetPropertiesDictionary() };
 
             // send email
-            var response = await _govNotifyAPI.SendEmailAsync(sendRequest);
+            var response = await _govNotifyAPI.SendEmailAsync(sendRequest).ConfigureAwait(false);
 
             // get result
-            return await _govNotifyAPI.GetEmailResultAsync(response.EmailId);
+            return await _govNotifyAPI.GetEmailResultAsync(response.EmailId).ConfigureAwait(false);
         }
     }
 }

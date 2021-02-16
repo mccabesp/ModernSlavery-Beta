@@ -40,9 +40,7 @@ namespace ModernSlavery.WebUI.DevOps
         public void RegisterModules(IList<Type> modules)
         {
             //Register references dependency modules
-            modules.AddDependency<ModernSlavery.BusinessDomain.Shared.DependencyModule>();
-            modules.AddDependency<ModernSlavery.WebUI.Shared.DependencyModule>();
-
+            modules.AddDependency<BusinessDomain.DevOps.DependencyModule>();
         }
     }
 }

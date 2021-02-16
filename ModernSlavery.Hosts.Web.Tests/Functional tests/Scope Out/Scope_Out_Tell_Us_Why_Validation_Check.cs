@@ -17,7 +17,7 @@ using ModernSlavery.Testing.Helpers.Extensions;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Fixing")]
+    [TestFixture]
 
     class Scope_Out_Tell_Us_Why_Validation_Check : BaseUITest
     {
@@ -64,10 +64,10 @@ namespace ModernSlavery.Hosts.Web.Tests
             SignOutDeleteCookiesAndReturnToRoot(this);
 
 
-            await this.SetSecurityCode(org, new DateTime(2021, 6, 10));
+            await this.SetSecurityCode(org, new DateTime(2021, 6, 10)).ConfigureAwait(false);
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(22)]
@@ -77,7 +77,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Goto(ScopeConstants.ScopeUrl);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(24)]
@@ -85,16 +85,16 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Set("Organisation Reference").To(org.OrganisationReference);
             Set("Security Code").To(org.SecurityCode);
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(26)]
         public async Task SubmittingIndentityFormLeadsToConfirmOrgDetails()
         {
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
             ExpectHeader("Confirm your organisation’s details");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(28)]
         public async Task VerifyOrgDetails()
@@ -103,18 +103,18 @@ namespace ModernSlavery.Hosts.Web.Tests
             RightOfText("Organisation Reference").Expect(org.OrganisationReference);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(30)]
         public async Task ContinueonVerifyDetailsLeadsToTelUsWhy()
         {
             Click("Confirm and Continue");
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
             ExpectHeader("Tell us why your organisation is not required to publish a modern slavery statement");
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(32)]
@@ -122,11 +122,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             Expect("The following errors were detected");
             //error message tbc
             Expect("Please select at least one reason why");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(34)]
@@ -137,7 +137,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ClickLabel("Other");
 
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             Expect("The following errors were detected");
             //error message tbc
@@ -148,7 +148,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Set("What is your organisation's annual turnover or ?").To("5");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(36)]
@@ -159,7 +159,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Please specify").To("Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five 1");
 
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             Expect("The following errors were detected");
             //error message tbc
             Expect("More than 200 characters entered");
@@ -167,9 +167,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Please specify").To("Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five Five");
 
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Check your information before sending");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

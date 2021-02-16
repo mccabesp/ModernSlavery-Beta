@@ -49,15 +49,15 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             SignOutDeleteCookiesAndReturnToRoot(this);
 
-            await AxeHelper.CheckAccessibilityAsync(this);
-            await this.SetSecurityCode(org, new DateTime(2021, 6, 10));
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
+            await this.SetSecurityCode(org, new DateTime(2021, 6, 10)).ConfigureAwait(false);
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
-            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);           
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail).ConfigureAwait(false);           
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(22)]
@@ -65,7 +65,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {            
             Goto(ScopeConstants.ScopeUrl);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(24)]
@@ -73,7 +73,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Set("Organisation Reference").To(org.OrganisationReference);
             Set("Security Code").To(org.SecurityCode);
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(25)]
@@ -83,7 +83,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectHeader("Confirm your organisation’s details");
             RightOfText("Organisation Name").Expect(org.OrganisationName);
             RightOfText("Organisation Reference").Expect(org.OrganisationReference);
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(26)]
@@ -92,7 +92,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Confirm and continue");
             ExpectHeader(That.Contains, "Your organisation has already been registered on our service");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(28)]
@@ -105,7 +105,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             () => { Expect("check the organisation’s status, and see whether our records show it’s required or not required to publish a modern slavery statement"); },
             () => { Expect("update its status (or any other details)"); });
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         

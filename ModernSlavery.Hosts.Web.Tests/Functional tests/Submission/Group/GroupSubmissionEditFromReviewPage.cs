@@ -4,21 +4,21 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Waiting on 4773")]
+    [TestFixture]
 
     public class GroupSubmissionEditFromReviewPage : GroupSubmission_SwitchSingleToGroup
 
-        //DATA NEEDED: a third Group org to swap out for - Fly Jet Sweeden
+    //DATA NEEDED: a third Group org to swap out for - Fly Jet Sweeden
     {
         [Test, Order(80)]
         public async Task NavigateToReviewAndEditOrganisationsPage()
         {
-            ExpectHeader("Review before submitting");
-            ExpectText("You can review and edit the organisations included in this group statement, or tell us it’s for a single organisation instead.");
-            ClickText("review and edit the organisations");
+            Click(The.Top, "Edit and republish");
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+            ClickLink("Organisations covered by the statement");
             ExpectHeader("Review the organisations in your group statement");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(81)]
@@ -35,13 +35,13 @@ namespace ModernSlavery.Hosts.Web.Tests
             AtRow("Fly Jet Sweeden").Click("Include");
             ExpectText("1 organisation included");
 
-            Click("View your group");
+            Click("Continue");
             ExpectHeader("Review the organisations in your group statement");
-            Click("Confirm and continue");
+            Click("Continue");
 
-            ExpectHeader("Review before submitting");
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

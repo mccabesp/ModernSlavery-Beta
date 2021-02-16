@@ -7,17 +7,12 @@ using System.Reflection;
 using System.Threading.Tasks;
 using EFCore.BulkExtensions;
 using Microsoft.Data.SqlClient;
-using Microsoft.Data.SqlClient.AlwaysEncrypted.AzureKeyVaultProvider;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Options;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Azure.KeyVault;
 
 namespace ModernSlavery.Infrastructure.Database
 {
@@ -28,12 +23,11 @@ namespace ModernSlavery.Infrastructure.Database
 
         private readonly DatabaseOptions _databaseOptions;
         private readonly SharedOptions _sharedOptions;
-        private readonly TestOptions _testOptions;
         private static bool _migrationEnsured;
         public bool MigrationsApplied { get; }
         //private static bool _encryptionInitialised;
 
-        public DatabaseContext(SharedOptions sharedOptions, TestOptions testOptions, DatabaseOptions databaseOptions)
+        public DatabaseContext(SharedOptions sharedOptions, DatabaseOptions databaseOptions)
         {
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             _databaseOptions = databaseOptions ?? throw new ArgumentNullException(nameof(databaseOptions));
@@ -55,7 +49,7 @@ namespace ModernSlavery.Infrastructure.Database
         {
             if (_migrationEnsured)
                 return MigrationsApplied; //This static variable is a temporary measure otherwise each request for a Database context takes a few seconds to check for migrations or if the database exists
-
+            
             Database.Migrate();
             _migrationEnsured = true;
 
@@ -94,7 +88,7 @@ namespace ModernSlavery.Infrastructure.Database
 
             #endregion
 
-            return await base.SaveChangesAsync();
+            return await base.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public DatabaseFacade GetDatabase()
@@ -115,7 +109,8 @@ namespace ModernSlavery.Infrastructure.Database
                 previousTimeout = Database.GetCommandTimeout();
                 Database.SetCommandTimeout(timeout);
             }
-            await DbContextBulkExtensions.BulkInsertAsync(this,entities.ToList(), b=> { b.SetOutputIdentity = setOutputIdentity; b.PreserveInsertOrder = setOutputIdentity; b.BatchSize = batchSize; });
+            await this.BulkInsertAsync(entities.ToList(), b=> { b.SetOutputIdentity = setOutputIdentity; b.PreserveInsertOrder = setOutputIdentity; b.BatchSize = batchSize; }).ConfigureAwait(false);
+
             if (timeout != null) Database.SetCommandTimeout(previousTimeout);
         }
 
@@ -127,7 +122,8 @@ namespace ModernSlavery.Infrastructure.Database
                 previousTimeout = Database.GetCommandTimeout();
                 Database.SetCommandTimeout(timeout);
             }
-            await DbContextBulkExtensions.BulkDeleteAsync(this, entities.ToList(), b => { b.BatchSize = batchSize; });
+            await this.BulkDeleteAsync(entities.ToList(), b => { b.BatchSize = batchSize; }).ConfigureAwait(false);
+
             if (timeout != null) Database.SetCommandTimeout(previousTimeout);
         }
 
@@ -139,7 +135,8 @@ namespace ModernSlavery.Infrastructure.Database
                 previousTimeout = Database.GetCommandTimeout();
                 Database.SetCommandTimeout(timeout);
             }
-            await DbContextBulkExtensions.BulkUpdateAsync(this, entities.ToList(), b => { b.BatchSize = batchSize; });
+            await this.BulkUpdateAsync(entities.ToList(), b => { b.BatchSize = batchSize; }).ConfigureAwait(false);
+
             if (timeout != null) Database.SetCommandTimeout(previousTimeout);
         }
         
@@ -147,7 +144,7 @@ namespace ModernSlavery.Infrastructure.Database
         {
             if (!optionsBuilder.IsConfigured)
             {
-#if DEBUG
+#if DEBUG || DEBUGLOCAL
                 #region On local development machines add migration version to database name
                 if (_sharedOptions.IsDevelopment() || _sharedOptions.IsTest())
                 {

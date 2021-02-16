@@ -1,0 +1,78 @@
+﻿@using static Core.Entities.StatementSummary.V1.StatementSummary;
+
+@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+
+<div class="statement-section-full" id="policies">
+    <div class="govuk-grid-column-two-thirds">
+        <h2 class="govuk-heading-m">
+            Policies (optional)
+        </h2>
+
+        <div class="govuk-body">
+            We asked the organisation whether its policies include the following provisions in relation to its domestic and international supply chains, as well as its own operations.
+        </div>
+    </div>
+
+    @if (Model.Policies.Contains(PolicyTypes.None))
+    {
+        <div class="govuk-grid-column-two-thirds">
+            <div class="nothing-included">
+                <div class="nothing-included__label">Organisation’s response</div>
+                <strong class="govuk-tag govuk-tag--blue nothing-included__tag">
+                    The organisation told us its policies do not include any of the provisions we listed in our question.
+                </strong>
+            </div>
+        </div>
+    }
+    else if (Model.Policies.Any())
+    {
+        <div class="govuk-grid-column-full">
+            <div class="app-question-list">
+                <div class="app-question-list__header">
+                    <div class="app-question-list__column app-question-list__name">
+                        Policy provisions we asked about
+                    </div>
+                    <div class="app-question-list__column app-question-list__response">
+                        Organisation’s response
+                    </div>
+                </div>
+                @foreach (var policy in Enums.GetValuesExcept<PolicyTypes>(PolicyTypes.Unknown, PolicyTypes.None))
+                {
+                    var isOther = policy == PolicyTypes.Other;
+                    <div class="app-question-list__item">
+                        <div class="app-question-list__column app-question-list__name">
+                            @policy.GetEnumDescription()
+                        </div>
+                        <div class="app-question-list__column app-question-list__response">
+                            <span class="app-question-list__response-label">
+                                Organisation’s response:
+                            </span>
+                            @if (!isOther)
+                            {
+                                <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.Policies.Contains(policy) ? "Included" : "Not included")</strong>
+                            }
+                            else
+                            {
+                                <div @(string.IsNullOrEmpty(Model.OtherPolicies) ? "aria-description='no answer provided'" : "") class="app-question-list__response-details">
+                                    @if (string.IsNullOrEmpty(Model.OtherPolicies))
+                                    {
+                                        <text>-</text>
+                                    }
+                                    else
+                                    {
+                                        <text>@Model.OtherPolicies</text>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <partial name="Parts/StatementSummary/_NoResponse" />
+    }
+
+</div>

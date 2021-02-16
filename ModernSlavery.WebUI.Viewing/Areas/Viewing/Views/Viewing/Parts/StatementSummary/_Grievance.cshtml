@@ -1,0 +1,59 @@
+﻿@using static Core.Entities.StatementSummary.V1.StatementSummary;
+
+@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel;
+
+<div class="govuk-!-margin-top-8 govuk-grid-column-two-thirds">
+    <h3 class="govuk-heading-m">
+        Grievance mechanisms
+    </h3>
+
+    <div class="govuk-body">
+        We asked the organisation how workers in its operations or supply chains could raise concerns or make complaints.
+    </div>
+</div>
+
+@if (Model.GrievanceMechanisms.Contains(GrievanceMechanismTypes.None))
+{
+    <div class="govuk-grid-column-two-thirds">
+        <div class="nothing-included">
+            <div class="nothing-included__label">Organisation’s response</div>
+            <strong class="govuk-tag govuk-tag--blue nothing-included__tag">
+                The organisation told us there were no processes in its operations or supply chains for workers to raise concerns or make complaints.
+            </strong>
+        </div>
+    </div>
+}
+else if (Model.GrievanceMechanisms.Any())
+{
+    <div class="govuk-grid-column-full">
+        <div class="app-question-list">
+            <div class="app-question-list__header">
+                <div class="app-question-list__column app-question-list__name">
+                    We asked if workers could raise concerns this way
+                </div>
+                <div class="app-question-list__column app-question-list__response">
+                    Organisation’s response
+                </div>
+            </div>
+            @foreach (var grievanceMechanism in Enums.GetValuesExcept<GrievanceMechanismTypes>(GrievanceMechanismTypes.Unknown, GrievanceMechanismTypes.None))
+            {
+                <div class="app-question-list__item">
+                    <div class="app-question-list__column app-question-list__name">
+                        @grievanceMechanism.GetEnumDescription()
+                    </div>
+                    <div class="app-question-list__column app-question-list__response">
+                        <span class="app-question-list__response-label">
+                            Organisation’s response:
+                        </span>
+                        <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.GrievanceMechanisms.Contains(grievanceMechanism) ? "Yes" : "No")</strong>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+}
+else
+{
+    <partial name="Parts/StatementSummary/_NoResponse" />
+}

@@ -48,7 +48,9 @@ namespace ModernSlavery.WebUI.Shared.Models
             errorViewModel.ActionUrl = customErrorMessage.ActionUrl == "#" && uri != null
                 ? uri.PathAndQuery
                 : customErrorMessage.ActionUrl;
-            errorViewModel.ActionText = customErrorMessage.ActionText;
+
+            if (!string.IsNullOrWhiteSpace(customErrorMessage.ActionText))
+                errorViewModel.ActionText = customErrorMessage.ActionText;
 
             //Assign any values to variables
             if (parameters != null)

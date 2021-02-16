@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -41,6 +42,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             public long? StatementOrganisationId { get; set; }
             public bool Included { get; set; }
             public long? OrganisationId { get; set; }
+            [Text] 
             public string OrganisationName { get; set; }
             public AddressModel Address { get; set; }
             public string CompanyNumber { get; set; }

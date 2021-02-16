@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.WebTesting;
 
 namespace ModernSlavery.WebTestPlugins

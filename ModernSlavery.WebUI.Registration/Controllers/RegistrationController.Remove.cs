@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Registration.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
-using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 
@@ -17,7 +16,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
     {
         [Authorize]
         [HttpGet("~/remove-organisation/{orgId}/{userId}")]
-        public async Task<IActionResult> RemoveOrganisation(string orgId, string userId)
+        public async Task<IActionResult> RemoveOrganisation([Obfuscated] string orgId, [Obfuscated] string userId)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();

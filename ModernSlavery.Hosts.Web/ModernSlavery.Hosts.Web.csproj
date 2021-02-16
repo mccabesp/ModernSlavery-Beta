@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AspNetCoreModuleName>AspNetCoreModuleV2</AspNetCoreModuleName>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <Copyright>Crown Copyright © $([System.DateTime]::UtcNow.Year) ($([System.DateTime]::UtcNow.ToLocalTime()))</Copyright>
     <ProjectGuid>{1DF71C5E-2C26-43ED-80EA-79317303909F}</ProjectGuid>
-    <LangVersion>8.0</LangVersion>
     <!-- This is required otherwise refs folder (only needed during runtime compilation) is published -->
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
     <!-- Removes all the satellite language folders from theoutput directory-->
@@ -15,16 +13,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
-    <PackageReference Include="Lindhart.Analyser.MissingAwaitWarning" Version="1.2.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.11.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.2.0" />
   </ItemGroup>
 
@@ -49,6 +41,7 @@
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Search\ModernSlavery.Infrastructure.Search.csproj" />
     <ProjectReference Include="..\ModernSlavery.Infrastructure.Storage\ModernSlavery.Infrastructure.Storage.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Admin\ModernSlavery.WebUI.Admin.csproj" />
+    <ProjectReference Include="..\ModernSlavery.WebUI.DevOps\ModernSlavery.WebUI.DevOps.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Identity\ModernSlavery.WebUI.Identity.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Registration\ModernSlavery.WebUI.Registration.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
@@ -56,10 +49,6 @@
     <ProjectReference Include="..\ModernSlavery.WebUI.Submission\ModernSlavery.WebUI.Submission.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Viewing\ModernSlavery.WebUI.Viewing.csproj" />
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <WarningsAsErrors>NU1605;CS4014;LindhartAnalyserMissingAwaitWarning;</WarningsAsErrors>
-  </PropertyGroup>
 
   <ItemGroup>
     <Content Remove="web.config" />
@@ -86,14 +75,6 @@
 
   <ItemGroup>
     <None Remove="Properties\launchSettings.bak" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram" Link="DependencyValidation1.layerdiagram">
-      <Visible>False</Visible>
-    </AdditionalFiles>
-    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
-    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
   </ItemGroup>
 
   <ItemGroup>

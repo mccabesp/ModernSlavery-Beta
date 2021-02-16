@@ -66,7 +66,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         /// <returns></returns>
         public virtual async Task<List<OrganisationsFileModel>> GetOrganisationFileModelByYearAsync(int year)
         {
-#if DEBUG
+#if DEBUG || DEBUGLOCAL
             var orgs = Debugger.IsAttached
                 ? DataRepository.GetAll<Organisation>().Take(100)
                 : DataRepository.GetAll<Organisation>();
@@ -77,7 +77,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
             foreach (var org in orgs)
             {
-                var record = await MapToOrgFileModel(org, year);
+                var record = await MapToOrgFileModel(org, year).ConfigureAwait(false);
                 records.Add(record);
             }
 
@@ -87,8 +87,8 @@ namespace ModernSlavery.BusinessDomain.Registration
         private async Task<OrganisationsFileModel> MapToOrgFileModel(Organisation org, int year)
         {
             var reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(org.SectorType, year);
-            var statement = await GetPrimaryStatementForYear(org, year);
-            var latestScope = await _scopeLogic.GetScopeByReportingDeadlineOrLatestAsync(org, reportingDeadline);
+            var statement = await GetPrimaryStatementForYear(org, year).ConfigureAwait(false);
+            var latestScope = await _scopeLogic.GetScopeByReportingDeadlineOrLatestAsync(org, reportingDeadline).ConfigureAwait(false);
             var address = org.LatestAddress;
 
             var record = new OrganisationsFileModel
@@ -122,7 +122,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 IsGroupStatement = statement?.StatementOrganisations.Any(),
                 FirstSubmittedDate = statement?.Created,
                 LatestSubmission = statement?.Modified,
-                NumberOfStatements = await CountStatementsIncludedForYear(org, year)
+                NumberOfStatements = await CountStatementsIncludedForYear(org, year).ConfigureAwait(false)
             };
 
             return record;
@@ -133,7 +133,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             var selfSubmittedReport = await DataRepository.FirstOrDefaultAsync<Statement>(s =>
                 s.OrganisationId == organisation.OrganisationId
                 && s.SubmissionDeadline.Year == year
-                && s.Status == StatementStatuses.Submitted);
+                && s.Status == StatementStatuses.Submitted).ConfigureAwait(false);
 
             var count = (selfSubmittedReport != null ? 1 : 0);
 
@@ -157,7 +157,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             var submittedStatement = await DataRepository.FirstOrDefaultAsync<Statement>(s =>
                 s.OrganisationId == organisation.OrganisationId
                 && s.SubmissionDeadline.Year == year
-                && s.Status == StatementStatuses.Submitted);
+                && s.Status == StatementStatuses.Submitted).ConfigureAwait(false);
 
             if (submittedStatement != null)
                 return submittedStatement;
@@ -189,9 +189,9 @@ namespace ModernSlavery.BusinessDomain.Registration
 
         public virtual async Task SetUniqueOrganisationReferencesAsync()
         {
-            var orgs = await DataRepository.ToListAsync<Organisation>(o => o.OrganisationReference == null);
-            foreach (var org in orgs) await SetUniqueOrganisationReferenceAsync(org);
-            await DataRepository.BulkUpdateAsync(orgs);
+            var orgs = DataRepository.GetAll<Organisation>().Where(o => o.OrganisationReference == null).ToList();
+            foreach (var org in orgs) await SetUniqueOrganisationReferenceAsync(org).ConfigureAwait(false);
+            await DataRepository.BulkUpdateAsync(orgs).ConfigureAwait(false);
         }
 
         public virtual async Task SetUniqueOrganisationReferenceAsync(Organisation organisation)
@@ -202,7 +202,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 organisation.OrganisationReference = GenerateOrganisationReference();
             } while (await DataRepository.AnyAsync<Organisation>(o =>
                 o.OrganisationId != organisation.OrganisationId &&
-                o.OrganisationReference == organisation.OrganisationReference));
+                o.OrganisationReference == organisation.OrganisationReference).ConfigureAwait(false));
         }
 
         public virtual string GenerateOrganisationReference()
@@ -224,7 +224,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             ScopeStatuses scopeStatus,
             bool saveToDatabase)
         {
-            var org = await GetOrganisationByOrganisationReferenceOrThrowAsync(organisationRef);
+            var org = await GetOrganisationByOrganisationReferenceOrThrowAsync(organisationRef).ConfigureAwait(false);
             var reportingDeadline = _reportingDeadlineHelper.GetReportingDeadline(org.SectorType, changeScopeToSnapshotYear);
             return await _scopeLogic.AddScopeAsync(
                 org,
@@ -232,7 +232,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                 currentUser,
                 reportingDeadline,
                 changeScopeToComment,
-                saveToDatabase);
+                saveToDatabase).ConfigureAwait(false);
         }
 
         public CustomResult<Organisation> LoadInfoFromOrganisationId(long organisationId)
@@ -371,17 +371,17 @@ namespace ModernSlavery.BusinessDomain.Registration
             var isnew = organisation.OrganisationId == 0;
 
             //Save the organisation to ensure it has an OrganisationId
-            await DataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync().ConfigureAwait(false);
 
             //Ensure the organisation has an organisation reference
             if (string.IsNullOrWhiteSpace(organisation.OrganisationReference))
-                await SetUniqueOrganisationReferenceAsync(organisation);
+                await SetUniqueOrganisationReferenceAsync(organisation).ConfigureAwait(false);
 
             //Create a presumed in-scope for current and previous years
             if (isnew)
             {
-                await organisation.SetPresumedScopesAsync(_reportingDeadlineHelper.GetReportingDeadlines(organisation.SectorType));
-                await DataRepository.SaveChangesAsync();
+                await organisation.SetPresumedScopesAsync(_reportingDeadlineHelper.GetReportingDeadlines(organisation.SectorType)).ConfigureAwait(false);
+                await DataRepository.SaveChangesAsync().ConfigureAwait(false);
             }
 
             //Set the latest scope
@@ -396,7 +396,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             //Set the latest registration
             organisation.FixLatestRegistration();
 
-            await DataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync().ConfigureAwait(false);
         }
 
         #region Organisation
@@ -423,14 +423,6 @@ namespace ModernSlavery.BusinessDomain.Registration
                 .ToDelimitedString(delimiter);
         }
 
-        public AddressModel GetOrganisationAddressModel(Organisation org, DateTime? maxDate = null,
-            AddressStatuses status = AddressStatuses.Active)
-        {
-            var address = GetOrganisationAddress(org, maxDate, status);
-
-            return address == null ? null : AddressModel.Create(address);
-        }
-
         public CustomError UnRetire(Organisation org, long byUserId, string details = null)
         {
             if (org.Status != OrganisationStatuses.Retired)
@@ -453,7 +445,7 @@ namespace ModernSlavery.BusinessDomain.Registration
 
             if (string.IsNullOrWhiteSpace(sicCodes)) yield break;
 
-            foreach (var sicCode in sicCodes.SplitI(@";, \n\r\t"))
+            foreach (var sicCode in sicCodes.SplitI(@";, \n\r\t".ToCharArray()))
             {
                 var code = sicCode.ToInt64();
                 if (code < 1) continue;
@@ -500,7 +492,7 @@ namespace ModernSlavery.BusinessDomain.Registration
                                 })));
 
             //Wait for all the logging tasks to complete
-            await Task.WhenAll(badSicLoggingtasks);
+            await Task.WhenAll(badSicLoggingtasks).ConfigureAwait(false);
         }
         #endregion
 
@@ -525,64 +517,60 @@ namespace ModernSlavery.BusinessDomain.Registration
                 yield return organisation.GetStatement(reportingDeadline) ?? defaultStatement;
             }
         }
-        public OrganisationRecord CreateOrganisationRecord(Organisation org, long userId = 0)
+
+        public IEnumerable<OrganisationRecord> CreateOrganisationRecords(IEnumerable<Organisation> orgs, bool detailed, long userId = 0)
         {
-            OrganisationAddress address = null;
-            if (userId > 0) address = org.UserOrganisations.FirstOrDefault(uo => uo.UserId == userId)?.Address;
-
-            if (address == null) address = org.LatestAddress ?? org.GetLatestAddress();
-
-            if (address == null)
-                return new OrganisationRecord
-                {
-                    OrganisationId = org.OrganisationId,
-                    SectorType = org.SectorType,
-                    OrganisationName = org.OrganisationName,
-                    NameSource = GetOrganisationName(org)?.Source,
-                    OrganisationReference = org.OrganisationReference,
-                    DateOfCessation = org.DateOfCessation,
-                    DUNSNumber = org.DUNSNumber,
-                    CompanyNumber = org.CompanyNumber,
-                    SicSectors = GetOrganisationSicSectorsString(org, null, ",<br/>"),
-                    SicCodeIds = GetOrganisationSicCodeIdsString(org),
-                    SicSource = GetOrganisationSicSource(org),
-                    RegistrationStatus = org.GetRegistrationStatus(),
-                    References = org.OrganisationReferences.ToDictionary(
-                        r => r.ReferenceName,
-                        r => r.ReferenceValue,
-                        StringComparer.OrdinalIgnoreCase)
-                };
-
-            return new OrganisationRecord
+            if (detailed || userId > 0) orgs.SelectMany(o => o.UserOrganisations);
+            if (detailed)
             {
+                orgs.SelectMany(o => o.OrganisationAddresses).ToList();
+                orgs.SelectMany(o => o.OrganisationReferences).ToList();
+                orgs.SelectMany(o => o.OrganisationSicCodes).ToList();
+            }
+            return orgs.Select(o => CreateOrganisationRecord(o, detailed, userId));
+        }
+
+        public OrganisationRecord CreateOrganisationRecord(Organisation org, bool detailed, long userId = 0)
+        {
+            var organisationRecord=new OrganisationRecord {
                 OrganisationId = org.OrganisationId,
                 SectorType = org.SectorType,
                 OrganisationName = org.OrganisationName,
-                NameSource = GetOrganisationName(org)?.Source,
+                CompanyNumber = org.CompanyNumber,
                 OrganisationReference = org.OrganisationReference,
                 DateOfCessation = org.DateOfCessation,
-                DUNSNumber = org.DUNSNumber,
-                CompanyNumber = org.CompanyNumber,
-                SicSectors = GetOrganisationSicSectorsString(org, null, ",<br/>"),
-                SicCodeIds = GetOrganisationSicCodeIdsString(org),
-                SicSource = GetOrganisationSicSource(org),
-                ActiveAddressId = address.AddressId,
-                AddressSource = address.Source,
-                Address1 = address.Address1,
-                Address2 = address.Address2,
-                Address3 = address.Address3,
-                City = address.TownCity,
-                County = address.County,
-                Country = address.Country,
-                PostCode = address.PostCode,
-                PoBox = address.PoBox,
-                IsUkAddress = address.IsUkAddress,
-                RegistrationStatus = org.GetRegistrationStatus(),
-                References = org.OrganisationReferences.ToDictionary(
-                    r => r.ReferenceName,
-                    r => r.ReferenceValue,
-                    StringComparer.OrdinalIgnoreCase)
+                DUNSNumber = org.DUNSNumber
             };
+
+            OrganisationAddress address = null;
+            if (userId > 0) address = org.UserOrganisations.FirstOrDefault(uo => uo.UserId == userId)?.Address;
+            if (address == null) address = org.LatestAddress ?? org.GetLatestAddress();
+
+            if (address != null)
+            {
+                organisationRecord.ActiveAddressId = address.AddressId;
+                organisationRecord.AddressSource = address.Source;
+                organisationRecord.Address1 = address.Address1;
+                organisationRecord.Address2 = address.Address2;
+                organisationRecord.Address3 = address.Address3;
+                organisationRecord.City = address.TownCity;
+                organisationRecord.County = address.County;
+                organisationRecord.Country = address.Country;
+                organisationRecord.PostCode = address.PostCode;
+                organisationRecord.PoBox = address.PoBox;
+                organisationRecord.IsUkAddress = address.IsUkAddress;
+            }
+
+            //Add details
+            if (detailed)
+            {
+                organisationRecord.NameSource = GetOrganisationName(org)?.Source;
+                organisationRecord.SicCodeIds = GetOrganisationSicCodeIdsString(org);
+                organisationRecord.SicSource = GetOrganisationSicSource(org);
+                organisationRecord.RegistrationStatus = org.GetRegistrationStatus();
+                organisationRecord.References = org.OrganisationReferences.ToDictionary(r => r.ReferenceName, r => r.ReferenceValue, StringComparer.OrdinalIgnoreCase);
+            }
+            return organisationRecord;
         }
 
         public bool GetOrganisationIsOrphan(Organisation organisation)
@@ -621,34 +609,6 @@ namespace ModernSlavery.BusinessDomain.Registration
         }
 
         /// <summary>
-        ///     Returns the latest address before specified date/time
-        /// </summary>
-        /// <param name="maxDate">Ignore address changes after this date/time - if empty returns the latest address</param>
-        /// <returns>The address of the organisation</returns>
-        public OrganisationAddress GetOrganisationAddress(Organisation organisation, DateTime? maxDate = null, AddressStatuses status = AddressStatuses.Active)
-        {
-            if (maxDate == null || maxDate.Value == DateTime.MinValue) maxDate = _reportingDeadlineHelper.GetReportingDeadline(organisation.SectorType).AddYears(1);
-
-            if (status == AddressStatuses.Active && organisation.LatestAddress != null &&
-                maxDate == _reportingDeadlineHelper.GetReportingDeadline(organisation.SectorType).AddYears(1)) return organisation.LatestAddress;
-
-            return organisation.GetAddress(maxDate.Value);
-        }
-
-        /// <summary>
-        ///     Returns the latest organisation name before specified date/time
-        /// </summary>
-        /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
-        /// <returns>The name of the organisation</returns>
-        public string GetOrganisationAddressString(Organisation organisation, DateTime? maxDate = null, AddressStatuses status = AddressStatuses.Active,
-            string delimiter = ", ")
-        {
-            var address = GetOrganisationAddress(organisation, maxDate, status);
-
-            return address?.GetAddressString(delimiter);
-        }
-
-        /// <summary>
         ///     Returns the latest organisation name before specified date/time
         /// </summary>
         /// <param name="maxDate">Ignore name changes after this date/time - if empty returns the latest name</param>
@@ -678,7 +638,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         public virtual async Task<Organisation> GetOrganisationByOrganisationReferenceAsync(string organisationReference)
         {
             return await DataRepository.FirstOrDefaultAsync<Organisation>(o =>
-                o.OrganisationReference.ToUpper() == organisationReference.ToUpper());
+                o.OrganisationReference.ToUpper() == organisationReference.ToUpper()).ConfigureAwait(false);
         }
 
         public virtual async Task<Organisation> GetOrganisationByOrganisationReferenceAndSecurityCodeAsync(
@@ -686,7 +646,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             string securityCode)
         {
             return await DataRepository.FirstOrDefaultAsync<Organisation>(o =>
-                o.OrganisationReference.ToUpper() == organisationReference.ToUpper() && o.SecurityCode == securityCode);
+                o.OrganisationReference.ToUpper() == organisationReference.ToUpper() && o.SecurityCode == securityCode).ConfigureAwait(false);
         }
 
 
@@ -706,7 +666,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         }
         public virtual async Task<Organisation> GetOrganisationByOrganisationReferenceOrThrowAsync(string organisationReference)
         {
-            var org = await GetOrganisationByOrganisationReferenceAsync(organisationReference);
+            var org = await GetOrganisationByOrganisationReferenceAsync(organisationReference).ConfigureAwait(false);
 
             if (org == null)
                 throw new ArgumentException(
@@ -724,7 +684,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             DateTime securityCodeExpiryDateTime,
             IOrganisationBusinessLogic.ActionSecurityCodeDelegate actionSecurityCodeDelegate)
         {
-            var listOfOrganisations = await GetAllActiveOrPendingOrganisationsOrThrowAsync();
+            var listOfOrganisations = await GetAllActiveOrPendingOrganisationsOrThrowAsync().ConfigureAwait(false);
 
             var concurrentBagOfProcessedOrganisations = new ConcurrentBag<Organisation>();
             var concurrentBagOfErrors = new ConcurrentBag<CustomResult<Organisation>>();
@@ -752,7 +712,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         public async Task<CustomResult<Organisation>> CreateOrganisationSecurityCodeAsync(string organisationRef,
             DateTime securityCodeExpiryDateTime)
         {
-            var org = await GetOrganisationByOrganisationReferenceOrThrowAsync(organisationRef);
+            var org = await GetOrganisationByOrganisationReferenceOrThrowAsync(organisationRef).ConfigureAwait(false);
             return _securityCodeLogic.CreateSecurityCode(org, securityCodeExpiryDateTime);
         }
 
@@ -760,13 +720,13 @@ namespace ModernSlavery.BusinessDomain.Registration
             DateTime securityCodeExpiryDateTime)
         {
             return await ActionSecurityCodesInBulkAsync(securityCodeExpiryDateTime,
-                _securityCodeLogic.CreateSecurityCode);
+                _securityCodeLogic.CreateSecurityCode).ConfigureAwait(false);
         }
 
         public async Task<CustomResult<Organisation>> ExtendOrganisationSecurityCodeAsync(string organisationRef,
             DateTime securityCodeExpiryDateTime)
         {
-            var org = await GetOrganisationByOrganisationReferenceOrThrowAsync(organisationRef);
+            var org = await GetOrganisationByOrganisationReferenceOrThrowAsync(organisationRef).ConfigureAwait(false);
             return _securityCodeLogic.ExtendSecurityCode(org, securityCodeExpiryDateTime);
         }
 
@@ -774,18 +734,18 @@ namespace ModernSlavery.BusinessDomain.Registration
             DateTime securityCodeExpiryDateTime)
         {
             return await ActionSecurityCodesInBulkAsync(securityCodeExpiryDateTime,
-                _securityCodeLogic.ExtendSecurityCode);
+                _securityCodeLogic.ExtendSecurityCode).ConfigureAwait(false);
         }
 
         public async Task<CustomResult<Organisation>> ExpireOrganisationSecurityCodeAsync(string organisationRef)
         {
-            var org = await GetOrganisationByOrganisationReferenceOrThrowAsync(organisationRef);
+            var org = await GetOrganisationByOrganisationReferenceOrThrowAsync(organisationRef).ConfigureAwait(false);
             return _securityCodeLogic.ExpireSecurityCode(org);
         }
 
         public async Task<CustomBulkResult<Organisation>> ExpireOrganisationSecurityCodesInBulkAsync()
         {
-            var listOfOrganisations = await GetAllActiveOrPendingOrganisationsOrThrowAsync();
+            var listOfOrganisations = await GetAllActiveOrPendingOrganisationsOrThrowAsync().ConfigureAwait(false);
 
             var concurrentBagOfProcessedOrganisations = new ConcurrentBag<Organisation>();
             var concurrentBagOfErrors = new ConcurrentBag<CustomResult<Organisation>>();
@@ -818,7 +778,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             {
                 organisation.FixLatestAddress();
             });
-            await DataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task FixLatestScopesAsync()
@@ -830,7 +790,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             {
                 organisation.FixLatestScope();
             });
-            await DataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task FixLatestStatementsAsync()
@@ -842,7 +802,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             {
                 organisation.FixLatestStatement();
             });
-            await DataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task FixLatestRegistrationsAsync()
@@ -854,7 +814,7 @@ namespace ModernSlavery.BusinessDomain.Registration
             {
                 organisation.FixLatestRegistration();
             });
-            await DataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync().ConfigureAwait(false);
         }
         #endregion
 

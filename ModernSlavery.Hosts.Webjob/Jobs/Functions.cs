@@ -13,7 +13,6 @@ using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
 using ModernSlavery.Hosts.Webjob.Classes;
 using ModernSlavery.Infrastructure.Database;
-using ModernSlavery.Infrastructure.Storage;
 
 namespace ModernSlavery.Hosts.Webjob.Jobs
 {
@@ -37,7 +36,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
         private readonly IPostcodeChecker _postCodeChecker;
         private readonly ISearchBusinessLogic _searchBusinessLogic;
         private readonly IGovNotifyAPI _govNotifyApi;
-        private readonly CompaniesHouseService _companiesHouseService;
+        private readonly ICompaniesHouseService _companiesHouseService;
         private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
         private readonly IAuthorisationBusinessLogic _authorisationBusinessLogic;
         #endregion
@@ -60,7 +59,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             IPostcodeChecker postCodeChecker,
             ISearchBusinessLogic searchBusinessLogic,
             IGovNotifyAPI govNotifyApi,
-            CompaniesHouseService companiesHouseService,
+            ICompaniesHouseService companiesHouseService,
             IAuthorisationBusinessLogic authorisationBusinessLogic)
         {
             _jobHost = jobHost;

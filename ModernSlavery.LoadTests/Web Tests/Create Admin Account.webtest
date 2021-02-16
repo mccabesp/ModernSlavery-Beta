@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<WebTest Name="Create Admin Account" Id="c5bbf985-f3fb-4843-a6f0-32296101d04e" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="" ResultsLocale="">
+<WebTest Name="Create Admin Account" Id="c5bbf985-f3fb-4843-a6f0-32296101d04e" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="60" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="" ResultsLocale="">
   <Items>
     <IncludedWebTest Name="Create User Account" Path="create user account.webtest" Id="4023c953-f79e-46ed-8182-ce311bb60956" IsCodedWebTest="False" InheritWebTestSettings="True" />
   </Items>

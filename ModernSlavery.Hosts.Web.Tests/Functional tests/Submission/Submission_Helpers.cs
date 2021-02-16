@@ -16,8 +16,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             ui.Goto("/manage-organisations");
 
             //navigate to org page
-            ui.Click("Manage Organisations");
-            ui.ExpectHeader("Select an organisation");
+            ui.Click("Your organisations");
+            ui.ExpectHeader("Register or select organisations you want to add statements for");
 
             //select org
             ui.Click(Organistion);
@@ -33,7 +33,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         public static void NavigateYourMSStatement(UIContext ui, string Organistion, string Year, bool MoreInfoRequired = false)
         {
             ui.Goto("/manage-organisations");
-            ui.ExpectHeader("Select an organisation");
+            ui.ExpectHeader("Register or select organisations you want to add statements for");
 
             ui.Click(Organistion);
 
@@ -41,7 +41,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             {
                 ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.MoreInformationRequiredComplete(ui, MoreInfoRequired, OrgName: Organistion);
             }
-            ui.ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            ui.ExpectHeader(That.Contains, "Manage your modern slavery statements");
 
             ui.RightOf(Year).Click(The.Top, "Start draft");
 
@@ -108,7 +108,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public static void NavigateToSectors(UIContext ui, string Organistion, string Year, bool MoreInfoRequired = false) {
             ui.Click("Mange Organisations");
-            ui.ExpectHeader("Select an organisation");
+            ui.ExpectHeader("Register or select organisations you want to add statements for");
 
             ui.Click("Organisation");
             ui.AtRow(Year).Click("Draft report");
@@ -244,6 +244,20 @@ namespace ModernSlavery.Hosts.Web.Tests
             {
                 Submission_Helper.ColapseSection(ui, SectionName, SectionOrder);
 
+            }
+
+            
+        }
+
+        public static void SectionCompleteionCheck(UIContext ui, bool Completed, string Label)
+        {
+            if (Completed)
+            {
+                ui.AtXPath("//li//span[contains(., '" + Label + "')]//parent::li").Expect("Completed");
+            }
+            else
+            {
+                ui.AtXPath("//li//span[contains(., '" + Label + "')]//parent::li").Expect("Not Started");
             }
         }
     }

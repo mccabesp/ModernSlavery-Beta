@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Group")]
+    [TestFixture]
 
     public class CheckIfOrganisationIsAlreadyCoveredByAStatement : BaseUITest
     {
@@ -45,21 +45,21 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             SignOutDeleteCookiesAndReturnToRoot(this);
 
-            ExpectHeader("Modern slavery statement submissions");
-            AtRow("2020-2021").Column("Status of statement published on this service").Expect("Already included in:");
-            AtRow("2020-2021").Column("Status of statement published on this service").Expect("Fly Jet Australia's 2020-2021 group submission, published on 1 Sepetember 2020");
-            AtRow("2020-2021").Column("Status of statement published on this service").Expect("Fly Jet England's 2020-2021 group submission, published on 1 June 2020");
+            ExpectHeader("Manage your modern slavery statements");
+            AtRow("2020").Column("Status of statement on the registry").Expect("Already included in:");
+            AtRow("2020").Column("Status of statement on the registry").Expect("Fly Jet Australia's 2020-2021 group submission, published on 1 Sepetember 2020");
+            AtRow("2020").Column("Status of statement on the registry").Expect("Fly Jet England's 2020-2021 group submission, published on 1 June 2020");
 
             Above("Fly Jet Australia's").Expect("Fly Jet England's");
             Below("Fly Jet England's").Expect("Fly Jet Australia's");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(2)]
         public async Task StartDraftForOrgAlreadyCoveredByGroupSubmission()
         {
-            AtRow("2020-2021").Click("Start draft");
+            AtRow("2020").Click("Start draft");
             ExpectHeader("You are included in another organisation’s submission for 2020 to 2021");
             Expect("You can still submit your own statement if you wish to do so by clicking on the ‘Continue’ button.");
             Click("Contine");
@@ -78,16 +78,16 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Continue");
             Click("Save draft");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(3)]
         public async Task CheckStatusOfDraftAndGroup()
         {
-            AtRow("2020 to 2021").Column("Status of statement published on this service").Expect("In progress");
-            AtRow("2020 to 2021").Column("Status of statement published on this service").Expect("Also included in Fly Jet's 2020-2021 group submission, published on 01/06/2020.");
+            AtRow("2020").Column("Status of statement on the registry").Expect("In progress");
+            AtRow("2020").Column("Status of statement on the registry").Expect("Also included in Fly Jet's 2020-2021 group submission, published on 01/06/2020.");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

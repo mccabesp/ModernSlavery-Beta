@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.WebTesting;
+﻿using Microsoft.VisualStudio.TestTools.WebTesting;
 
 namespace ModernSlavery.WebTestPlugins
 {
@@ -14,13 +13,13 @@ namespace ModernSlavery.WebTestPlugins
         {
             if (string.IsNullOrWhiteSpace(ContextParamSource) || string.IsNullOrWhiteSpace(ContextParamTarget)) return;
 
-            var source = e.WebTest.Context.ContainsKey(ContextParamSource) ? e.WebTest.Context[ContextParamSource].ToString() : null;
+            var source = e.WebTest.Context.ContainsKey(ContextParamSource) ? e.WebTest.Context[ContextParamSource]?.ToString() : null;
             if (string.IsNullOrWhiteSpace(source)) return;
 
-            var target = e.WebTest.Context[ContextParamTarget].ToString();
+            var target = e.WebTest.Context[ContextParamTarget]?.ToString();
             if (!Overwrite && !string.IsNullOrWhiteSpace(target)) return;
 
-            var val = int.Parse(e.WebTest.Context[ContextParamSource].ToString());
+            var val = int.Parse(e.WebTest.Context[ContextParamSource]?.ToString());
             val--;
             e.WebTest.Context[ContextParamTarget] = val;
         }

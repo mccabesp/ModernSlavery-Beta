@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model ProgressViewModel
 
@@ -15,7 +16,7 @@
         @Html.HiddenFor(m => m.Submitted);
 
         <div class="govuk-form-group">
-            <fieldset class="govuk-fieldset" aria-describedby="progress-hint">
+            <fieldset class="govuk-fieldset">
                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
                     <h1 class="govuk-fieldset__heading">
                         @Model.PageTitle
@@ -26,7 +27,7 @@
                         <div id="progress-measures-hint" class="govuk-hint govuk-body govuk-!-margin-bottom-5">
                             For example, do you use key performance indicators (KPIs) to measure your performance, or have you set progress goals for your next statement?
                         </div>
-                        <textarea name="ProgressMeasures" id="progress-measures" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="progress-measures-info">@(Model.ProgressMeasures)</textarea>
+                        <textarea name="ProgressMeasures" aria-labelledby="progress-measures-hint" id="progress-measures" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="progress-measures-info">@(Model.ProgressMeasures)</textarea>
                     </div>
                     <div id="progress-measures-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
                         You can enter up to 500 characters

@@ -30,7 +30,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         }
 
         [HttpGet("~/Go/{shortCode?}", Order = 1)]
-        public async Task<IActionResult> Go(string shortCode)
+        public async Task<IActionResult> Go([Text]string shortCode)
         {
             if (!string.IsNullOrWhiteSpace(shortCode))
             {
@@ -73,7 +73,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         }
 
         #region Feedback
-        [HttpGet("send-feedback")]
+        [HttpGet("~/send-feedback")]
         public IActionResult SendFeedback()
         {
             var model = new FeedbackViewModel();
@@ -98,7 +98,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             }
         }
 
-        [HttpPost("send-feedback")]
+        [HttpPost("~/send-feedback")]
         public async Task<IActionResult> SendFeedback(FeedbackViewModel viewModel)
         {
             if (!ModelState.IsValid)
@@ -149,6 +149,12 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         }
         #endregion
 
+        [HttpGet("~/contact-us")]
+        public IActionResult ContactUs()
+        {
+            return View("ContactUs", null);
+        }
+
         #region PrivacyPolicy
 
         [HttpGet("~/privacy-policy")]
@@ -160,14 +166,14 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [HttpPost("~/privacy-policy")]
-        public async Task<IActionResult> PrivacyPolicy(string command)
+        public async Task<IActionResult> PrivacyPolicy([IgnoreText]string command)
         {
             if (!User.Identity.IsAuthenticated) return RedirectToAction("PrivacyPolicy");
 
             //Ensure user has completed the registration process
 
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult == null) return checkResult;
+            if (checkResult != null) return checkResult;
 
             if (!IsImpersonatingUser && !SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
             {
@@ -260,12 +266,13 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         #endregion
 
-        #region User Satisfaction Survey
-        [HttpGet("~/satisfaction-survey")]
-        public IActionResult SatisfactionSurvey()
+        #region AccessibilityStatement
+        [HttpGet("~/accessibility-statement")]
+        public IActionResult AccessibilityStatement()
         {
-            return View("SatisfactionSurvey");
+            return View("AccessibilityStatement", null);
         }
+
         #endregion
     }
 }

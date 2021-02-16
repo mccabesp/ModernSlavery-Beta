@@ -1,6 +1,6 @@
 ﻿@{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Enter your PIN - Modern Slavery reporting service";
+    Title = "Enter your PIN";
 }
 @inject IWebService WebService
 @model CompleteViewModel
@@ -38,7 +38,7 @@
                         </span>
                     </summary>
                     <div class="govuk-details__text">
-                        If your PIN hasn't arrived after 7 days or has expired, <a class="govuk-link" href="@Url.Action("RequestPIN")">request a new PIN</a>.
+                        If your PIN hasn't arrived after 7 days or has expired, <a class="govuk-link" asp-controller="Registration" asp-action="RequestPIN" asp-route-id="@SharedBusinessLogic.Obfuscator.Obfuscate(Model.OrganisationId)">request a new PIN</a>.
                     </div>
                 </details>
 

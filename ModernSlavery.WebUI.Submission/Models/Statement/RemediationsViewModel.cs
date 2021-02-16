@@ -6,6 +6,7 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -30,11 +31,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
     public class RemediationsViewModel : BaseStatementViewModel
     {
-        public override string PageTitle => "What action did you take in response?";
+        public override string PageTitle => "Does your statement refer to any actions your organisation took after finding indicators of forced labour?";
 
         public List<RemediationTypes> Remediations { get; set; } = new List<RemediationTypes>();
 
         [MaxLength(256)]
+        [Text]
         public string OtherRemediations { get; set; }
 
         public List<IndicatorTypes> Indicators { get; set; } = new List<IndicatorTypes>();

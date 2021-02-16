@@ -40,7 +40,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect("Included in statement (6 organisations)");
             Click("Included in statement (6 organisations)");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(2)]
@@ -55,7 +55,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect("Confirm and continue");
             Expect("Select more organisations");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

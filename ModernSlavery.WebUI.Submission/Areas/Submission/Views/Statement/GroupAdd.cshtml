@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model GroupAddViewModel
 @{
@@ -33,7 +34,7 @@
         </div>
     </div>
 
-    <a href="@Model.BackUrl">
+    <a href="@Model.BackUrl" class="govuk-link">
         Return to previous search results
     </a>
 

@@ -1,0 +1,31 @@
+﻿@using static Core.Entities.StatementSummary.V1.StatementSummary;
+
+@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel;
+
+<div id="progress" class="statement-section-two-thirds">
+    <h2 class="govuk-heading-m">
+        Demonstrating progress (optional)
+    </h2>
+
+    @{
+        var hasAnswered = !string.IsNullOrEmpty(Model.ProgressMeasures);
+    }
+    <div class="govuk-body">
+        We asked the organisation how its statement demonstrates progress over time in addressing modern slavery risks.
+        @if (hasAnswered)
+        {
+            <text>They provided the following answer:</text>
+        }
+    </div>
+    @if (hasAnswered)
+    {
+        <div class="govuk-body">
+            @Model.ProgressMeasures
+        </div>
+    }
+    else
+    {
+        <partial name="Parts/StatementSummary/_NoResponse" />
+    }
+
+</div>

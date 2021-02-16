@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Autofac;
-using IdentityServer4;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -17,18 +15,16 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
+using ModernSlavery.Infrastructure.Caching;
 using ModernSlavery.Infrastructure.Database.Classes;
 using ModernSlavery.Infrastructure.Hosts;
-using ModernSlavery.Infrastructure.Logging;
 using ModernSlavery.Infrastructure.Storage;
 using ModernSlavery.Infrastructure.Telemetry;
 using ModernSlavery.Infrastructure.Telemetry.AppInsights;
 using ModernSlavery.WebAPI.Public.Classes;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Middleware;
 using ModernSlavery.WebUI.Shared.Classes.Providers;
-using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
 using ModernSlavery.WebUI.Shared.Options;
 
@@ -46,6 +42,7 @@ namespace ModernSlavery.Hosts.Web
         private readonly BasicAuthenticationOptions _basicAuthenticationOptions;
         private readonly DynamicRoutesOptions _dynamicRoutesOptions;
         private readonly IdentityClientOptions _identityClientOptions;
+        private readonly FeatureSwitchOptions _featureSwitchOptions;
 
         public DependencyModule(
             ILogger<DependencyModule> logger,
@@ -54,7 +51,8 @@ namespace ModernSlavery.Hosts.Web
             ResponseCachingOptions responseCachingOptions, DistributedCacheOptions distributedCacheOptions,
             DataProtectionOptions dataProtectionOptions, BasicAuthenticationOptions basicAuthenticationOptions,
             DynamicRoutesOptions dynamicRoutesOptions,
-            IdentityClientOptions identityClientOptions)
+            IdentityClientOptions identityClientOptions,
+            FeatureSwitchOptions featureSwitchOptions)
         {
             _logger = logger;
             _sharedOptions = sharedOptions;
@@ -65,6 +63,7 @@ namespace ModernSlavery.Hosts.Web
             _basicAuthenticationOptions = basicAuthenticationOptions;
             _dynamicRoutesOptions = dynamicRoutesOptions;
             _identityClientOptions = identityClientOptions;
+            _featureSwitchOptions = featureSwitchOptions;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -77,23 +76,21 @@ namespace ModernSlavery.Hosts.Web
 
             var mvcBuilder = services.AddControllersWithViews(options =>
                 {
-                    options.OutputFormatters.Add(new CsvMediaTypeFormatter());
-                    options.OutputFormatters.Add(new XmlMediaTypeFormatter());
+                    options.OutputFormatters.Add(new StatementSummaryCsvFormatter());
+                    options.OutputFormatters.Add(new StatementSummaryXmlFormatter());
                     options.FormatterMappings.SetMediaTypeMappingForFormat("csv", MediaTypeHeaderValue.Parse("text/csv"));
-
                     options.RespectBrowserAcceptHeader = true; // false by default - Any 'Accept' header gets turned into application/json. If you want to allow the clients to accept different headers, you need to switch that translation off
-                    options.AddStringTrimmingProvider(); //Add modelstate binder to trim input 
+                    options.AddSecureSimpleModelBinderProvider();//Note required yet as encryption/decryption not used yet
                     options.AddViewModelBinderProvider();
-                    options.ModelBinderProviders.Insert(0, new SecuredModelBinderProvider());
-                    options.ModelMetadataDetailsProviders.Add(new TrimModelBinder()); //Set DisplayMetadata to input empty strings as null
                     options.ModelMetadataDetailsProviders.Add(new DefaultResourceValidationMetadataProvider()); // sets default resource type to use for display text and error messages
                     if (_responseCachingOptions.Enabled)_responseCachingOptions.CacheProfiles.ForEach(p =>options.CacheProfiles.Add(p)); //Load the response cache profiles from options
-                    options.Filters.Add<ErrorHandlingFilter>();
-                    options.Filters.Add<HttpExceptionFilter>(); 
+                    options.Filters.Add<XssValidationFilter>(); //Checks for Xss
                     options.Filters.Add<ViewModelResultFilter>(); 
+
                 }).AddXmlSerializerFormatters().AddXmlDataContractSerializerFormatters();
 
             mvcBuilder.AddApplicationPart<WebAPI.Public.DependencyModule>();
+            if (_featureSwitchOptions.IsEnabled("DevOps"))mvcBuilder.AddApplicationPart<WebUI.DevOps.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Identity.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Account.DependencyModule>();
             mvcBuilder.AddApplicationPart<WebUI.Admin.DependencyModule>();
@@ -141,16 +138,19 @@ namespace ModernSlavery.Hosts.Web
             services.AddSession(options =>
                 {
                     options.Cookie.IsEssential = true; //This is required otherwise session will not load
-                    options.Cookie.SecurePolicy =
-                        CookieSecurePolicy.Always; //Equivalent to <httpCookies requireSSL="true" /> from Web.Config
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; //Equivalent to <httpCookies requireSSL="true" /> from Web.Config
                     options.Cookie.HttpOnly = false; //Always use https cookies
                     options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
                     options.Cookie.Domain = _sharedOptions.EXTERNAL_HOSTNAME.BeforeFirst(":"); //Domain cannot be an authority and contain a port number
                     options.IdleTimeout = TimeSpan.FromMinutes(_sharedOptions.SessionTimeOutMinutes); //Equivalent to <sessionState timeout="20"> from old Web.config
+
                 });
 
-            //Add the distributed cache and data protection
-            services.AddDistributedCache(_distributedCacheOptions).AddDataProtection(_dataProtectionOptions);
+            //Add the distributed cache
+            services.AddDistributedCache(_distributedCacheOptions);
+
+            //Add data protection
+            services.AddDataProtection(_dataProtectionOptions);
 
             //This may now be required 
             services.AddHttpsRedirection(options => { options.HttpsPort = 443; });
@@ -161,6 +161,10 @@ namespace ModernSlavery.Hosts.Web
                 options.Cookie.IsEssential = true;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
+                options.Cookie.Expiration= TimeSpan.FromMinutes(_sharedOptions.SessionTimeOutMinutes);
+                
+                options.SlidingExpiration = true;
+                options.ExpireTimeSpan= TimeSpan.FromMinutes(_sharedOptions.SessionTimeOutMinutes);
             });
 
             services.ConfigureExternalCookie(options =>
@@ -173,6 +177,7 @@ namespace ModernSlavery.Hosts.Web
             #region Configure Identity Client
             //Configure the services required for authentication by IdentityServer
             services.AddIdentityServerClient(
+                _sharedOptions,
                 _identityClientOptions.IssuerUri,
                 _identityClientOptions.ClientId,
                 _identityClientOptions.ClientSecret,
@@ -215,6 +220,7 @@ namespace ModernSlavery.Hosts.Web
             if (_sharedOptions.DebugHeaders) app.UseMiddleware<DebugHeadersMiddleware>();
 
             app.UseMiddleware<ExceptionMiddleware>();
+
             if (_sharedOptions.UseDeveloperExceptions)
             {
                 app.UseBrowserLink();
@@ -238,8 +244,8 @@ namespace ModernSlavery.Hosts.Web
             app.UseAuthorization();
             app.UseCookiePolicy(new CookiePolicyOptions
             {
-                MinimumSameSitePolicy =  Microsoft.AspNetCore.Http.SameSiteMode.Strict,
-                Secure = CookieSecurePolicy.Always
+                MinimumSameSitePolicy =  Microsoft.AspNetCore.Http.SameSiteMode.Strict, //Change to default SameSiteMode.Lax when using cross-origin OAuth2 authentication
+                Secure = CookieSecurePolicy.Always,                 
             });
 
             app.UseMiddleware<MaintenancePageMiddleware>(_sharedOptions.MaintenanceMode); //Redirect to maintenance page when Maintenance mode settings = true
@@ -279,6 +285,7 @@ namespace ModernSlavery.Hosts.Web
         public void RegisterModules(IList<Type> modules)
         {
             modules.AddDependency<WebAPI.Public.DependencyModule>();
+            if (_featureSwitchOptions.IsEnabled("DevOps")) modules.AddDependency<WebUI.DevOps.DependencyModule>();
             modules.AddDependency<WebUI.Identity.DependencyModule>();
             modules.AddDependency<WebUI.StaticFiles.DependencyModule>();
             modules.AddDependency<WebUI.Account.DependencyModule>();

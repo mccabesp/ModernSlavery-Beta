@@ -66,7 +66,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (vm == null)
             {
                 // fail - no organisation found
-                ModelState.AddModelError(3027);
+                ModelState.AddModelError(3027, nameof(FastTrackViewModel.SecurityCode));
+                ModelState.AddModelError(3027, nameof(FastTrackViewModel.OrganisationReference));
                 return View("FastTrack", model);
             }
             else if (vm.IsSecurityCodeExpired)

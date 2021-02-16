@@ -36,8 +36,12 @@ namespace ModernSlavery.WebUI.Shared
             //Add the custom url helper
             services.AddSingleton<IUrlHelperFactory,CustomUrlHelperFactory>();
 
-            //Register service dependencies here
+            //Register sector types
             services.AddSingleton<SectorTypeIndex>();
+
+            //Register Xss validator
+            services.AddSingleton<XssValidator>();
+            
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

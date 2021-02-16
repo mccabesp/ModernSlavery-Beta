@@ -1,0 +1,55 @@
+﻿@using ModernSlavery.Core.Extensions
+
+@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+
+<div class="statement-section-two-thirds" id="sectors">
+    <h2 class="govuk-heading-m">
+        The organisation’s sectors and turnover
+    </h2>
+
+    <div>
+        <h3 class="govuk-heading-m">Sectors</h3>
+        <p class="govuk-body">
+            The organisation operates in the following sectors:
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            @foreach (var sector in Model.Sectors)
+            {
+                if (sector.Description == "Other")
+                {
+                    <li>@Model.OtherSectors</li>
+                }
+                else
+                {
+                    <li>@sector.Description</li>
+                }
+            }
+        </ul>
+    </div>
+
+    <div>
+        <h3 class="govuk-heading-m">Turnover</h3>
+        <p class="govuk-body">
+            Its turnover in the financial accounting year of this statement was:
+        </p>
+        <p class="govuk-body">
+            @Model.Turnover.Value.GetEnumDescription()
+        </p>
+
+        <div class="govuk-inset-text">
+            If the organisation is a public body, this amount is based on the organisation’s budget for the year of the statement.
+        </div>
+
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    What does 'turnover' refer to in group statements?
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                If this is a group statement, this includes the total turnover for all the organisations covered by the statement.
+            </div>
+        </details>
+    </div>
+</div>

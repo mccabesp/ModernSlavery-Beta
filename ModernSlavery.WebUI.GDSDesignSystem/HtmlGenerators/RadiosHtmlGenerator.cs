@@ -61,7 +61,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 
             var radiosViewModel = new RadiosViewModel
             {
-                Name = $"GovUk_Radio_{propertyName}",
+                Name = propertyName,
                 IdPrefix = $"GovUk_{propertyName}",
                 Items = radios,
                 Fieldset = fieldsetOptions,

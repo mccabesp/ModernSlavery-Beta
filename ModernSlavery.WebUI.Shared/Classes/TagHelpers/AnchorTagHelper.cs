@@ -19,7 +19,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.TagHelpers
             //Load the relationship attribute
             var rels = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
             if (output.Attributes.ContainsName("rel"))
-                rels.AddRange(output.Attributes["rel"].Value.ToStringOrEmpty().SplitI(";, "));
+                rels.AddRange(output.Attributes["rel"].Value.ToStringOrEmpty().SplitI(";, ".ToCharArray()));
 
             var isDownload = false;
             if (output.Attributes.ContainsName("download"))

@@ -7,40 +7,22 @@
 @inject FeatureSwitchOptions featureSwitchOptions
 @inject IWebService WebService
 @{
-    var title = !string.IsNullOrEmpty(ViewBag.Title) ? ViewBag.Title : "Modern Slavery";
-    var documentTitle = string.Format("{0} - {1}", title, "GOV.UK");
-
     ViewBag.hidePhase = ViewBag.hidePhase == null ? false : true;
 }
 <!-- @Html.PageIdentifier() -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>@documentTitle</title>
-    @*<sitemap:meta http-equiv="content-type" default-content="text/html; charset=UTF-8" />
-        <sitemap:meta name="description" default-content="@ViewBag.pageDescription" required="false" />
-        <sitemap:meta name="robots" required="false" />*@
+    <meta charset="utf-8" />
+    <meta http-equiv="content-type" default-content="text/html; charset=UTF-8" />
+    <partial name="Robots" />
+
 
     @if (User.Identity.IsAuthenticated)
     {
-        <meta http-equiv="refresh" content="@(sharedOptions.SessionTimeOutMinutes * 60);@Url.Action("SessionExpired", "Shared", null, "https")" />
+        <meta http-equiv="refresh" content="@(sharedOptions.SessionTimeOutSeconds);@Url.Action("SessionExpired", "Shared", null, "https")" />
     }
-    <meta name="google-site-verification" content="uRt7CAkfClOB8Jig6Pw2-DELUWuuyG2kYKip0UThxhg" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    @if (!string.IsNullOrWhiteSpace(ViewBag.ogType))
-    {
-        <meta property="og:type" content="@(ViewBag.ogType)" />
-    }
-    @if (!string.IsNullOrWhiteSpace(ViewBag.ogTitle))
-    {
-        <meta property="og:title" content="@(ViewBag.ogTitle)" />
-    }
-    @if (!string.IsNullOrWhiteSpace(ViewBag.ogDescription))
-    {
-        <meta property="og:description" content="@(ViewBag.ogDescription)" />
-    }
-    <meta property="og:image" content="/assets/public/govuk_template/assets/images/opengraph-image.png?0.12.0">
     <meta name="format-detection" content="telephone=no" />
 
     <script type="text/javascript" nonce="@Html.GetNonce()">
@@ -67,22 +49,24 @@
 
     @if (!CookieHelper.HasSeenLatestCookieMessage(Context.Request))
     {
-        <environment exclude="Development, DEV, TEST, QAT, UR">
+        @if (IsRelease)
+        {
             <!--[if !IE 8]><!-->
             <link asp-append-version="true" href="/assets/styles/app-all.min.css" rel="stylesheet" type="text/css" media="all" />
             <!--<![endif]-->
             <!--[if IE 8]>
                 <link href="/assets/styles/app-ie8.min.css" rel="stylesheet" type="text/css" media="all" />
             <![endif]-->
-        </environment>
-        <environment include="Development, DEV, TEST, QAT, UR">
+        }
+        else
+        {
             <!--[if !IE 8]><!-->
             <link asp-append-version="true" href="/assets/styles/app-all.css" rel="stylesheet" type="text/css" media="all" />
             <!--<![endif]-->
             <!--[if IE 8]>
                 <link href="/assets/styles/app-ie8.css" rel="stylesheet" type="text/css" media="all" />
             <![endif]-->
-        </environment>
+        }
     }
 </head>
 <body class="@(ViewBag.bodyClasses)">
@@ -126,29 +110,46 @@
                         {
                             <span id="proposition-name">@sharedOptions.ServiceName</span>
                         }
-                    <ul id="proposition-links">
-                        @if (featureSwitchOptions.IsEnabled("NavigationLinks") && User.Identity.IsAuthenticated)
-                        {
-                                <li>
-                                    <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("ManageOrganisations", "Submission", "Submission"))">Your organisations</a>
-                                </li>
+                        <ul id="proposition-links">
+                            @if (featureSwitchOptions.IsEnabled("NavigationLinks") && User.Identity.IsAuthenticated)
+                            {
+                                if (IsAdministrator)
+                                {
+                                    <li>
+                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("Home", "Admin", "Admin"))">Admin</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("ManageOrganisations", "Submission", "Submission"))">Your organisations</a>
+                                    </li>
+                                }
+
+                                if (IsDevOpsAdministrator)
+                                {
+                                    <li>
+                                        <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("Home", "DevOps", "DevOps"))">Your organisations</a>
+                                    </li>
+                                }
+
                                 <li>
                                     <a rel="track" data-track-category="Header Link Clicked" href="@(Url.ActionArea("ManageAccount", "Account", "Account"))">Your details</a>
                                 </li>
-                               
+
                                 <li @*id="login-links"*@ class="nowrap">
-                                        <a asp-action="SignOut" asp-controller="Account" asp-area="Account">Sign out</a>
+                                    <a asp-action="SignOut" asp-controller="Account" asp-area="Account">Sign out</a>
                                 </li>
-                        }
+                            }
 
 
-                        else if (!Url.IsAction("Login", "Identity", "Identity") && !User.Identity.IsAuthenticated)
-                        {
-                            <li id="login-links" class="nowrap">
-                                <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Sign in</a>
-                            </li>
-                        }
-                    </ul>
+                            else if (!Url.IsAction("Login", "Identity", "Identity") && !User.Identity.IsAuthenticated)
+                            {
+                                <li id="login-links" class="nowrap">
+                                    <a asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Sign in</a>
+                                </li>
+                            }
+                        </ul>
                     </nav>
                 </div>
             </div>
@@ -198,7 +199,7 @@
                 <div class="footer-meta-inner">
                     <ul>
                         <li>
-                            <a asp-page="/ContactUs">Contact us</a>
+                            <a asp-action="ContactUs" asp-controller="Shared">Contact us</a>
                         </li>
                         @if (featureSwitchOptions.IsEnabled("CookiePolicyLink"))
                         {
@@ -218,6 +219,14 @@
                                 <a asp-action="ReportConcerns" asp-controller="Shared">Report Concerns</a>
                             </li>
                         }
+                        @if (featureSwitchOptions.IsEnabled("AccessibilityLink"))
+                        {
+                            <li>
+                                <a asp-action="AccessibilityStatement" asp-controller="Shared">Accessibility statement</a>
+                            </li>
+                        }
+
+
                         @if (VirtualDateTime.Offset != TimeSpan.Zero)
                         {
                             <li style="font-size: smaller">@(VirtualDateTime.Now)</li>

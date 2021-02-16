@@ -32,6 +32,8 @@ namespace ModernSlavery.Core.Classes
 
         public async Task<bool> IsUrlWorking(string url)
         {
+            if (Options.Disabled) return true;
+
             Uri uri;
 
             if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
@@ -43,7 +45,7 @@ namespace ModernSlavery.Core.Classes
 
             try
             {
-                var response = await client.SendAsync(request);
+                var response = await client.SendAsync(request).ConfigureAwait(false);
 
                 if (response.IsSuccessStatusCode)
                     return true;

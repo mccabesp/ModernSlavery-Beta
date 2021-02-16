@@ -55,6 +55,17 @@ namespace ModernSlavery.WebUI.Registration.Classes
         {
             if (searchText.IsNumber()) searchText = searchText.PadLeft(8, '0');
 
+            if (_testOptions.LoadTesting && _testOptions.SearchCompaniesHouse)
+            {
+                var lastSearchText = _Session["LastPrivateSearchText"] as string;
+                if (string.IsNullOrWhiteSpace(lastSearchText))
+                {
+                    var testOrg = _DataRepository.GetAll<Organisation>().Where(o => o.SectorType == SectorTypes.Private && o.Status == OrganisationStatuses.Active).OrderBy(o => Guid.NewGuid()).First();
+                    lastSearchText = testOrg.OrganisationName;
+                }
+                searchText = lastSearchText;
+            }
+
             var remoteTotal = 0;
             var searchResults = LoadSearch(searchText);
 
@@ -62,17 +73,18 @@ namespace ModernSlavery.WebUI.Registration.Classes
             {
                 var localResults = new List<Organisation>();
 
-                if (_testOptions.LoadTesting)
+                if (_testOptions.LoadTesting && !_testOptions.SearchCompaniesHouse)
                 {
                     searchResults = new PagedResult<OrganisationRecord>();
                     localResults = _DataRepository.GetAll<Organisation>().Where(o => o.SectorType == SectorTypes.Private && o.Status == OrganisationStatuses.Active).OrderBy(o => Guid.NewGuid()).Take(_companiesHouseOptions.MaxResponseCompanies).ToList();
-                    searchResults.Results=localResults.Select(o => _organisationBusinessLogic.CreateOrganisationRecord(o)).ToList();
+                    searchResults.Results= _organisationBusinessLogic.CreateOrganisationRecords(localResults,false).ToList();
                     searchResults.PageSize = _companiesHouseOptions.MaxResponseCompanies;
                     searchResults.VirtualRecordTotal = searchResults.Results.Count;
                     searchResults.ActualRecordTotal = searchResults.VirtualRecordTotal;
                 }
                 else
                 {
+
                     var orgs = _DataRepository.GetAll<Organisation>().Where(o => o.SectorType == SectorTypes.Private && o.Status == OrganisationStatuses.Active).OrderBy(o => o.OrganisationName).ToList();
 
                     if (searchText.IsCompanyNumber())
@@ -117,19 +129,25 @@ namespace ModernSlavery.WebUI.Registration.Classes
 
                         if (localResults.Count > 0)
                         {
-                            searchResults.Results.InsertRange(0, localResults.Select(o => _organisationBusinessLogic.CreateOrganisationRecord(o)));
+                            var localRecords = _organisationBusinessLogic.CreateOrganisationRecords(localResults, false);
+
+                            //Make sure local organisations are first
+                            searchResults.Results.InsertRange(0, localRecords);
+
                             searchResults.ActualRecordTotal += localTotal;
                         }
                     }
                 }
 
+                searchResults.VirtualRecordTotal = searchResults.ActualRecordTotal > _companiesHouseOptions.MaxResponseCompanies
+                    ? _companiesHouseOptions.MaxResponseCompanies
+                    : searchResults.ActualRecordTotal;
+
                 SaveSearch(searchText, searchResults, remoteTotal);
             }
 
             var result = new PagedResult<OrganisationRecord>();
-            result.VirtualRecordTotal = searchResults.ActualRecordTotal > _companiesHouseOptions.MaxResponseCompanies
-                ? _companiesHouseOptions.MaxResponseCompanies
-                : searchResults.ActualRecordTotal;
+            result.VirtualRecordTotal = searchResults.VirtualRecordTotal;
             result.ActualRecordTotal = searchResults.ActualRecordTotal;
             result.CurrentPage = page;
             result.PageSize = pageSize;

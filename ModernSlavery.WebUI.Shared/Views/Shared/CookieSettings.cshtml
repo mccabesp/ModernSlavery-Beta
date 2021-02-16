@@ -1,9 +1,9 @@
 ﻿@using ModernSlavery.Core.Models
 @inject SharedOptions sharedOptions
-@{Layout = "~/Views/GdsLayout.cshtml";}
 @model CookieSettingsViewModel
 @{
-    ViewBag.Title = $"Cookies on {sharedOptions.ServiceName}";
+    Layout = "~/Views/GdsLayout.cshtml";
+    Title = $"Cookies on the {sharedOptions.ServiceName}";
 }
 
 <div class="govuk-grid-row cookie-settings-page">
@@ -16,7 +16,7 @@
         }
 
         <form method="POST" action="@Url.Action("CookieSettings", "Shared")">
-            <h1 class="govuk-heading-xl">Cookies on @sharedOptions.ServiceName</h1>
+            <h1 class="govuk-heading-xl">Cookies on the @sharedOptions.ServiceName</h1>
             <p class="govuk-body">Cookies are files saved on your phone, tablet or computer when you visit a website.</p>
             <p class="govuk-body">We use cookies to store information about how you use our service, such as the pages you visit.</p>
 
@@ -184,7 +184,7 @@
 
             <p class="govuk-body">These essential cookies do things like:</p>
             <ul class="govuk-list govuk-list--bullet">
-                <li>enable you to login to submit information about your organisation's modern slavery statement</li>
+                <li>enable you to log in to submit information about your organisation's modern slavery statement</li>
                 <li>remember your progress through the service</li>
                 <li>remember notifications you’ve seen so that we don’t show them again</li>
             </ul>

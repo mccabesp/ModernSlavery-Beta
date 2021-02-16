@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<WebTest Name="Private Organisation User Journey" Id="8623a495-f498-4802-a3cf-07f1e857c355" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="" ResultsLocale="">
+<WebTest Name="Private Organisation User Journey" Id="8623a495-f498-4802-a3cf-07f1e857c355" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="60" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="" ResultsLocale="">
   <Items>
     <IncludedWebTest Name="Create User Account" Path="..\web tests\create user account.webtest" Id="4023c953-f79e-46ed-8182-ce311bb60956" IsCodedWebTest="False" InheritWebTestSettings="True" />
     <IncludedWebTest Name="Register Private Organisation" Path="..\web tests\register private organisation.webtest" Id="837d5c0b-9a6f-42e0-8cad-745e7b5b2f10" IsCodedWebTest="False" InheritWebTestSettings="True" />

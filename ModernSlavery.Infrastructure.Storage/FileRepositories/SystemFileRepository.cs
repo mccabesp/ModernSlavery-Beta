@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Options;
 using Newtonsoft.Json;
 
 namespace ModernSlavery.Infrastructure.Storage.FileRepositories
@@ -14,6 +15,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
     public class SystemFileRepository : IFileRepository
     {
         private readonly DirectoryInfo _rootDir;
+        public string RootPath { get; }
         private readonly StorageOptions _storageOptions;
 
         public SystemFileRepository(StorageOptions storageOptions)
@@ -26,62 +28,61 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             Directory.CreateDirectory(storageOptions.LocalStorageRoot);
 
             _rootDir = new DirectoryInfo(storageOptions.LocalStorageRoot);
+            RootPath = _rootDir.FullName;
         }
-
-        public string RootDir => _rootDir.FullName;
 
         public async Task<IEnumerable<string>> GetDirectoriesAsync(string directoryPath,
             string searchPattern = null,
             bool recursive = false)
         {
-            return await Task.Run(() => GetDirectories(directoryPath, searchPattern = null, recursive));
+            return await Task.Run(() => GetDirectories(directoryPath, searchPattern = null, recursive)).ConfigureAwait(false);
         }
 
         public async Task<bool> GetFileExistsAsync(string filePath)
         {
-            return await Task.Run(() => GetFileExists(filePath));
+            return await Task.Run(() => GetFileExists(filePath)).ConfigureAwait(false);
         }
 
         public async Task CreateDirectoryAsync(string directoryPath)
         {
-            await Task.Run(() => CreateDirectory(directoryPath));
+            await Task.Run(() => CreateDirectory(directoryPath)).ConfigureAwait(false);
         }
 
         public async Task<bool> GetDirectoryExistsAsync(string directoryPath)
         {
-            return await Task.Run(() => GetDirectoryExists(directoryPath));
+            return await Task.Run(() => GetDirectoryExists(directoryPath)).ConfigureAwait(false);
         }
 
         public async Task<DateTime> GetLastWriteTimeAsync(string filePath)
         {
-            return await Task.Run(() => GetLastWriteTime(filePath));
+            return await Task.Run(() => GetLastWriteTime(filePath)).ConfigureAwait(false);
         }
 
         public async Task<long> GetFileSizeAsync(string filePath)
         {
-            return await Task.Run(() => GetFileSize(filePath));
+            return await Task.Run(() => GetFileSize(filePath)).ConfigureAwait(false);
         }
 
         public async Task DeleteFileAsync(string filePath)
         {
-            await Task.Run(() => DeleteFile(filePath));
+            await Task.Run(() => DeleteFile(filePath)).ConfigureAwait(false);
         }
 
         public async Task CopyFileAsync(string sourceFilePath, string destinationFilePath, bool overwrite)
         {
-            await Task.Run(() => CopyFile(sourceFilePath, destinationFilePath, overwrite));
+            await Task.Run(() => CopyFile(sourceFilePath, destinationFilePath, overwrite)).ConfigureAwait(false);
         }
 
         public async Task<IEnumerable<string>> GetFilesAsync(string directoryPath, string searchPattern = null,
             bool recursive = false)
         {
-            return await Task.Run(() => GetFiles(directoryPath, searchPattern, recursive));
+            return await Task.Run(() => GetFiles(directoryPath, searchPattern, recursive)).ConfigureAwait(false);
         }
 
         public async Task<bool> GetAnyFileExistsAsync(string directoryPath, string searchPattern = null,
             bool recursive = false)
         {
-            return await Task.Run(() => GetAnyFileExists(directoryPath, searchPattern, recursive));
+            return await Task.Run(() => GetAnyFileExists(directoryPath, searchPattern, recursive)).ConfigureAwait(false);
         }
 
         public async Task<string> ReadAsync(string filePath)
@@ -90,44 +91,44 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
-            return await Task.Run(() => File.ReadAllText(filePath));
+            return await Task.Run(() => File.ReadAllText(filePath)).ConfigureAwait(false);
         }
 
         public async Task ReadAsync(string filePath, Stream stream)
         {
-            await Task.Run(() => Read(filePath, stream));
+            await Task.Run(() => Read(filePath, stream)).ConfigureAwait(false);
         }
 
         public async Task<byte[]> ReadBytesAsync(string filePath)
         {
-            return await Task.Run(() => ReadBytes(filePath));
+            return await Task.Run(() => ReadBytes(filePath)).ConfigureAwait(false);
         }
 
         public async Task<DataTable> ReadDataTableAsync(string filePath)
         {
-            var fileContent = await GetFilesAsync(filePath);
+            var fileContent = await GetFilesAsync(filePath).ConfigureAwait(false);
             return fileContent.FirstOrDefault()?.ToDataTable();
         }
 
 
         public async Task AppendAsync(string filePath, string text)
         {
-            await Task.Run(() => Append(filePath, text));
+            await Task.Run(() => Append(filePath, text)).ConfigureAwait(false);
         }
 
         public async Task WriteAsync(string filePath, byte[] bytes)
         {
-            await Task.Run(() => Write(filePath, bytes));
+            await Task.Run(() => Write(filePath, bytes)).ConfigureAwait(false);
         }
 
         public async Task WriteAsync(string filePath, Stream stream)
         {
-            await Task.Run(() => Write(filePath, stream));
+            await Task.Run(() => Write(filePath, stream)).ConfigureAwait(false);
         }
 
         public async Task WriteAsync(string filePath, FileInfo uploadFile)
         {
-            await Task.Run(() => Write(filePath, uploadFile));
+            await Task.Run(() => Write(filePath, uploadFile)).ConfigureAwait(false);
         }
 
         public string GetFullPath(string filePath)
@@ -141,12 +142,12 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
         public async Task<IDictionary<string, string>> LoadMetaDataAsync(string filePath)
         {
-            return await Task.Run(() => LoadMetaData(filePath));
+            return await Task.Run(() => LoadMetaData(filePath)).ConfigureAwait(false);
         }
 
         public async Task<string> GetMetaDataAsync(string filePath, string key)
         {
-            return await Task.Run(() => GetMetaData(filePath, key));
+            return await Task.Run(() => GetMetaData(filePath, key)).ConfigureAwait(false);
         }
 
         public Task SetMetaDataAsync(string filePath, string key, string value)
@@ -316,8 +317,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
-            if (!Directory.Exists(filePath))
-                throw new DirectoryNotFoundException($"Cannot find directory '{filePath}'");
+            if (!Directory.Exists(filePath))Directory.CreateDirectory(filePath);
 
             var results = string.IsNullOrWhiteSpace(searchPattern)
                 ? Directory.GetFiles(filePath, "*.*",

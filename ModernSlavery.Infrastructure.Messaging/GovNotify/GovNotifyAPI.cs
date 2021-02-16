@@ -60,7 +60,7 @@ namespace ModernSlavery.Infrastructure.Messaging.GovNotify
                 var response = await _govNotifyClient.SendEmailAsync(
                     sendEmailRequest.EmailAddress,
                     sendEmailRequest.TemplateId,
-                    sendEmailRequest.Personalisation, _govNotifyOptions.ClientReference);
+                    sendEmailRequest.Personalisation, _govNotifyOptions.ClientReference).ConfigureAwait(false);
 
                 return response != null ? new SendEmailResponse { EmailId = response.id } : throw new NotifyClientException("No response returned");
             }
@@ -82,7 +82,7 @@ namespace ModernSlavery.Infrastructure.Messaging.GovNotify
         {
             try
             {
-                var response = await _govNotifyClient.SendLetterAsync(templateId, personalisation, clientReference);
+                var response = await _govNotifyClient.SendLetterAsync(templateId, personalisation, clientReference).ConfigureAwait(false);
                 return response != null ? new SendLetterResponse { LetterId = response.id } : throw new NotifyClientException("No response returned");
             }
             catch (NotifyClientException e)
@@ -102,7 +102,7 @@ namespace ModernSlavery.Infrastructure.Messaging.GovNotify
 
         public async Task<SendEmailResult> GetEmailResultAsync(string emailId)
         {
-            var notification = await _govNotifyClient.GetNotificationByIdAsync(emailId);
+            var notification = await _govNotifyClient.GetNotificationByIdAsync(emailId).ConfigureAwait(false);
 
             return new SendEmailResult
             {

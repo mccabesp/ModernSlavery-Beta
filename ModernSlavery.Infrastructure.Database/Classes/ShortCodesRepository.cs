@@ -36,12 +36,12 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         public async Task<List<ShortCodeModel>> GetAllShortCodesAsync()
         {
             //Asynchronously wait to enter the Semaphore. If no-one has been granted access to the Semaphore, code execution will proceed, otherwise this thread waits here until the semaphore is released 
-            await _ShortCodesLock.WaitAsync();
+            await _ShortCodesLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 if (_ShortCodes == null || _ShortCodesLastLoaded.AddMinutes(5) < VirtualDateTime.Now)
                 {
-                    var orgs = await LoadIfNewerAsync();
+                    var orgs = await LoadIfNewerAsync().ConfigureAwait(false);
                     if (orgs != null) _ShortCodes = orgs;
 
                     _ShortCodesLastLoaded = VirtualDateTime.Now;
@@ -60,7 +60,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         public async Task ClearAllShortCodesAsync()
         {
             //Asynchronously wait to enter the Semaphore. If no-one has been granted access to the Semaphore, code execution will proceed, otherwise this thread waits here until the semaphore is released 
-            await _ShortCodesLock.WaitAsync();
+            await _ShortCodesLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 _ShortCodesLoaded = DateTime.MinValue;
@@ -77,22 +77,22 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
         public async Task<List<ShortCodeModel>> LoadIfNewerAsync()
         {
-            var shortCodesPath = Path.Combine(SharedOptions.DataPath, Filenames.ShortCodes);
-            var fileExists = await FileRepository.GetFileExistsAsync(shortCodesPath);
+            var shortCodesPath = Path.Combine(SharedOptions.AppDataPath, Filenames.ShortCodes);
+            var fileExists = await FileRepository.GetFileExistsAsync(shortCodesPath).ConfigureAwait(false);
 
             if (!fileExists) return null;
 
             var newloadTime =
-                fileExists ? await FileRepository.GetLastWriteTimeAsync(shortCodesPath) : DateTime.MinValue;
+                fileExists ? await FileRepository.GetLastWriteTimeAsync(shortCodesPath).ConfigureAwait(false) : DateTime.MinValue;
 
             if (_ShortCodesLoaded > DateTime.MinValue && newloadTime <= _ShortCodesLoaded) return null;
 
-            var orgs = fileExists ? await FileRepository.ReadAsync(shortCodesPath) : null;
+            var orgs = fileExists ? await FileRepository.ReadAsync(shortCodesPath).ConfigureAwait(false) : null;
             if (string.IsNullOrWhiteSpace(orgs)) throw new Exception($"No content not load '{shortCodesPath}'");
 
             _ShortCodesLoaded = newloadTime;
 
-            var list = await FileRepository.ReadCSVAsync<ShortCodeModel>(shortCodesPath);
+            var list = await FileRepository.ReadCSVAsync<ShortCodeModel>(shortCodesPath).ConfigureAwait(false);
             if (!list.Any()) throw new Exception($"No records found in '{shortCodesPath}'");
 
             list = list.OrderBy(c => c.ShortCode).ToList();

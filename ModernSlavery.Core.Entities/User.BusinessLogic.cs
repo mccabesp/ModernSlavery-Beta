@@ -14,6 +14,10 @@ namespace ModernSlavery.Core.Entities
 
         [NotMapped] public string ContactFullname => (ContactFirstName + " " + ContactLastName).TrimI();
 
+        [NotMapped] public bool IsVerifyEmailSent => EmailVerifySendDate>DateTime.MinValue;
+        [NotMapped] public bool IsVerifiedEmail => EmailVerifiedDate>DateTime.MinValue;
+        public bool IsVerificationCodeExpired(int emailVerificationExpiryHours) => EmailVerifySendDate!=null && EmailVerifySendDate.Value.AddHours(emailVerificationExpiryHours) < VirtualDateTime.Now;
+        public TimeSpan GetTimeToNextVerificationResend(int emailVerificationMinResendHours) => EmailVerifySendDate==null ? TimeSpan.Zero : EmailVerifySendDate.Value.AddHours(emailVerificationMinResendHours) - VirtualDateTime.Now;
 
         [NotMapped]
         public bool SendUpdates
@@ -100,14 +104,14 @@ namespace ModernSlavery.Core.Entities
         {
             if (EmailVerifiedDate != null) return null;
 
-            var verifyCode = Encryption.EncryptQuerystring(UserId + ":" + Created.ToSmallDateTime());
+            var verifyCode = Encryption.Encrypt($"{UserId}:{Created.ToSmallDateTime()}", Encryption.Encodings.Base62);
             var verifyUrl = $"/sign-up/verify-email?code={verifyCode}";
             return verifyUrl;
         }
 
         public string GetPasswordResetUrl()
         {
-            var resetCode = Encryption.EncryptQuerystring(UserId + ":" + VirtualDateTime.Now.ToSmallDateTime());
+            var resetCode = Encryption.Encrypt($"{UserId}:{VirtualDateTime.Now.ToSmallDateTime()}", Encryption.Encodings.Base62);
             var resetUrl = $"/register/enter-new-password?code={resetCode}";
             return resetUrl;
         }

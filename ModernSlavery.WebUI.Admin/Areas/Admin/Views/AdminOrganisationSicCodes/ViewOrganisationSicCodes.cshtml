@@ -1,13 +1,13 @@
 ﻿@model Organisation
 @{Layout = "~/Views/GdsLayout.cshtml";}
 @{
-    ViewBag.Title = $"SIC codes history - {Model.OrganisationName} - Administration - Modern Slavery Reporting service";
+    Title = $"SIC codes history - {Model.OrganisationName} - Administration";
 }
 
 @section BeforeMain {
     @{
         var crumbs = new List<CrumbViewModel>
-        {
+{
             new CrumbViewModel
             {
                 Text = "Admin",
@@ -34,52 +34,55 @@
 <span class="govuk-caption-xl">Administration</span>
 <h1 class="govuk-heading-xl">
     SIC codes history
-    <br/>
+    <br />
     <span class="govuk-!-font-size-27">
         for @(Model.OrganisationName)
     </span>
 </h1>
 
-@Html.GovUkButton(new ButtonViewModel
+@if (IsSuperAdministrator || IsDatabaseAdministrator)
 {
-    Href = Url.Action("ChangeSicCodesGet", "AdminOrganisationSicCodes", new {id = Model.OrganisationId}),
-    Text = "Change SIC codes"
-})
 
+    @Html.GovUkButton(new ButtonViewModel
+    {
+        Href = Url.Action("ChangeSicCodesGet", "AdminOrganisationSicCodes", new { id = Model.OrganisationId }),
+        Text = "Change SIC codes"
+    })
+}
 
 <h2 class="govuk-heading-m">Current SIC codes</h2>
 
 <table class="govuk-table">
     <thead class="govuk-table__head">
-    <tr class="govuk-table__row">
-        <th scope="col" class="govuk-table__header">SIC code</th>
-        <th scope="col" class="govuk-table__header">Added on date</th>
-        <th scope="col" class="govuk-table__header">Source</th>
-    </tr>
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">SIC code</th>
+            <th scope="col" class="govuk-table__header">Added on date</th>
+            <th scope="col" class="govuk-table__header">Source</th>
+        </tr>
     </thead>
     <tbody class="govuk-table__body">
-    @{
-        var currentSicCodes = Model.OrganisationSicCodes
-            .Where(osc => !osc.Retired.HasValue)
-            .OrderBy(osc => osc.SicCode.SicCodeId)
-            .ToList();
-    }
+        @{
+            var currentSicCodes = Model.OrganisationSicCodes
+                .Where(osc => !osc.Retired.HasValue)
+                .OrderBy(osc => osc.SicCode.SicCodeId)
+                .ToList();
+        }
 
-    @foreach (var organisationSicCode in currentSicCodes)
-    {
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell">
-                <b>@(organisationSicCode.SicCode.SicCodeId)</b>
-                @(organisationSicCode.SicCode.Description)
-                <br/>
-                <span class="govuk-body-s">
-                    part of: @(organisationSicCode.SicCode.SicSection.Description)
-                </span>
-            </td>
-            <td class="govuk-table__cell">@organisationSicCode.Created.ToString("d MMM yyyy")</td>
-            <td class="govuk-table__cell">@organisationSicCode.Source</td>
-        </tr>
-    }
+        @foreach (var organisationSicCode in currentSicCodes)
+        {
+            <tr class="govuk-table__row">
+                <td class="govuk-table__cell">
+                    <b>@(organisationSicCode.SicCode.SicCodeId)</b>
+                    @(organisationSicCode.SicCode.Description)
+                    <br />
+                    <span class="govuk-body-s">
+                        part of: @(organisationSicCode.SicCode.SicSection.Description)
+                    </span>
+                </td>
+                <td class="govuk-table__cell">@organisationSicCode.Created.ToString("d MMM yyyy")</td>
+                <td class="govuk-table__cell">@organisationSicCode.Source</td>
+            </tr>
+        }
     </tbody>
 </table>
 
@@ -87,37 +90,37 @@
 
 <table class="govuk-table">
     <thead class="govuk-table__head">
-    <tr class="govuk-table__row">
-        <th scope="col" class="govuk-table__header">SIC code</th>
-        <th scope="col" class="govuk-table__header">Added on date</th>
-        <th scope="col" class="govuk-table__header">Removed on date</th>
-        <th scope="col" class="govuk-table__header">Source</th>
-    </tr>
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">SIC code</th>
+            <th scope="col" class="govuk-table__header">Added on date</th>
+            <th scope="col" class="govuk-table__header">Removed on date</th>
+            <th scope="col" class="govuk-table__header">Source</th>
+        </tr>
     </thead>
     <tbody class="govuk-table__body">
-    @{
-        var previousSicCodes = Model.OrganisationSicCodes
-            .Where(osc => osc.Retired.HasValue)
-            .OrderByDescending(osc => osc.Retired.Value)
-            .ThenBy(osc => osc.SicCode.SicCodeId)
-            .ToList();
-    }
+        @{
+            var previousSicCodes = Model.OrganisationSicCodes
+                .Where(osc => osc.Retired.HasValue)
+                .OrderByDescending(osc => osc.Retired.Value)
+                .ThenBy(osc => osc.SicCode.SicCodeId)
+                .ToList();
+        }
 
-    @foreach (var organisationSicCode in previousSicCodes)
-    {
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell">
-                <b>@(organisationSicCode.SicCode.SicCodeId)</b>
-                @(organisationSicCode.SicCode.Description)
-                <br/>
-                <span class="govuk-body-s">
-                    part of: @(organisationSicCode.SicCode.SicSection.Description)
-                </span>
-            </td>
-            <td class="govuk-table__cell">@organisationSicCode.Created.ToString("d MMM yyyy")</td>
-            <td class="govuk-table__cell">@organisationSicCode.Retired.Value.ToString("d MMM yyyy")</td>
-            <td class="govuk-table__cell">@organisationSicCode.Source</td>
-        </tr>
-    }
+        @foreach (var organisationSicCode in previousSicCodes)
+        {
+            <tr class="govuk-table__row">
+                <td class="govuk-table__cell">
+                    <b>@(organisationSicCode.SicCode.SicCodeId)</b>
+                    @(organisationSicCode.SicCode.Description)
+                    <br />
+                    <span class="govuk-body-s">
+                        part of: @(organisationSicCode.SicCode.SicSection.Description)
+                    </span>
+                </td>
+                <td class="govuk-table__cell">@organisationSicCode.Created.ToString("d MMM yyyy")</td>
+                <td class="govuk-table__cell">@organisationSicCode.Retired.Value.ToString("d MMM yyyy")</td>
+                <td class="govuk-table__cell">@organisationSicCode.Source</td>
+            </tr>
+        }
     </tbody>
 </table>

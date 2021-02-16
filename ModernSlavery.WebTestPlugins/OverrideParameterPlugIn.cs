@@ -1,8 +1,5 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.WebTesting;
+﻿using Microsoft.VisualStudio.TestTools.WebTesting;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace ModernSlavery.WebTestPlugins
 {

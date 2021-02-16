@@ -2,6 +2,7 @@
 using Microsoft.Azure.Management.Fluent;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Infrastructure.Azure.AppService;
+using ModernSlavery.Infrastructure.Azure.Cache;
 using ModernSlavery.Infrastructure.Azure.DevOps;
 using ModernSlavery.Infrastructure.Azure.KeyVault;
 using ModernSlavery.Infrastructure.Azure.SqlServer;
@@ -14,7 +15,7 @@ namespace ModernSlavery.Infrastructure.Azure
 {
     public class CommandLineParser
     {
-        private static AzureManager AzureManager = new AzureManager();
+        private static AzureManager AzureManager;
         private static AzureOptions _azureOptions;
 
         private static Type[] LoadCommandLineVerbTypes()
@@ -65,6 +66,18 @@ namespace ModernSlavery.Infrastructure.Azure
                             break;
                     }
                     break;
+                case RedisCacheOptions cacheOptions:
+                    Authenticate(verbType as AzureOptions);
+
+                    var cacheManager = new DistributedCacheManager(AzureManager, null,null);
+
+                    switch (verbType)
+                    {
+                        case RedisCacheRebootOptions options:
+                            cacheManager.ClearCacheAsync().Wait();
+                            break;
+                    }
+                    break;
                 case AppServiceOptions appServiceOptions:
                     Authenticate(verbType as AzureOptions);
                     var appServiceManager = new AppServiceManager(_Azure);
@@ -87,14 +100,14 @@ namespace ModernSlavery.Infrastructure.Azure
                             sqlManager.SetDatabaseEdition(options.Database, options.DatabaseEdition);
                             break;
                         case SqlServerOpenFirewallOptions options:
-                            sqlManager.OpenFirewall(options.Server, options.RuleName,options.StartIP, options.EndIP);
+                            sqlManager.OpenFirewall(options.Server, options.RuleName, options.StartIP, options.EndIP);
                             break;
                         case SqlServerDeleteFirewallOptions options:
                             sqlManager.DeleteFirewall(options.Server, options.RuleName);
                             break;
                     }
                     break;
-                case DevOpsOptions devOpsOptions:
+                case DevOps.DevOpsOptions devOpsOptions:
                     var devOpsManager = new DevOpsManager(devOpsOptions.Organisation, devOpsOptions.PersonalAccessToken);
 
                     switch (verbType)
@@ -112,8 +125,9 @@ namespace ModernSlavery.Infrastructure.Azure
         /// <param name="azureOptions"></param>
         private static void Authenticate(AzureOptions azureOptions)
         {
+            AzureManager = AzureManager ?? new AzureManager(azureOptions);
             if (azureOptions == null) throw new ArgumentNullException(nameof(azureOptions));
-            AzureManager.Authenticate(azureOptions);
+            AzureManager.Authenticate();
             _azureOptions = azureOptions;
         }
     }

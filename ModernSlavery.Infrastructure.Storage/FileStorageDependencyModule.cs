@@ -4,6 +4,7 @@ using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Options;
 using ModernSlavery.Infrastructure.Storage.FileRepositories;
 
 namespace ModernSlavery.Infrastructure.Storage

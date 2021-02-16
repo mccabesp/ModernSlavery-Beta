@@ -1,80 +1,75 @@
 ﻿@model DownloadViewModel
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
-    ViewBag.Title = "Administration: Downloads";
+    Layout = "~/Views/GdsLayout.cshtml";
+    Title = "Administration: Downloads";
 }
-<main id="content" role="main">
-    <div class="breadcrumbs dynamic-content default-content" style="display: block;">
-        <ol>
-            <li style="display: block; padding-bottom: 0; padding-top: 0.75em;">
-                &lt;
-                @Html.ActionLink("Back to administration home", "Home")
-            </li>
-        </ol>
-    </div>
 
-    <div class="grid-row">
-        <div class="column-full">
-            @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+@section BeforeMain {
+    <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Url.Action("Home")">Back to Adminstration home</a>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+        {
+            @await Html.GovUkValidationSummaryAsync()
+            @Html.AntiForgeryToken()
+            <div style="float: right; font-size: smaller;">
+                <span>
+                    <a class="govuk-link" href="@Url.Action("Downloads", "Admin", new {v = Guid.NewGuid().ToShortString()})" title="Show more recent content">@VirtualDateTime.Now.ToString("d MMM HH:mm")</a>
+                </span>
+            </div>
+
+            <h1 class="govuk-heading-l" style="margin-top: 0.3em;">
+                <span id="companyname">Administration</span> <br />
+                <span class="govuk-hint govuk-!-font-size-24 govuk-!-margin-top-2">Downloads</span>
+            </h1>
+
+ 
+            foreach (var type in Model.Downloads.Select(d => d.Type).Distinct())
             {
-                @await Html.CustomValidationSummaryAsync()
-                @Html.AntiForgeryToken()
-                <div style="float: right; font-size: smaller;">
-                    <span>
-                        <a href="@Url.Action("Downloads", "Admin", new {v = Guid.NewGuid().ToShortString()})" title="Show more recent content">@VirtualDateTime.Now.ToString("d MMM HH:mm")</a>
-                    </span>
-                </div>
-
-                <h1 class="heading-large" style="margin-top: 0.3em;">
-                    <span id="companyname">Administration</span>
-                    <span class="heading-secondary">Downloads</span>
-                </h1>
-
-                foreach (var type in Model.Downloads.Select(d => d.Type).Distinct())
+                var downloads = Model.Downloads.Where(d => d.Type.EqualsI(type));
+                <h2 class="govuk-heading-m">@type</h2>
+                if (!downloads.Any())
                 {
-                    var downloads = Model.Downloads.Where(d => d.Type.EqualsI(type));
-                    <h2 class="heading-medium">@type</h2>
-                    if (!downloads.Any())
+                    <h3 class="govuk-heading-m">No @type.ToLower() files found</h3>
+                }
+                else
+                {
+                    foreach (var download in downloads)
                     {
-                        <h3 class="heading-medium">No @type.ToLower() files found</h3>
-                    }
-                    else
-                    {
-                        foreach (var download in downloads)
-                        {
-                            <div style="border-bottom: 1px solid lightgrey; padding: 5px 0px">
-                                @if (download.Modified != null)
-                                {
-                                    <div>
-                                        <a href="@Url.Action("Read", new {filePath = download.Filepath})">
-                                            <b>@download.Title</b>
-                                        </a><br />@download.Description
-                                    </div>
-                                    <div class="info">
-                                        &#9642; <a href="@Url.Action("Download", new {filePath = download.Filepath})" target="_blank" style="white-space: nowrap">@download.Filename</a>
-                                        &#9642; Records: @download.Count
-                                        &#9642; Modified: <span title="@download.Modified.Value.ToShortTimeString()">@download.Modified.Value.ToString("d MMM yy HH:mm")</span>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <span style="font-weight: bold">@download.Title</span>
-                                    <br />
-                                    @download.Description
-                                    <div class="info">
-                                        &#9642; No files found
-                                        @if (download.ShowUpdateButton)
-                                        {
-                                            <button type="submit" style="cursor: pointer; float: right;" class="link-button" id="btnUpdate" name="Command" value="Update:@download.Filepath" title="Updates the data records">Update</button>
-                                        }
-                                    </div>
-                                }
-                            </div>
-                        }
+                        <div style="border-bottom: 1px solid lightgrey; padding: 5px 0px">
+                            @if (download.Modified != null)
+                            {
+                                <div>
+                                    <a class="govuk-link"href="@Url.Action("Read", new {filePath = download.Filepath})">
+                                        <b>@download.Title</b>
+                                    </a><br />@download.Description
+                                </div>
+                                <div class="info">
+                                    &#9642; <a class="govuk-link" href="@Url.Action("Download", new {filePath = download.Filepath})" target="_blank" style="white-space: nowrap">@download.Filename</a>
+                                    &#9642; Records: @download.Count
+                                    &#9642; Modified: <span title="@download.Modified.Value.ToShortTimeString()">@download.Modified.Value.ToString("d MMM yy HH:mm")</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <span style="font-weight: bold">@download.Title</span>
+                                <br />
+                                @download.Description
+                                <div class="info">
+                                    &#9642; No files found
+                                    @if ((IsSuperAdministrator || IsDatabaseAdministrator) && download.ShowUpdateButton)
+                                    {
+                                        <button type="submit" style="cursor: pointer; float: right;" class="link-button" id="btnUpdate" name="Command" value="Update:@download.Filepath" title="Updates the data records">Update</button>
+                                    }
+                                </div>
+                            }
+                        </div>
                     }
                 }
             }
-        </div>
-
+        }
     </div>
-</main>
+
+</div>

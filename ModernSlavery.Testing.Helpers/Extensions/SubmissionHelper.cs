@@ -12,31 +12,35 @@ namespace ModernSlavery.Testing.Helpers.Extensions
     {
         public static void GroupOrSingleScreenComplete(UIContext ui, bool IsGroup = false, string OrgName = null, string Year = null)
         {
-            ui.ExpectHeader("Who is your statement for?");
+            ui.ExpectHeader("Does your modern slavery statement cover a single organisation or a group of organisations?");
 
-            if (OrgName != null && Year != null)
-            {
-                ui.ExpectHeader("The " + Year + " modern slavery statement for " + OrgName + " covers:");
-            }
+            //if (OrgName != null && Year != null)
+            //{
+            //    ui.ExpectHeader("The " + Year + " modern slavery statement for " + OrgName + " covers:");
+            //}
 
             if (IsGroup)
             {
-                ui.ClickLabel("a group of organisations");
-                ui.Click("Continue");
+                ui.ClickLabel("A group of organisations");
+                ui.Click("Save and continue");
                 ui.ExpectHeader(That.Contains, "Which organisations are included in your group statement?");
             }
             else
             {
-                ui.ClickLabel("a single organisation");
-                ui.Click("Continue");
-                ui.ExpectHeader("Your modern slavery statement");
+                ui.ClickLabel("A single organisation");
+                ui.Click("Save and continue");
+
+                if (Year != null)
+                {
+                    ui.ExpectHeader("Add your " + Year + "modern slavery statement to the registry");
+                }
             }
         }
 
         public static void MoreInformationRequiredComplete(UIContext ui, bool WasRequired, string DeadlineYear = "2019", string OrgName = null)
         {
 
-         ui.Expect("We need more information");
+            ui.Expect("We need more information");
             if (OrgName.HasValue())
             {
                 ui.Expect(OrgName);
@@ -67,7 +71,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
 
             ui.Click("Continue");
-            ui.ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            ui.ExpectHeader(That.Contains, "Manage your modern slavery statements");
         }
     }
 }

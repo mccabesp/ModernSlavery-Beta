@@ -28,10 +28,7 @@ namespace ModernSlavery.Core.Models
         public string SicSource { get; set; }
 
         //Public Sector
-        public string EmailDomains { get; set; }
         public string RegistrationStatus { get; set; }
-
-        public string SicSectors { get; set; }
 
         public SortedSet<int> GetSicCodes()
         {
@@ -39,18 +36,6 @@ namespace ModernSlavery.Core.Models
             foreach (var sicCode in SicCodeIds.SplitI()) codes.Add(sicCode.ToInt32());
 
             return codes;
-        }
-
-        public bool IsAuthorised(string emailAddress)
-        {
-            if (!emailAddress.IsEmailAddress()) throw new ArgumentException("Bad email address");
-
-            if (string.IsNullOrWhiteSpace(EmailDomains)) return false;
-
-            var emailDomains = EmailDomains.SplitI(";")
-                .Select(ep => ep.ContainsI("*@") ? ep : ep.Contains('@') ? "*" + ep : "*@" + ep)
-                .ToList();
-            return emailDomains.Count > 0 && emailAddress.LikeAny(emailDomains);
         }
 
         public AddressModel ToAddressModel()

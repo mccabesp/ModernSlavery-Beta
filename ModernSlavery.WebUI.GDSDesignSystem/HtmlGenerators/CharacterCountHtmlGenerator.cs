@@ -34,7 +34,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 
             var characterCountViewModel = new CharacterCountViewModel
             {
-                Name = $"GovUk_Text_{propertyName}",
+                Name = propertyName,
                 Id = $"GovUk_{propertyName}",
                 MaxLength = maximumCharacters,
                 Value = currentValue,

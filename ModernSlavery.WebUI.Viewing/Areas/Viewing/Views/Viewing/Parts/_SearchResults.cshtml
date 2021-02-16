@@ -4,13 +4,13 @@
 <div class="search-results-list">
     <div class="govuk-grid-row header-row">
         <div class="govuk-grid-column-two-thirds">
-            <p class="govuk-body govuk-!-font-weight-bold">Modern slavery statements</p>
+            <h2 class="govuk-heading-s">Modern slavery statements</h2>
         </div>
         <div class="govuk-grid-column-one-third">
-            <p class="govuk-body govuk-!-font-weight-bold"> Statement year</p>
+            <h2 class="govuk-heading-s"> Statement year</h2>
         </div>
     </div>
-    <ul class="govuk-list govuk-!-margin-bottom-0">
+    <ul class="govuk-list govuk-!-margin-bottom-0" id="search-results">
         @foreach (var organisation in Model.Organisations.Results)
         {
             var organisationIdentifier = Obfuscator.Obfuscate(organisation.ParentOrganisationId);
@@ -41,7 +41,7 @@
                                 <p class="govuk-body govuk-!-margin-bottom-2 grey-text">Group statement</p>
                             }
                         }
-                        <p class="govuk-body govuk-!-margin-bottom-2 address">@organisation.Address.GetFullAddress()</p>
+                        <p class="govuk-body govuk-!-margin-bottom-2 address">@organisation.Address?.GetFullAddress()</p>
                         @if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
                         {
                             <p class="govuk-body govuk-!-margin-bottom-2 company-number">Company number: @organisation.CompanyNumber</p>

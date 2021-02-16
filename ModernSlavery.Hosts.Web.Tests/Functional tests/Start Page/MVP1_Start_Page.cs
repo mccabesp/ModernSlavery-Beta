@@ -56,7 +56,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Goto("/start");
             ExpectHeader("Submit a modern slavery statement");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
 
@@ -74,7 +74,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             () => { Expect("are legally required to publish an annual modern slavery statement in the UK"); },
             () => { Expect("answer some questions about your statement"); },
             () => { Expect("have chosen to publish a modern slavery statement voluntarily"); }) ;
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(24)]
@@ -82,7 +82,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             ClickText("Start now");
             ExpectHeader("Sign in or create an account");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

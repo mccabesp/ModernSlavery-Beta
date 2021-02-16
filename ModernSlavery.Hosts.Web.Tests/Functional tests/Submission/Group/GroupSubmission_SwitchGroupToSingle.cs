@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Awaiting Submission merge")]
+    [TestFixture]
 
     public class GroupSubmission_SwitchGroupToSingle : CreateAccount
     {
@@ -25,10 +25,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(30)]
         public async Task RegisterOrg()
         {
-            await this.RegisterUserOrganisationAsync(TestData.Organisations[0].OrganisationName, UniqueEmail);
-            await this.RegisterUserOrganisationAsync(TestData.Organisations[1].OrganisationName, UniqueEmail);
+            await this.RegisterUserOrganisationAsync(TestData.Organisations[0].OrganisationName, UniqueEmail).ConfigureAwait(false);
+            await this.RegisterUserOrganisationAsync(TestData.Organisations[1].OrganisationName, UniqueEmail).ConfigureAwait(false);
 
-            await this.RegisterUserOrganisationAsync(TestData.OrgName, UniqueEmail);
+            await this.RegisterUserOrganisationAsync(TestData.OrgName, UniqueEmail).ConfigureAwait(false);
         }
 
         [Test, Order(32)]
@@ -36,10 +36,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Goto("/");
 
-            Click("Manage organisations");
-            ExpectHeader(That.Contains, "Select an organisation");
+            Click("Your organisations");
+            Expect("Your registered organisations");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(34)]
@@ -47,18 +47,32 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Click(TestData.Organisations[0].OrganisationName);
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            ExpectHeader(That.Contains, "Manage your modern slavery statements");
 
-            RightOfText("2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "No");
-            await Task.CompletedTask;
+            RightOfText("2020").BelowText("Do you have to publish a statement on your website by law?").Expect(What.Contains, "No");
+            await Task.CompletedTask.ConfigureAwait(false);
         }
+        [Test, Order(35)]
+        public async Task ContinueToSubmission()
+        {
+            Click(The.Top, "Start draft");
+            ExpectHeader("Before you start");
+            Click("Continue");
+            ExpectHeader("Transparency and modern slavery");
+            Click("Continue");
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
 
         [Test, Order(36)]
         public async Task ChooseGroupSubmission()
         {
+            Click("Organisations covered by the statement");
             ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, true, TestData.Organisations[0].OrganisationName, "2020");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(38)]
@@ -73,13 +87,13 @@ namespace ModernSlavery.Hosts.Web.Tests
                 AtRow(TestData.Organisations[i].OrganisationName).Click("Include");
             }
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(40)]
         public async Task ViewGroup()
         {
-            Click("View your group");
+            Click("Continue");
             ExpectHeader("Review the organisations in your group statement");
 
             for (int i = 0; i < 5; i++)
@@ -88,148 +102,174 @@ namespace ModernSlavery.Hosts.Web.Tests
                 BelowHeader(TestData.Organisations[i].OrganisationName).Expect("Company number: " + TestData.Organisations[i].CompanyNumber);
             }
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
-        [Test, Order(42)]
-        public async Task ContinueToSubmission()
-        {
-            Click("Confirm and continue");
-            ExpectHeader("Before you start");
-            Click("Start Now");
-            ExpectHeader("Your modern slavery statement");
 
-            await Task.CompletedTask;
-        }
 
         [Test, Order(43)]
         public async Task YourModernSlaveryStatement()
         {
-
-            ExpectHeader("Your modern slavery statement");
+            Click("Continue");
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
 
             Set("URL").To(Submission.YourMSStatement_URL);
+
+            Click("Save and Continue");
 
             Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_To_Year, "1");
             Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_To_Year, "2");
 
+            Click("Save and continue");
+            ExpectHeader("What is the name of the director (or equivalent) who signed off your statement?");
             Set("First name").To(Submission.YourMSStatement_First);
             Set("Last name").To(Submission.YourMSStatement_Last);
             Set("Job title").To(Submission.YourMSStatement_JobTitle);
 
-            Submission_Helper.DateSet(this, Submission.YourMSStatement_ApprovalDate_Day, Submission.YourMSStatement_ApprovalDate_Month, Submission.YourMSStatement_ApprovalDate_Year, "3");
+            Submission_Helper.DateSet(this, Submission.YourMSStatement_ApprovalDate_Day, Submission.YourMSStatement_ApprovalDate_Month, Submission.YourMSStatement_ApprovalDate_Year, "1");
 
-            Click("Continue");
-            await Task.CompletedTask;
+            Click("Save and Continue");
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(44)]
         public async Task AreasCoveredByYourModernSlaveryStatement()
         {
-            ExpectHeader("Areas covered by your modern slavery statement");
+            Click("Recommended areas covered by the statement");
+            ExpectHeader("Does your statement cover the following areas in relation to modern slavery?");
 
             BelowHeader("Your organisation’s structure, business and supply chains").ClickLabel(The.Top, "Yes");
             BelowHeader("Policies").ClickLabel(The.Top, "Yes");
-            BelowHeader("Risk assessment and management").ClickLabel(The.Top, "Yes");
-            BelowHeader("Due diligence processes").ClickLabel(The.Top, "Yes");
-            BelowHeader("Staff training about slavery and human trafficking").ClickLabel(The.Top, "Yes");
-            BelowHeader("Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions").ClickLabel(The.Top, "Yes");
+            BelowHeader("Risk assessment").ClickLabel(The.Top, "Yes");
+            BelowHeader("Due diligence (steps to address risk)").ClickLabel(The.Top, "Yes");
+            BelowHeader("Training about modern slavery").ClickLabel(The.Top, "Yes");
+            BelowHeader("Goals and key performance indicators (KPIs) to measure the effectiveness of your actions and progress over time").ClickLabel(The.Top, "Yes");
 
-            Click("Continue");
-            ExpectHeader(That.Contains, "Your organisation");
+            Click("Save and Continue");
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
+
+        [Test, Order(45)]
+        public async Task YourOrganisation()
+        {
+            Click("Your organisation's sectors and turnover");
+            ExpectHeader(That.Contains, "Which sectors does your organisation operate in?");
+
+            foreach (var sector in Submission.YourOrganisation_Sectors)
+            {
+                ClickLabel(sector);
+            }
+
+            ExpectLabel("Please specify");
+            Set("Please specify").To("Other details");
+            Click("Save and Continue");
+            ExpectHeader("What was your turnover during the financial year the statement relates to?");
+
+            ClickLabel(Submission.YourOrganisation_Turnover);
+
+            Click("Save and continue");
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(46)]
-        public async Task NavigatePastOptionalSections()
+        public async Task HowManyYears()
         {
+            Click("How many years you've been producing statements");
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
-            Click("Continue");
-            ExpectHeader("Policies");
+            ExpectHeader("How many years has your organisation been producing modern slavery statements?");
+            ClickLabel("This is the first time");
 
-            Click("Continue");
-            ExpectHeader(That.Contains, "Supply chain risks and due diligence");
+            Click("Save and continue");
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
 
-            Click("Continue");
-            ExpectHeader(That.Contains, "Supply chain risks and due diligence");
-
-            Click("Continue");
-            ExpectHeader("Training");
-
-            Click("Continue");
-            ExpectHeader("Monitoring progress");
-
-            Click("Continue");
-            ExpectHeader("Review before submitting");
-
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(47)]
         public async Task OptionalSectionsIncomplete()
         {
+            var MandatorySections = new string[] {
+            "Organisations covered by the statement",
+            "Statement URL, dates and sign-off",
+            "Recommended areas covered by the statement",
+            "Your organisation", //abbereviated due to ' in string
+            "How many years you" //abbereviated due to ' in string
+            };
+
+            var OptionalSections = new string[] {
+            "Policies",
+            "Training",
+            "Monitoring working conditions",
+            "Modern slavery risks",
+            "Finding indicators of modern slavery",
+            "Demonstrating progress"
+            };
+
+
             //mandaotry sections should be completed
-            RightOf("Your modern Slavery statement").Expect("Completed");
-            RightOf("Areas covered by your modern statement").Expect("Completed");
+            foreach (var mandatorySection in MandatorySections)
+            {
+                Submission_Helper.SectionCompleteionCheck(this, true, mandatorySection);
+            }
 
             //optional sections incomplete
-            RightOf("Your organisation").Expect("Not Completed");
-            RightOf("Policies").Expect("Not Completed");
-            RightOf("Supply chain risks and due diligence (part 1)").Expect("Not Completed");
-            RightOf("Supply chain risks and due diligence (part 2)").Expect("Not Completed");
-            RightOf("Training").Expect("Not Completed");
-            RightOf("Monitoring progress").Expect("Not Completed");
-            await Task.CompletedTask;
+            foreach (var optionalSection in OptionalSections)
+            {
+                Submission_Helper.SectionCompleteionCheck(this, false, optionalSection);
+            }
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(48)]
         public async Task SwitchToSingleSubmission()
         {
-            ClickLink(That.Contains, "tell us it’s for a single organisation");
-            ExpectHeader("Who is your statement for?");
+            Click("Organisations covered by the statement");
+            ExpectHeader("Review the organisations in your group statement");
+            ClickLink("specify a single organisation");
 
-            ClickLabel("A signgle organisation");
-            Click("Continue");
+            ExpectHeader("Does your modern slavery statement cover a single organisation or a group of organisations?");
 
-            ExpectHeader("Review before submitting");
+            ClickLabel("A single organisation");
+            Click("Save and continue");
 
-            Expect("2020 modern slavery statement for " + TestData.Organisations[0].OrganisationName + " (group)");
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
 
-            Expect("2020 modern slavery statement for " + TestData.Organisations[0].OrganisationName);
+            ClickLabel("I understand and agree with the above declaration");
+            Click("Submit for publication");
 
-
-            Click("Submit fo publication");
-
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(50)]
         public async Task SubmitDraft()
         {
-            Expect("Submit");
-            Expect("You've submitted your Modern Slavery statement for 2020");
+            Expect(What.Contains, "Submission complete");
 
-
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
         [Test, Order(52)]
         public async Task CheckSubmission()
         {
-            Goto("/");
+            Goto("/manage-organisations");
 
-            Click("Manage organisations");
-            ExpectHeader(That.Contains, "Select an organisation");
+            Click("Your organisations");
+            Expect("Your registered organisations");
 
 
             Click(TestData.Organisations[0].OrganisationName);
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            ExpectHeader(That.Contains, "Manage your modern slavery statements");
 
-            RightOfText("2020").BelowText("Status of statement published on this service").Expect(What.Contains, "Submission complete");
+            RightOfText("2020").BelowText("Status of statement on the registry").Expect(What.Contains, "Published");
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -238,21 +278,21 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Goto("/");
 
-            Click("Manage organisations");
-            ExpectHeader(That.Contains, "Select an organisation");
+            Click("Your organisations");
+            Expect("Your registered organisations");
 
 
             Click(TestData.Organisations[1].OrganisationName);
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            ExpectHeader(That.Contains, "Manage your modern slavery statements");
 
-            RightOfText("2020").BelowText("Status of statement published on this service").Expect("Not started");
+            RightOfText("2020").BelowText("Status of statement on the registry").Expect("Not started");
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
 
 
-    }    
+    }
 }

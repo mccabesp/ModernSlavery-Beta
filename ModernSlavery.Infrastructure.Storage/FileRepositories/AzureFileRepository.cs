@@ -11,12 +11,14 @@ using Microsoft.WindowsAzure.Storage.File;
 using Microsoft.WindowsAzure.Storage.RetryPolicies;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 {
     public class AzureFileRepository : IFileRepository
     {
         private readonly CloudFileDirectory _rootDir;
+        public string RootPath {get;}
 
         private readonly StorageOptions _storageOptions;
 
@@ -39,24 +41,23 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             var share = fileClient.GetShareReference(storageOptions.AzureShareName);
 
             _rootDir = share.GetRootDirectoryReference();
+            RootPath = Url.Combine("/", _rootDir.Name);
         }
-
-        public string RootDir => _rootDir.Name;
 
         public async Task<IEnumerable<string>> GetDirectoriesAsync(string directoryPath,
             string searchPattern = null,
             bool recursive = false)
         {
-            if (string.IsNullOrWhiteSpace(directoryPath)) directoryPath = _rootDir.Name;
+            if (string.IsNullOrWhiteSpace(directoryPath)) directoryPath = RootPath;
 
             directoryPath = Url.DirToUrlSeparator(directoryPath);
 
-            var directory = await GetDirectoryAsync(directoryPath);
-            if (directory == null || !await directory.ExistsAsync())
+            var directory = await GetDirectoryAsync(directoryPath).ConfigureAwait(false);
+            if (directory == null || !await directory.ExistsAsync().ConfigureAwait(false))
                 throw new DirectoryNotFoundException($"Cannot find directory '{directoryPath}'");
 
             var token = new FileContinuationToken();
-            var items = await directory.ListFilesAndDirectoriesSegmentedAsync(token);
+            var items = await directory.ListFilesAndDirectoriesSegmentedAsync(token).ConfigureAwait(false);
 
             var directories = new List<string>();
 
@@ -69,7 +70,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
                     if (recursive)
                         directories.AddRange(await GetDirectoriesAsync(Url.Combine(directoryPath, dir.Name),
-                            searchPattern, recursive));
+                            searchPattern, recursive).ConfigureAwait(false));
                 }
 
             return directories;
@@ -82,7 +83,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             directoryPath = Url.DirToUrlSeparator(directoryPath);
 
             directoryPath = directoryPath.TrimI(@"/\");
-            var dirs = directoryPath.SplitI(@"/\");
+            var dirs = directoryPath.SplitI(@"/\".ToCharArray());
             if (dirs.Length < 1) return;
 
             var directory = _rootDir;
@@ -90,10 +91,10 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             foreach (var dir in dirs)
             {
                 var file = directory.GetFileReference(dir);
-                if (file != null && await file.ExistsAsync()) return;
+                if (file != null && await file.ExistsAsync().ConfigureAwait(false)) return;
 
                 directory = directory.GetDirectoryReference(dir);
-                if (directory != null) await directory.CreateIfNotExistsAsync();
+                if (directory != null) await directory.CreateIfNotExistsAsync().ConfigureAwait(false);
             }
         }
 
@@ -103,8 +104,8 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             directoryPath = Url.DirToUrlSeparator(directoryPath);
 
-            var dir = await GetDirectoryAsync(directoryPath);
-            return dir != null && await dir.ExistsAsync();
+            var dir = await GetDirectoryAsync(directoryPath).ConfigureAwait(false);
+            return dir != null && await dir.ExistsAsync().ConfigureAwait(false);
         }
 
         public async Task<bool> GetFileExistsAsync(string filePath)
@@ -113,11 +114,11 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             filePath = Url.DirToUrlSeparator(filePath);
 
-            var directory = await GetDirectoryAsync(Url.GetDirectoryName(filePath));
-            if (directory == null || !await directory.ExistsAsync()) return false;
+            var directory = await GetDirectoryAsync(Url.GetDirectoryName(filePath)).ConfigureAwait(false);
+            if (directory == null || !await directory.ExistsAsync().ConfigureAwait(false)) return false;
 
-            var file = await GetFileAsync(filePath);
-            return file != null && await file.ExistsAsync();
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
+            return file != null && await file.ExistsAsync().ConfigureAwait(false);
         }
 
         public async Task<DateTime> GetLastWriteTimeAsync(string filePath)
@@ -126,8 +127,8 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             filePath = Url.DirToUrlSeparator(filePath);
 
-            var file = await GetFileAsync(filePath);
-            if (file == null || !await file.ExistsAsync())
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
+            if (file == null || !await file.ExistsAsync().ConfigureAwait(false))
                 throw new FileNotFoundException($"Cannot find file '{filePath}'");
 
             return file.Properties.LastModified.Value.LocalDateTime;
@@ -139,11 +140,11 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             filePath = Url.DirToUrlSeparator(filePath);
 
-            var file = await GetFileAsync(filePath);
-            if (file == null || !await file.ExistsAsync())
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
+            if (file == null || !await file.ExistsAsync().ConfigureAwait(false))
                 throw new FileNotFoundException($"Cannot find file '{filePath}'");
 
-            await file.FetchAttributesAsync();
+            await file.FetchAttributesAsync().ConfigureAwait(false);
             return file.Properties.Length;
         }
 
@@ -154,11 +155,8 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             filePath = Url.DirToUrlSeparator(filePath);
 
-            var file = await GetFileAsync(filePath);
-            await file?.DeleteIfExistsAsync();
-            var metaPath = filePath + ".metadata";
-            var metaFile = await GetFileAsync(metaPath);
-            await metaFile?.DeleteIfExistsAsync();
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
+            await (file?.DeleteIfExistsAsync()).ConfigureAwait(false);
         }
 
         public async Task CopyFileAsync(string sourceFilePath, string destinationFilePath, bool overwrite)
@@ -166,17 +164,17 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             sourceFilePath = Url.DirToUrlSeparator(sourceFilePath);
             destinationFilePath = Url.DirToUrlSeparator(destinationFilePath);
 
-            var sourceCloudFile = await GetFileAsync(sourceFilePath);
-            if (sourceCloudFile == null || !await sourceCloudFile.ExistsAsync())
+            var sourceCloudFile = await GetFileAsync(sourceFilePath).ConfigureAwait(false);
+            if (sourceCloudFile == null || !await sourceCloudFile.ExistsAsync().ConfigureAwait(false))
                 throw new FileNotFoundException($"Cannot find file '{sourceFilePath}'");
 
-            var destinationCloudFile = await GetFileAsync(destinationFilePath);
-            if (!overwrite && await destinationCloudFile.ExistsAsync())
+            var destinationCloudFile = await GetFileAsync(destinationFilePath).ConfigureAwait(false);
+            if (!overwrite && await destinationCloudFile.ExistsAsync().ConfigureAwait(false))
                 throw new FileNotFoundException($"Destination file already exists '{destinationFilePath}'");
 
-            await DeleteFileAsync(destinationFilePath);
+            await DeleteFileAsync(destinationFilePath).ConfigureAwait(false);
 
-            await destinationCloudFile.StartCopyAsync(sourceCloudFile);
+            await destinationCloudFile.StartCopyAsync(sourceCloudFile).ConfigureAwait(false);
         }
 
         public async Task<IEnumerable<string>> GetFilesAsync(string directoryPath, string searchPattern = null,
@@ -186,13 +184,13 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             directoryPath = Url.DirToUrlSeparator(directoryPath);
 
-            var directory = await GetDirectoryAsync(directoryPath);
-            if (directory == null || !await directory.ExistsAsync())
+            var directory = await GetDirectoryAsync(directoryPath).ConfigureAwait(false);
+            if (directory == null || !await directory.ExistsAsync().ConfigureAwait(false))
                 throw new DirectoryNotFoundException($"Cannot find directory '{directoryPath}'");
 
             var files = new List<string>();
             var token = new FileContinuationToken();
-            var items = await directory.ListFilesAndDirectoriesSegmentedAsync(token);
+            var items = await directory.ListFilesAndDirectoriesSegmentedAsync(token).ConfigureAwait(false);
             foreach (var fileDir in items.Results)
                 if (fileDir is CloudFile)
                 {
@@ -203,7 +201,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
                 else if (recursive)
                 {
                     var dir = (CloudFileDirectory) fileDir;
-                    files.AddRange(await GetFilesAsync(Url.Combine(directoryPath, dir.Name), searchPattern, recursive));
+                    files.AddRange(await GetFilesAsync(Url.Combine(directoryPath, dir.Name), searchPattern, recursive).ConfigureAwait(false));
                 }
 
             return files;
@@ -216,13 +214,13 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             directoryPath = Url.DirToUrlSeparator(directoryPath);
 
-            var directory = await GetDirectoryAsync(directoryPath);
-            if (directory == null || !await directory.ExistsAsync())
+            var directory = await GetDirectoryAsync(directoryPath).ConfigureAwait(false);
+            if (directory == null || !await directory.ExistsAsync().ConfigureAwait(false))
                 throw new DirectoryNotFoundException($"Cannot find directory '{directoryPath}'");
 
             var files = new List<string>();
             var token = new FileContinuationToken();
-            var items = await directory.ListFilesAndDirectoriesSegmentedAsync(token);
+            var items = await directory.ListFilesAndDirectoriesSegmentedAsync(token).ConfigureAwait(false);
             foreach (var fileDir in items.Results)
                 if (fileDir is CloudFile)
                 {
@@ -232,7 +230,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
                 else if (recursive)
                 {
                     var dir = (CloudFileDirectory) fileDir;
-                    if (await GetAnyFileExistsAsync(Url.Combine(directoryPath, dir.Name), searchPattern, recursive))
+                    if (await GetAnyFileExistsAsync(Url.Combine(directoryPath, dir.Name), searchPattern, recursive).ConfigureAwait(false))
                         return true;
                 }
 
@@ -245,11 +243,11 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             filePath = Url.DirToUrlSeparator(filePath);
 
-            var file = await GetFileAsync(filePath);
-            if (file == null || !await file.ExistsAsync())
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
+            if (file == null || !await file.ExistsAsync().ConfigureAwait(false))
                 throw new FileNotFoundException($"Cannot find file '{filePath}'");
 
-            return await file.DownloadTextAsync();
+            return await file.DownloadTextAsync().ConfigureAwait(false);
         }
 
         public async Task ReadAsync(string filePath, Stream stream)
@@ -258,11 +256,11 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             filePath = Url.DirToUrlSeparator(filePath);
 
-            var file = await GetFileAsync(filePath);
-            if (file == null || !await file.ExistsAsync())
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
+            if (file == null || !await file.ExistsAsync().ConfigureAwait(false))
                 throw new FileNotFoundException($"Cannot find file '{filePath}'");
 
-            await file.DownloadToStreamAsync(stream);
+            await file.DownloadToStreamAsync(stream).ConfigureAwait(false);
         }
 
         public async Task<byte[]> ReadBytesAsync(string filePath)
@@ -271,13 +269,13 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             filePath = Url.DirToUrlSeparator(filePath);
 
-            var file = await GetFileAsync(filePath);
-            if (file == null || !await file.ExistsAsync())
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
+            if (file == null || !await file.ExistsAsync().ConfigureAwait(false))
                 throw new FileNotFoundException($"Cannot find file '{filePath}'");
 
-            await file.FetchAttributesAsync();
+            await file.FetchAttributesAsync().ConfigureAwait(false);
             var bytes = new byte[file.Properties.Length];
-            await file.DownloadToByteArrayAsync(bytes, 0);
+            await file.DownloadToByteArrayAsync(bytes, 0).ConfigureAwait(false);
             return bytes;
         }
 
@@ -285,7 +283,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
         {
             filePath = Url.DirToUrlSeparator(filePath);
 
-            var fileContent = await ReadAsync(filePath);
+            var fileContent = await ReadAsync(filePath).ConfigureAwait(false);
             return fileContent.ToDataTable();
         }
 
@@ -299,16 +297,16 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             //Ensure the directory exists
             var directory = Url.GetDirectoryName(filePath);
-            if (!string.IsNullOrWhiteSpace(directory) && !await GetDirectoryExistsAsync(directory))
-                await CreateDirectoryAsync(directory);
+            if (!string.IsNullOrWhiteSpace(directory) && !await GetDirectoryExistsAsync(directory).ConfigureAwait(false))
+                await CreateDirectoryAsync(directory).ConfigureAwait(false);
 
             var buffer = Encoding.UTF8.GetBytes(text);
-            var file = await GetFileAsync(filePath);
-            if (await file.ExistsAsync())
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
+            if (await file.ExistsAsync().ConfigureAwait(false))
             {
-                await file.FetchAttributesAsync();
-                await file.ResizeAsync(file.Properties.Length + buffer.Length);
-                using (var fileStream = await file.OpenWriteAsync(null))
+                await file.FetchAttributesAsync().ConfigureAwait(false);
+                await file.ResizeAsync(file.Properties.Length + buffer.Length).ConfigureAwait(false);
+                using (var fileStream = await file.OpenWriteAsync(null).ConfigureAwait(false))
                 {
                     fileStream.Seek(buffer.Length * -1, SeekOrigin.End);
                     fileStream.Write(buffer, 0, buffer.Length);
@@ -316,10 +314,10 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             }
             else
             {
-                await file.UploadFromByteArrayAsync(buffer, 0, buffer.Length);
+                await file.UploadFromByteArrayAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
             }
 
-            await file.FetchAttributesAsync();
+            await file.FetchAttributesAsync().ConfigureAwait(false);
         }
 
         public async Task WriteAsync(string filePath, byte[] bytes)
@@ -330,13 +328,13 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             //Ensure the directory exists
             var directory = Url.GetDirectoryName(filePath);
-            if (!string.IsNullOrWhiteSpace(directory) && !await GetDirectoryExistsAsync(directory))
-                await CreateDirectoryAsync(directory);
+            if (!string.IsNullOrWhiteSpace(directory) && !await GetDirectoryExistsAsync(directory).ConfigureAwait(false))
+                await CreateDirectoryAsync(directory).ConfigureAwait(false);
 
-            var file = await GetFileAsync(filePath);
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
 
             var stream = new SyncMemoryStream(bytes, 0, bytes.Length);
-            await file.UploadFromStreamAsync(stream);
+            await file.UploadFromStreamAsync(stream).ConfigureAwait(false);
         }
 
         public async Task WriteAsync(string filePath, Stream stream)
@@ -347,11 +345,11 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             //Ensure the directory exists
             var directory = Url.GetDirectoryName(filePath);
-            if (!string.IsNullOrWhiteSpace(directory) && !await GetDirectoryExistsAsync(directory))
-                await CreateDirectoryAsync(directory);
+            if (!string.IsNullOrWhiteSpace(directory) && !await GetDirectoryExistsAsync(directory).ConfigureAwait(false))
+                await CreateDirectoryAsync(directory).ConfigureAwait(false);
 
-            var file = await GetFileAsync(filePath);
-            await file.UploadFromStreamAsync(stream);
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
+            await file.UploadFromStreamAsync(stream).ConfigureAwait(false);
         }
 
         public async Task WriteAsync(string filePath, FileInfo uploadFile)
@@ -364,14 +362,14 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             //Ensure the directory exists
             var directory = Url.GetDirectoryName(filePath);
-            if (!string.IsNullOrWhiteSpace(directory) && !await GetDirectoryExistsAsync(directory))
-                await CreateDirectoryAsync(directory);
+            if (!string.IsNullOrWhiteSpace(directory) && !await GetDirectoryExistsAsync(directory).ConfigureAwait(false))
+                await CreateDirectoryAsync(directory).ConfigureAwait(false);
 
-            var file = await GetFileAsync(filePath);
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
 
             try
             {
-                await file.UploadFromFileAsync(uploadFile.FullName);
+                await file.UploadFromFileAsync(uploadFile.FullName).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -385,7 +383,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
         {
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
-            if (!Path.IsPathRooted(filePath)) filePath = Url.Combine(_rootDir.Name, filePath);
+            if (!Path.IsPathRooted(filePath)) filePath = Url.Combine(RootPath, filePath);
 
             filePath = Url.DirToUrlSeparator(filePath);
             return filePath;
@@ -395,9 +393,9 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
         {
             filePath = Url.DirToUrlSeparator(filePath);
 
-            var file = await GetFileAsync(filePath);
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
 
-            if (file == null || !await file.ExistsAsync())
+            if (file == null || !await file.ExistsAsync().ConfigureAwait(false))
                 throw new FileNotFoundException($"Cannot find file '{filePath}'", filePath);
 
             return file.Metadata;
@@ -407,7 +405,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
         {
             filePath = Url.DirToUrlSeparator(filePath);
 
-            var metaData = await LoadMetaDataAsync(filePath);
+            var metaData = await LoadMetaDataAsync(filePath).ConfigureAwait(false);
             return metaData.ContainsKey(key) ? metaData[key] : null;
         }
 
@@ -415,7 +413,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
         {
             filePath = Url.DirToUrlSeparator(filePath);
 
-            var metaData = await LoadMetaDataAsync(filePath);
+            var metaData = await LoadMetaDataAsync(filePath).ConfigureAwait(false);
 
             if (metaData.ContainsKey(key) && metaData[key] == value) return;
 
@@ -423,15 +421,15 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
                 metaData[key] = value;
             else if (metaData.ContainsKey(key)) metaData.Remove(key);
 
-            await SaveMetaDataAsync(filePath, metaData);
+            await SaveMetaDataAsync(filePath, metaData).ConfigureAwait(false);
         }
 
         public async Task SaveMetaDataAsync(string filePath, IDictionary<string, string> metaData)
         {
             filePath = Url.DirToUrlSeparator(filePath);
 
-            var file = await GetFileAsync(filePath);
-            if (file == null || !await file.ExistsAsync())
+            var file = await GetFileAsync(filePath).ConfigureAwait(false);
+            if (file == null || !await file.ExistsAsync().ConfigureAwait(false))
                 throw new FileNotFoundException($"Cannot find file '{filePath}'", filePath);
 
             //Set the new values
@@ -440,7 +438,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             //Remove the old values
             foreach (var key in file.Metadata.Keys.Except(metaData.Keys)) file.Metadata.Remove(key);
 
-            await file.SetMetadataAsync();
+            await file.SetMetadataAsync().ConfigureAwait(false);
         }
 
 

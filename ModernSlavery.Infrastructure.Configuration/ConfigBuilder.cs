@@ -40,9 +40,8 @@ namespace ModernSlavery.Infrastructure.Configuration
             appBuilder.AddEnvironmentVariables("DOTNET_");
             appBuilder.AddEnvironmentVariables("ASPNETCORE_");
             appBuilder.AddEnvironmentVariables();
-
             if (_commandlineArgs!=null && _commandlineArgs.Any())appBuilder.AddCommandLine(_commandlineArgs);
-            
+
             _appConfig = appBuilder.Build();
 
             if (_appConfig["WEBSITE_RUN_FROM_PACKAGE"] == "1")
@@ -127,10 +126,11 @@ namespace ModernSlavery.Infrastructure.Configuration
             //Dump the settings to the console
             if (_appConfig.GetValueOrDefault("TestOptions:DUMP_SETTINGS", false))
             {
-                var dumpPath = Path.Combine(_appConfig["Filepaths:LogFiles"], $"{_appConfig.GetApplicationName()}.SETTINGS.json");
-                Directory.CreateDirectory(Path.GetDirectoryName(dumpPath));
-                File.WriteAllLines(dumpPath, configDictionary.Keys.Select(key=>$@"[{key}]={configDictionary[key]}"));
-                Console.WriteLine($@"AppSettings Dumped to file: {dumpPath}");
+                var dumpSettingPath = Path.Combine(_appConfig["Filepaths:LogFiles"], $"{_appConfig.GetApplicationName()}.SETTINGS.txt");
+                Directory.CreateDirectory(Path.GetDirectoryName(dumpSettingPath));
+                File.WriteAllLines(dumpSettingPath, configDictionary.Keys.Select(key=>$@"[{key}]={configDictionary[key]}"));
+                Console.WriteLine($@"AppSettings Dumped to file: {dumpSettingPath}");
+                _appConfig["DumpSettingPath"] = dumpSettingPath;
             }
 
             return _appConfig;

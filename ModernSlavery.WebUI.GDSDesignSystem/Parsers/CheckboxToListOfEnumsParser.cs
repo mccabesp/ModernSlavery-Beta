@@ -16,7 +16,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
             PropertyInfo property,
             HttpRequest httpRequest)
         {
-            var propertyName = $"GovUk_Checkbox_{property.Name}";
+            var propertyName = property.Name;
             var parameterValues = httpRequest.Form[propertyName];
 
             ThrowIfPropertyTypeIsNotListOfEnums(property);

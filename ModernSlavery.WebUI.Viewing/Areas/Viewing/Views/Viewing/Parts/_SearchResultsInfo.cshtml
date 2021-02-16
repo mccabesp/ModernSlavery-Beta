@@ -1,7 +1,7 @@
 ﻿@using ModernSlavery.Core
 @model SearchViewModel
 @{
-    var results = $"{Model.Organisations.ActualRecordTotal} result{(Model.Organisations.ActualRecordTotal != 1 ? "s" : "")}";
+    var results = Model.Organisations!=null ? $"{Model.Organisations.ActualRecordTotal} result{(Model.Organisations.ActualRecordTotal != 1 ? "s" : "")}" : "0 results";
 }
 <div id="js-search-results-info" data-module="remove-filter" class="result-info">
     <div>

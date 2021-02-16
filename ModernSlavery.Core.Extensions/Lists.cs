@@ -16,20 +16,70 @@ namespace ModernSlavery.Core.Extensions
 {
     public static class Lists
     {
-        public static string[] SplitI(this string list,
-            string separators = ";,",
-            int maxItems = 0,
-            StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries)
+        /// <summary>
+        /// Splits a string into a maximum number of substrings based on the characters in an array.
+        /// </summary>
+        /// <param name="text">The text which needs to be split</param>
+        /// <param name="separator">A character that delimits the substrings in this string.</param>
+        /// <param name="count">The maximum number of substrings to return.</param>
+        /// <param name="options">System.StringSplitOptions.RemoveEmptyEntries (Default) to omit empty array elements from the array returned; or System.StringSplitOptions.None to include empty array elements in the array returned.</param>
+        /// <returns>An array whose elements contain the substrings in this string that are delimited by one or more characters in separator.</returns>
+        public static string[] SplitI(this string text, char separator, int count = 0, StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries)
         {
-            if (string.IsNullOrWhiteSpace(list)) return new string[0];
+            return text.SplitI(new char[]{separator},count, options);
+        }
 
-            if (separators == null) throw new ArgumentNullException("separators");
+        /// <summary>
+        /// Splits a string into a maximum number of substrings based on the characters in an array.
+        /// </summary>
+        /// <param name="text">The text which needs to be split</param>
+        /// <param name="separators">A character array that delimits the substrings in this string or null. Default(null) = {';',','}</param>
+        /// <param name="count">The maximum number of substrings to return.</param>
+        /// <param name="options">System.StringSplitOptions.RemoveEmptyEntries (Default) to omit empty array elements from the array returned; or System.StringSplitOptions.None to include empty array elements in the array returned.</param>
+        /// <returns>An array whose elements contain the substrings in this string that are delimited by one or more characters in separator.</returns>
+        public static string[] SplitI(this string text,char[] separators = null,int count = 0,StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return new string[0];
+            if (separators == null) separators = new[] { ';', ',' };
 
-            if (separators == string.Empty) return list.ToCharArray().Select(c => c.ToString()).ToArray();
+            if (!separators.Any()) throw new ArgumentNullException(nameof(separators));
 
-            if (maxItems > 0) return list.Split(separators.ToCharArray(), maxItems, options);
+            if (count > 0) return text.Split(separators, count, options);
 
-            return list.Split(separators.ToCharArray(), options);
+            return text.Split(separators, options);
+        }
+
+        /// <summary>
+        /// Splits a string into a maximum number of substrings based on the characters in an array.
+        /// </summary>
+        /// <param name="text">The text which needs to be split</param>
+        /// <param name="separator">A character that delimits the substrings in this string.</param>
+        /// <param name="count">The maximum number of substrings to return.</param>
+        /// <param name="options">System.StringSplitOptions.RemoveEmptyEntries (Default) to omit empty array elements from the array returned; or System.StringSplitOptions.None to include empty array elements in the array returned.</param>
+        /// <returns>An array whose elements contain the substrings in this string that are delimited by one or more characters in separator.</returns>
+        public static string[] SplitI(this string text, string separator, int count = 0, StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries)
+        {
+            return text.SplitI(new string[] { separator }, count, options);
+        }
+
+        /// <summary>
+        /// Splits a string into a maximum number of substrings based on the characters in an array.
+        /// </summary>
+        /// <param name="text">The text which needs to be split</param>
+        /// <param name="separators">A character array that delimits the substrings in this string or null. Default(null) = {";",","}</param>
+        /// <param name="count">The maximum number of substrings to return.</param>
+        /// <param name="options">System.StringSplitOptions.RemoveEmptyEntries (Default) to omit empty array elements from the array returned; or System.StringSplitOptions.None to include empty array elements in the array returned.</param>
+        /// <returns>An array whose elements contain the substrings in this string that are delimited by one or more characters in separator.</returns>
+        public static string[] SplitI(this string text, string[] separators, int count = 0, StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return new string[0];
+            if (separators == null) separators = new[] { ";", "," };
+
+            if (!separators.Any() || separators.All(c => string.IsNullOrEmpty(c))) throw new ArgumentNullException(nameof(separators));
+
+            if (count > 0) return text.Split(separators, count, options);
+
+            return text.Split(separators, options);
         }
 
         public static IEnumerable<string> DistinctI(this IEnumerable<string> list, bool ignoreCase = true)
@@ -91,7 +141,7 @@ namespace ModernSlavery.Core.Extensions
                     if (string.IsNullOrWhiteSpace(collection[key])) continue;
 
                     if (allowDuplicateKeys)
-                        foreach (var value in collection[key].SplitI(","))
+                        foreach (var value in collection[key].SplitI(','))
                             keyValues.Add(new KeyValuePair<string, string>(key, value));
                     else
                         keyValues.Add(new KeyValuePair<string, string>(key, collection[key]));
@@ -137,8 +187,7 @@ namespace ModernSlavery.Core.Extensions
             return list.ToDelimitedString(delimiter, appendage);
         }
 
-        public static string ToDelimitedString<T>(this IEnumerable<T> list, string delimiter = ",",
-            string appendage = null)
+        public static string ToDelimitedString<T>(this IEnumerable<T> list, string delimiter = ",",string appendage = null, bool htmlEncode=false)
         {
             if (list == null) return null;
 
@@ -148,8 +197,10 @@ namespace ModernSlavery.Core.Extensions
             {
                 if (item == null) continue;
 
-                var text = item.ToString();
+                var text = item.ToString().Trim();
                 if (string.IsNullOrWhiteSpace(text)) continue;
+                
+                if (htmlEncode) text = WebUtility.HtmlEncode(text);
 
                 if (result != null && !string.IsNullOrEmpty(delimiter) && !result.EndsWithI(delimiter))
                     result += delimiter;

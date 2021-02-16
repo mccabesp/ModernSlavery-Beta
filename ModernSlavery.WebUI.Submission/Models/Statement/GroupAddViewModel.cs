@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -34,6 +35,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         [Required(AllowEmptyStrings = false)]
         [MaxLength(100)]
+        [Text] 
         public string NewOrganisationName { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

@@ -44,7 +44,7 @@ namespace ModernSlavery.Hosts.Webjob.Classes
         /// <param name="message"></param>
         public async Task<bool> SendMsuMessageAsync(string subject, string message)
         {
-            var emailAddresses = _msuEmailProvider.EmailOptions.AdminDistributionList.SplitI(";").ToList();
+            var emailAddresses = _msuEmailProvider.EmailOptions.AdminDistributionList.SplitI(';').ToList();
             emailAddresses = emailAddresses.RemoveI("sender", "recipient");
             if (emailAddresses.Count == 0)
                 throw new ArgumentNullException(nameof(_msuEmailProvider.EmailOptions.AdminDistributionList));
@@ -91,7 +91,7 @@ namespace ModernSlavery.Hosts.Webjob.Classes
 
         public async Task<bool> SendMessageAsync(string subject, string recipients, string message)
         {
-            var emailAddresses = recipients.SplitI(";").ToList();
+            var emailAddresses = recipients.SplitI(';').ToList();
             emailAddresses = emailAddresses.RemoveI("sender", "recipient");
             if (emailAddresses.Count == 0) throw new ArgumentNullException(nameof(recipients));
 

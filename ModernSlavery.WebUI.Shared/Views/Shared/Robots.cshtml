@@ -1,0 +1,37 @@
+﻿@using ModernSlavery.WebUI.Shared.Options;
+@inject SharedOptions sharedOptions
+@inject FeatureSwitchOptions featureSwitchOptions
+@if (!string.IsNullOrWhiteSpace(Title))
+{
+    if (Title.ContainsI("modern slavery statement"))
+    {
+        <title>@(Title) - GOV.UK</title>
+    }
+    else
+    {
+        <title>@(Title): @sharedOptions.ServiceName - GOV.UK</title>
+    }
+}
+@if (Robots == RobotDirectives.None || !featureSwitchOptions.IsEnabled($"MetaRobots{AreaName}", $"MetaRobots"))
+{
+    <meta name="robots" content="None" />
+}
+else if (Robots.IsAny(RobotDirectives.All, RobotDirectives.NoFollow))
+{
+    <meta name="robots" content="@Robots" />
+    @if (!string.IsNullOrWhiteSpace(Description))
+    {
+        <meta name="Description" content="@Description" />
+    }
+    @foreach (var property in OpenGraph.Keys)
+    {
+        <meta property="og:@property" content="@(OpenGraph[property])" />
+    }
+    <meta property="og:image" content="/assets/images/govuk-opengraph-image.png">
+}
+else //if (Robots==RobotDirectives.NoIndex))
+{
+    <meta name="robots" content="@Robots" />
+}
+
+

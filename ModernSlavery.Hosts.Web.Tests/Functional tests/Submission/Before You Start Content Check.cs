@@ -11,115 +11,98 @@ namespace ModernSlavery.Hosts.Web.Tests
 
     public class Before_You_Start_Content_Check : CreateAccount
     {
-       const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
+        const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
 
-            private Organisation org;
-            [OneTimeSetUp]
-            public async Task SetUp()
-            {
-                org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
-            await Task.CompletedTask;
-            }
+        private Organisation org;
+        [OneTimeSetUp]
+        public async Task SetUp()
+        {
+            org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
 
-            public Before_You_Start_Content_Check() : base(_firstname, _lastname, _title, _email, _password)
-            {
-
-
-            }
-
-            [Test, Order(29)]
-            public async Task RegisterOrg()
-            {
-                await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
-            }
+        public Before_You_Start_Content_Check() : base(_firstname, _lastname, _title, _email, _password)
+        {
 
 
-            [Test, Order(40)]
+        }
+
+        [Test, Order(29)]
+        public async Task RegisterOrg()
+        {
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail).ConfigureAwait(false);
+        }
+
+
+        [Test, Order(34)]
         public async Task NavigateToBeforeYouStart()
         {
 
             RefreshPage();
 
-            ExpectHeader("Select an organisation");
+            ExpectHeader("Register or select organisations you want to add statements for");
 
             Click(org.OrganisationName);
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
 
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            ExpectHeader(That.Contains, "Manage your modern slavery statements");
 
             Click(The.Bottom, "Start Draft");
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
-        [Test, Order(41)]
+        [Test, Order(36)]
         public async Task PageHeaderContent()
         {
             ExpectHeader("Before you start");
             Expect("To use this service, you will need to provide us with some basic information about your most recent modern slavery statement.");
-            await Task.CompletedTask;
+            Expect("We will then ask you some additional questions about your statement. These are optional – but we strongly encourage you to complete them. All our questions relate to the period covered by your statement.");
+
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+        [Test, Order(38)]
+        public async Task FirstParagraphCheck()
+        {
+            ExpectHeader("Saving and editing your answers");
+            Expect("You do not have to answer all our questions in one go. You can save and edit your answers as often as you like before you submit them.");
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(42)]
-        public async Task FirstParagraphNotExpanded()
+        public async Task SecondParagraphCheck()
         {
-            Expect("Read more about the information you need to provide");
-            ExpectNo("the name of the organisation, or group of organisations, your statement is for");
-            await Task.CompletedTask;
-        }
-
-        [Test, Order(43)]
-        public async Task ExpandFirstParagraphAndCheckContent()
-        {
-            ClickText("Read more about the information you need to provide");
-            await AxeHelper.CheckAccessibilityAsync(this);
-            Expect("the name of the organisation, or group of organisations, your statement is for");
-            Expect("the period covered by the statement");
-            Expect("who signed off the statement, and when");
-            Expect("which of the recommended areas the statement covers");
-            Expect("a link to the full statement on your website");
-
-            await Task.CompletedTask;
+            ExpectHeader("Publishing your answers on GOV.UK");
+            Expect("When you submit your answers, we will publish all the information you’ve provided as a statement summary on the Modern slavery statement registry on GOV.UK. This will include a link to the full statement on your website. It will be available for public viewing.");
+            Expect("If you need to, you can make changes to your published answers and resubmit them. Your updated information will then replace your original answers on the registry.");
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(44)]
-        public async Task SecondParagraphNotExpanded()
+        public async Task ThirdParagraphCheck()
         {
-            Expect("We will then ask you some additional questions about your statement. These are optional – but we strongly encourage you to complete them.");
-            Expect("Read more about the additional questions");
-            ExpectNo("Additional questions cover:");
+            ExpectHeader("What the published information will look like");
+            Expect(What.Contains, "You can see examples of published statement summaries on ");
+            ExpectLink("Find a modern slavery statement");
 
-            await Task.CompletedTask;
+            //todo check link address
+            //BelowHeader("").ExpectXpath
+
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(45)]
-        public async Task ExpandSecondParagraphForContentCheck()
+        public async Task ExpectAndUseContinue()
         {
-            ClickText("Read more about the additional questions");
-            Expect("Additional questions cover:");
-            Expect("the sector your organisation operates in");
-            Expect("your policies and codes in relation to modern slavery");
-            Expect("your supply chain risks and due diligence processes");
-            Expect("staff training on modern slavery risks");
-            Expect("how you use goals and key performance indicators to monitor your progress in addressing modern slavery risks");
-            Expect("The information you provide us with will be published on our viewing service.");
+            Expect("Continue");
+            Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
+            ExpectHeader("Transparency and modern slavery");
 
-
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
-
-        [Test, Order(46)]
-        public async Task ExpectAndUseStartNow()
-        {
-            Expect("Start now");
-            Click("Start now");
-            await AxeHelper.CheckAccessibilityAsync(this);
-            ExpectHeader("Who is your statement for?");
-
-            await Task.CompletedTask;
-        }
-    }    
+    }
 }

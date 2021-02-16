@@ -3,7 +3,7 @@
 @model SearchViewModel
 @{
     var showPrev = Model.Organisations.CurrentPage > 1;
-    var showNext = Model.Organisations.CurrentPage < Model.Organisations.PageCount;
+    var showNext = Model.Organisations.CurrentPage < Model.Organisations.ActualPageCount;
 
     var prevPage = showPrev ? Model.Organisations.CurrentPage - 1 : -1;
     var nextPage = showNext ? Model.Organisations.CurrentPage + 1 : -1;
@@ -29,7 +29,7 @@
                             </span>
                         </span>
                         <span class="gem-c-pagination__link-divider visually-hidden">:</span>
-                        <span class="gem-c-pagination__link-label">@(Model.Organisations.CurrentPage - 1) of @Model.Organisations.PageCount</span>
+                        <span class="gem-c-pagination__link-label">@(Model.Organisations.CurrentPage - 1) of @Model.Organisations.ActualPageCount</span>
 
                     </a>
                 </li>
@@ -48,7 +48,7 @@
                             </span>
                         </span>
                         <span class="gem-c-pagination__link-divider visually-hidden">:</span>
-                        <span class="gem-c-pagination__link-label">@(Model.Organisations.CurrentPage + 1) of <span id="pageCount" data-pagecount="@(Model.Organisations.PageCount)">@(Model.Organisations.PageCount)</span></span>
+                        <span class="gem-c-pagination__link-label">@(Model.Organisations.CurrentPage + 1) of <span id="pageCount" data-pagecount="@(Model.Organisations.ActualPageCount)">@(Model.Organisations.ActualPageCount)</span></span>
 
                     </a>
                 </li>

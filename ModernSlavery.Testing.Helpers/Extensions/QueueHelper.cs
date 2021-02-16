@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
-using ModernSlavery.Infrastructure.Storage;
+using ModernSlavery.Core.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +17,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
             var queues = ListQueuesAsync(storageOptions.AzureConnectionString);
             await foreach (var queue in queues)
-                await queue.ClearAsync();
+                await queue.ClearAsync().ConfigureAwait(false);
         }
 
 
@@ -34,7 +34,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
             do
             {
-                var segment = await queueClient.ListQueuesSegmentedAsync(continuationToken);
+                var segment = await queueClient.ListQueuesSegmentedAsync(continuationToken).ConfigureAwait(false);
                 continuationToken = segment.ContinuationToken;
 
                 foreach (var queue in segment.Results)

@@ -25,6 +25,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace ModernSlavery.Infrastructure.Hosts
 {
@@ -36,7 +38,10 @@ namespace ModernSlavery.Infrastructure.Hosts
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             var hostBuilder = Host.CreateDefaultBuilder(commandlineArgs);
-            
+
+            additionalSettings??=new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            additionalSettings["BaseDirectory"] = AppDomain.CurrentDomain.BaseDirectory;
+
             //Load the configuration
             var configBuilder = new ConfigBuilder(additionalSettings, commandlineArgs);
             var appConfig = configBuilder.Build();
@@ -196,6 +201,7 @@ namespace ModernSlavery.Infrastructure.Hosts
             });
         }
 
+      
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             var ex = e.ExceptionObject as Exception;

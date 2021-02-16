@@ -1,12 +1,31 @@
-﻿<div id="ErrorSummary" class="@(ViewData.ModelState.IsValid ? "customvalidation-summary-valid" : "customvalidation-summary-errors") error-summary" data-valmsg-summary="@(!ViewBag.ExcludePropertyErrors)">
-    @if (!string.IsNullOrWhiteSpace(ViewBag.ValidationSummaryMessage))
-    {
-        <span>@ViewBag.ValidationSummaryMessage</span>
-    }
-    <ul>
-        @foreach (var modelError in ViewData.ModelState.Where(kv => ViewBag.ExcludePropertyErrors == false || string.IsNullOrWhiteSpace(kv.Key)).SelectMany(keyValuePair => keyValuePair.Value.Errors))
+﻿@{
+    var errors = ViewData.ModelState.Where(kv => ViewBag.ExcludePropertyErrors == false || string.IsNullOrWhiteSpace(kv.Key)).SelectMany(keyValuePair => keyValuePair.Value.Errors);
+    var messages = this.GetDisplayMessages();
+}
+@if (errors.Any())
+{
+    <div id="ErrorSummary" class="customvalidation-summary-errors error-summary" data-valmsg-summary="@(!ViewBag.ExcludePropertyErrors)">
+        @if (!string.IsNullOrWhiteSpace(ViewBag.ValidationSummaryMessage))
         {
-            <li>@modelError.ErrorMessage</li>
+            <span>@ViewBag.ValidationSummaryMessage</span>
         }
-    </ul>
-</div>
+        <ul>
+            @foreach (var error in errors)
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+@if (messages.Any())
+{
+    <div id="ErrorSummary" class="customvalidation-summary-errors display-message-summary">
+        <ul>
+            @foreach (var message in messages)
+            {
+                <li class="display-message">@message</li>
+            }
+        </ul>
+    </div>
+    this.ClearDisplayMessages();
+}

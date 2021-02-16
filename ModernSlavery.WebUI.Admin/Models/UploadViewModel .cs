@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {
@@ -12,13 +13,13 @@ namespace ModernSlavery.WebUI.Admin.Models
         [Serializable]
         public class Upload
         {
-            public string Type { get; set; }
-            public string Title { get; set; }
-            public string Description { get; set; }
+            [BindNever] public string Type { get; set; }
+            [BindNever] public string Title { get; set; }
+            [BindNever] public string Description { get; set; }
 
-            public string Filename => Path.GetFileName(Filepath);
+            [BindNever]public string Filename => Path.GetFileName(Filepath);
 
-            public string Filepath { get; set; }
+            [BindNever] public string Filepath { get; set; }
             public DateTime Modified { get; set; }
 
             public int DatabaseCount { get; set; }

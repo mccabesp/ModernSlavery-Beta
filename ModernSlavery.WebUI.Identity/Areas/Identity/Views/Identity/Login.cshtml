@@ -1,7 +1,10 @@
-﻿@model LoginViewModel
+﻿@inject SharedOptions sharedOptions
+@model LoginViewModel
 @{
+    Title = $"Sign in to the {sharedOptions.ServiceName}";
+    Description = "Sign in or create an account for the Modern slavery statement registry. Add your organisation’s statement details to the registry";
     Layout = "~/Views/DfeTemplate.cshtml";
-    ViewData["PageTitle"] = "Sign in - Modern Slavery reporting service - GOV.UK";
+    Robots = RobotDirectives.All;
 }
 
 @section Head {
@@ -28,7 +31,7 @@
                 Sign in or create an account
             </h1>
             <p>
-                If you have an account, sign in using your email address and password. <br/>
+                If you have an account, sign in using your email address and password. <br />
                 After signing into your account you can register a new organisation or manage your existing organisations.
             </p>
             <p class="notice">
@@ -47,11 +50,11 @@
                     <legend class="visuallyhidden">Sign in</legend>
                     <div class="form-group ">
                         <label asp-for="Username" class="form-label">Email</label>
-                        <input class="form-control" asp-for="Username" autofocus autocomplete="off" >
+                        <input class="form-control" asp-for="Username" autofocus autocomplete="off">
                     </div>
                     <div class="form-group ">
                         <label asp-for="Password" class="form-label">Password</label>
-                        <input type="password" class="form-control" asp-for="Password"  autocomplete="off" required>
+                        <input type="password" class="form-control" asp-for="Password" autocomplete="off" required>
                     </div>
                     <div class="form-group">
                         <button class="button dynamic-content default-content alert manual" name="button" value="login">Sign in</button>
@@ -59,15 +62,19 @@
                 </fieldset>
             </form>
 
-            <h2>Problems with your password?</h2>
-            <a id="forgotten-password" href="/manage-account/password-reset">Reset your password</a>
+            <p>
+                Problems with your password?
+                <br />
+                <a id="forgotten-password" href="/manage-account/password-reset">Reset your password</a>
+            </p>
+
 
             <h2 class="heading-medium">
                 No account yet?
             </h2>
             <p>
                 If you're new to the service you will need to create an account. This will allow you to register organisations and submit information about their modern slavery statements.
-                <br/>
+                <br />
                 <a href="/sign-up">Create an account</a>
             </p>
 

@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -23,12 +24,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Identity.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Identity.Controllers
 {
@@ -51,6 +56,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IdentityServerOptions _identityServerOptions;
 
+        private readonly FeatureSwitchOptions _featureSwitchOptions;
         public IdentityController(
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
@@ -58,6 +64,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             IEventService events,
             IUserRepository userRepository,
             IdentityServerOptions identityServerOptions,
+            FeatureSwitchOptions featureSwitchOptions,
             ILogger<IdentityController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(
             logger, webService, sharedBusinessLogic)
         {
@@ -67,6 +74,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
             _events = events;
+            _featureSwitchOptions = featureSwitchOptions;
         }
 
         #region Ping 
@@ -135,16 +143,12 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         ///     Show login page
         /// </summary>
         [HttpGet("sign-in")]
-        public async Task<IActionResult> Login(string returnUrl)
+        public async Task<IActionResult> Login([IgnoreText] string returnUrl)
         {
             if (string.IsNullOrWhiteSpace(returnUrl))return Redirect(_identityServerOptions.DefaultSigninUri);
 
             // build a model so we know what to show on the login page
             var vm = await BuildLoginViewModelAsync(returnUrl);
-
-            if (vm.IsExternalLoginOnly)
-                // we only have one option for logging in and it's an external provider
-                return await ExternalLogin(vm.ExternalLoginScheme, returnUrl);
 
             // Check if we are verifying a email change request
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
@@ -160,7 +164,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         /// </summary>
         [ValidateAntiForgeryToken]
         [HttpPost("sign-in")]
-        public async Task<IActionResult> Login(LoginInputModel model, string button)
+        public async Task<IActionResult> Login(LoginInputModel model, [IgnoreText] string button)
         {
             var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
 
@@ -222,8 +226,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                     }
                     else
                     {
-                        await _events.RaiseAsync(new UserLoginSuccessEvent(user.EmailAddress, user.UserId.ToString(),
-                            user.Fullname));
+                        await _events.RaiseAsync(new UserLoginSuccessEvent(user.EmailAddress, user.UserId.ToString(),user.Fullname));
 
                         // only set explicit expiration here if user chooses "remember me". 
                         // otherwise we rely upon expiration configured in cookie middleware.
@@ -231,22 +234,31 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                         if (IdentityOptions.AllowRememberLogin && model.RememberLogin)
                             props = new AuthenticationProperties
                             {
-                                IsPersistent = true,
-                                ExpiresUtc = DateTimeOffset.UtcNow.Add(IdentityOptions.RememberMeLoginDuration)
+                                // Refreshing the authentication session should be allowed.
+                                AllowRefresh = true,
+
+                                // Whether the authentication session is persisted across 
+                                // multiple requests. When used with cookies, controls
+                                // whether the cookie's lifetime is absolute (matching the
+                                // lifetime of the authentication ticket) or session-based.
+
+                                IsPersistent = false, //Invalidate the authentication ticket accross browser session
+
+                                // The time at which the authentication ticket expires. A 
+                                // value set here overrides the ExpireTimeSpan option of 
+                                // CookieAuthenticationOptions set with AddCookie.
+
+                                //ExpiresUtc = DateTimeOffset.UtcNow.Add(IdentityOptions.RememberMeLoginDuration) //Use ExpireTimeSpan of AddCookie
+
+                                // The full path or absolute URI to be used as an http 
+                                // redirect response value.
+                                //RedirectUri = <string>
                             };
 
                         // set the user role
-                        var claims = new List<Claim>();
-
-                        if (user.Status == UserStatuses.New || user.Status == UserStatuses.Active)
-                            claims.Add(
-                                new Claim(
-                                    ClaimTypes.Role,
-                                    SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(user) ? "GPGadmin" : "GPGemployer"));
-
+                        var claims = GetRoleClaims(user);
                         // issue authentication cookie with subject ID and username
-                        await HttpContext.SignInAsync(user.UserId.ToString(), user.EmailAddress, props,
-                            claims.ToArray());
+                        await HttpContext.SignInAsync(user.UserId.ToString(), user.EmailAddress, props,claims.ToArray());
 
                         // make sure the returnUrl is still valid, and if so redirect back to authorize endpoint or a local page
                         // the IsLocalUrl check is only necessary if you want to support additional local pages, otherwise IsValidReturnUrl is more strict
@@ -297,6 +309,25 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             var vm = await BuildLoginViewModelAsync(model);
             return View(vm);
         }
+
+        private IEnumerable<Claim> GetRoleClaims(User user)
+        {
+            if (user.Status == UserStatuses.New || user.Status == UserStatuses.Active)
+            {
+                if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(user))
+                {
+                    yield return new Claim(ClaimTypes.Role, UserRoleNames.Admin);
+                    if (SharedBusinessLogic.AuthorisationBusinessLogic.IsDatabaseAdministrator(user))
+                        yield return new Claim(ClaimTypes.Role, UserRoleNames.DatabaseAdmin);
+                    if (SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(user))
+                        yield return new Claim(ClaimTypes.Role, UserRoleNames.SuperAdmin);
+                    if (_featureSwitchOptions.IsEnabled("DevOps") && SharedBusinessLogic.AuthorisationBusinessLogic.IsDevOpsAdministrator(user))
+                        yield return new Claim(ClaimTypes.Role, UserRoleNames.DevOpsAdmin);
+                }
+                else
+                    yield return new Claim(ClaimTypes.Role, UserRoleNames.Submitter);
+            }
+        }
         #endregion
 
         #region SignOut
@@ -304,7 +335,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         ///     Show logout page
         /// </summary>
         [HttpGet("sign-out")]
-        public async Task<IActionResult> Logout(string logoutId)
+        public async Task<IActionResult> Logout([IgnoreText] string logoutId)
         {
             //If there is no logoutid then sign-out via webui
             if (string.IsNullOrWhiteSpace(logoutId))return Redirect(_identityServerOptions.DefaultSignoutUri);
@@ -625,76 +656,5 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         }
         #endregion
 
-        #region External SignIn
-
-        /// <summary>
-        ///     initiate roundtrip to external authentication provider
-        /// </summary>
-        [HttpGet("external-login")]
-        public async Task<IActionResult> ExternalLogin(string provider, string returnUrl)
-        {
-            if (IdentityOptions.WindowsAuthenticationSchemeName == provider)
-                // windows authentication needs special handling
-                return await ProcessWindowsLoginAsync(returnUrl);
-
-            // start challenge and roundtrip the return URL and 
-            var props = new AuthenticationProperties
-            {
-                RedirectUri = Url.Action("ExternalLoginCallback"),
-                Items = { { "returnUrl", returnUrl }, { "scheme", provider } }
-            };
-            return Challenge(props, provider);
-        }
-
-        /// <summary>
-        ///     Post processing of external authentication
-        /// </summary>
-        [HttpGet("external-login-callback")]
-        public async Task<IActionResult> ExternalLoginCallback()
-        {
-            // read external identity from the temporary cookie
-            var result =
-                await HttpContext.AuthenticateAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
-            if (result?.Succeeded != true) throw new Exception("External authentication error");
-
-            // lookup our user and external provider info
-            var (user, provider, providerUserId, claims) =
-                await FindUserFromExternalProviderAsync(result);
-            if (user == null)
-                // this might be where you might initiate a custom workflow for user registration
-                // in this sample we don't show how that would be done, as our sample implementation
-                // simply auto-provisions new external user
-                user = await AutoProvisionUserAsync(provider, providerUserId, claims);
-
-            // this allows us to collect any additonal claims or properties
-            // for the specific prtotocols used and store them in the local auth cookie.
-            // this is typically used to store data needed for signout from those protocols.
-            var additionalLocalClaims = new List<Claim>();
-            var localSignInProps = new AuthenticationProperties();
-            ProcessLoginCallbackForOidc(result, additionalLocalClaims, localSignInProps);
-            ProcessLoginCallbackForWsFed(result, additionalLocalClaims, localSignInProps);
-            ProcessLoginCallbackForSaml2p(result, additionalLocalClaims, localSignInProps);
-
-            // issue authentication cookie for user
-            await _events.RaiseAsync(new UserLoginSuccessEvent(provider, providerUserId, user.UserId.ToString(),
-                user.Fullname));
-            await HttpContext.SignInAsync(
-                user.UserId.ToString(),
-                user.EmailAddress,
-                provider,
-                localSignInProps,
-                additionalLocalClaims.ToArray());
-
-            // delete temporary cookie used during external authentication
-            await HttpContext.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
-
-            // validate return URL and redirect back to authorization endpoint or a local page
-            var returnUrl = result.Properties.Items["returnUrl"];
-            if (_interaction.IsValidReturnUrl(returnUrl) || Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
-
-            return Redirect("~/");
-        }
-
-        #endregion
     }
 }

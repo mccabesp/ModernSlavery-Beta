@@ -27,16 +27,21 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(20)]
         public async Task NavigateToSearchPage()
         {
+            Goto("/manage-organisations");
+
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
+
             Click("Register an organisation");
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
-            ExpectHeader("Registration Options");
-
-            ClickLabel("Public Sector Organisation");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            ClickLabel("No");
+            ClickLabel("Public sector organisation");
             Click("Continue");
 
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
             ExpectHeader("Find your organisation");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
  [Test, Order(22)]
@@ -44,7 +49,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             //clicking search without field filled should cause validaiton
             Click(The.Bottom, "Search");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             Expect("There is a problem");
             Expect("There's a problem with your search");
             Expect("Please enter an organisation to search for");

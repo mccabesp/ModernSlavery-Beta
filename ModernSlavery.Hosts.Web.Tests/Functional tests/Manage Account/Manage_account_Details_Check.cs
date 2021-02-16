@@ -21,12 +21,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click(The.Top, "Manage Account");
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
 
             ExpectHeader("Login details");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -56,8 +56,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             //AtText("Phone number").Expect("");
 
             ExpectHeader("Contact preferences");
-            RightOf("I would like to receive information about webinars, events and new guidance").Expect("Yes") ;
-            RightOf("I'm happy to be contacted for feedback on this service and take part in surveys about modern slavery").Expect("Yes");
+            RightOf("I would like to receive information on resources and guidance relating to modern slavery").Expect("Yes") ;
+            RightOf("I am happy to be contacted for feedback on this service").Expect("Yes");
 
             Expect("Help us improve this service");
             Expect(What.Contains, "We want to understand what our users want so that we can");
@@ -65,7 +65,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect(What.Contains, "Take part in our survey and make your voice heard.");
 
             Expect("Complete our Survey");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 

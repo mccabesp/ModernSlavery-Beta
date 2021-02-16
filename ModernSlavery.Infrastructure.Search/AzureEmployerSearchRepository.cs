@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -29,6 +31,7 @@ namespace ModernSlavery.Infrastructure.Search
         private const string synonymMapName = "desc-synonymmap";
         private readonly IMapper _autoMapper;
 
+        private readonly HttpClient _httpClient;
         private Lazy<Task<ISearchServiceClient>> _serviceClient;
         private Lazy<Task<ISearchIndexClient>> _indexClient;
 
@@ -42,6 +45,7 @@ namespace ModernSlavery.Infrastructure.Search
             SharedOptions sharedOptions,
             TestOptions testOptions,
             SearchOptions searchOptions,
+            HttpClient httpClient,
             [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog,
             IMapper autoMapper,
             IOptions<TelemetryConfiguration> telemetryOptions=null,
@@ -50,6 +54,7 @@ namespace ModernSlavery.Infrastructure.Search
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             _testOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions));
             _searchOptions = searchOptions ?? throw new ArgumentNullException(nameof(searchOptions));
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
             Disabled = searchOptions.Disabled;
             if (Disabled)
@@ -64,7 +69,7 @@ namespace ModernSlavery.Infrastructure.Search
             IndexName = searchOptions.OrganisationIndexName.ToLower();
             if (string.IsNullOrWhiteSpace(searchOptions.ServiceName)) throw new ArgumentNullException(nameof(searchOptions.ServiceName));
 
-#if DEBUG
+#if DEBUG || DEBUGLOCAL
             /* Since we cant emulate Search Index we share the same search search on Azure DEV environment.
              * Therefore we must use a different index name to the default when running locally in development mode
              * So as not to interfer with the default indexes.
@@ -90,12 +95,13 @@ namespace ModernSlavery.Infrastructure.Search
                 async () =>
                 {
                     //Get the service client
-                    var _serviceClient = new SearchServiceClient(_searchOptions.ServiceName, new SearchCredentials(_searchOptions.AdminApiKey));
+                    var serviceClient = new SearchServiceClient(new SearchCredentials(_searchOptions.AdminApiKey),_httpClient,true);
+                    serviceClient.SearchServiceName = _searchOptions.ServiceName;
 
                     //Ensure the index exists
-                    await CreateIndexIfNotExistsAsync(_serviceClient, IndexName).ConfigureAwait(false);
+                    await CreateIndexIfNotExistsAsync(serviceClient, IndexName).ConfigureAwait(false);
 
-                    return _serviceClient;
+                    return serviceClient;
                 });
         }
 
@@ -112,11 +118,17 @@ namespace ModernSlavery.Infrastructure.Search
                     }
 
                     if (!string.IsNullOrWhiteSpace(_searchOptions.QueryApiKey))
-                        return new SearchIndexClient(_searchOptions.ServiceName, IndexName, new SearchCredentials(_searchOptions.QueryApiKey));
+                    {
+                        var indexClient = new SearchIndexClient(new SearchCredentials(_searchOptions.QueryApiKey),_httpClient,true);
+                        indexClient.IndexName = IndexName;
+
+                        return indexClient;
+                    }
 
                     throw new ArgumentNullException(
                         $"You must provide '{nameof(_searchOptions.AdminApiKey)}' or '{nameof(_searchOptions.QueryApiKey)}'");
                 });
+
         }
 
 
@@ -283,6 +295,9 @@ namespace ModernSlavery.Infrastructure.Search
 
             //Recreate the index client
             SetIndexClient();
+
+            //Recreate the index
+            await CreateIndexIfNotExistsAsync(IndexName);
         }
 
         public async Task AddOrUpdateDocumentsAsync(IEnumerable<OrganisationSearchModel> newRecords)
@@ -296,7 +311,7 @@ namespace ModernSlavery.Infrastructure.Search
             newRecords = newRecords.OrderBy(o => o.OrganisationName);
 
             //Set the records to add or update
-            var actions = newRecords.Select(r => IndexAction.MergeOrUpload(r))
+            var actions = newRecords.Select(r => IndexAction.Upload(r))
                 .ToList();
 
             var batches = new ConcurrentBag<IndexBatch<OrganisationSearchModel>>();
@@ -421,7 +436,7 @@ namespace ModernSlavery.Infrastructure.Search
             do
             {
                 var searchResults = await SearchDocumentsAsync(null,currentPage,selectFields: selectFields, filter:filter);
-                totalPages = searchResults.PageCount;
+                totalPages = searchResults.ActualPageCount;
                 resultsList.AddRange(searchResults.Results);
                 currentPage++;
             } while (currentPage < totalPages);
@@ -540,5 +555,8 @@ namespace ModernSlavery.Infrastructure.Search
             //Return the results
             return searchResults;
         }
+
+  
+
     }
 }

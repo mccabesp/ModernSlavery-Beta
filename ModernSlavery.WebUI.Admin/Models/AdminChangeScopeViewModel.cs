@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.WebUI.GDSDesignSystem;
 using ModernSlavery.WebUI.GDSDesignSystem.Attributes.ValidationAttributes;
 using ModernSlavery.WebUI.GDSDesignSystem.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {
@@ -9,10 +10,12 @@ namespace ModernSlavery.WebUI.Admin.Models
     {
         public long OrganisationId { get; set; }
 
+        [BindNever] 
         public string OrganisationName { get; set; }
         public ScopeStatuses? CurrentScopeStatus { get; set; }
 
         [GovUkValidateRequired(ErrorMessageIfMissing = "Please enter a reason for this change.")]
+        [Text]
         public string Reason { get; set; }
 
         [GovUkValidateRequired(ErrorMessageIfMissing = "Please select a new scope.")]

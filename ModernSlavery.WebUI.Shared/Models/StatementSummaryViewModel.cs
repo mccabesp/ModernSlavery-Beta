@@ -42,6 +42,7 @@ namespace ModernSlavery.WebUI.Shared.Models
                     .ForMember(d => d.OtherGrievanceMechanisms, opt => opt.MapFrom(s=>s.Summary.OtherGrievanceMechanisms))
                     .ForMember(d => d.OtherWorkConditionsMonitoring, opt => opt.MapFrom(s=>s.Summary.OtherWorkConditionsMonitoring))
                     .ForMember(d => d.Risks, opt => opt.MapFrom(s=>s.Summary.Risks))
+                    .ForMember(d => d.NoRisks, opt => opt.MapFrom(s=>s.Summary.NoRisks))
                     .ForMember(d => d.Indicators, opt => opt.MapFrom(s=>s.Summary.Indicators))
                     .ForMember(d => d.OtherIndicators, opt => opt.MapFrom(s=>s.Summary.OtherIndicators))
                     .ForMember(d => d.Remediations, opt => opt.MapFrom(s=>s.Summary.Remediations))
@@ -90,6 +91,7 @@ namespace ModernSlavery.WebUI.Shared.Models
         public bool? GroupSubmission { get; set; }
         public string ParentName { get; set; }
         public string ChildOrganisationId { get; set; }
+        public int? GroupOrganisationCount { get; set; }
         #endregion
 
         #region Url & Email Fields
@@ -190,6 +192,8 @@ namespace ModernSlavery.WebUI.Shared.Models
             #region Risks
 
             public List<StatementRisk> Risks { get; set; } = new List<StatementRisk>();
+
+            public bool NoRisks { get; set; }
 
             #endregion
 

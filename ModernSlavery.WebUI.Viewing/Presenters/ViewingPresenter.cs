@@ -3,31 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Classes.ErrorMessages;
-using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Options;
 using ModernSlavery.WebUI.Shared.Models;
 using ModernSlavery.WebUI.Viewing.Models;
-using static ModernSlavery.Core.Entities.Statement;
 
 namespace ModernSlavery.WebUI.Viewing.Presenters
 {
     public interface IViewingPresenter
     {
-        IObfuscator Obfuscator { get; }
-        Task<SearchViewModel> SearchAsync(SearchQueryModel searchQuery);
-        Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(string organisationIdentifier, int reportingDeadlineYear);
-        Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(string organisationIdentifier, int reportingDeadlineYear);
-        Task<Outcome<StatementErrors, List<StatementSummaryViewModel>>> GetStatementSummaryGroupViewModel(string organisationIdentifier, int reportingDeadlineYear);
-        SearchViewModel GetSearchViewModel(SearchQueryModel searchQuery);
-        Task<Outcome<StatementErrors, string>> GetLinkRedirectUrl(string organisationIdentifier, int reportingDeadlineYear);
+        Task SearchAsync(SearchViewModel viewModel);
+        Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(long organisationId, int reportingDeadlineYear);
+        Task<Outcome<StatementErrors, List<StatementSummaryViewModel>>> GetStatementSummaryGroupViewModel(long organisationId, int reportingDeadlineYear);
+        Task<Outcome<StatementErrors, string>> GetLinkRedirectUrl(long organisationId, int reportingDeadlineYear);
+        Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(long organisationId, int reportingDeadlineYear);
+
+        /// <summary>
+        /// Checks if a statement has changed since the last modified date and returns Http 304 (Not Modified)
+        /// Also sets the last modified header to the status date of the statement
+        /// </summary>
+        /// <param name="httpContext">The current http context to get/set the caching flags from</param>
+        /// <param name="organisationId">The unique id of the organisation</param>
+        /// <param name="reportingDeadlineYear"></param>
+        /// <returns></returns>
+        IActionResult CheckStatementModified(HttpContext httpContext, long organisationId, int reportingDeadlineYear, int cacheSeconds = 3600);
     }
 
     public class ViewingPresenter : IViewingPresenter
@@ -37,11 +47,10 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         private readonly IStatementBusinessLogic _statementBusinessLogic;
         private readonly IViewingService _viewingService;
         private readonly IUrlChecker _urlChecker;
-        public IObfuscator Obfuscator { get; }
         private readonly IMapper _mapper;
         private readonly IServiceProvider _serviceProvider;
         private readonly ISearchBusinessLogic _searchBusinessLogic;
-        private readonly SectorTypeIndex _sectorTypes;
+        private readonly TestOptions _testOptions;
         #endregion
 
         #region Constructor
@@ -53,139 +62,78 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             IMapper mapper,
             ISearchBusinessLogic searchBusinessLogic,
             IUrlChecker urlChecker,
-            SectorTypeIndex sectorTypes)
+            TestOptions testOptions)
         {
             _viewingService = viewingService;
             _statementBusinessLogic = statementBusinessLogic;
             _sharedBusinessLogic = sharedBusinessLogic;
-            Obfuscator = obfuscator;
             _mapper = mapper;
             _serviceProvider = serviceProvider;
-            _sectorTypes = sectorTypes;
             _searchBusinessLogic = searchBusinessLogic;
             _urlChecker = urlChecker;
+            _testOptions = testOptions;
         }
         #endregion
 
         #region Search methods
 
-        public SearchViewModel GetSearchViewModel(SearchQueryModel searchQuery)
-        {
-            return new SearchViewModel
-            {
-                TurnoverOptions = GetTurnoverOptions(searchQuery.Turnovers),
-                SectorOptions = GetSectorOptions(searchQuery.Sectors),
-                ReportingYearOptions = GetReportingYearOptions(searchQuery.Years),
-                Keywords = searchQuery.Keywords,
-                Sectors = searchQuery.Sectors,
-                Turnovers = searchQuery.Turnovers,
-                Years = searchQuery.Years
-            };
-        }
-
-        public async Task<SearchViewModel> SearchAsync(SearchQueryModel searchQuery)
+        public async Task SearchAsync(SearchViewModel viewModel)
         {
             //Execute the search
-            var searchResults = await _viewingService.SearchBusinessLogic.SearchOrganisationsAsync(
-                searchQuery.Keywords,
-                searchQuery.Turnovers,
-                searchQuery.Sectors,
-                searchQuery.Years,
+            viewModel.Organisations = await _viewingService.SearchBusinessLogic.SearchOrganisationsAsync(
+                viewModel.Search,
+                viewModel.Turnovers,
+                viewModel.Sectors,
+                viewModel.Years,
                 false,
                 false,
-                searchQuery.PageNumber,
-                searchQuery.PageSize);
-
-            // build the result view model
-            return new SearchViewModel
-            {
-                TurnoverOptions = GetTurnoverOptions(searchQuery.Turnovers),
-                SectorOptions = GetSectorOptions(searchQuery.Sectors),
-                ReportingYearOptions = GetReportingYearOptions(searchQuery.Years),
-                Organisations = searchResults,
-                Keywords = searchQuery.Keywords,
-                PageNumber = searchQuery.PageNumber,
-                Sectors = searchQuery.Sectors,
-                Turnovers = searchQuery.Turnovers,
-                Years = searchQuery.Years
-            };
+                viewModel.PageNumber,
+                viewModel.PageSize);
         }
 
-        #endregion
-
-        #region Filter methods
-        public List<OptionSelect> GetTurnoverOptions(IEnumerable<byte> filterTurnoverRanges)
-        {
-            var allRanges = Enums.GetValues<StatementTurnoverRanges>();
-
-            // setup the filters
-            var results = new List<OptionSelect>();
-            foreach (var range in allRanges)
-            {
-                if (range == StatementTurnoverRanges.NotProvided) continue;
-                var id = (byte)range;
-                var label = range.GetEnumDescription();
-                var isChecked = filterTurnoverRanges != null && filterTurnoverRanges.Contains(id);
-                results.Add(
-                    new OptionSelect
-                    {
-                        Id = $"Turnover{id}",
-                        Label = label,
-                        Value = id.ToString(),
-                        Checked = isChecked
-                        // Disabled = facetResults.Count == 0 && !isChecked
-                    });
-            }
-
-            return results;
-        }
-
-        public List<OptionSelect> GetSectorOptions(IEnumerable<short> filterSectorTypeIds)
-        {
-            // setup the filters
-            var sources = new List<OptionSelect>();
-            foreach (var sectorType in _sectorTypes)
-            {
-                sources.Add(
-                    new OptionSelect
-                    {
-                        Id = sectorType.Id.ToString(),
-                        Label = sectorType.Description.TrimEnd('\r', '\n'),
-                        Value = sectorType.Id.ToString(),
-                        Checked = filterSectorTypeIds != null && filterSectorTypeIds.Any(x => x == sectorType.Id)
-                    });
-            }
-
-            return sources;
-        }
-
-        public List<OptionSelect> GetReportingYearOptions(IEnumerable<int> filterSnapshotYears)
-        {
-            // setup the filters
-            var reportingDeadlines = _sharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadlines(SectorTypes.Public);
-            var sources = new List<OptionSelect>();
-            foreach (var reportingDeadline in reportingDeadlines)
-            {
-                var isChecked = filterSnapshotYears != null && filterSnapshotYears.Any(x => x == reportingDeadline.Year);
-                sources.Add(
-                    new OptionSelect
-                    {
-                        Id = reportingDeadline.Year.ToString(),
-                        Label = reportingDeadline.Year.ToString(),
-                        Value = reportingDeadline.Year.ToString(),
-                        Checked = isChecked
-                        // Disabled = facetResults.Count == 0 && !isChecked
-                    });
-            }
-
-            return sources;
-        }
         #endregion
 
         #region Statement methods
-        public async Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(string organisationIdentifier, int reportingDeadlineYear)
+
+        /// <summary>
+        /// Note: This wont work as CSP nonce - breaks javascript when response is cached
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="organisationId"></param>
+        /// <param name="reportingDeadlineYear"></param>
+        /// <param name="cacheSeconds"></param>
+        /// <returns></returns>
+        public IActionResult CheckStatementModified(HttpContext httpContext, long organisationId, int reportingDeadlineYear, int cacheSeconds=3600)
         {
-            long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
+            //Net No-Check
+            httpContext.Response.GetTypedHeaders().CacheControl = new CacheControlHeaderValue {
+                NoCache = true
+            };
+
+            var statement = _sharedBusinessLogic.DataRepository.GetAll<Statement>().FirstOrDefault(s => s.OrganisationId == organisationId && s.SubmissionDeadline.Year == reportingDeadlineYear && s.Status == StatementStatuses.Submitted);
+            if (statement != null)
+            {
+                var lastSubmitted = new DateTime(statement.StatusDate.Year, statement.StatusDate.Month, statement.StatusDate.Day, statement.StatusDate.Hour, statement.StatusDate.Minute, statement.StatusDate.Second);
+
+                var ifModifiedSince = httpContext.Request.GetTypedHeaders().IfModifiedSince;
+                if (ifModifiedSince != null && ifModifiedSince.HasValue)
+                {
+                    if (lastSubmitted <= ifModifiedSince.Value && ifModifiedSince.Value.AddSeconds(cacheSeconds) > DateTime.Now)
+                    {
+                            httpContext.Response.GetTypedHeaders().LastModified = ifModifiedSince.Value.LocalDateTime;
+                            return new StatusCodeResult(StatusCodes.Status304NotModified);
+                        }
+                }
+            }
+
+            //Set the last modified date to when the statement was last submitted
+            httpContext.Response.GetTypedHeaders().LastModified = DateTime.Now;
+
+            return null;
+        }
+
+        public async Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(long organisationId, int reportingDeadlineYear)
+        {
             var openOutcome = await _statementBusinessLogic.GetLatestSubmittedStatementModelAsync(organisationId, reportingDeadlineYear);
             if (openOutcome.Fail) return new Outcome<StatementErrors, StatementViewModel>(openOutcome.Errors);
 
@@ -200,9 +148,8 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             return new Outcome<StatementErrors, StatementViewModel>(statementViewModel);
         }
 
-        public async Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(string organisationIdentifier, int reportingDeadlineYear)
+        public async Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(long organisationId, int reportingDeadlineYear)
         {
-            long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
             var organisationSearchModel = await _searchBusinessLogic.GetOrganisationAsync(organisationId, reportingDeadlineYear);
 
             if (organisationSearchModel == null)
@@ -212,9 +159,8 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             return new Outcome<StatementErrors, StatementSummaryViewModel>(vm);
         }
 
-        public async Task<Outcome<StatementErrors, List<StatementSummaryViewModel>>> GetStatementSummaryGroupViewModel(string organisationIdentifier, int reportingDeadlineYear)
+        public async Task<Outcome<StatementErrors, List<StatementSummaryViewModel>>> GetStatementSummaryGroupViewModel(long organisationId, int reportingDeadlineYear)
         {
-            long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
             var groups = await _searchBusinessLogic.ListGroupOrganisationsAsync(organisationId, reportingDeadlineYear);
 
             if (!groups.Any())
@@ -224,15 +170,14 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             return new Outcome<StatementErrors, List<StatementSummaryViewModel>>(vm);
         }
 
-        public async Task<Outcome<StatementErrors, string>> GetLinkRedirectUrl(string organisationIdentifier, int reportingDeadlineYear)
+        public async Task<Outcome<StatementErrors, string>> GetLinkRedirectUrl(long organisationId, int reportingDeadlineYear)
         {
-            var organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
             var organisationSearchModel = await _searchBusinessLogic.GetOrganisationAsync(organisationId, reportingDeadlineYear);
 
             if (organisationSearchModel == null)
                 return new Outcome<StatementErrors, string>(StatementErrors.NotFound, $"Cannot find statement summary for Organisation:{organisationId} due for reporting deadline year {reportingDeadlineYear}");
 
-            var isWorking = await _urlChecker.IsUrlWorking(organisationSearchModel.StatementUrl);
+            var isWorking = _testOptions.LoadTesting || await _urlChecker.IsUrlWorking(organisationSearchModel.StatementUrl);
 
             if (isWorking)
                 return new Outcome<StatementErrors, string>(organisationSearchModel.StatementUrl);

@@ -4,6 +4,6 @@ namespace ModernSlavery.Core.Interfaces
 {
     public interface IPostcodeChecker
     {
-        Task<bool> IsValidPostcode(string postcode);
+        Task<bool> CheckPostcodeAsync(string postcode);
     }
 }

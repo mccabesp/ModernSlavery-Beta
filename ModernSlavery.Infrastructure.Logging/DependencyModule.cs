@@ -4,7 +4,7 @@ using Autofac;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Interfaces;
-using ModernSlavery.Infrastructure.Storage;
+using ModernSlavery.Core.Options;
 using ModernSlavery.Infrastructure.Storage.MessageQueues;
 
 namespace ModernSlavery.Infrastructure.Logging

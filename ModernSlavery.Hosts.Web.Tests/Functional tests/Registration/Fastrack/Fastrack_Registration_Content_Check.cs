@@ -19,7 +19,7 @@ namespace ModernSlavery.Hosts.Web.Tests
     [TestFixture]
     public class Fastrack_Registration_Content_Check : CreateAccount
     {
-        const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email+"frcc"; const string _password = Create_Account.roger_password;
+        const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email + "frcc"; const string _password = Create_Account.roger_password;
 
         string Pin;
         public Fastrack_Registration_Content_Check() : base(_firstname, _lastname, _title, _email, _password)
@@ -33,20 +33,17 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Register an organisation");
 
+            ExpectHeader("Did you receive a letter from us?");
+            Expect("The letter includes an organisation reference and security code.");
 
-            ExpectHeader("Registration Options");
-
-            ClickLabel("Fast Track");
-
+            ClickLabel("Yes");
             Click("Continue");
-
             ExpectHeader("Fast track registration");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         public async Task ContentCheck()
         {
-
             BelowHeader("Fast track registration").ExpectText("If you have received a letter you can enter your employer reference and security code to fast track your organisation`s registration");
 
             BelowHeader("Fast track registration").ExpectLabel("Employer reference");
@@ -56,10 +53,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             BelowHeader("Fast track registration").ExpectField("Security code");
 
             ExpectButton("Continue");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
-        }
-
-        
-
     }
+}

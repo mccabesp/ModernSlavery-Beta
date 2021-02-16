@@ -12,10 +12,11 @@
 
         <div id="SearchByKeywordsGroup">
             <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s"></legend>
                 <div class="gov-uk-c-searchbar">
                     <div class="gov-uk-l-searchbar__table">
                         <div class="gov-uk-l-searchbar__cell">
-                            <input name="SearchKeywords" id="SearchKeywords" value="@(Model)" class="gov-uk-c-searchbar__input" type="text" autocomplete="on" spellcheck="false" maxlength="100">
+                            <input name="SearchKeywords" id="SearchKeywords" value="@(Model)" class="gov-uk-c-searchbar__input" type="text" autocomplete="on" spellcheck="false" aria-label="Search">
                             @Html.ValidationMessage($"SearchKeywords", null, new { @class = "govuk-error-message" })
                         </div>
                         <div class="gov-uk-l-searchbar__cell">

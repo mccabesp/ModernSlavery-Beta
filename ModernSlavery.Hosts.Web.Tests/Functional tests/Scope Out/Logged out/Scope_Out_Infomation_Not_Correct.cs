@@ -67,10 +67,10 @@ private bool TestRunFailed = false;
             SignOutDeleteCookiesAndReturnToRoot(this);
 
 
-            await this.SetSecurityCode(org, new DateTime(2021, 6, 10));
+            await this.SetSecurityCode(org, new DateTime(2021, 6, 10)).ConfigureAwait(false);
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(22)]
@@ -78,9 +78,9 @@ private bool TestRunFailed = false;
         {
             Goto(TestData.ScopeUrl);
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(24)]
@@ -88,7 +88,7 @@ private bool TestRunFailed = false;
         {
             Set("Organisation Reference").To(org.OrganisationReference);
             Set("Security Code").To(org.SecurityCode);
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(26)]
@@ -96,9 +96,9 @@ private bool TestRunFailed = false;
         {
             Click("Continue");
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Confirm your organisation’s details");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
 
@@ -110,7 +110,7 @@ private bool TestRunFailed = false;
 
             ExpectXPath("//a[contains(@href, 'mailto:modernslaverystatements@homeoffice.gov.uk')]");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
     }

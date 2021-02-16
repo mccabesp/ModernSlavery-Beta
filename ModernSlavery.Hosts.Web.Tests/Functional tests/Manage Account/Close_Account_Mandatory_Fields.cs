@@ -19,12 +19,12 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task ClickManageAccount_RedirectsToChangeDetailsPage()
         {
-            Click(The.Top, "Manage Account");
-            await AxeHelper.CheckAccessibilityAsync(this);
+            Click("Your details");
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
-            ExpectHeader("Login details");
+            ExpectHeader("Manage your account");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -34,11 +34,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Close your account");
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
 
             ExpectHeader("Close your account");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -47,11 +47,11 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task MandatoryFieldCheck()
         {
             ClickText("Close account");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             ExpectHeader("There is a problem");
             Expect("You need to enter your password before you can close your account");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 

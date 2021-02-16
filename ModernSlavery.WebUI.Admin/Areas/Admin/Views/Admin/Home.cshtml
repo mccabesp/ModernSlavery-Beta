@@ -1,14 +1,24 @@
-﻿@model AdminHomepageViewModel
-@{Layout = "/Views/GdsLayout.cshtml";}
+﻿@inherits ModernSlavery.WebUI.Shared.Classes.BaseRazorView<TModel>
+@model AdminHomepageViewModel
 @{
-    ViewBag.Title = "Administration - Modern Slavery Reporting service";
+    Layout = "/Views/GdsLayout.cshtml";
+
+    Title = "Administration - Modern Slavery Reporting service";
+    var adminTypes = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+    if (Controller.IsDatabaseAdministrator) adminTypes.Add("Database");
+    if (Controller.IsDevOpsAdministrator) adminTypes.Add("DevOps");
+    if (Controller.IsSuperAdministrator) adminTypes.Add("Super");
+
+    if (adminTypes.Count == 0) adminTypes.Add("Basic");
 }
 
+<div style="float:right"><b>Admin Roles</b>: (@(adminTypes.ToDelimitedString(", ")))</div>
 <h1 class="govuk-heading-xl">Administration</h1>
 
-@if (Model.IsDowngradedDueToIpRestrictions)
+
+@if (!IsTrustedIP)
 {
-    <div class="govuk-warning-text">
+    <div class="govuk-warning-text" data-egress-ip="@(Context.GetUserHostAddress())">
         <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
         <strong class="govuk-warning-text__text">
             <span class="govuk-warning-text__assistive">Warning</span>
@@ -33,44 +43,48 @@
     </div>
 </form>
 
-<h2 class="govuk-heading-l">Actions</h2>
 
-@if (Model.IsSuperAdministrator)
+@if (IsSuperAdministrator || IsDatabaseAdministrator)
 {
+    <h2 class="govuk-heading-l">Actions</h2>
     <p class="govuk-body">
         <a href="@(Url.Action("Impersonate"))" class="govuk-link govuk-!-font-weight-bold">Impersonate user</a>
         <br />
         Login as a user to view their screens.
     </p>
+
+    @if (IsDatabaseAdministrator)
+    {
+        <p class="govuk-body">
+            <a href="@(Url.Action("ManualChanges"))" class="govuk-link govuk-!-font-weight-bold">Execute manual changes</a>
+            <br />
+            Execute various manual tasks on system and data.
+        </p>
+    }
 }
 
-@if (Model.IsSuperAdministrator && Model.IsDatabaseAdministrator)
+@if (IsSuperAdministrator || IsTrustedIP)
+{
+    <h2 class="govuk-heading-l">Registrations</h2>
+}
+
+@if (IsSuperAdministrator)
+{
+
+    <p class="govuk-body">
+        <a href="@(Url.Action("UnconfirmedPins", "AdminUnconfirmedPins"))" class="govuk-link govuk-!-font-weight-bold">Unconfirmed PINs in the post</a>
+        <br />
+        PINs in the Post that haven't yet been confirmed.
+    </p>
+}
+@if (IsTrustedIP)
 {
     <p class="govuk-body">
-        <a href="@(Url.Action("ManualChanges"))" class="govuk-link govuk-!-font-weight-bold">Execute manual changes</a>
+        <a href="@(Url.Action("PendingRegistrations"))" class="govuk-link govuk-!-font-weight-bold">Pending registrations</a>
         <br />
-        Execute various manual tasks on system and data.
-    </p>
-    <p class="govuk-body">
-        <a href="@(Url.Action("TriggerWebjobs"))" class="govuk-link govuk-!-font-weight-bold">Trigger webjobs</a>
-        <br />
-        Manually force immidiate execution of scheduled webjobs
+        List of registrations which are awaiting manual authorisation.
     </p>
 }
-
-<h2 class="govuk-heading-l">Registrations</h2>
-
-<p class="govuk-body">
-    <a href="@(Url.Action("UnconfirmedPins", "AdminUnconfirmedPins"))" class="govuk-link govuk-!-font-weight-bold">Unconfirmed PINs in the post</a>
-    <br />
-    PINs in the Post that haven't yet been confirmed.
-</p>
-
-<p class="govuk-body">
-    <a href="@(Url.Action("PendingRegistrations"))" class="govuk-link govuk-!-font-weight-bold">Pending registrations</a>
-    <br />
-    List of registrations which are awaiting manual authorisation.
-</p>
 
 <h2 class="govuk-heading-l">Information</h2>
 

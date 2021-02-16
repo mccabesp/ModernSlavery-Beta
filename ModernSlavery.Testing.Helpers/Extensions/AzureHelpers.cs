@@ -2,14 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ModernSlavery.Infrastructure.Azure;
-using ModernSlavery.Infrastructure.Azure.DevOps;
 using System;
 using ModernSlavery.Core.Extensions;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using ModernSlavery.Infrastructure.Azure.KeyVault;
-using Microsoft.Azure.Management.Sql.Fluent.Models;
-using Microsoft.Azure.Management.Sql.Fluent;
 using SqlManager = ModernSlavery.Infrastructure.Azure.DevOps.SqlManager;
 
 namespace ModernSlavery.Testing.Helpers.Extensions
@@ -26,40 +23,43 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
         private static IAzure Initialise(this IHost host)
         {
-            if (_azureManager != null && AzureManager.Azure != null) return AzureManager.Azure;
+            if (_azureManager != null && _azureManager.Azure != null) return _azureManager.Azure;
 
             _config = host.Services.GetRequiredService<IConfiguration>();
+            var _azureOptions = host.Services.GetRequiredService<AzureOptions>();
 
-            var clientId = _config["ClientId"];
-            if (string.IsNullOrWhiteSpace(clientId)) return null;
-
-            var clientSecret = _config["ClientSecret"];
-            var tenantId = _config["TenantId"];
-
-            _azureManager = new AzureManager();
-            var _azure = _azureManager.Authenticate(clientId, clientSecret, tenantId);
+            _azureManager = new AzureManager(_azureOptions);
+            var _azure = _azureManager.Authenticate();
 
             return _azure;
         }
 
-        private static bool InitialiseSql(this IAzure azure)
+        private static bool IsLocalDb()
         {
-            SqlManager sqlManager = _sqlManager;
-            if (sqlManager == null)
+            var connectionString = _config["Database:ConnectionString"];
+            var connectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
+
+            var sqlServerName = connectionStringBuilder.DataSource.BeforeFirst(".database.windows.net", StringComparison.OrdinalIgnoreCase, false, true).AfterFirst("tcp:", StringComparison.OrdinalIgnoreCase, false, true);
+            return sqlServerName.ContainsI("localdb");
+        }
+
+        private static void InitialiseSql(this IHost host)
+        {
+            if (IsLocalDb()) return;
+
+            host.Initialise();
+
+            if (_sqlManager == null)
             {
-                sqlManager = new SqlManager(azure);
+                _sqlManager = new SqlManager(_azureManager.Azure);
 
                 var connectionString = _config["Database:ConnectionString"];
                 var connectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
-
                 var sqlServerName = connectionStringBuilder.DataSource.BeforeFirst(".database.windows.net", StringComparison.OrdinalIgnoreCase, false, true).AfterFirst("tcp:", StringComparison.OrdinalIgnoreCase, false, true);
-                if (sqlServerName.ContainsI("localdb")) return false;
 
-                _sqlManager = sqlManager;
                 _sqlServerName = sqlServerName;
                 _sqlDatabaseName = connectionStringBuilder.InitialCatalog;
             }
-            return true;
         }
 
         #region SQL Firewall
@@ -69,9 +69,10 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         /// <param name="host">The webhost</param>
         public static void OpenSQLFirewall(this IHost host)
         {
-            var azure = host.Initialise();
+            _config = host.Services.GetRequiredService<IConfiguration>();
+            if (IsLocalDb()) return;
 
-            if (azure==null || !azure.InitialiseSql()) return;
+            host.InitialiseSql();
 
             var sqlFirewallRuleName = $"TESTAGENT_{_config.GetValue("AGENT_NAME", Environment.MachineName)}";
             _sqlManager.OpenFirewall(_sqlServerName, sqlFirewallRuleName);
@@ -87,15 +88,6 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             if (!string.IsNullOrWhiteSpace(_sqlServerName) && !string.IsNullOrWhiteSpace(_sqlFirewallRuleName))_sqlManager?.DeleteFirewall(_sqlServerName, _sqlFirewallRuleName);
         }
         #endregion
-
-        public static void SetSqlDatabaseEdition(this IHost host, DatabaseEdition newDatabaseEdition)
-        {
-            var azure = host.Initialise();
-
-            if (!azure.InitialiseSql()) return;
-
-            _sqlManager.SetDatabaseEdition(_sqlDatabaseName, newDatabaseEdition);
-        }
 
         #region KeyVault
         private static bool InitialiseKeyVault(this IAzure azure)

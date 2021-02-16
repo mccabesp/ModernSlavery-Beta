@@ -88,5 +88,6 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// </summary>
         /// <returns>List of organisations whose scoped were changed</returns>
         Task<HashSet<Organisation>> SetPresumedScopesAsync();
+        Task<bool> SetPresumedScopesAsync(Organisation org);
     }
 }

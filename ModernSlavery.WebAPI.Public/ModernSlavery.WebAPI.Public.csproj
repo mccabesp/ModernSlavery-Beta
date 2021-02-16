@@ -1,9 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-  </PropertyGroup>
-
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!-- Only Required when we dont want warnings eg CS1591: Missing XML comment for publicly visible type or member 'TodoController.GetAll()'-->
@@ -29,7 +24,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="6.0.1" />
   </ItemGroup>
 
-
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.BusinessDomain.Shared\ModernSlavery.BusinessDomain.Shared.csproj" />
     <ProjectReference Include="..\ModernSlavery.BusinessDomain.Submission\ModernSlavery.BusinessDomain.Submission.csproj" />
@@ -38,5 +32,4 @@
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
     <ProjectReference Include="..\ModernSlavery.WebUI.Shared\ModernSlavery.WebUI.Shared.csproj" />
   </ItemGroup>
-
 </Project>

@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model TransparencyViewModel
 
@@ -11,18 +12,18 @@
         <h1 class="govuk-heading-l govuk-!-margin-bottom-5">
             @Model.PageTitle
         </h1>
-        <p class="govuk-body">
-            The purpose of the Modern slavery statement registry is to make it easier for people to find statements, and bring greater transparency to the steps organisations are taking to address modern slavery risks in their operations and supply chains.
-        </p>
+        <p class="govuk-body">Under section 54 of the Modern Slavery Act 2015 modern slavery statements must cover the steps that all relevant organisations have taken to ensure that slavery and human trafficking is not taking place in any of their supply chains or any parts of their business. If an organisation has taken no steps, it must still publish a statement stating this clearly.</p>
 
-        <p class="govuk-body govuk-!-margin-bottom-6">
-            We acknowledge that identifying and addressing modern slavery risks is a long-term challenge.
+        <p class="govuk-body">
+            The purpose of the Modern slavery statement registry is to increase supply chain transparency and improve understanding of modern slavery risks and best practice.
         </p>
 
         <p class="govuk-body govuk-!-margin-bottom-3">
-            Our aim is to encourage organisations to:
+            We acknowledge that identifying and addressing modern slavery risks is a long-term challenge.
+            Our aim is for organisations to:
         </p>
-            <ul class="govuk-list govuk-list--bullet  govuk-!-margin-bottom-6">
+
+         <ul class="govuk-list govuk-list--bullet  govuk-!-margin-bottom-6">
                 <li class="govuk-!-margin-bottom-6">
                     be open and transparent about modern slavery risks in their operations and supply chains
                 </li>
@@ -35,9 +36,9 @@
             </ul>
     
 
-        <p class="govuk-body govuk-!-margin-bottom-7">
-            We encourage you to answer all questions as fully as possible, to increase supply chain transparency and improve understanding of modern slavery risks and best practice.
-        </p>
+         <p class="govuk-body govuk-!-margin-bottom-7">
+             We encourage you to answer all questions as fully as possible.
+         </p>
 
         <a href="@Model.ContinueUrl" class="govuk-button">
             Continue

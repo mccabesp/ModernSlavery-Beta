@@ -3,6 +3,7 @@
 
 
 using System.ComponentModel.DataAnnotations;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Identity.Models
 {
@@ -13,9 +14,14 @@ namespace ModernSlavery.WebUI.Identity.Models
         [Required] public string Username { get; set; }
 
         [MaxLength(100)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        [Password]
         [Required] public string Password { get; set; }
 
         public bool RememberLogin { get; set; }
+        
+        [IgnoreText]
         public string ReturnUrl { get; set; }
     }
 }

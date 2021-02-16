@@ -76,7 +76,7 @@ namespace ModernSlavery.Infrastructure.Messaging
                 Options.Username,
                 Options.Password,
                 Options.Port,
-                simulate: _testOptions.SimulateMessageSend);
+                simulate: _testOptions.SimulateMessageSend).ConfigureAwait(false);
 
             return new SendEmailResult
             {

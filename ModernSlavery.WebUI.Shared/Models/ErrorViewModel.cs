@@ -1,4 +1,5 @@
 ﻿using System;
+using ModernSlavery.Core.Extensions;
 
 namespace ModernSlavery.WebUI.Shared.Models
 {
@@ -12,5 +13,8 @@ namespace ModernSlavery.WebUI.Shared.Models
         public string CallToAction { get; set; }
         public string ActionText { get; set; } = "Continue";
         public string ActionUrl { get; set; }
+
+        public int ResponseCode => ErrorCode.Between(400, 599) ? ErrorCode : 500;
+
     }
 }

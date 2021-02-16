@@ -27,7 +27,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
         {
             var property = ExpressionHelpers.GetPropertyFromExpression(propertyLambdaExpression);
 
-            ThrowIfPropertyHasNonDefaultValue(model, property);
+            //ThrowIfPropertyHasNonDefaultValue(model, property);
 
             if (TypeHelpers.IsNullableEnum(typeof(TProperty)))
                 RadioToNullableEnumParser.ParseAndValidate(model, property, httpRequest);
@@ -39,6 +39,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
                 NullableIntParser.ParseAndValidate(model, property, httpRequest);
         }
 
+        [Obsolete("This is not required as values are bound from inputs with same name and not prefixed with GovUk_")]
         private static void ThrowIfPropertyHasNonDefaultValue(object model, PropertyInfo property)
         {
             var currentValue = property.GetValue(model);

@@ -3,28 +3,25 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.WebAPI.Models;
 using ModernSlavery.WebAPI.Public.Classes;
-using ModernSlavery.WebUI.Shared.Models;
-using Swashbuckle.AspNetCore.Annotations;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using Swashbuckle.AspNetCore.Filters;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace ModernSlavery.WebAPI.Public.Controllers
 {
     [ApiController]
+    [ApiControllerExceptionFilter]
+    [ResponseCache(CacheProfileName = "PublicApi")]
     [Area("Api")]
     [Route("Api/Public")]
     [Produces("application/json", "text/json", "application/csv", "text/csv", "application/xml", "text/xml")]
@@ -35,9 +32,11 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         private readonly IMapper _mapper;
         private readonly IDataRepository _dataRepository;
         private readonly ISearchBusinessLogic _searchBusinessLogic;
+        private readonly IMemoryCache _memoryCache;
 
-        public PublicApiController(ILogger<PublicApiController> logger, IObfuscator obfuscator, IMapper mapper, IDataRepository dataRepository, ISearchBusinessLogic searchBusinessLogic)
+        public PublicApiController(ILogger<PublicApiController> logger, IObfuscator obfuscator, IMapper mapper, IDataRepository dataRepository, ISearchBusinessLogic searchBusinessLogic, IMemoryCache memoryCache)
         {
+            _memoryCache = memoryCache;
             _logger = logger;
             _obfuscator = obfuscator;
             _mapper = mapper;
@@ -97,16 +96,25 @@ namespace ModernSlavery.WebAPI.Public.Controllers
             //Ensure the years are in 4 digits
             years = years?.Select(y => y.ToFourDigitYear()).ToArray();
 
-            //Retrieve the results from the search service
-            var organisationSearchModels = await _searchBusinessLogic.ListSearchDocumentsAsync(years);
+            //Calculate the filename
+            string fileName;
+            if (years.Count()>1)
+                fileName=$"StatementSummaries-{years[0]}-{years[years.Length - 1].ToString().Substring(2)}";
+            else if (years.Any())
+                fileName=$"StatementSummary-{years[0]}";
+            else
+                fileName=$"StatementSummaries {years.ToDelimitedString(" ")}";
+
+            //Retrieve the results from the cache or search service
+            var organisationSearchModels = GetStatementSummariesFromCache(fileName);
+            if (organisationSearchModels == null)
+            {
+                organisationSearchModels = await _searchBusinessLogic.ListSearchDocumentsAsync(years);
+                SetStatementSummariesToCache(fileName, organisationSearchModels);
+            }
 
             //Set the results for a download if browser accepts mime types of "application/*"
-            if (years.Count()>1)
-                SetDownloadDisposition($"StatementSummaries-{years[0]}-{years[years.Length - 1].ToString().Substring(2)}");
-            else if (years.Any())
-                SetDownloadDisposition($"StatementSummary-{years[0]}");
-            else
-                SetDownloadDisposition($"StatementSummaries");
+            SetDownloadDisposition(fileName);
 
             // build the result view model
             foreach (var organisationSearchModel in organisationSearchModels)
@@ -122,7 +130,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <returns></returns>
         [HttpGet("StatementSummaries{fromYear}-{toYear}.{extension}")]
         [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryDownloadModel>))]
-        public async IAsyncEnumerable<StatementSummaryDownloadModel> ListStatementSummariesAsync(int fromYear, int toYear, string extension)
+        public async IAsyncEnumerable<StatementSummaryDownloadModel> ListStatementSummariesAsync(int fromYear, int toYear, [IgnoreText]string extension)
         {
             //Ensure search service is enabled
             if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable, "Service is disabled");
@@ -162,7 +170,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <returns></returns>
         [HttpGet("StatementSummaries{year}.{extension}")]
         [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryDownloadModel>))]
-        public async IAsyncEnumerable<StatementSummaryDownloadModel> ListStatementSummariesAsync(int year, string extension)
+        public async IAsyncEnumerable<StatementSummaryDownloadModel> ListStatementSummariesAsync(int year, [IgnoreText]string extension)
         {
             //Ensure search service is enabled
             if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable, "Service is disabled");
@@ -197,7 +205,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <param name="year">The year of the submitted statement</param>
         /// <returns>A list of group statement summaries for the specified organisation and year</returns>
         [HttpGet("GetStatementSummary")]
-        public async Task<StatementSummaryDownloadModel> GetStatementSummaryAsync([FromQuery] string parentOrganisationId, int year)
+        public async Task<StatementSummaryDownloadModel> GetStatementSummaryAsync([FromQuery][Obfuscated] string parentOrganisationId, int year)
         {
             //Ensure search service is enabled
             if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable, "Service is disabled");
@@ -226,7 +234,7 @@ namespace ModernSlavery.WebAPI.Public.Controllers
         /// <returns>A list of group statement summaries for the specified organisation and year</returns>
         [HttpGet("ListGroupStatementSummaries")]
         [SwaggerResponseExample((int)HttpStatusCode.OK, typeof(ListModelExample<StatementSummaryDownloadModel>))]
-        public async IAsyncEnumerable<StatementSummaryDownloadModel> ListGroupStatementSummariesAsync([FromQuery] string parentOrganisationId, int year)
+        public async IAsyncEnumerable<StatementSummaryDownloadModel> ListGroupStatementSummariesAsync([FromQuery][Obfuscated] string parentOrganisationId, int year)
         {
             //Ensure search service is enabled
             if (_searchBusinessLogic.Disabled) throw new HttpException(HttpStatusCode.ServiceUnavailable, "Service is disabled");
@@ -262,6 +270,19 @@ namespace ModernSlavery.WebAPI.Public.Controllers
                 Inline = false  // false = prompt the user for downloading;  true = browser to try to show the file inline
             };
             Response.Headers.Add("Content-Disposition", cd.ToString());
+        }
+
+
+        private IEnumerable<OrganisationSearchModel> GetStatementSummariesFromCache(string fileName)
+        {
+            return _memoryCache.TryGetValue(fileName.ToLower(), out IEnumerable<OrganisationSearchModel> statementSummaries) ? statementSummaries : null;
+        }
+
+        private MemoryCacheEntryOptions _cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60));
+        private void SetStatementSummariesToCache(string fileName, IEnumerable<OrganisationSearchModel> statementSummaries)
+        {
+            // Save data in cache.
+            _memoryCache.Set(fileName.ToLower(), statementSummaries, _cacheEntryOptions);
         }
     }
 }

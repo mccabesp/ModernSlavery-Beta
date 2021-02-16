@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Registration.Models
@@ -13,10 +14,13 @@ namespace ModernSlavery.WebUI.Registration.Models
         public string PIN { get; set; }
 
         public bool AllowResend { get; set; }
+        [BindNever]
         public string Remaining { get; set; }
         public DateTime AccountingDate { get; set; }
 
         public long OrganisationId { get; set; }
+        
+        [BindNever]
         public string OrganisationName { get; set; }
     }
 }

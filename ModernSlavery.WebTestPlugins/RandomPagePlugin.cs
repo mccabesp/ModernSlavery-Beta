@@ -17,7 +17,7 @@ namespace ModernSlavery.WebTestPlugins
         {
             if (string.IsNullOrWhiteSpace(RecordTotalParamSource) || string.IsNullOrWhiteSpace(RandomPageParamTarget)) return;
             if (!e.WebTest.Context.ContainsKey(RecordTotalParamSource)) return;
-            var recordTotalParam=e.WebTest.Context[RecordTotalParamSource].ToString();
+            var recordTotalParam=e.WebTest.Context[RecordTotalParamSource]?.ToString();
             if (string.IsNullOrWhiteSpace(recordTotalParam)) return;
 
             int recordTotal = int.Parse(recordTotalParam);

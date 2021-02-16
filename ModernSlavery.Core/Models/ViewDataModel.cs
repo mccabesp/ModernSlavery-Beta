@@ -22,7 +22,7 @@ namespace ModernSlavery.Core.Models
 
         public SortedSet<int> SicCodeIds
         {
-            get { return new SortedSet<int>(SicCodes.SplitI("," + Environment.NewLine).Select(s => s.ToInt32())); }
+            get { return new SortedSet<int>(SicCodes.SplitI($",{Environment.NewLine}".ToCharArray()).Select(s => s.ToInt32())); }
         }
 
         public string SicSectionIds { get; set; }

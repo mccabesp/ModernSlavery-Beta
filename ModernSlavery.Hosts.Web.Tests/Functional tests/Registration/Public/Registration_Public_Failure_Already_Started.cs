@@ -26,24 +26,24 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task RegisterDuplicateOrg()
         {
             Goto("/");
-            await NavigateToOrgPage();
-            await SearchForOrg();
+            await NavigateToOrgPage().ConfigureAwait(false);
+            await SearchForOrg().ConfigureAwait(false);
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(42)]
 
         public async Task SelectingDuplicateOrgCausesValidation()
         {
             ClickButton(That.Contains, "Choose");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             //org already started
             //error should appear
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             Expect("The following errors were detected");
             Expect("You have already started registering for this organisation");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
     }

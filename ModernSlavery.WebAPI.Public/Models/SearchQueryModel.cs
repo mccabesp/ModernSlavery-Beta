@@ -7,6 +7,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Net;
 using static ModernSlavery.Core.Entities.Statement;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebAPI.Models
 {
@@ -18,6 +19,7 @@ namespace ModernSlavery.WebAPI.Models
         /// The keyword to search for
         /// </summary>
         [FromQuery(Name = "search")]
+        [Text]
         public string Keywords { get; set; }
 
         /// <summary>

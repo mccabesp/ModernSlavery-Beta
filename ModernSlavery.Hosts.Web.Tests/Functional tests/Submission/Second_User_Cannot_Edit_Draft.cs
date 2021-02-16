@@ -30,34 +30,34 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
 
-            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
-            await this.RegisterUserOrganisationAsync(org.OrganisationName, SecondEmail);
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail).ConfigureAwait(false);
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, SecondEmail).ConfigureAwait(false);
             RefreshPage();
 
-            await this.SaveDatabaseAsync();
+            await this.SaveDatabaseAsync().ConfigureAwait(false);
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(40)]
         public async Task StartSubmission()
         {
 
-            ExpectHeader("Select an organisation");
+            ExpectHeader("Register or select organisations you want to add statements for");
 
             Click(org.OrganisationName);
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            ExpectHeader(That.Contains, "Manage your modern slavery statements");
 
 
             Click(The.Top, "Start Draft");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Before you start");
             Click("Start Now");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(42)]
@@ -78,8 +78,8 @@ namespace ModernSlavery.Hosts.Web.Tests
             Submission_Helper.DateSet(this, Submission.YourMSStatement_ApprovalDate_Day, Submission.YourMSStatement_ApprovalDate_Month, Submission.YourMSStatement_ApprovalDate_Year, "3");
 
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            await Task.CompletedTask;
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(44)]
@@ -95,16 +95,16 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click(The.Bottom, "Sign in");
 
-            ExpectHeader("Select an organisation");
+            ExpectHeader("Register or select organisations you want to add statements for");
 
             Click(org.OrganisationName);
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            ExpectHeader(That.Contains, "Manage your modern slavery statements");
 
 
             Click(The.Top, "Continue");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(46)]
@@ -115,18 +115,18 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect("Another user is currently editing this statement summary. Please try again later");
 
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            await Task.CompletedTask;
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(48)]
         public async Task ClickingContinueLeadsToSubmissionsPage()
         {
             Click("Continue");
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            ExpectHeader(That.Contains, "Manage your modern slavery statements");
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            await Task.CompletedTask;
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

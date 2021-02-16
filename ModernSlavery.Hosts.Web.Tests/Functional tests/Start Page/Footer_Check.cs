@@ -43,9 +43,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(2)]
         public async Task ReturnToRootPage()
         {
-            SignOutDeleteCookiesAndReturnToRoot(this);            
+            SignOutDeleteCookiesAndReturnToRoot(this);
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -56,28 +56,25 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectLink("Cookies");
             ExpectLink("Privacy Policy");
 
-          
 
-            await Task.CompletedTask;
+
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
-        [Test, Order(6 )]
-        public async Task CheckLinkNavigation ()
+        [Test, Order(6)]
+        public async Task CheckLinkNavigation()
         {
             ClickLink("Contact us");
             ExpectHeader("Contact us");
             ClickLink("Cookies");
-            ExpectHeader("Cookies on Modern slavery statement registry");
+            ExpectHeader("Cookies on the Modern slavery statement registry");
 
             ClickLink("Privacy Policy");
             ExpectHeader("Privacy Policy");
 
-
-
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
-    } 
-    
+    }
+
 }

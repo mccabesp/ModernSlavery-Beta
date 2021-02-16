@@ -30,7 +30,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 
             var textAreaViewModel = new TextAreaViewModel
             {
-                Name = $"GovUk_Text_{propertyName}",
+                Name = propertyName,
                 Id = $"GovUk_{propertyName}",
                 Value = currentValue,
                 Rows = rows,

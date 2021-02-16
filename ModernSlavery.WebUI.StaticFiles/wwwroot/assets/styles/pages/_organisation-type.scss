@@ -1,0 +1,8 @@
+﻿
+.organisation-type .govuk-hint .govuk-list {
+    color: $govuk-secondary-text-colour;
+
+    & > li {
+        margin-bottom: 0;
+    }
+}

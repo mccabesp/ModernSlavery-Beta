@@ -45,17 +45,17 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             SignOutDeleteCookiesAndReturnToRoot(this);
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
 
             Click("Sign in");
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             Click("Create an account");
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             ExpectHeader("Create an Account");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -70,7 +70,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Set("Job title").To("Company Reporter");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -82,13 +82,13 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Confirm password").To("test");
 
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             Expect("The following errors were detected");
 
             BelowLabel("Password").Expect("The Password must be at least 8 characters long.");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -100,12 +100,12 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Confirm password").To("testtest");
 
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             Expect("The following errors were detected");
 
             BelowLabel("Password").Expect("Password must contain at least one upper case, 1 lower case character and 1 digit");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(5)]
@@ -115,12 +115,12 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Confirm password").To("testtest");
 
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             Expect("The following errors were detected");
 
             BelowLabel("Password").Expect("The password and confirmation password do not match.");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

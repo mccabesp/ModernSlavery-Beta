@@ -18,6 +18,7 @@ namespace ModernSlavery.WebUI.Registration.Models
     {
         [Required(AllowEmptyStrings = false)]
         [StringLength(100, MinimumLength = 3)]
+        [Text]
         public string OrganisationName { get; set; }
 
         [Required(AllowEmptyStrings = false)]
@@ -26,20 +27,24 @@ namespace ModernSlavery.WebUI.Registration.Models
 
         [Required(AllowEmptyStrings = false)]
         [StringLength(100, MinimumLength = 3)]
+        [Text]
         public string CharityNumber { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [StringLength(100, MinimumLength = 3)]
+        [Text]
         public string MutualNumber { get; set; }
 
         public bool NoReference { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [StringLength(100, MinimumLength = 3)]
+        [Text]
         public string OtherName { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [StringLength(100, MinimumLength = 3)]
+        [Text]
         public string OtherValue { get; set; }
 
         public bool ContainsReference=> !string.IsNullOrWhiteSpace(CompanyNumber)

@@ -1,0 +1,23 @@
+﻿@using ModernSlavery.Core.Extensions
+@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+
+<div class="statement-section-two-thirds" id="years">
+    <h2 class="govuk-heading-m">Number of years producing statements</h2>
+    <div class="govuk-body">
+        The organisation has been producing modern slavery statements for the following number of years:
+    </div>
+    <div class="govuk-body">
+        @Model.StatementYears.Value.GetEnumDescription()
+
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    How does this work for group statements?
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                If the statement is for a group of organisations, this answer applies to the organisation with the longest history of producing statements.
+            </div>
+        </details>
+    </div>
+</div>

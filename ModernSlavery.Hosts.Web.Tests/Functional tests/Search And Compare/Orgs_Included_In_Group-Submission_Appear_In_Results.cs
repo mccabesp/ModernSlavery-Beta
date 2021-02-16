@@ -18,75 +18,77 @@ using ModernSlavery.Testing.Helpers.Extensions;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture, Ignore("Being fixed on other branch")]
+    [TestFixture]
 
     public class Orgs_Included_In_Group_Submission_Appear_In_Results : GroupSubmission_Success
     {
-            
-           [Test, Order(60)]
-    public async Task ReturnToRoot()
-    {
+
+        [Test, Order(63)]
+        public async Task ReturnToRoot()
+        {
+            await TestRunSetup.TestWebHost.RefreshSearchDocuments().ConfigureAwait(false);
+
             SignOutDeleteCookiesAndReturnToRoot(this);
             ExpectHeader("See what organisations are doing to tackle modern slavery");
 
-            await Task.CompletedTask;
-    }
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
 
-    [Test, Order(62)]
-    public async Task Navigate_To_Search()
-    {
+        [Test, Order(64)]
+        public async Task Navigate_To_Search()
+        {
             Click("Find statements");
 
             ExpectHeader("Search modern slavery statements");
-            await Task.CompletedTask;
-    }
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
 
-    [Test, Order(64)]
-    public async Task Find_Group_Statements()
-    {
+        [Test, Order(65)]
+        public async Task Find_Group_Statements()
+        {
             SetXPath("//input[@class='gov-uk-c-searchbar__input']").To(Organisations[0].OrganisationName);
 
             ClickXPath("//button[@class='gov-uk-c-searchbar__submit gov-uk-c-searchbar__submit--blue']");
 
 
             Expect("1 result");
-        
-            
-            await Task.CompletedTask;
-    }
+
+
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
 
         [Test, Order(66)]
         public async Task CheckParentOrg()
         {
             AtXPath("//p[contains(., '" + Organisations[0].OrganisationName + "')]//parent::div").Expect("2020");
             AtXPath("//p[contains(., '" + Organisations[0].OrganisationName + "')]//parent::div").Expect(What.Contains, "Reported as group");
-            AtXPath("//p[contains(., '" + Organisations[0].OrganisationName + "')]//parent::div").Expect("Company number: " + Organisations[0].CompanyNumber);                           
-            AtXPath("//p[contains(., '" + Organisations[0].OrganisationName + "')]//parent::div").Expect("Company number: " + Organisations[0].GetAddressString(DateTime.Now));
+            AtXPath("//p[contains(., '" + Organisations[0].OrganisationName + "')]//parent::div").Expect("Company number: " + Organisations[0].CompanyNumber);
+            AtXPath("//p[contains(., '" + Organisations[0].OrganisationName + "')]//parent::div").Expect(Organisations[0].GetAddressString(DateTime.Now));
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
-        [Test, Order(68)]
-    public async Task How_Can_We_Improve()
-    {
+        [Test, Order(67)]
+        public async Task How_Can_We_Improve()
+        {
             Click("Back");
             Click("See all statements");
             Expect("5 results");
 
             for (int i = 1; i < 5; i++)
             {
-                
 
-                
+
+
                 AtXPath("//p[contains(., '" + Organisations[i].OrganisationName + "')]//parent::div").Expect("2020");
-                AtXPath("//p[contains(., '" + Organisations[i].OrganisationName + "')]//parent::div").ExpectXPath("//span[contains(., 'Submitted under')]//parent::p//span[contains(., '"+ Organisations[0].OrganisationName + "')]");
-                AtXPath("//p[contains(., '" + Organisations[i].OrganisationName + "')]//parent::div").Expect("Company number: " + Organisations[0].CompanyNumber);
-                AtXPath("//p[contains(., '" + Organisations[i].OrganisationName + "')]//parent::div").Expect("Company number: " + Organisations[0].GetAddressString(DateTime.Now)) ;
+                AtXPath("//p[contains(., '" + Organisations[i].OrganisationName + "')]//parent::div").ExpectXPath("//span[contains(., 'Submitted under')]//parent::p//span[contains(., '" + Organisations[0].OrganisationName + "')]");
+                AtXPath("//p[contains(., '" + Organisations[i].OrganisationName + "')]//parent::div").Expect("Company number: " + Organisations[i].CompanyNumber);
+                AtXPath("//p[contains(., '" + Organisations[i].OrganisationName + "')]//parent::div").Expect(Organisations[i].GetAddressString(DateTime.Now));
 
 
             }
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
     }
-    
-}
 }

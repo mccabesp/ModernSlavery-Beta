@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -16,7 +18,6 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
-using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
 using ModernSlavery.WebUI.Shared.Models;
 using CompareAttribute = System.ComponentModel.DataAnnotations.CompareAttribute;
@@ -196,19 +197,32 @@ namespace ModernSlavery.WebUI.Shared.Classes.HtmlHelper
             return htmlHelper.HiddenSecured(modelExpression.Metadata.Name);
         }
 
-        public static HtmlString EnumDisplayNameFor<T>(this T item)
-            where T : Enum
+        public static IHtmlContent Replace(this IHtmlHelper htmlHelper, string content, string oldValue, string newValue)
         {
-            var type = item.GetType();
-            var member = type.GetField(item.ToString());
-            var displayName = (DisplayAttribute)member.GetCustomAttributes(typeof(DisplayAttribute), false).FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(content))content = htmlHelper.Encode(content);
+            return new HtmlString(content.ReplaceI(oldValue, newValue));
+        }
 
-            if (displayName != null)
-            {
-                return new HtmlString(displayName.Description);
-            }
+        public static IHtmlContent Linebreak(this IHtmlHelper htmlHelper, IEnumerable<string> lines, string prefix = null)
+        {
+            return new HtmlString(lines.ToDelimitedString(prefix+"<br/>",htmlEncode:true));
+        }
 
-            return new HtmlString(item.ToString());
+        public static IHtmlContent Linebreak(this IHtmlHelper htmlHelper, string content, string originalDelimiter="\r\n", string prefix=null)
+        {
+            if (string.IsNullOrWhiteSpace(content)) return null;
+            if (string.IsNullOrEmpty(originalDelimiter)) throw new ArgumentNullException(nameof(originalDelimiter));
+
+            var lines = content.SplitI(originalDelimiter);
+            return htmlHelper.Linebreak(lines,prefix);
+        }
+
+        public static IHtmlContent ReplaceFor<TModel,TResult>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, TResult>> expression, string oldValue, string newValue)
+        {
+            _modelExpressionProvider = _modelExpressionProvider ?? htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IModelExpressionProvider>();
+            var modelExpression = _modelExpressionProvider.CreateModelExpression(htmlHelper.ViewData, expression);
+            if (modelExpression.Model is string modelAsString)return htmlHelper.Replace(modelAsString, oldValue, newValue);
+            throw new ArgumentException("Expression does not return a string");
         }
 
         #region Validation messages

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ModernSlavery.Hosts.Web.Tests
 {
-    [TestFixture, Ignore("Need to review navigation logic")]
+    [TestFixture]
 
     public class Review_And_Edit_Link_Navigation : CreateAccount
     {
@@ -34,18 +34,18 @@ namespace ModernSlavery.Hosts.Web.Tests
         [Test, Order(29)]
         public async Task RegisterOrg()
         {
-            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail).ConfigureAwait(false);
             RefreshPage();
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(40)]
         public async Task NavigateToReviewAndEdit()
         {
 
             Submission_Helper.NavigateToSubmission(this, org.OrganisationName, "2020", MoreInfoRequired: true);
-            await AxeHelper.CheckAccessibilityAsync(this);
-            await Task.CompletedTask;
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(42)]
@@ -61,7 +61,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectLink("Supply chain risks and due diligence (part 2)");
             ExpectLink("Training");
             ExpectLink("Monitoring progress");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(42)]
@@ -76,12 +76,12 @@ namespace ModernSlavery.Hosts.Web.Tests
             SaveAndCancelcheck(this, "Supply chain risks and due diligence (part 2)", "Supply Chain Risks and due diligence", Submission.OrgName_Blackpool);
             SaveAndCancelcheck(this, "Training", "Training", Submission.OrgName_Blackpool);
             SaveAndCancelcheck(this, "Monitoring progress", "Monitoring progress", Submission.OrgName_Blackpool);
-           
-            await Task.CompletedTask;
+
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
-        private static void SaveAndCancelcheck(UIContext ui, string LinkText, string HeaderText, string OrgName) 
-        { 
+        private static void SaveAndCancelcheck(UIContext ui, string LinkText, string HeaderText, string OrgName)
+        {
             //navigate to page
             ui.ExpectHeader("Review before submitting");
             ui.ClickLink(LinkText);

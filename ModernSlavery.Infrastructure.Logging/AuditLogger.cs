@@ -35,7 +35,7 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task WriteAsync(IEnumerable<object> records)
         {
-            foreach (var record in records) await WriteAsync(record);
+            foreach (var record in records) await WriteAsync(record).ConfigureAwait(false);
         }
 
         public async Task WriteAsync(object record)
@@ -43,7 +43,7 @@ namespace ModernSlavery.Infrastructure.Logging
             var wrapper = new LogRecordWrapperModel
                 {ApplicationName = ApplicationName, FileName = fileName, Record = record};
 
-            await queue.AddMessageAsync(wrapper);
+            await queue.AddMessageAsync(wrapper).ConfigureAwait(false);
         }
     }
 }

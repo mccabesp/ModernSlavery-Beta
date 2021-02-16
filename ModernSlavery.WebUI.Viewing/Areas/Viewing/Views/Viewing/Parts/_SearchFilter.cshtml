@@ -1,19 +1,23 @@
 ﻿@model SearchViewModel
+@*<a id="ClearFilters" href="search-results?Search=@(Model.Search)">Clear all filters</a>
 
-@*<a id="ClearFilters" href="search-results?search=@(Model.Keywords)">Clear all filters</a>
+    <div class="filter-divider"></div>*@
+<div>
+    <a class="gem-c-skip-link govuk-skip-link" href="#search-results">Skip to results</a>
+</div>
+<div role="search" aria-label="Search filters">
 
-<div class="filter-divider"></div>*@
+    <partial name="Parts/_SearchOptionSelect" model="@Model.GetYearGroup()" />
 
-<partial name="Parts/_SearchOptionSelect" model="@Model.GetSectorGroup()" />
+    <div class="filter-divider"></div>
 
-<div class="filter-divider"></div>
+    <partial name="Parts/_SearchOptionSelect" model="@Model.GetTurnoverGroup()" />
 
-<partial name="Parts/_SearchOptionSelect" model="@Model.GetTurnoverGroup()" />
+    <div class="filter-divider"></div>
 
-<div class="filter-divider"></div>
+    <partial name="Parts/_SearchOptionSelect" model="@Model.GetSectorGroup()" />
 
-<partial name="Parts/_SearchOptionSelect" model="@Model.GetYearGroup()" />
+    <div class="filter-divider"></div>
 
-<div class="filter-divider"></div>
-
-<input id="UpdateFilterParams" class="govuk-button govuk-button--secondary button-update js-update-filters" type="submit" value="Update results" />
+    <input id="UpdateFilterParams" class="govuk-button govuk-button--secondary button-update js-update-filters" type="submit" value="Update results" />
+</div>

@@ -480,7 +480,7 @@ namespace ModernSlavery.Core.Entities
         /// <returns></returns>
         public bool GetUserIsRegistered(long userId)
         {
-            return UserOrganisations.Any(uo => uo.UserId == userId && uo.PINConfirmedDate != null);
+            return UserOrganisations.Any(uo => uo.UserId == userId && uo.IsRegisteredOK);
         }
 
         public string GetRegistrationStatus()

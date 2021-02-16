@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<WebTest Name="Public Organisation User Journey" Id="82f63e4a-ec27-4088-805f-601ff4a868f8" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="0" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="" ResultsLocale="">
+<WebTest Name="Public Organisation User Journey" Id="82f63e4a-ec27-4088-805f-601ff4a868f8" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="60" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="" ResultsLocale="">
   <Items>
     <IncludedWebTest Name="Create User Account" Path="..\web tests\create user account.webtest" Id="4023c953-f79e-46ed-8182-ce311bb60956" IsCodedWebTest="False" InheritWebTestSettings="True" />
     <IncludedWebTest Name="Register Public Organisation" Path="..\web tests\register public organisation.webtest" Id="7452106f-b520-4696-aa92-2f83a35c543d" IsCodedWebTest="False" InheritWebTestSettings="True" />
@@ -30,5 +30,6 @@
     </WebTestPlugin>
     <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.ResolveParameterPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="ResolveParameterPlugIn" Description="" />
     <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.RelativePathPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="RelativePathPlugIn" Description="" />
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.AddressFixPlugin, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="AddressFixPlugin" Description="" />
   </WebTestPlugins>
 </WebTest>

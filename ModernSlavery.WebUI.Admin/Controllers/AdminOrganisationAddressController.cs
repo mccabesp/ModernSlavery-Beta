@@ -1,41 +1,40 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "GPGadmin")]
+    [Authorize(Roles = UserRoleNames.Admin)]
     [Route("admin")]
     public class AdminOrganisationAddressController : BaseController
     {
-        private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
         private readonly ICompaniesHouseAPI CompaniesHouseApi;
         private readonly ICompaniesHouseService UpdateFromCompaniesHouseService;
 
         public AdminOrganisationAddressController(
-            IAdminService adminService,
             ICompaniesHouseAPI companiesHouseApi,
             ICompaniesHouseService updateFromCompaniesHouseService,
             AuditLogger auditLogger,
-            ILogger<AdminOrganisationAddressController> logger, IWebService webService,
+            ILogger<AdminOrganisationAddressController> logger,
+            IWebService webService,
             ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
-            _adminService = adminService;
             UpdateFromCompaniesHouseService = updateFromCompaniesHouseService;
             this.auditLogger = auditLogger;
             CompaniesHouseApi = companiesHouseApi;
@@ -50,19 +49,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpGet("organisation/{id}/address/change")]
-        public IActionResult ChangeAddressGet(long id)
+        [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
+        public async Task<IActionResult> ChangeAddressGet(long id)
         {
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
                 try
                 {
-                    var organisationFromCompaniesHouse =
-                        CompaniesHouseApi.GetCompanyAsync(organisation.CompanyNumber).Result;
+                    var organisationFromCompaniesHouse = await CompaniesHouseApi.GetCompanyAsync(organisation.CompanyNumber);
 
-                    var addressFromCompaniesHouse =
-                        UpdateFromCompaniesHouseService.CreateOrganisationAddressFromCompaniesHouseAddress(
-                            organisationFromCompaniesHouse.RegisteredOfficeAddress);
+                    var addressFromCompaniesHouse = await UpdateFromCompaniesHouseService.CreateOrganisationAddressFromCompaniesHouseAddressAsync(organisationFromCompaniesHouse.RegisteredOfficeAddress);
 
                     if (!organisation.GetLatestAddress().AddressMatches(addressFromCompaniesHouse))
                         return OfferNewCompaniesHouseAddress(organisation, addressFromCompaniesHouse);
@@ -112,6 +109,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost("organisation/{id}/address/change")]
+        [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
         public IActionResult ChangeAddressPost(long id, ChangeOrganisationAddressViewModel viewModel)
         {
             // We might need to change the value of Action before we go to the view
@@ -141,8 +139,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         private IActionResult OfferNewCompaniesHouseAction(ChangeOrganisationAddressViewModel viewModel,
             Organisation organisation)
-        {
+        {            
             viewModel.ParseAndValidateParameters(Request, m => m.AcceptCompaniesHouseAddress);
+
+            if (!ModelState.IsValid)
+                foreach (var state in ModelState.Where(state => state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid))
+                    foreach (var error in state.Value.Errors)
+                        viewModel.AddErrorFor(state.Key, error.ErrorMessage);
 
             if (viewModel.HasAnyErrors())
             {
@@ -155,6 +158,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 return SendToManualChangePage(organisation);
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
+
+            if (!ModelState.IsValid)
+                foreach (var state in ModelState.Where(state => state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid))
+                    foreach (var error in state.Value.Errors)
+                        viewModel.AddErrorFor(state.Key, error.ErrorMessage);
+
+            if (!ModelState.IsValid)
+                foreach (var state in ModelState.Where(state => state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid))
+                    foreach (var error in state.Value.Errors)
+                        viewModel.AddErrorFor(state.Key, error.ErrorMessage);
 
             if (viewModel.HasAnyErrors())
             {
@@ -181,6 +194,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             viewModel.ParseAndValidateParameters(Request, m => m.PostCode);
             viewModel.ParseAndValidateParameters(Request, m => m.IsUkAddress);
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
+
+            if (!ModelState.IsValid)
+                foreach (var state in ModelState.Where(state => state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid))
+                    foreach (var error in state.Value.Errors)
+                        viewModel.AddErrorFor(state.Key, error.ErrorMessage);
 
             if (viewModel.HasAnyErrors())
             {

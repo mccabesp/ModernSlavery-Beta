@@ -25,6 +25,7 @@ using Extensions = ModernSlavery.WebUI.Shared.Classes.Extensions.Extensions;
 namespace ModernSlavery.WebUI.Shared.Controllers
 {
     [NoCache]
+    [ControllerExceptionFilter]
     public class BaseController : Controller
     {
         #region Dependencies
@@ -52,6 +53,8 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             WebTracker = webService.WebTracker;
 
             SharedBusinessLogic = sharedBusinessLogic;
+
+            ViewData["controller"] = this;
         }
 
     
@@ -102,8 +105,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         {
             if (string.IsNullOrWhiteSpace(controllerName)) controllerName = ControllerName;
 
-            return !(UrlReferrer == null) &&
-                   UrlReferrer.PathAndQuery.EqualsI(Url.Action(actionName, controllerName, routeValues));
+            return !string.IsNullOrWhiteSpace(LastControllerAction) && LastControllerAction.EqualsI($"{(!string.IsNullOrWhiteSpace(controllerName) ? $"{controllerName}/" : "")}{actionName}");
         }
 
         protected bool WasAnyAction(params string[] actionUrls)
@@ -206,8 +208,6 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         [NonAction]
         protected async Task TrackPageViewAsync(string pageTitle = null, string pageUrl = null)
         {
-            if (string.IsNullOrWhiteSpace(pageTitle)) pageTitle = ViewBag.Title;
-
             if (string.IsNullOrWhiteSpace(pageTitle)) pageTitle = RouteData.Values["action"].ToString();
 
             if (string.IsNullOrWhiteSpace(pageUrl))
@@ -394,12 +394,14 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         public bool IsTrustedIP => SharedBusinessLogic.SharedOptions.IsTrustedAddress(UserHostAddress);
 
-        public bool IsAdministrator => SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser);
-        public bool IsSuperAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(CurrentUser);
-        public bool IsDatabaseAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsDatabaseAdministrator(CurrentUser);
-        public bool IsImpersonatingUser => OriginalUser != null && SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(OriginalUser);
+        public bool IsAdministrator => SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser);
+        public bool IsSuperAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(VirtualUser);
+        public bool IsDatabaseAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsDatabaseAdministrator(VirtualUser);
+        public bool IsDevOpsAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsDevOpsAdministrator(VirtualUser);
 
-        protected User VirtualUser =>
+        public bool IsImpersonatingUser => OriginalUser != null && SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser);
+
+        public User VirtualUser =>
             User.Identity.IsAuthenticated
                 ? ImpersonatedUserId > 0 ? SharedBusinessLogic.DataRepository.Get<User>(ImpersonatedUserId) :
                 SharedBusinessLogic.DataRepository.FindUser(User)
@@ -439,7 +441,6 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             set => Session["ImpersonatedUserId"] = value;
         }
 
-
         [NonAction]
         protected async Task<IActionResult> CheckUserRegisteredOkAsync()
         {
@@ -466,10 +467,10 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (VirtualUser.Status == UserStatuses.Retired) return new ChallengeResult();
 
             //When email not verified
-            if (VirtualUser.EmailVerifiedDate.EqualsI(null, DateTime.MinValue))
+            if (!VirtualUser.IsVerifiedEmail)
             {
                 //If email not sent
-                if (VirtualUser.EmailVerifySendDate.EqualsI(null, DateTime.MinValue))
+                if (!VirtualUser.IsVerifyEmailSent)
                 {
                     if (IsAnyAction("NewAccount/VerifyEmail")) return null;
 
@@ -478,8 +479,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
 
                 //If verification code has expired
-                if (VirtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions
-                    .EmailVerificationExpiryHours) < VirtualDateTime.Now)
+                if (VirtualUser.IsVerificationCodeExpired(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours))
                 {
                     if (IsAnyAction("NewAccount/VerifyEmail")) return null;
 
@@ -488,10 +488,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
 
                 //If code min time hasnt elapsed 
-                var remainingTime =
-                    VirtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions
-                        .EmailVerificationMinResendHours)
-                    - VirtualDateTime.Now;
+                var remainingTime = VirtualUser.GetTimeToNextVerificationResend(SharedBusinessLogic.SharedOptions.EmailVerificationMinResendHours);
                 if (remainingTime > TimeSpan.Zero)
                 {
                     //Process the code if there is one
@@ -515,9 +512,11 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
             {
                 if (IsAnyAction(
+                    "Account/ManageAccount",
                     "NewAccount/VerifyEmail",
                     "NewAccount/EmailConfirmed",
                     "Admin/ReviewRequest",
+                    "Admin/ReviewRequestPost",
                     "Admin/ConfirmCancellation",
                     "Admin/RequestAccepted",
                     "Admin/RequestCancelled"))
@@ -532,6 +531,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (ControllerName.EqualsI("admin")
                 || IsAnyAction(
                     "Admin/ReviewRequest",
+                    "Admin/ReviewRequestPost",
                     "Admin/ConfirmCancellation",
                     "Admin/RequestAccepted",
                     "Admin/RequestCancelled"))
@@ -568,87 +568,74 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             //Always allow user home or remove registration page 
             if (IsAnyAction(
                 "Submission/ManageOrganisations",
+                "Shared/PrivacyPolicy",
                 "Registration/RemoveOrganisation",
                 "Registration/RemoveOrganisationPost",
                 "Submission/ReportForOrganisation",
                 "Submission/ManageOrganisation",
                 "Scope/ChangeOrganisationScope",
-                "Registration/ActivateService",
-                "Registration/ServiceActivated",
-                "Scope/DeclareScope"))
+                "Scope/DeclareScope"
+                ))
                 return null;
 
             // allow statement
-            if (ControllerName == "Statement")
-                return null;
+            if (ControllerName == "Statement")return null;
 
             // if the user doesn't have a selected an organisation then go to the ManageOrgs page
-            var userOrg =
-                VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == ReportingOrganisationId);
+            var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == ReportingOrganisationId);
             if (userOrg == null)
             {
-                Logger.LogWarning(
-                    $"Cannot find UserOrganisation for user {VirtualUser.UserId} and organisation {ReportingOrganisationId}");
-
+                Logger.LogWarning($"Cannot find UserOrganisation for user {VirtualUser.UserId} and organisation {ReportingOrganisationId}");
                 return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
             }
 
             if (userOrg.Organisation.SectorType == SectorTypes.Private)
-                if (userOrg.PINConfirmedDate.EqualsI(null, DateTime.MinValue))
+                if (!userOrg.IsRegisteredOK)
                 {
                     //If pin never sent then go to resend point
-                    if (userOrg.PINSentDate.EqualsI(null, DateTime.MinValue))
+                    if (!userOrg.IsPINCodeSent)
                     {
-                        if (IsAnyAction("Registration/PINSent", "Registration/RequestPIN")) return null;
+                        if (IsAnyAction("Registration/PINSent", "Registration/RequestPIN", "Registration/RequestPINPost")) return null;
 
                         return RedirectToActionArea("PINSent","Registration", "Registration");
                     }
 
                     //If PIN sent and expired then prompt to request a new pin
-                    if (userOrg.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays) <
-                        VirtualDateTime.Now)
+                    if (userOrg.IsPINCodeExpired(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays))
                     {
-                        if (IsAnyAction("Registration/PINSent", "Registration/RequestPIN")) return null;
+                        if (IsAnyAction("Registration/PINSent", "Registration/RequestPIN", "Registration/RequestPINPost")) return null;
 
-                        return View("CustomError", WebService.ErrorViewModelFactory.Create(1106));
+                        return View("CustomError", WebService.ErrorViewModelFactory.Create(1106, new { OrganisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId) }));
                     }
 
                     //If PIN resends are allowed and currently on PIN send page then allow it to continue
-                    var remainingTime =
-                        userOrg.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostMinRepostDays) -
-                        VirtualDateTime.Now;
+                    var remainingTime = userOrg.GetTimeToNextPINResend(SharedBusinessLogic.SharedOptions.PinInPostMinRepostDays);
                     if (remainingTime <= TimeSpan.Zero &&
-                        IsAnyAction("Registration/PINSent", "Registration/RequestPIN")) return null;
+                        IsAnyAction("Registration/PINSent", "Registration/RequestPIN", "Registration/RequestPINPost")) return null;
 
                     //If PIN Not expired redirect to ActivateService where they can either enter the same pin or request a new one 
-                    if (IsAnyAction("Registration/RequestPIN"))
-                        return View("CustomError",
-                            WebService.ErrorViewModelFactory.Create(1120,
-                                new {remainingTime = remainingTime.ToFriendly(maxParts: 2)}));
+                    if (IsAnyAction("Registration/RequestPIN", "Registration/RequestPINPost"))
+                        return View("CustomError",WebService.ErrorViewModelFactory.Create(1120,new {remainingTime = remainingTime.ToFriendly(maxParts: 2), OrganisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId) }));
 
                     if (IsAnyAction("Registration/ActivateService")) return null;
 
                     return RedirectToActionArea("ActivateService", "Registration", "Registration");
                 }
 
-            //Ensure user has completed the registration process
-            //If user is fully registered then start submit process
-            if (ControllerName.EqualsI("Registration"))
+            //Ensure pending manual registrations always redirected back to home
+            if (!userOrg.IsRegisteredOK)
+            {
+                Logger.LogWarning($"UserOrganisation for user {userOrg.UserId} and organisation {userOrg.OrganisationId} PIN is not confirmed");
+                return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
+            }
+            else if (ControllerName.EqualsI("Registration"))
             {
                 if (IsAnyAction("Registration/RequestReceived")) return null;
 
-                if (IsAnyAction("Registration/ServiceActivated") && WasAnyAction("Registration/ActivateService",
-                    "Registration/ConfirmOrganisation")) return null;
+                if (IsAnyAction("Registration/ServiceActivated") && WasAnyAction("Registration/ActivateService", "Registration/ConfirmOrganisation")) return null;
 
+                //Report user is already registered
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1109));
-            }
-
-            //Ensure pending manual registrations always redirected back to home
-            if (userOrg.PINConfirmedDate == null)
-            {
-                Logger.LogWarning(
-                    $"UserOrganisation for user {userOrg.UserId} and organisation {userOrg.OrganisationId} PIN is not confirmed");
-                return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
             }
 
             return null;
@@ -676,6 +663,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             set => Session["LastController"] = value;
         }
 
+        public string LastControllerAction => $"{(!string.IsNullOrWhiteSpace(LastController) ? $"{LastController}/" : "")}{LastAction}";
         #endregion
 
         #region Exception handling methods
@@ -684,6 +672,15 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         protected void AddModelError(int errorCode, string propertyName = null, object parameters = null)
         {
             ModelState.AddModelError(errorCode, propertyName, parameters);
+        }
+
+        [NonAction]
+        protected void AddDisplayMessage(string displayMessage)
+        {
+            if (string.IsNullOrWhiteSpace(displayMessage)) throw new ArgumentNullException(nameof(displayMessage));
+            var messages = new HashSet<string>(Session.Get<List<string>>("DisplayMessages") ?? new List<string>(),StringComparer.OrdinalIgnoreCase);
+            messages.Add(displayMessage);
+            Session["DisplayMessages"] = messages.ToList();
         }
 
         [NonAction]

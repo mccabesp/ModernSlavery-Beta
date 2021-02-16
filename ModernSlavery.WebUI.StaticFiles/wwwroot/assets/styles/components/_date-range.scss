@@ -9,4 +9,25 @@
             margin-right: 32px;
         }
     }
+
+
+    @include govuk-media-query($from: desktop) {
+        .mobile-errors {
+            display: none;
+        }
+
+        .desktop-errors {
+            display: contents;
+        }
+    }
+
+    @include govuk-media-query($until: desktop) {
+        .mobile-errors {
+            display: contents;
+        }
+
+        .desktop-errors {
+            display: none;
+        }
+    }
 }

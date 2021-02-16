@@ -4,6 +4,7 @@ using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -31,6 +32,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         [Required(AllowEmptyStrings = false)]
         [StringLength(100, ErrorMessage = "You must enter an organisations name or company number between 3 and 100 characters in length", MinimumLength = 3)]
+        [Text] 
         public string SearchKeywords { get; set; }
 
         public PagedResult<OrganisationRecord> ResultsPage { get; set; } = new PagedResult<OrganisationRecord>();
@@ -59,11 +61,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             get
             {
-                if (ResultsPage == null || ResultsPage.PageCount <= 5) return 1;
+                if (ResultsPage == null || ResultsPage.ActualPageCount <= 5) return 1;
 
                 if (ResultsPage.CurrentPage < 4) return 1;
 
-                if (ResultsPage.CurrentPage + 2 > ResultsPage.PageCount) return ResultsPage.PageCount - 4;
+                if (ResultsPage.CurrentPage + 2 > ResultsPage.ActualPageCount) return ResultsPage.ActualPageCount - 4;
 
                 return ResultsPage.CurrentPage - 2;
             }
@@ -95,8 +97,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             if (organisationRecord.OrganisationId > 0) return StatementOrganisations.FindIndex(o => o.OrganisationId == organisationRecord.OrganisationId);
             if (!string.IsNullOrWhiteSpace(organisationRecord.CompanyNumber)) return StatementOrganisations.FindIndex(o => o.CompanyNumber.EqualsI(organisationRecord.CompanyNumber));
-            var address = organisationRecord.GetFullAddress();
-            if (!string.IsNullOrWhiteSpace(address)) return StatementOrganisations.FindIndex(o => o.OrganisationName.EqualsI(organisationRecord.NameSource) && o.Address.GetFullAddress().EqualsI(address));
+            var address = organisationRecord?.GetFullAddress();
+            if (!string.IsNullOrWhiteSpace(address)) return StatementOrganisations.FindIndex(o => o.OrganisationName.EqualsI(organisationRecord.NameSource) && address.EqualsI(o.Address?.GetFullAddress()));
             return StatementOrganisations.FindIndex(o => o.OrganisationName.EqualsI(organisationRecord.NameSource));
         }
 

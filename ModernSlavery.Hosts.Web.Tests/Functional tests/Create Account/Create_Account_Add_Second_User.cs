@@ -40,23 +40,23 @@ namespace ModernSlavery.Hosts.Web.Tests
             AppSettingHelper.SetShowEmailVerifyLink(TestRunSetup.TestWebHost, true);
             SignOutDeleteCookiesAndReturnToRoot(this);
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             RefreshPage();
             Click("Sign in");
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             ExpectHeader("Sign in or create an account");
 
             BelowHeader("No account yet?");
             Click("Create an account");
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             ExpectHeader("Create an Account");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -73,10 +73,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("Password").To(_password);
             Set("Confirm password").To(_password);
 
-            ClickLabel("I would like to receive information about webinars, events and new guidance");
-            ClickLabel("I'm happy to be contacted for feedback on this service and take part in surveys about modern slavery");
-
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(13)]
@@ -85,9 +82,9 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Continue");
             ExpectHeader("Verify your email address");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
 
@@ -103,7 +100,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //get email verification link
             SecondUrl = WebDriver.FindElement(By.LinkText(SecondEmail)).GetAttribute("href");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -113,7 +110,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //verify email
             Goto(SecondUrl);
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             Set("Email").To(SecondEmail);
             Set("Password").To(_password);
@@ -121,24 +118,24 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click(The.Bottom, "Sign In");
 
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("You've confirmed your email address");
 
             Expect("To finish creating your account, select continue.");
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
 
             ExpectHeader("Privacy Policy");
 
             Click("Continue");
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
-            ExpectHeader("Select an organisation");
+            ExpectHeader("Register or select organisations you want to add statements for");
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 

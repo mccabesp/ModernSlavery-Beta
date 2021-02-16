@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ModernSlavery.Core;
@@ -16,8 +17,8 @@ using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
-using Newtonsoft.Json;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
@@ -40,46 +41,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        private async Task<long> UpdateDownloadFilesAsync(string parameters, string comment, StringWriter writer,
-            bool test)
-        {
-            if (!string.IsNullOrWhiteSpace(parameters)) throw new ArgumentException("ERROR: parameters must be empty");
-
-            var count = await _adminService.OrganisationSearchRepository.GetDocumentCountAsync();
-            if (!test)
-            {
-                await _adminService.ExecuteWebjobQueue.AddMessageAsync(
-                    new QueueWrapper(
-                        $"command=UpdateDownloadFiles&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
-                writer.WriteLine(
-                    $"An email will be sent to '{CurrentUser.EmailAddress}' when the background task '{nameof(UpdateDownloadFilesAsync)}' has completed");
-            }
-
-            return count;
-        }
-
-        private async Task<long> FixOrganisationsNamesAsync(string parameters, string comment, StringWriter writer,
-            bool test)
-        {
-            if (!string.IsNullOrWhiteSpace(parameters)) throw new ArgumentException("ERROR: parameters must be empty");
-
-            var count = await SharedBusinessLogic.DataRepository.GetAll<OrganisationName>()
-                .Where(o => o.Name.ToLower().Contains(" ltd"))
-                .Select(o => o.OrganisationId)
-                .Distinct()
-                .CountAsync();
-            if (!test)
-            {
-                await _adminService.ExecuteWebjobQueue.AddMessageAsync(
-                    new QueueWrapper(
-                        $"command=FixOrganisationsNames&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
-                writer.WriteLine(
-                    $"An email will be sent to '{CurrentUser.EmailAddress}' when the background task '{nameof(FixOrganisationsNamesAsync)}' has completed");
-            }
-
-            return count;
-        }
-
         public class BulkResult
         {
             public int Count { get; set; }
@@ -89,26 +50,26 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #region Manual Changes
 
         [HttpGet("manual-changes")]
+        [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
         public IActionResult ManualChanges()
         {
-            //Throw error if the user is not a super administrator
-            if (!IsDatabaseAdministrator)
-                return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a database administrator");
-
             return View(new ManualChangesViewModel());
         }
 
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [HttpPost("manual-changes")]
+        [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
         public async Task<IActionResult> ManualChanges(ManualChangesViewModel model)
         {
-            //Throw error if the user is not a super administrator
-            if (!IsDatabaseAdministrator)
-                return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a database administrator");
-
             model.Results = null;
-            ModelState.Clear();
+
+            if (!ModelState.IsValid)
+            {
+                this.SetModelCustomErrors<ManualChangesViewModel>();
+                return View("ManualChanges", model);
+            }
+
             var test = model.LastTestedCommand != model.Command
                        || model.LastTestedInput != model.Parameters.ReplaceI(Environment.NewLine, ";");
             model.Tested = false;
@@ -125,9 +86,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     {
                         case "Please select..":
                             throw new ArgumentException("ERROR: You must first select a command");
-                        case "Fix organisation names":
-                            count = await FixOrganisationsNamesAsync(model.Parameters, model.Comment, writer, test);
-                            break;
                         case "Add organisations latest name":
                             count = await SetOrganisationNameAsync(model.Parameters, model.Comment, writer, test);
                             break;
@@ -178,15 +136,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         case "Set organisation as in scope":
                             count = await SetOrganisationScopeAsync(model.Parameters, model.Comment, writer,
                                 ScopeStatuses.InScope, test);
-                            break;
-                        case "Update search indexes":
-                            count = await UpdateOrganisationSearchIndexesAsync(model.Parameters, model.Comment, writer, test);
-                            break;
-                        case "Update GPG download data files":
-                            count = await UpdateDownloadFilesAsync(model.Parameters, model.Comment, writer, test);
-                            break;
-                        case "Fix database errors":
-                            count = await FixDatabaseErrorsAsync(model.Parameters, model.Comment, writer, test);
                             break;
                         case "Create security code":
                             count = await SecurityCodeWorkAsync(
@@ -296,6 +245,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 model.Results = writer.ToString();
             }
 
+            ModelState.Clear();
             return View(model);
         }
 
@@ -382,7 +332,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             bool test)
         {
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -493,105 +443,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return count;
         }
 
-        private async Task<long> FixDatabaseErrorsAsync(string parameters, string comment, StringWriter writer,
-            bool test)
-        {
-            if (!string.IsNullOrWhiteSpace(parameters)) throw new ArgumentException("ERROR: parameters must be empty");
-
-            var count = 0;
-
-            #region Fix latest registrations
-
-            var orgs = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                .Where(o => o.LatestRegistration == null && o.UserOrganisations.Any(uo => uo.PINConfirmedDate != null));
-            var subCount = 0;
-            foreach (var org in orgs)
-            {
-                var latestReg = org.UserOrganisations.OrderByDescending(o => o.PINConfirmedDate)
-                    .FirstOrDefault(o => o.PINConfirmedDate != null);
-                if (latestReg != null)
-                {
-                    //DOTNETCORE MERGE - latestReg.LatestOrganisation = org;
-                    org.LatestRegistration = latestReg;
-                    subCount++;
-                    writer.WriteLine(
-                        $"{subCount:000}: Organisation '{org.OrganisationReference}:{org.OrganisationName}' missing a latest registration {(test ? "will be" : "was successfully")} fixed");
-                }
-            }
-
-            if (!test && subCount > 0) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-
-            if (subCount == 0) writer.WriteLine("No organisations missing a latest registration");
-
-            count += subCount;
-
-            #endregion
-
-            #region Fix latest statements
-
-            orgs = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                .Where(o => o.LatestStatement == null && o.Statements.Any(r => r.Status == StatementStatuses.Submitted));
-            subCount = 0;
-            foreach (var org in orgs)
-            {
-                var latestStatement = org.Statements.OrderByDescending(o => o.SubmissionDeadline)
-                    .FirstOrDefault(o => o.Status == StatementStatuses.Submitted);
-                if (latestStatement != null)
-                {
-                    latestStatement.Organisation = org;
-                    org.LatestStatement = latestStatement;
-                    subCount++;
-                    writer.WriteLine(
-                        $"{subCount:000}: Organisation '{org.OrganisationReference}:{org.OrganisationName}' missing a latest statement {(test ? "will be" : "was successfully")} fixed");
-                }
-            }
-
-            if (!test && subCount > 0) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-
-            if (subCount == 0) writer.WriteLine("No organisations missing a latest return");
-
-            count += subCount;
-
-            #endregion
-
-            #region Fix latest scopes
-
-            orgs = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                .Where(o => o.LatestScope == null &&
-                            o.OrganisationScopes.Any(s => s.ScopeStatus != ScopeStatuses.Unknown));
-            subCount = 0;
-            foreach (var org in orgs)
-            {
-                var latestScope = org.OrganisationScopes.OrderByDescending(o => o.SubmissionDeadline)
-                    .FirstOrDefault(o => o.ScopeStatus != ScopeStatuses.Unknown);
-                if (latestScope != null)
-                {
-                    //DOTNETCORE MERGE - latestScope.LatestOrganisation = org;
-                    org.LatestScope = latestScope;
-                    subCount++;
-                    writer.WriteLine(
-                        $"{subCount:000}: Organisation '{org.OrganisationReference}:{org.OrganisationName}' missing a latest scope {(test ? "will be" : "was successfully")} fixed");
-                }
-            }
-
-            if (!test && subCount > 0) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-
-            if (subCount == 0) writer.WriteLine("No organisations missing a latest scope");
-
-            count += subCount;
-
-            #endregion
-
-            return count;
-        }
-
         private async Task<int> SetOrganisationCompanyNumberAsync(string input, string comment, StringWriter writer,
             bool test)
         {
             var methodName = nameof(SetOrganisationCompanyNumberAsync);
 
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -675,7 +533,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     //Output the actual execution result
                     org.CompanyNumber = newValue;
                     writer.WriteLine(
-                        $"{i}: {organisationRef}: {org.OrganisationName} Company Number='{org.CompanyNumber}' set to '{newValue}'");
+                        $"{i}: {organisationRef}: {org.OrganisationName} Company Number='{oldValue}' set to '{newValue}'");
                     if (!test)
                     {
                         await _adminService.ManualChangeLog.WriteAsync(
@@ -705,7 +563,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var methodName = nameof(SetOrganisationSicCodesAsync);
 
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -848,7 +706,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var methodName = nameof(SetOrganisationAddressesAsync);
 
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -1027,7 +885,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var methodName = nameof(SetPublicSectorTypeAsync);
 
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -1179,7 +1037,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var methodName = nameof(SetOrganisationDUNSNumberAsync);
 
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -1294,7 +1152,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var methodName = nameof(DeleteSubmissionsAsync);
 
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -1384,6 +1242,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             comment,
                             $"Year={year} Organisation='{organisationRef}'"));
                     await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+
+                    //Update the search indexes
+                    await _searchBusinessLogic.RefreshSearchDocumentsAsync(statement.Organisation, statement.SubmissionDeadline.Year).ConfigureAwait(false);
                 }
 
                 count++;
@@ -1395,7 +1256,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         private async Task<int> UnRetireOrganisationsAsync(string input, string comment, StringWriter writer, bool test)
         {
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -1483,7 +1344,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var methodName = nameof(RetireOrganisationsAsync);
 
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -1566,7 +1427,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var methodName = nameof(ConvertPrivateOrganisationsToPublicAsync);
 
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -1747,7 +1608,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var methodName = nameof(ConvertPublicOrganisationsToPrivateAsync);
 
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -1940,7 +1801,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var methodName = nameof(SetOrganisationNameAsync);
 
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -2046,7 +1907,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var methodName = nameof(ResetOrganisationNameAsync);
 
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -2188,7 +2049,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             SecurityCodeDelegate callBackDelegatedMethod)
         {
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -2308,7 +2169,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var methodName = MethodBase.GetCurrentMethod().Name;
 
             //Split the input into separate action lines
-            var lines = input.SplitI(Environment.NewLine);
+            var lines = input.SplitI(Environment.NewLine.ToCharArray());
             if (lines.Length == 0) throw new ArgumentException("ERROR: You must supply 1 or more input parameters");
 
             //Execute the command for each line
@@ -2597,37 +2458,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             return result;
-        }
-
-        #endregion
-
-        #region Trigger Webjobs
-        [HttpGet("trigger-webjobs")]
-        public IActionResult TriggerWebjobs()
-        {
-            //Throw error if the user is not a super administrator
-            if (!IsDatabaseAdministrator)
-                return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a database administrator");
-
-            return View();
-        }
-
-        [PreventDuplicatePost]
-        [ValidateAntiForgeryToken]
-        [HttpPost("trigger-webjobs")]
-        public async Task<IActionResult> TriggerWebjobs(string webjobname)
-        {
-            //Throw error if the user is not a super administrator
-            if (!IsDatabaseAdministrator)
-                return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a database administrator");
-
-            if (!string.IsNullOrWhiteSpace(webjobname))
-            {
-                await _adminService.ExecuteWebjobQueue.AddMessageAsync(
-                    new QueueWrapper($"command={webjobname}"));
-            }
-
-            return RedirectToAction("Home");
         }
 
         #endregion

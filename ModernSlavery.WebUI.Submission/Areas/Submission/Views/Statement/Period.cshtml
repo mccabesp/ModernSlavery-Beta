@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model PeriodCoveredViewModel
 
@@ -60,6 +61,11 @@
                     <div class="app-date-range__child">
                         <p class="govuk-body">to</p>
                     </div>
+                    <span class="mobile-errors">
+                        <span asp-validation-for="StatementStartDay" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementStartMonth" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementStartYear" class="govuk-error-message"></span>
+                    </span>
                     <div class="app-date-range__child">
                         <div class="govuk-date-input" id="reporting-end">
                             <div class="govuk-date-input__item">
@@ -88,15 +94,23 @@
                             </div>
                         </div>
                     </div>
+                    <span class="mobile-errors">
+                        <span asp-validation-for="StatementEndDay" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementEndMonth" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementEndYear" class="govuk-error-message"></span>
+                    </span>
 
-                    <span asp-validation-for="StatementStartDay" class="govuk-error-message"></span>
-                    <span asp-validation-for="StatementStartMonth" class="govuk-error-message"></span>
-                    <span asp-validation-for="StatementStartYear" class="govuk-error-message"></span>
+                    <span class="desktop-errors">
+                        <span asp-validation-for="StatementStartDay" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementStartMonth" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementStartYear" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementEndDay" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementEndMonth" class="govuk-error-message"></span>
+                        <span asp-validation-for="StatementEndYear" class="govuk-error-message"></span>
+                    </span>
                     <span asp-validation-for="StatementStartDate" class="govuk-error-message"></span>
-                    <span asp-validation-for="StatementEndDay" class="govuk-error-message"></span>
-                    <span asp-validation-for="StatementEndMonth" class="govuk-error-message"></span>
-                    <span asp-validation-for="StatementEndYear" class="govuk-error-message"></span>
-                </div>
+                    <span asp-validation-for="StatementEndDate" class="govuk-error-message"></span>
+                </div>               
             </fieldset>
         </div>
 

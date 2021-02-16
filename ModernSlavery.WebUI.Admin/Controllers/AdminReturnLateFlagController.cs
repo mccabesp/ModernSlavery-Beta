@@ -1,29 +1,34 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "GPGadmin")]
+    [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
     [Route("admin")]
     [NoCache]
-    public class AdminReturnLateFlagController : Controller
+    public class AdminReturnLateFlagController : BaseController
     {
         private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
 
         public AdminReturnLateFlagController(
             IAdminService adminService, 
-            AuditLogger auditLogger)
+            AuditLogger auditLogger,
+            ILogger<AdminReturnLateFlagController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             _adminService = adminService;
             this.auditLogger = auditLogger;
@@ -48,6 +53,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var specifiedStatement = _adminService.SharedBusinessLogic.DataRepository.Get<Statement>(id);
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
+
+            if (!ModelState.IsValid)
+                foreach (var state in ModelState.Where(state => state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid))
+                    foreach (var error in state.Value.Errors)
+                        viewModel.AddErrorFor(state.Key, error.ErrorMessage);
 
             if (viewModel.HasAnyErrors())
             {

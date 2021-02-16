@@ -1,0 +1,48 @@
+<Project>
+  <PropertyGroup>
+    <Copyright>Crown Copyright © $([System.DateTime]::UtcNow.Year) ($([System.DateTime]::UtcNow.ToLocalTime()))</Copyright>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Configurations>Debug;Release;DebugLocal</Configurations>
+    <!--<LangVersion>8.0</LangVersion>-->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="App_Data\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'!='DebugLocal' AND '$(Configuration)'!='loadtest'">
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <OutputPath></OutputPath>
+    <WarningsAsErrors>NU1605;CS4014;LindhartAnalyserMissingAwaitWarning</WarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Common analyzers shared by all projects -->
+  <ItemGroup Condition="'$(Configuration)'!='DebugLocal' AND '$(Configuration)'!='loadtest'">
+    <PackageReference Include="Lindhart.Analyser.MissingAwaitWarning" Version="2.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.15.0.24505">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+
+    <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.11.0" />
+
+    <AdditionalFiles Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram" Link="DependencyValidation1.layerdiagram">
+      <Visible>False</Visible>
+    </AdditionalFiles>
+    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.layout" Link="DependencyValidation1.layerdiagram.layout" />
+    <None Include="..\ModernSlavery.DependencyValidation\DependencyValidation1.layerdiagram.suppressions" Link="DependencyValidation1.layerdiagram.suppressions" />
+    <Compile Include="..\SolutionSuppressions.cs" Link="SolutionSuppressions.cs" />
+  </ItemGroup>
+</Project>
+

@@ -3,8 +3,8 @@
 <table class="govuk-table organisation-list">
     <thead class="govuk-table__head">
         <tr class="govuk-table__row">
-            <th class="govuk-table__header">Organisation</th>
-            <th class="govuk-table__header"></th>
+            <th class="govuk-table__header" scope="col">Organisation</th>
+            <td class="govuk-table__header" ></td>
         </tr>
     </thead>
     <tbody class="govuk-table__body">
@@ -18,7 +18,7 @@
                         <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold govuk-blue">
                             @if (Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation.Count == 1)
                             {
-                                <span>Included in the @Html.Raw(Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation[0].ReplaceI("\n", "<br />"))</span>
+                                <span>Included in the @Html.Linebreak(Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation[0],"\n")</span>
                             }
                             else
                             {
@@ -33,13 +33,13 @@
                                         Included in:
                                         @foreach (var otherSubmissionsInformation in Model.StatementOrganisations[organisationIndex].OtherSubmissionsInformation)
                                         {
-                                            <div class="govuk-!-padding-top-4">the @Html.Raw(otherSubmissionsInformation.ReplaceI("\n", "<br />"))</div>
+                                            <div class="govuk-!-padding-top-4">the @Html.Linebreak(otherSubmissionsInformation,"\n")</div>
                                         }
                                     </div>
                                 </details>
                             }
                         </p>
-                        <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold"> @(Model.StatementOrganisations[organisationIndex].OrganisationName)</p>
+                        <h2 class="govuk-heading-s govuk-!-margin-bottom-2 govuk-!-font-weight-bold"> @(Model.StatementOrganisations[organisationIndex].OrganisationName)</h2>
                         <p class="govuk-body govuk-!-margin-bottom-2">@(Model.StatementOrganisations[organisationIndex].Address?.GetFullAddress())</p>
                         @if (Model.StatementOrganisations[organisationIndex].CompanyNumber != null)
                         {
@@ -50,7 +50,7 @@
                     else
                     {
                         <div>
-                            <p class="govuk-body govuk-!-margin-bottom-2 govuk-!-font-weight-bold"> @(Model.StatementOrganisations[organisationIndex].OrganisationName)</p>
+                            <h2 class="govuk-heading-s govuk-!-margin-bottom-2 govuk-!-font-weight-bold"> @(Model.StatementOrganisations[organisationIndex].OrganisationName)</h2>
                             <p class="govuk-body govuk-!-margin-bottom-2">@(Model.StatementOrganisations[organisationIndex].Address?.GetFullAddress())</p>
                             @if (Model.StatementOrganisations[organisationIndex].CompanyNumber != null)
                             {
@@ -60,7 +60,7 @@
                     }
                 </td>
                 <td class="govuk-table__cell buttons">
-                    <button type="submit" class="link-button govuk-link" name="removeIndex" value="@organisationIndex">Remove</button>
+                    <button type="submit" class="link-button govuk-link" name="removeIndex" value="@organisationIndex" aria-label="Remove @(Model.StatementOrganisations[organisationIndex].OrganisationName)">Remove</button>
 
                 </td>
             </tr>

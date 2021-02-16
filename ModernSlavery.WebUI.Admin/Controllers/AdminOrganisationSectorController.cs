@@ -2,30 +2,34 @@
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
-using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "GPGadmin")]
+    [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
     [Route("admin")]
     [NoCache]
-    public class AdminOrganisationSectorController : Controller
+    public class AdminOrganisationSectorController : BaseController
     {
         private readonly IAdminService _adminService;
         private readonly AuditLogger auditLogger;
 
         public AdminOrganisationSectorController(
             IAdminService adminService,
-            AuditLogger auditLogger)
+            AuditLogger auditLogger,
+            ILogger<AdminOrganisationSectorController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             _adminService = adminService;
             this.auditLogger = auditLogger;
@@ -62,6 +66,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 viewModel.AddErrorFor<AdminChangePublicSectorClassificationViewModel, int?>(
                     m => m.SelectedPublicSectorTypeId,
                     "Please select a public sector classification");
+
+            if (!ModelState.IsValid)
+                foreach (var state in ModelState.Where(state => state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid))
+                    foreach (var error in state.Value.Errors)
+                        viewModel.AddErrorFor(state.Key, error.ErrorMessage);
 
             if (viewModel.HasAnyErrors()) return View("ChangePublicSectorClassification", viewModel);
 

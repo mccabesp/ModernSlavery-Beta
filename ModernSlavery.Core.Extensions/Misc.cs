@@ -56,6 +56,12 @@ namespace ModernSlavery.Core.Extensions
             return enumerable != null;
         }
 
+        public static bool IsEnumerable<T>(this object value)
+        {
+            var enumerable = value as IEnumerable<T>;
+            return enumerable != null;
+        }
+
         public static DateTime GetAssemblyCreationTime(this Assembly assembly)
         {
             var filePath = assembly.Location;

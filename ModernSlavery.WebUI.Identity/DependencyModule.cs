@@ -49,6 +49,8 @@ namespace ModernSlavery.WebUI.Identity
                         options.UserInteraction.LoginUrl = "/identity/sign-in";
                         options.UserInteraction.LogoutUrl = "/identity/sign-out";
                         options.UserInteraction.ErrorUrl = "/identity/error";
+                        options.Authentication.CookieLifetime= TimeSpan.FromMinutes(_sharedOptions.SessionTimeOutMinutes);
+                        options.Authentication.CookieSlidingExpiration = true;
                     })
                 .AddInMemoryClients(_identityServerOptions.Clients)
                 .AddInMemoryIdentityResources(new List<IdentityResource>

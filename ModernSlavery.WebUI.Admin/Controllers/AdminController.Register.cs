@@ -8,20 +8,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Models.LogModels;
+using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Classes.UrlHelper;
 using ModernSlavery.WebUI.Shared.Models;
-using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     public partial class AdminController
     {
-        private ActionResult UnwrapRegistrationRequest(OrganisationViewModel model, out UserOrganisation userOrg,
+        private ActionResult UnwrapRegistrationRequest(ReviewOrganisationViewModel model, out UserOrganisation userOrg,
             bool ignoreDUNS)
         {
             userOrg = null;
@@ -30,9 +29,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             long orgId = 0;
             try
             {
-                var code = Encryption.DecryptQuerystring(model.ReviewCode);
+                var code = Encryption.Decrypt(model.ReviewCode, Encryption.Encodings.Base62);
                 code = HttpUtility.UrlDecode(code);
-                var args = code.SplitI(":");
+                var args = code.SplitI(':');
                 if (args.Length != 3) throw new ArgumentException("Too few parameters in registration review code");
 
                 userId = args[0].ToLong();
@@ -106,19 +105,19 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 : null;
 
             model.CharityNumber = userOrg.Organisation.OrganisationReferences
-                .Where(o => o.ReferenceName.ToLower() == nameof(OrganisationViewModel.CharityNumber).ToLower())
+                .Where(o => o.ReferenceName.ToLower() == nameof(ReviewOrganisationViewModel.CharityNumber).ToLower())
                 .Select(or => or.ReferenceValue)
                 .FirstOrDefault();
 
             model.MutualNumber = userOrg.Organisation.OrganisationReferences
-                .Where(o => o.ReferenceName.ToLower() == nameof(OrganisationViewModel.MutualNumber).ToLower())
+                .Where(o => o.ReferenceName.ToLower() == nameof(ReviewOrganisationViewModel.MutualNumber).ToLower())
                 .Select(or => or.ReferenceValue)
                 .FirstOrDefault();
 
             model.OtherName = userOrg.Organisation.OrganisationReferences.ToList()
                 .Where(
-                    o => o.ReferenceName.ToLower() != nameof(OrganisationViewModel.CharityNumber).ToLower()
-                         && o.ReferenceName.ToLower() != nameof(OrganisationViewModel.MutualNumber).ToLower())
+                    o => o.ReferenceName.ToLower() != nameof(ReviewOrganisationViewModel.CharityNumber).ToLower()
+                         && o.ReferenceName.ToLower() != nameof(ReviewOrganisationViewModel.MutualNumber).ToLower())
                 .Select(or => or.ReferenceName)
                 .FirstOrDefault();
 
@@ -134,24 +133,23 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #region ReviewRequest
 
         [HttpGet("review-request/{code}")]
-        public async Task<IActionResult> ReviewRequest(string code)
+        [IPAddressFilter]
+        public async Task<IActionResult> ReviewRequest([IgnoreText] string code)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            var model = new OrganisationViewModel();
+            var model = new ReviewOrganisationViewModel();
 
             if (string.IsNullOrWhiteSpace(code))
             {
                 //Load the organisation from session
-                model = UnstashModel<OrganisationViewModel>();
+                model = UnstashModel<ReviewOrganisationViewModel>();
                 if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1114));
             }
-            else
-            {
-                model.ReviewCode = code;
-            }
+
+            model.ReviewCode = code;
 
             //Unwrap code
             UserOrganisation userOrg;
@@ -159,11 +157,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (result != null) return result;
 
             //Tell reviewer if this org has already been approved
-            if (model.IsManualRegistration)
+            
+            if (userOrg.Organisation.UserOrganisations.Any())
             {
-                var firstRegistered = userOrg.Organisation.UserOrganisations
-                    .OrderByDescending(uo => uo.PINConfirmedDate)
-                    .FirstOrDefault(uo => uo.PINConfirmedDate != null);
+                var firstRegistered = userOrg.Organisation.UserOrganisations.OrderByDescending(uo => uo.PINConfirmedDate).FirstOrDefault(uo => uo.PINConfirmedDate != null);
+
                 if (firstRegistered != null)
                     AddModelError(
                         3017,
@@ -262,10 +260,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (orgIds.Any())
             {
                 //Add the registrations
-                var orgs =
-                    await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                        .Where(o => orgIds.Contains(o.OrganisationId)).ToListAsync();
-                model.ManualOrganisations = orgs.Select(o => _adminService.OrganisationBusinessLogic.CreateOrganisationRecord(o)).ToList();
+                var orgs = await SharedBusinessLogic.DataRepository.GetAll<Organisation>().Where(o => orgIds.Contains(o.OrganisationId)).ToListAsync();
+                model.ManualOrganisations = _adminService.OrganisationBusinessLogic.CreateOrganisationRecords(orgs, true).ToList();
             }
 
             //Ensure exact match shown at top
@@ -292,18 +288,17 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
+        [IPAddressFilter]
         [HttpPost("review-request/{code}")]
-        public async Task<IActionResult> ReviewRequest(OrganisationViewModel model, string command)
+        public async Task<IActionResult> ReviewRequestPost([IgnoreText]string command)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
             //Make sure we can load organisations from session
-            var m = UnstashModel<OrganisationViewModel>();
-            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-
-            model.ManualOrganisations = m.ManualOrganisations;
+            var model = UnstashModel<ReviewOrganisationViewModel>();
+            if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             //Unwrap code
             UserOrganisation userOrg;
@@ -311,49 +306,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (result != null) return result;
 
             //Check model is valid
-
-            //Exclude the address details
-            var excludes = new HashSet<string>();
-            excludes.AddRange(
-                nameof(model.Address1),
-                nameof(model.Address2),
-                nameof(model.Address3),
-                nameof(model.City),
-                nameof(model.County),
-                nameof(model.Country),
-                nameof(model.Postcode),
-                nameof(model.PoBox));
-
-            //Exclude the contact details
-            excludes.AddRange(
-                nameof(model.ContactFirstName),
-                nameof(model.ContactLastName),
-                nameof(model.ContactJobTitle),
-                nameof(model.ContactEmailAddress),
-                nameof(model.ContactPhoneNumber));
-
-            //Exclude the SIC Codes
-            excludes.Add(nameof(model.SicCodeIds));
-
-            excludes.Add(nameof(model.SearchText));
-            excludes.Add(nameof(model.OrganisationName));
-            excludes.AddRange(
-                nameof(model.CompanyNumber),
-                nameof(model.CharityNumber),
-                nameof(model.MutualNumber),
-                nameof(model.OtherName),
-                nameof(model.OtherValue));
-
-            excludes.Add(nameof(model.RegistrationType));
-
-            //Exclude the DUNS number when declining
-            if (command.EqualsI("decline")) excludes.Add(nameof(model.DUNSNumber));
-
-            ModelState.Exclude(excludes.ToArray());
-
             if (!ModelState.IsValid)
             {
-                this.SetModelCustomErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<ReviewOrganisationViewModel>();
                 return View(nameof(ReviewRequest), model);
             }
 
@@ -442,7 +397,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (!ModelState.IsValid)
                 {
-                    this.SetModelCustomErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<ReviewOrganisationViewModel>();
                     return View("ReviewRequest", model);
                 }
 
@@ -504,7 +459,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress)))
                 {
                     ModelState.AddModelError(1132);
-                    this.SetModelCustomErrors<OrganisationViewModel>();
+                    this.SetModelCustomErrors<ReviewOrganisationViewModel>();
                     return View("ReviewRequest", model);
                 }
 
@@ -571,6 +526,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("confirm-cancellation")]
+        [IPAddressFilter]
         public async Task<IActionResult> ConfirmCancellation()
         {
             //Ensure user has completed the registration process
@@ -578,7 +534,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (checkResult != null) return checkResult;
 
             //Make sure we can load organisations from session
-            var model = UnstashModel<OrganisationViewModel>();
+            var model = UnstashModel<ReviewOrganisationViewModel>();
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             return View("ConfirmCancellation", model);
@@ -591,15 +547,16 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [HttpPost("confirm-cancellation")]
-        public async Task<IActionResult> ConfirmCancellation(OrganisationViewModel model, string command)
+        [IPAddressFilter]
+        public async Task<IActionResult> ConfirmCancellation([IgnoreText] string command)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
             //Load the organisations from session
-            var m = UnstashModel<OrganisationViewModel>();
-            if (m == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
+            var model = UnstashModel<ReviewOrganisationViewModel>();
+            if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
 
             //If cancel button clicked the n return to review page
             if (command.EqualsI("Cancel")) return RedirectToAction("ReviewRequest", new { code = model.ReviewCode });
@@ -667,7 +624,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     : model.CancellationReason))
             {
                 ModelState.AddModelError(1131);
-                this.SetModelCustomErrors<OrganisationViewModel>();
+                this.SetModelCustomErrors<ReviewOrganisationViewModel>();
                 return View("ConfirmCancellation", model);
             }
 
@@ -697,6 +654,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         ///     Show review accepted confirmation
         ///     <returns></returns>
         [HttpGet("request-accepted")]
+        [IPAddressFilter]
         public async Task<IActionResult> RequestAccepted()
         {
             //Ensure user has completed the registration process
@@ -704,11 +662,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (checkResult != null) return checkResult;
 
             //Make sure we can load model from session
-            var model = UnstashModel<OrganisationViewModel>();
+            var model = UnstashModel<ReviewOrganisationViewModel>(true);
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-
-            //Clear the stash
-            ClearStash();
 
             return View("RequestAccepted", model);
         }
@@ -717,6 +672,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         ///     Show review cancel confirmation
         ///     <returns></returns>
         [HttpGet("request-cancelled")]
+        [IPAddressFilter]
         public async Task<IActionResult> RequestCancelled()
         {
             //Ensure user has completed the registration process
@@ -724,11 +680,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (checkResult != null) return checkResult;
 
             //Make sure we can load model from session
-            var model = UnstashModel<OrganisationViewModel>();
+            var model = UnstashModel<ReviewOrganisationViewModel>(true);
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1112));
-
-            //Clear the stash
-            ClearStash();
 
             return View("RequestCancelled", model);
         }

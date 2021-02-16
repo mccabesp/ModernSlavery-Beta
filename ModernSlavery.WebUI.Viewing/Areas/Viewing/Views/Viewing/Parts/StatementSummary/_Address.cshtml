@@ -1,0 +1,26 @@
+﻿@model Core.Models.AddressModel
+
+<details class="govuk-details" data-module="govuk-details">
+    <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+            Organisation address
+        </span>
+    </summary>
+    <div class="govuk-details__text">
+        @if (Model != null)
+        {
+            var address = Model?.GetAddressList(); 
+            for (var i = 0; i < address.Count; i++)
+            {
+                if (i < address.Count - 1)
+                {
+                    <text>@address[i],</text>
+                    <br>
+                }
+                else // last element doesnt need a comma or line break
+                {
+                    <text>@address[i]</text>
+                }
+            }}
+    </div>
+</details>

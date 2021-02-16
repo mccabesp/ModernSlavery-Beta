@@ -15,12 +15,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         const string _firstname = Create_Account.roger_first; const string _lastname = Create_Account.roger_last; const string _title = Create_Account.roger_job_title; const string _email = Create_Account.roger_email; const string _password = Create_Account.roger_password;
 
 
-        private Organisation org;   
+        private Organisation org;
         [OneTimeSetUp]
         public async Task SetUp()
         {
             //HostHelper.ResetDbScope();
-            
+
 
 
         }
@@ -36,78 +36,117 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
 
-            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail).ConfigureAwait(false);
             RefreshPage();
 
-            await this.SaveDatabaseAsync();
+            await this.SaveDatabaseAsync().ConfigureAwait(false);
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(40)]
         public async Task StartSubmission()
         {
 
-            ExpectHeader("Select an organisation");
+            ExpectHeader("Register or select organisations you want to add statements for");
 
             Click(org.OrganisationName);
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            ExpectHeader(That.Contains, "Manage your modern slavery statements");
 
-            
+
             Click(The.Top, "Start Draft");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Before you start");
-            Click("Start Now");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+
+
+            Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
+            ExpectHeader("Transparency and modern slavery");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            Click("Continue");
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+
+
+            Click("Organisations covered by the statement");
             ModernSlavery.Testing.Helpers.Extensions.SubmissionHelper.GroupOrSingleScreenComplete(this, OrgName: TestData.OrgName);
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(42)]
-        public async Task YourModernSlaveryStatement()
+        public async Task StatementURLDateAndSignOff()
         {
-            
-        ExpectHeader("Your modern slavery statement");
-
+            Click("Statement URL, dates and sign-off");
+            ExpectHeader("Provide a link to the modern slavery statement on your organisation's website");
             Set("URL").To(Submission.YourMSStatement_URL);
 
+            Click("Save and Continue");
+
+            ExpectHeader("What period does this statement cover?");
             Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_From_Year, "1");
             Submission_Helper.DateSet(this, Submission.YourMSStatement_To_Day, Submission.YourMSStatement_To_Month, Submission.YourMSStatement_To_Year, "2");
 
+
+            Click("Save and continue");
+            ExpectHeader("What is the name of the director (or equivalent) who signed off your statement?");
             Set("First name").To(Submission.YourMSStatement_First);
             Set("Last name").To(Submission.YourMSStatement_Last);
             Set("Job title").To(Submission.YourMSStatement_JobTitle);
 
-            Submission_Helper.DateSet(this, Submission.YourMSStatement_ApprovalDate_Day, Submission.YourMSStatement_ApprovalDate_Month, Submission.YourMSStatement_ApprovalDate_Year, "3");
+            Submission_Helper.DateSet(this, Submission.YourMSStatement_ApprovalDate_Day, Submission.YourMSStatement_ApprovalDate_Month, Submission.YourMSStatement_ApprovalDate_Year, "1");
 
-            Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            await Task.CompletedTask;
+            Click("Save and Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(44)]
         public async Task AreasCoveredByYourModernSlaveryStatement()
         {
-            ExpectHeader("Areas covered by your modern slavery statement");
+            Click("Recommended areas covered by the statement");
+            ExpectHeader("Does your statement cover the following areas in relation to modern slavery?");
 
             BelowHeader("Your organisation’s structure, business and supply chains").ClickLabel(The.Top, "Yes");
             BelowHeader("Policies").ClickLabel(The.Top, "Yes");
-            BelowHeader("Risk assessment and management").ClickLabel(The.Top, "Yes");
-            BelowHeader("Due diligence processes").ClickLabel(The.Top, "Yes");
-            BelowHeader("Staff training about slavery and human trafficking").ClickLabel(The.Top, "Yes");
-            BelowHeader("Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions").ClickLabel(The.Top, "Yes");
+            BelowHeader("Risk assessment").ClickLabel(The.Top, "Yes");
+            BelowHeader("Due diligence (steps to address risk)").ClickLabel(The.Top, "Yes");
+            BelowHeader("Training about modern slavery").ClickLabel(The.Top, "Yes");
+            BelowHeader("Goals and key performance indicators (KPIs) to measure the effectiveness of your actions and progress over time").ClickLabel(The.Top, "Yes");
 
-            Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            await Task.CompletedTask;
+            Click("Save and Continue");
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
+        [Test, Order(45)]
+        public async Task HowManyYears()
+        {
+            Click("How many years you've been producing statements");
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
+
+            ExpectHeader("How many years has your organisation been producing modern slavery statements?");
+            ClickLabel("This is the first time");
+
+            Click("Save and continue");
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(46)]
         public async Task YourOrganisation()
-        { 
-            ExpectHeader(That.Contains, "Your organisation");
+        {
+            Click("Your organisation's sectors and turnover");
+            ExpectHeader(That.Contains, "Which sectors does your organisation operate in?");
 
             foreach (var sector in Submission.YourOrganisation_Sectors)
             {
@@ -116,18 +155,27 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             //Set("What was your turnover or budget during the last financial accounting year?").To(Submission.YourOrganisation_Turnover);
             ExpectLabel("Please specify");
-            ClickLabel(Submission.YourOrganisation_Turnover);
-            Set("OtherSector").To("Other details");
-            Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            Set("Please specify").To("Other details");
+            Click("Save and Continue");
+            ExpectHeader("What was your turnover during the financial year the statement relates to?");
 
-            await Task.CompletedTask;
+            ClickLabel(Submission.YourOrganisation_Turnover);
+
+            Click("Save and continue");
+
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(48)]
         public async Task Policies()
         {
-            ExpectHeader("Policies");
+            Click("Policies");
+            ExpectHeader("Do your organisation's policies include any of the following provisions in relation to modern slavery?");
 
             foreach (var Policy in Submission.Policies_SelectedPolicies)
             {
@@ -136,226 +184,239 @@ namespace ModernSlavery.Hosts.Web.Tests
                 //fill in other details
                 if (Policy == "Other")
                 {
-                    Set("OtherPolicies").To(Submission.Policies_OtherDetails);
-                    ExpectLabel("Please provide details");
+                    ExpectLabel("Please specify");
+                    Set("Please specify").To(Submission.Policies_OtherDetails);
                 }
             }
 
-            Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            await Task.CompletedTask;
+            Click("Save and continue");
+
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
-        [Test, Order(50)]
-        public async Task SCRPart1()
-        {
-
-            ExpectHeader(That.Contains, "Supply chain risks and due diligence");
-
-            //goods and services
-            Submission_Helper.ExpandSection(this, "Goods and Services", "1");
-            foreach (var GoodOrService in Submission.SupplyChainRisks_SelectedGoodsAndServices)
-            {
-                NearHeader(The.Top, "Goods and Services").Click(GoodOrService);               
-            }
-            //NearHeader(The.Top, "Goods and Services").Expect(Submission.SupplyChainRisks_SelectedGoodsAndServices.Length + " Selected");
-            Submission_Helper.ColapseSection(this, "Goods and Services", "1");
-
-            //Vulnerable Groups
-            Submission_Helper.ExpandSection(this, "Vulnerable groups", "1");
-            
-            foreach (var VulnerableGroup in Submission.SupplyChainRisks_SelectedVulnerableGroups)
-            {
-                NearHeader(The.Top, "Vulnerable groups").ClickLabel(VulnerableGroup);
-                if (VulnerableGroup == "Other vulnerable group(s)")
-                {
-                    Set("Please specify").To(Submission.SupplyChainRisks_OtherVulernableGroupsDetails);
-                }
-            }
-           // NearHeader(The.Top, "Vulnerable groups").Expect(Submission.SupplyChainRisks_SelectedVulnerableGroups.Length + " Selected");
-            
-            Submission_Helper.ColapseSection(this, "Goods and Services", "1");
-
-
-            //Type of work
-            Submission_Helper.ExpandSection(this, "Type of work", "1");
-
-            foreach (var TypeOfWork in Submission.SupplyChainRisks_SelectedTypeOfWorks)
-            {
-                NearHeader(The.Top, "Type of work").ClickLabel(TypeOfWork);
-                if (TypeOfWork == "Other type of work")
-                {
-                    BelowHeader(The.Top, "Type of work").Set(The.Top, "Please specify").To(Submission.SupplyChainRisks_OtherTypeOfWorkDetails);
-                }
-            }
-            //NearHeader(The.Top, "Type of work").Expect(Submission.SupplyChainRisks_SelectedTypeOfWorks.Length + " Selected");
-
-            Submission_Helper.ColapseSection(this, "Type of work", "1");
-
-            //Sectors
-            Submission_Helper.ExpandSection(this, "Sectors", "1");
-
-            foreach (var Sector in Submission.SupplyChainRisks_SelectedSectors)
-            {
-                NearHeader(The.Top, "Sectors").ClickLabel(Sector);
-               
-                    if (Sector == "Other sector")
-                    {
-                    BelowHeader(The.Top, "Sectors").Set(The.Top, "Please specify").To(Submission.SupplyChainRisks_OtherSectorDetails);
-                    }            
-            }
-
-            Set(The.Top, "If you want to specify an area not mentioned above, please provide details").To(Submission.SuppliChainRisks_OtherArea);
-
-
-            //NearHeader(The.Top, "Sectors").Expect(What.Contains, Submission.SupplyChainRisks_SelectedSectors.Length.ToString() + " Selected");
-            
-            
-            
-            Submission_Helper.ColapseSection(this, "Type of work", "1");
-
-            //goods and services - highest risk
-            Submission_Helper.ExpandSection(this, "Goods and Services", "2");
-            foreach (var GoodOrService in Submission.SupplyChainRisks_SelectedGoodsAndServices)
-            {
-                NearHeader(The.Bottom, "Goods and Services").Click(GoodOrService);
-                NearHeader(The.Bottom, "Goods and Services").Below(GoodOrService).Set(The.Top).To(GoodOrService + "Details");
-            }
-            Submission_Helper.ColapseSection(this, "Goods and Services", "2");
-
-            
-
-            Set(The.Bottom, "If you want to specify an area not mentioned above, please provide details").To(Submission.SuppliChainRisks_OtherArea);
-
-
-            //countries
-            Submission_Helper.CountrySelect(this, "Africa", Submission.SupplyChainRisks_SelectedCountriesAfrica);
-            Submission_Helper.CountrySelect(this, "Asia", Submission.SupplyChainRisks_SelectedCountriesAsia);
-            Submission_Helper.CountrySelect(this, "Europe", Submission.SupplyChainRisks_SelectedCountriesEurope);
-            Submission_Helper.CountrySelect(this, "North America", Submission.SupplyChainRisks_SelectedCountriesNorthAmerica);
-            Submission_Helper.CountrySelect(this, "Oceania", Submission.SupplyChainRisks_SelectedCountriesOceania);
-            Submission_Helper.CountrySelect(this, "South America", Submission.SupplyChainRisks_SelectedCountriesSouthAmerica);
-            Submission_Helper.CountrySelect(this, "Antarctica", Submission.SupplyChainRisks_SelectedCountriesAntarctica);
-            
-            Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            ExpectHeader(That.Contains, "Supply chain risks and due diligence");
-
-
-            await Task.CompletedTask;
-        }
-
-        [Test, Order(52)]
-        public async Task SCRPart2()
-        {
-            //Partnerships   
-            Submission_Helper.ChekcboxSelector(this, "Partnerships", Submission.SupplyChainRisks_SelectedPartnerships);
-
-            //social audits
-            Submission_Helper.ChekcboxSelector(this, "Social audits", Submission.SupplyChainRisks_SelectedSocialAudits, 
-                OtherOption: "other type of social audit",
-                OtherFieldLabel: "Please specify",
-                OtherDetails: Submission.SupplyChainRisks_OtherSocialAudits);
-
-            //Anonymous grievance mechanism
-            Submission_Helper.ChekcboxSelector(this, "Anonymous grievance mechanisms", Submission.SupplyChainRisks_SelectedGrievanceMechanisms);
-
-            //indicators
-            BelowHeader("For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?").Expect("Examples include workers with no formal identification, or who are always dropped off and collected in the same way, often late at night or early in the morning.");
-
-            BelowHeader("For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?").ClickLabel(The.Top, "Yes");
-
-            BelowHeader("For the period of this statement, have you identified any potential indicators of forced labour or modern slavery in your operations or supply chain?").Set(The.Top, "Please provide details").To(Submission.SupplyChainRisks_IndicatorDetails);
-
-            //instances
-            BelowHeader("Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?").ClickLabel(The.Top, "Yes");
-            BelowHeader("Have you or anyone else found instances of modern slavery in your operations or supply chain in the last year?").Set(The.Top, "Please provide details").To(Submission.SupplyChainRisks_InStanceDetails);
-
-            //Remidiation Actions
-            BelowHeader("Did your organisation take any remediation actions in response?").ClickLabel(The.Top, "Yes");
-
-            //label[contains(text(), 'repayment of recruitment fees')]/preceding-sibling::input
-            //sSubmission_Helper.ChekcboxSelector(this, "What actions did your organisation take?", Submission.SupplyChainRisks_SelectedRemediationActions, NeedExpand: false);
-            //ClickXPath("/html/body/div/main/div/div/form/fieldset[3]/div/div/div[2]/div[2]/div[2]/div/fieldset/div/div[1]/input");
-            //foreach (var Action in Submission.SupplyChainRisks_SelectedRemediationActions)
-            //{
-            //    ClickXPath("//label[contains(text(), '" + Action +"')]/preceding-sibling::input");
-
-            //    if (Action == "other")
-            //    {
-            //        Set(The.Bottom, "Please specify").To("Other details");
-            //    }
-            //}
-
-            ClickHeader("What actions did your organisation take?");
-            Press(Keys.Tab);
-            Press(Keys.Space);
-            for (int i = 0; i < 5; i++)
-            {
-                Press(Keys.Tab);
-            }
-            Press(Keys.Space);
-
-            Set("OtherRemediation").To("Other details");
-
-
-            Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            ExpectHeader("Training");
-
-            await Task.CompletedTask;
-        }
-
-        [Test, Order(54)]
+        [Test, Order(49)]
         public async Task Training()
         {
+            Click("Training");
+
+            ExpectHeader("If you provided training on modern slavery during the period of the statement, who was it for?");
             //Training
-            Submission_Helper.ChekcboxSelector(this, "Training", Submission.SelectedTrainings,
+            Submission_Helper.ChekcboxSelector(this, "If you provided training on modern slavery during the period of the statement, who was it for?", Submission.SelectedTrainings,
                 OtherOption: "Other",
                 OtherFieldLabel: "Please Specify",
                 OtherDetails: Submission.OtherTrainings,
                 NeedExpand: false);
 
-            Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            ExpectHeader("Monitoring progress");
-            await Task.CompletedTask;
+            Click("Save and continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
+        [Test, Order(50)]
+        public async Task MonitoringWorkingConditions()
+        {
+            Click("Monitoring working conditions");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            ExpectHeader("During the period of the statement, who did you engage with to help you monitor working conditions across your operations and supply chain?");
+
+            Submission_Helper.ChekcboxSelector(this, "During the period of the statement, who did you engage with to help you monitor working conditions across your operations and supply chain?", Submission.MonitoringProgress_SelectedWhoDidYouEngageWith);
+            Click("Save and continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            ExpectHeader("Did you use social audits to look for signs of forced labour?");
+            Submission_Helper.ChekcboxSelector(this, "Did you use social audits to look for signs of forced labour?", Submission.MonitoringProgress_SelectedSocialAudits);
+            Click("Save and continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            ExpectHeader("What types of grievance mechanisms did you have in place?");
+            Submission_Helper.ChekcboxSelector(this, "What types of grievance mechanisms did you have in place?", Submission.MonitoringProgress_SelectedGrievanceMechanisms);
+            Click("Save and continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            ExpectHeader("Are there any other ways you monitored working conditions across your operations and supply chains?");
+            Set("Tell us briefly what you did").To(Submission.MonitoringProgress_OtherWays);
+
+            Click("Save and continue");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
+        [Test, Order(52)]
+        public async Task ModernSlaveryRisks()
+        {
+            Click("Modern slavery risks");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            ExpectHeader("Tell us about your modern slavery risks");
+
+            SetXPath("(//textarea)[1]").To("Risk 1");
+            SetXPath("(//textarea)[2]").To("Risk 2");
+            SetXPath("(//textarea)[3]").To("Risk 3");
+
+
+            Click("Save and continue");
+
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            ExpectHeader("About this risk");
+            Expect("Risk 1");
+
+            BelowHeader("Where was the risk you described most likely to occur?").ClickLabel("Within your own operations");
+
+            BelowHeader("Who was most likely to be affected?").ClickLabel("Women");
+            BelowHeader("Who was most likely to be affected?").ClickLabel("Children");
+
+            ClickText("In which country?");
+            Type("France");
+            ClickText("About this risk"); //clicking the header to finish using the dropdown
+            Click("Add country");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            ExpectRow("France");
+
+            Below("Tell us about your actions or plans to address this risk").SetXPath("//textarea").To("Risk 1 actions");
+
+            Click("Save and continue");
+
+            //risk 2
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            ExpectHeader("About this risk");
+            Expect("Risk 2");
+
+            BelowHeader("Where was the risk you described most likely to occur?").ClickLabel("Within your supply chains");
+            Below("Within your supply chains").ClickLabel("Tier 1 suppliers");
+            Below("Within your supply chains").ClickLabel("Tier 2 suppliers");
+            Below("Within your supply chains").ClickLabel("Tier 3 suppliers and below");
+            Below("Within your supply chains").ClickLabel("Don't know");
+
+
+            BelowHeader("Who was most likely to be affected?").ClickLabel("Women");
+            BelowHeader("Who was most likely to be affected?").ClickLabel("Children");
+            BelowHeader("Who was most likely to be affected?").ClickLabel("Migrants");
+            BelowHeader("Who was most likely to be affected?").ClickLabel("Refugees");
+
+            ClickText("In which country?");
+            Type("Germany");
+            ClickText("About this risk"); //clicking the header to finish using the dropdown
+            Click("Add country");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            ExpectRow("Germany");
+
+            //commentd out curently due to country selection issue
+            //todo figure out how to select country properly
+            //BelowHeader("In which country?").Set("SelectedCountry").To("Japan");
+            //ClickText("Add");
+            //await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            //ExpectRow("Japan");
+
+            //BelowHeader("In which country?").Set("SelectedCountry").To("Mexico");
+            //ClickText("Add");
+            //await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            //ExpectRow("Mexico");
+            //BelowHeader("In which country?").Set("SelectedCountry").To("Nigeria");
+            //ClickText("Add");
+            //await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            //ExpectRow("Nigeria");
+
+            Below("Tell us about your actions or plans to address this risk").SetXPath("//textarea").To("Risk 2 actions");
+
+            Click("Save and continue");
+
+            //risk 3
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            ExpectHeader("About this risk");
+            Expect("Risk 3");
+
+            BelowHeader("Where was the risk you described most likely to occur?").ClickLabel("Other");
+            Below("Other").Set(The.Top, "Please specify").To("Other location");
+
+
+            BelowHeader("Who was most likely to be affected?").ClickLabel("Other vulnerable group(s)");
+            Below("Other vulnerable group(s)").Set(The.Top, "Please specify").To("Other groups");
+
+            ClickText("In which country?");
+            Type("Ireland");
+            ClickText("About this risk"); //clicking the header to finish using the dropdown
+            Click("Add country");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            ExpectRow("Ireland");
+
+            Below("Tell us about your actions or plans to address this risk").SetXPath("//textarea").To("Risk 3 actions");
+
+            Click("Save and continue");
+
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
+
+        [Test, Order(54)]
+        public async Task FindingIndicators()
+        {
+            Click("Finding indicators of modern slavery");
+
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
+
+            ExpectHeader("Does your statement refer to finding any International Labour Organization (ILO) indicators of forced labour?");
+
+            foreach (var label in Submission.FindingIndicators_SelectedIndicators)
+            {
+                ClickLabel(label);
+            }
+            Click("Save and Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            ExpectHeader("What action did you take in response?");
+
+            foreach (var label in Submission.FindingIndicators_SelectedActions)
+            {
+                ClickLabel(label);
+            }
+
+            Click("Save and Continue");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            ExpectHeader("Add your 2020 modern slavery statement to the registry");
+
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(56)]
-        public async Task MonitoringProgress()
+        public async Task DemonstratingProgress()
         {
-            BelowHeader("Does your modern slavery statement include goals relating to how you will prevent modern slavery in your operations and supply chains?").ClickLabel("No");
+            Click("Demonstrating progress");
 
-            Set("How is your organisation measuring progress towards these goals?").To(Submission.MonitoringProgress);
-            BelowLabel("What were your key achievements in relation to reducing modern slavery during the period covered by this statement?").Set(The.Top).To(Submission.MonitoringAchievements);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
-            BelowHeader("How many years has your organisation been producing modern slavery statements?").Below("If your statement is for a group of organisations, please select the answer that applies to the organisation with the longest history of producing statements.").ClickLabel("1 to 5 years");
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
-            Click("Continue");
-            ExpectHeader("Review before submitting");
+            ExpectHeader("How does your statement demonstrate your progress over time in addressing modern slavery risks?");
 
-            //all sections should be completed
-            RightOf("Your modern Slavery statement").Expect("Completed");
-            RightOf("Areas covered by your modern statement").Expect("Completed");
+            SetXPath("//textarea").To("We use KPIs");
 
+            Click("Save and Continue");
 
-            RightOf("Your organisation").Expect("Completed");
-            RightOf("Policies").Expect("Completed");
-            RightOf("Supply chain risks and due diligence (part 1)").Expect("Completed");
-            RightOf("Supply chain risks and due diligence (part 2)").Expect("Completed");
-            RightOf("Training").Expect("Completed");
-            RightOf("Monitoring progress").Expect("Completed");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
-            ExpectButton("Submit for Publication");
-            ExpectButton("Exit and save Changes");
-            ExpectButton("Exit and lose Changes");
+            await Task.CompletedTask.ConfigureAwait(false);
+        }
 
-            Click("Exit and save Changes");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");            
+        [Test, Order(58)]
+        public async Task SaveAsDraft()
+        {
+            Click("Save as draft");
 
-            await Task.CompletedTask;
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
-    }
+}

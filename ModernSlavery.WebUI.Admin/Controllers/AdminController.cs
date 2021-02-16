@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -32,19 +33,25 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "GPGadmin")]
+    [Authorize(Roles = UserRoleNames.Admin)]
     [Route("admin")]
     public partial class AdminController : BaseController
     {
         private readonly IAdminService _adminService;
+        private readonly IAdminHistory _adminHistory;
+        private readonly ISearchBusinessLogic _searchBusinessLogic;
+
         #region Constructors
 
         public AdminController(
             IAdminService adminService,
-            ILogger<AdminController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(
-            logger, webService, sharedBusinessLogic)
+            ISearchBusinessLogic searchBusinessLogic,
+            IAdminHistory adminHistory,
+            ILogger<AdminController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             _adminService = adminService;
+            _adminHistory = adminHistory;
+            _searchBusinessLogic = searchBusinessLogic;
         }
 
         #endregion
@@ -54,12 +61,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet]
         public IActionResult Home()
         {
+            ClearStash();
+
             var viewModel = new AdminHomepageViewModel
             {
-                IsSuperAdministrator = _adminService.SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(CurrentUser),
-                IsDatabaseAdministrator = _adminService.SharedBusinessLogic.AuthorisationBusinessLogic.IsDatabaseAdministrator(CurrentUser),
-                IsDowngradedDueToIpRestrictions =
-                    !IsTrustedIP && (_adminService.SharedBusinessLogic.AuthorisationBusinessLogic.IsDatabaseAdministrator(CurrentUser) || _adminService.SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(CurrentUser)),
                 FeedbackCount = SharedBusinessLogic.DataRepository.GetAll<Feedback>().Count(),
                 LatestFeedbackDate = SharedBusinessLogic.DataRepository.GetAll<Feedback>()
                     .OrderByDescending(feedback => feedback.CreatedDate)
@@ -77,116 +82,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("history")]
         public async Task<IActionResult> History()
         {
-            var model = new DownloadViewModel();
-            var downloads = new List<DownloadViewModel.Download>();
-            DownloadViewModel.Download download;
+            var vm = await _adminHistory.GetHistoryLogs();
 
-            //Ensure the log directory exists
-            if (!await SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(SharedBusinessLogic.SharedOptions.LogPath))
-                await SharedBusinessLogic.FileRepository.CreateDirectoryAsync(SharedBusinessLogic.SharedOptions.LogPath);
-
-            #region Create Registration History
-
-            var files = await SharedBusinessLogic.FileRepository.GetFilesAsync(
-                SharedBusinessLogic.SharedOptions.LogPath, "RegistrationLog*.csv", true);
-            if (!files.Any())
-            {
-                //Create the first log file
-                var logRecords = new List<RegisterLogModel>();
-                foreach (var userOrg in SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
-                    .Where(uo => uo.PINConfirmedDate != null)
-                    .OrderBy(uo => uo.PINConfirmedDate))
-                {
-                    var status = await SharedBusinessLogic.DataRepository.GetAll<OrganisationStatus>()
-                        .FirstOrDefaultAsync(
-                            os => os.OrganisationId == userOrg.OrganisationId
-                                  && os.Status == userOrg.Organisation.Status
-                                  && os.StatusDate == userOrg.Organisation.StatusDate);
-                    if (status == null)
-                        Logger.LogError(
-                            $"Could not find status '{userOrg.Organisation.Status}' for organisation '{userOrg.OrganisationId}' at '{userOrg.Organisation.StatusDate}' while creating registration history");
-                    else
-                        logRecords.Add(
-                            new RegisterLogModel
-                            {
-                                StatusDate = status.StatusDate,
-                                Status = status.StatusDetails,
-                                ActionBy = status.ByUser.EmailAddress,
-                                Details = "",
-                                Sector = userOrg.Organisation.SectorType,
-                                Organisation = userOrg.Organisation.OrganisationName,
-                                CompanyNo = userOrg.Organisation.CompanyNumber,
-                                Address = userOrg?.Address.GetAddressString(),
-                                SicCodes = userOrg.Organisation.GetLatestSicCodeIdsString(),
-                                UserFirstname = userOrg.User.Firstname,
-                                UserLastname = userOrg.User.Lastname,
-                                UserJobtitle = userOrg.User.JobTitle,
-                                UserEmail = userOrg.User.EmailAddress,
-                                ContactFirstName = userOrg.User.ContactFirstName,
-                                ContactLastName = userOrg.User.ContactLastName,
-                                ContactJobTitle = userOrg.User.ContactJobTitle,
-                                ContactOrganisation = userOrg.User.ContactOrganisation,
-                                ContactPhoneNumber = userOrg.User.ContactPhoneNumber
-                            });
-                }
-
-                if (logRecords.Count > 0)
-                    await _adminService.RegistrationLog.WriteAsync(logRecords.OrderBy(l => l.StatusDate));
-
-                //Get the files again
-                files = await SharedBusinessLogic.FileRepository.GetFilesAsync(
-                    SharedBusinessLogic.SharedOptions.LogPath, "RegistrationLog*.csv", true);
-            }
-
-            foreach (var filePath in files)
-            {
-                download = new DownloadViewModel.Download
-                {
-                    Type = "Registration History",
-                    Filepath = filePath,
-                    Title = "Registration History",
-                    Description = "Audit history of approved and rejected registrations."
-                };
-                if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(download.Filepath))
-                    download.Modified =
-                        await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(download.Filepath);
-
-                downloads.Add(download);
-            }
-
-            model.Downloads.OrderByDescending(d => d.Modified).ThenByDescending(d => d.Filename);
-            model.Downloads.AddRange(downloads);
-
-            #endregion
-
-            #region Create Submission History
-
-            downloads = new List<DownloadViewModel.Download>();
-
-            files = await SharedBusinessLogic.FileRepository.GetFilesAsync(SharedBusinessLogic.SharedOptions.LogPath,"SubmissionLog*.csv", true);
-
-            foreach (var filePath in files)
-            {
-                download = new DownloadViewModel.Download
-                {
-                    Type = "Submission History",
-                    Filepath = filePath,
-                    Title = "Submission History",
-                    Description = "Audit history of approved and rejected registrations."
-                };
-                if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(download.Filepath))
-                    download.Modified =
-                        await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(download.Filepath);
-
-                downloads.Add(download);
-            }
-
-            model.Downloads.OrderByDescending(d => d.Modified).ThenByDescending(d => d.Filename);
-            model.Downloads.AddRange(downloads);
-
-            #endregion
-
-            return View("History", model);
+            return View(vm);
         }
 
         #endregion
@@ -194,7 +92,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #region Download Action
 
         [HttpGet("download")]
-        public async Task<IActionResult> Download(string filePath)
+        public async Task<IActionResult> Download([IgnoreText] string filePath)
         {
             //Ensure the file exists
             if (string.IsNullOrWhiteSpace(filePath)) return new HttpNotFoundResult("Missing file path");
@@ -224,7 +122,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #region Read Action
 
         [HttpGet("read")]
-        public async Task<IActionResult> Read(string filePath)
+        public async Task<IActionResult> Read([IgnoreText] string filePath)
         {
             //Ensure the file exists
             if (string.IsNullOrWhiteSpace(filePath) ||
@@ -247,8 +145,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #region PendingRegistration Action
 
         [HttpGet("pending-registrations")]
+        [IPAddressFilter]
         public async Task<IActionResult> PendingRegistrations()
         {
+            UnstashModel<ReviewOrganisationViewModel>(true);
+
             var nonUkAddressUserOrganisations =
                 SharedBusinessLogic.DataRepository
                     .GetAll<UserOrganisation>()
@@ -516,12 +417,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpPost("downloads")]
         [ValidateAntiForgeryToken]
         [PreventDuplicatePost]
-        public async Task<IActionResult> Downloads(string command)
+        [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
+        public async Task<IActionResult> Downloads([IgnoreText] string command)
         {
-            //Throw error if the user is not a super administrator
-            if (!IsSuperAdministrator)
-                return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a super administrator");
-
             var model = UnstashModel<DownloadViewModel>();
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1138));
 
@@ -555,7 +453,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var upload = new UploadViewModel.Upload
             {
                 Type = Filenames.SicSections,
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.SicSections),
+                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.AppDataPath, Filenames.SicSections),
                 Title = "SIC Sections",
                 Description = "Standard Industrial Classification (SIC) sector titles. Import performs Add/Update/Delete.",
                 DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<SicSection>().CountAsync()
@@ -572,7 +470,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             upload = new UploadViewModel.Upload
             {
                 Type = Filenames.SicCodes,
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.SicCodes),
+                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.AppDataPath, Filenames.SicCodes),
                 Title = "SIC Codes",
                 Description = "Standard Industrial Classification (SIC) codes and titles. Import performs Add/Update/Delete.",
                 DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<SicCode>().CountAsync()
@@ -589,7 +487,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             upload = new UploadViewModel.Upload
             {
                 Type = Filenames.StatementSectorTypes,
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.StatementSectorTypes),
+                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.AppDataPath, Filenames.StatementSectorTypes),
                 Title = "Statement Sector Types",
                 Description = "Sector types used for Modern Slavery Statements. Import performs Add/Update/Delete.",
                 DatabaseCount = await SharedBusinessLogic.DataRepository.GetAll<StatementSectorType>().CountAsync()
@@ -606,7 +504,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             upload = new UploadViewModel.Upload
             {
                 Type = Filenames.ImportPrivateOrganisations,
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ImportPrivateOrganisations),
+                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.AppDataPath, Filenames.ImportPrivateOrganisations),
                 Title = "Private Organisations Import",
                 Description = "Add only new Private Organisations from external data source.  Import performs Add only.",
                 DatabaseCount = await SharedBusinessLogic.DataRepository.CountAsync<Organisation>(r=>r.SectorType== SectorTypes.Private)
@@ -624,7 +522,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             upload = new UploadViewModel.Upload
             {
                 Type = Filenames.ImportPublicOrganisations,
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ImportPublicOrganisations),
+                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.AppDataPath, Filenames.ImportPublicOrganisations),
                 Title = "Public Organisations Import",
                 Description = "Public Organisations from external data source.  Import performs Add only.",
                 DatabaseCount = await SharedBusinessLogic.DataRepository.CountAsync<Organisation>(r => r.SectorType == SectorTypes.Public)
@@ -643,7 +541,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             upload = new UploadViewModel.Upload
             {
                 Type = Filenames.ShortCodes,
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DataPath, Filenames.ShortCodes),
+                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.AppDataPath, Filenames.ShortCodes),
                 Title = "Short Codes",
                 Description = "Short codes for tracking and routing users to specific web pages. Import performs Add/Update/Delete.",
                 DatabaseCount = allShortCodes == null ? 0 : allShortCodes.Count
@@ -664,14 +562,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [PreventDuplicatePost]
         [HttpPost("uploads")]
         [RequestSizeLimit(52428800)]
-        public async Task<IActionResult> Uploads(List<IFormFile> files, string command)
+        [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
+        public async Task<IActionResult> Uploads(List<IFormFile> files, [IgnoreText] string command)
         {
             string fileName = command.AfterFirst(":");
             command = command.BeforeFirst(":");
-
-            //Throw error if the user is not a super administrator
-            if (!IsSuperAdministrator)
-                return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a super administrator");
 
             var model = UnstashModel<UploadViewModel>();
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1138));
@@ -953,7 +848,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #region Action Impersonate
 
         [HttpGet("impersonate")]
-        public async Task<IActionResult> Impersonate(string emailAddress)
+        [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
+        public async Task<IActionResult> Impersonate([EmailAddress]string emailAddress)
         {
             if (!string.IsNullOrWhiteSpace(emailAddress)) return await ImpersonatePost(emailAddress);
 
@@ -963,16 +859,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpPost("impersonate")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ImpersonatePost(string emailAddress)
+        [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
+        public async Task<IActionResult> ImpersonatePost([EmailAddress]string emailAddress)
         {
             //Ignore case of email address
             emailAddress = emailAddress?.ToLower();
 
-            //Throw error if the user is not a super administrator
-            if (!IsSuperAdministrator)
-                return new HttpUnauthorizedResult($"User {CurrentUser?.EmailAddress} is not a super administrator");
-
-            if (string.IsNullOrWhiteSpace(emailAddress) || !emailAddress.IsEmailAddress())
+            if (!ModelState.IsValid || string.IsNullOrWhiteSpace(emailAddress) || !emailAddress.IsEmailAddress())
             {
                 ModelState.AddModelError("", "You must enter a valid email address");
                 return View("Impersonate");

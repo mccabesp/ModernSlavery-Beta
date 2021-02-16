@@ -27,12 +27,12 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click("Sign out");
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             Expect("Signed out");
             Click(The.Top, "Sign in");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -40,7 +40,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public async Task CheckContentOfSignInPage()
         {
-            
+
             ExpectHeader("Sign in or create an account");
             Expect(What.Contains, "If you have an account, sign in using your email address and password.");
             Expect(What.Contains, "After signing into your account you can register a new organisation or manage your existing organisations.");
@@ -48,13 +48,13 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect("Password");
             Expect("Sign in");
 
-            Expect("Problems with your password?");
+            Expect(What.Contains, "Problems with your password?");
             ExpectLink("Reset your password");
 
             ExpectHeader("No account yet?");
             Expect(What.Contains, "If you're new to the service you will need to create an account. This will allow you to register organisations and submit information about their modern slavery statements.");
             Expect("Create an account");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
         [Test, Order(14)]
@@ -63,7 +63,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
 
             Expect("Modern slavery statement registry");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 

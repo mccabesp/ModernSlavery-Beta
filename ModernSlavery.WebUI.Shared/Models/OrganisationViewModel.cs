@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
-using ModernSlavery.WebUI.Shared.Classes.Attributes;
-using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 
 namespace ModernSlavery.WebUI.Shared.Models
 {
@@ -23,7 +18,6 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         public bool IsManualRegistration { get; set; }
         public bool IsManualAuthorised { get; set; }
-        public bool IsSelectedAuthorised { get; set; }
         public bool IsFastTrackAuthorised { get; set; }
         public bool IsSecurityCodeExpired { get; set; }
         public bool IsRegistered { get; set; }
@@ -38,9 +32,8 @@ namespace ModernSlavery.WebUI.Shared.Models
         
         public SortedSet<int> GetSicCodeIds()
         {
-            var separators = ";,: \n\r" + Environment.NewLine;
             var codes = new SortedSet<int>();
-            foreach (var sicCode in SicCodeIds.SplitI(separators)) codes.Add(sicCode.ToInt32());
+            foreach (var sicCode in SicCodeIds.SplitI(";,: \n\r".ToCharArray())) codes.Add(sicCode.ToInt32());
 
             return codes;
         }
@@ -62,17 +55,10 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         #region Search details
 
-        [Required(AllowEmptyStrings = false)]
-        public string RegistrationType { get; set; }
+        public bool? IsFastTrack { get; set; }
 
-        [Required(AllowEmptyStrings = false)] public SectorTypes? SectorType { get; set; }
+        public SectorTypes? SectorType { get; set; }
 
-        [Required]
-        [StringLength(
-            100,
-            ErrorMessage = "You must enter an organisations name or company number between 3 and 100 characters in length",
-            MinimumLength = 3)]
-        [DisplayName("Search")]
         public string SearchText { get; set; }
 
         public int LastPrivateSearchRemoteTotal { get; set; }
@@ -81,8 +67,6 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         #region Organisation details
 
-        [Required(AllowEmptyStrings = false)]
-        [StringLength(100, MinimumLength = 3)]
         public string OrganisationName { get; set; }
 
         public string NameSource { get; set; }
@@ -91,26 +75,16 @@ namespace ModernSlavery.WebUI.Shared.Models
 
         public bool NoReference { get; set; }
 
-        [Required(AllowEmptyStrings = false)]
-        [CompanyNumber]
         public string CompanyNumber { get; set; }
 
-        [Required(AllowEmptyStrings = false)]
-        [StringLength(100, MinimumLength = 3)]
         public string CharityNumber { get; set; }
 
-        [Required(AllowEmptyStrings = false)]
-        [StringLength(100, MinimumLength = 3)]
         public string MutualNumber { get; set; }
 
-        [DUNSNumber] public string DUNSNumber { get; set; }
+        public string DUNSNumber { get; set; }
 
-        [Required(AllowEmptyStrings = false)]
-        [StringLength(100, MinimumLength = 3)]
         public string OtherName { get; set; }
 
-        [Required(AllowEmptyStrings = false)]
-        [StringLength(100, MinimumLength = 3)]
         public string OtherValue { get; set; }
 
         public bool IsDUNS =>
@@ -129,25 +103,15 @@ namespace ModernSlavery.WebUI.Shared.Models
         #endregion
 
         #region Address details
-
-        [Required(AllowEmptyStrings = false)]
-        [MaxLength(100)]
         public string Address1 { get; set; }
-
-        [MaxLength(100)] public string Address2 { get; set; }
-
+        public string Address2 { get; set; }
         public string Address3 { get; set; }
         public string City { get; set; }
         public string County { get; set; }
         public string Country { get; set; }
-
-        [Required(AllowEmptyStrings = false)]
-        [StringLength(20, MinimumLength = 3)]
         public string Postcode { get; set; }
-
         public string PoBox { get; set; }
         public string AddressSource { get; set; }
-
         public bool? IsUkAddress { get; set; }
 
         public string GetFullAddress()
@@ -163,47 +127,45 @@ namespace ModernSlavery.WebUI.Shared.Models
             list.Add(PoBox);
             return list.ToDelimitedString(", ");
         }
+        public List<string> GetAddressList()
+        {
+            var list = new List<string>();
+            if (!string.IsNullOrWhiteSpace(Address1)) list.Add(Address1);
 
+            if (!string.IsNullOrWhiteSpace(Address2)) list.Add(Address2);
+
+            if (!string.IsNullOrWhiteSpace(Address3)) list.Add(Address3);
+
+            if (!string.IsNullOrWhiteSpace(City)) list.Add(City);
+
+            if (!string.IsNullOrWhiteSpace(County)) list.Add(County);
+
+            if (!string.IsNullOrWhiteSpace(Country)) list.Add(Country);
+
+            if (!string.IsNullOrWhiteSpace(Postcode)) list.Add(Postcode);
+
+            if (!string.IsNullOrWhiteSpace(PoBox)) list.Add(PoBox);
+
+            return list;
+        }
         #endregion
 
         #region Contact details
-
-        [MaxLength(50)]
-        [Required(AllowEmptyStrings = false)]
         public string ContactFirstName { get; set; }
-
-        [MaxLength(50)]
-        [Required(AllowEmptyStrings = false)]
         public string ContactLastName { get; set; }
-
-        [MaxLength(50)]
-        [Required(AllowEmptyStrings = false)]
         public string ContactJobTitle { get; set; }
-
-        [Required(AllowEmptyStrings = false)]
-        [DataType(DataType.EmailAddress)]
         public string ContactEmailAddress { get; set; }
-
         public string EmailAddress { get; set; }
-
-        [Required(AllowEmptyStrings = false)]
-        [Phone]
-        [MaxLength(20)]
         public string ContactPhoneNumber { get; set; }
-
         #endregion
 
         #region SIC code details
-
-        [Required(AllowEmptyStrings = false)] public string SicCodeIds { get; set; }
-
+        public string SicCodeIds { get; set; }
         public List<int> SicCodes { get; set; } = new List<int>();
         public string SicSource { get; set; }
-
         #endregion
 
         #region Manual Organisations
-
         public int MatchedReferenceCount { get; set; }
 
         public List<OrganisationRecord> ManualOrganisations { get; set; }

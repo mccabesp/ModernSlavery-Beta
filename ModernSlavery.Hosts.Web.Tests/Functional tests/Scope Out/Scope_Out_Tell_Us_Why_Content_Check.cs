@@ -65,19 +65,19 @@ namespace ModernSlavery.Hosts.Web.Tests
             SignOutDeleteCookiesAndReturnToRoot(this);
 
 
-            await this.SetSecurityCode(org, new DateTime(2021, 6, 10));
+            await this.SetSecurityCode(org, new DateTime(2021, 6, 10)).ConfigureAwait(false);
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(22)]
         public async Task EnterScopeURLLeadsToOrgIdentityPage()
         {
             SignOutDeleteCookiesAndReturnToRoot(this);
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
             Goto(ScopeConstants.ScopeUrl);
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(24)]
@@ -85,16 +85,16 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Set("Organisation Reference").To(org.OrganisationReference);
             Set("Security Code").To(org.SecurityCode);
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(26)]
         public async Task SubmittingIndentityFormLeadsToConfirmOrgDetails()
         {
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Confirm your organisation’s details");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(28)]
         public async Task VerifyOrgDetails()
@@ -103,18 +103,18 @@ namespace ModernSlavery.Hosts.Web.Tests
             RightOfText("Organisation Reference").Expect(org.OrganisationReference);
             //todo await helper implementation for address logic
             //RightOfText("Registered address").Expect("");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(30)]
         public async Task ContinueonVerifyDetailsLeadsToTelUsWhy()
         {
             Click("Confirm and Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Tell us why your organisation is not required to publish a modern slavery statement");
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(32)]
@@ -127,7 +127,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             () => { ExpectLabel("It is in administration or liquidation, has closed or is dormant, or has merged with another organisation"); },
             () => { ExpectLabel("Other"); });
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(34)]
@@ -143,7 +143,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectLabel("Please specify");
             Expect("You have 1000 characters remaining");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(36)]
@@ -157,7 +157,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             () => { ExpectLabel("Job title"); },
             () => { ExpectLabel("Email address"); });
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(38)]
@@ -166,7 +166,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect(What.Contains, "Guidance");
             Expect(What.Contains, " is available to help you work out whether your organisation is required to publish a modern slavery statement.");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

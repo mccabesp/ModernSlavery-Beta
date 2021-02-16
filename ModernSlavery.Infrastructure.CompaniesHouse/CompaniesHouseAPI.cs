@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
@@ -20,17 +21,14 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
     public class CompaniesHouseAPI : ICompaniesHouseAPI
     {
         private readonly CompaniesHouseOptions _companiesHouseOptions;
-        private readonly SharedOptions _sharedOptions;
-        private readonly TestOptions _testOptions;
         private readonly HttpClient _httpClient;
         private readonly string[] _apiKeys;
+        public RetryPolicyTypes RetryPolicy { get; set; } = RetryPolicyTypes.None;
 
-        public CompaniesHouseAPI(CompaniesHouseOptions companiesHouseOptions, SharedOptions sharedOptions, TestOptions testOptions, HttpClient httpClient)
+        public CompaniesHouseAPI(CompaniesHouseOptions companiesHouseOptions, HttpClient httpClient)
         {
             _companiesHouseOptions = companiesHouseOptions ?? throw new ArgumentNullException("You must provide the companies house options",nameof(CompaniesHouseOptions));
-            _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
-            _testOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions));
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(sharedOptions));
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _apiKeys = _companiesHouseOptions.GetApiKeys();
             if (_apiKeys.Length==0)throw new ArgumentNullException(nameof(companiesHouseOptions.ApiKey));
         }
@@ -43,11 +41,11 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
 
             //Get the first page of results and the total records, number of pages, and page size
             var page1task = SearchCompaniesAsync(searchText, 1, pageSize);
-            await page1task;
+            await page1task.ConfigureAwait(false);
 
             //Calculate the maximum page size
             int maxPages = (int) Math.Ceiling((double)maxRecords / page1task.Result.PageSize);
-            maxPages = page1task.Result.PageCount > maxPages ? maxPages : page1task.Result.PageCount;
+            maxPages = page1task.Result.ActualPageCount > maxPages ? maxPages : page1task.Result.ActualPageCount;
 
             //Add a task for ll pages from 2 upwards to maxpages
             var tasks = new List<Task<PagedResult<OrganisationRecord>>>();
@@ -55,7 +53,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                 tasks.Add(SearchCompaniesAsync(searchText, subPage, page1task.Result.PageSize));
 
             //Wait for all the tasks to complete
-            if (tasks.Count > 0)await Task.WhenAll(tasks);
+            if (tasks.Count > 0)await Task.WhenAll(tasks).ConfigureAwait(false);
 
             //Add page 1 to the list of completed tasks
             tasks.Insert(0, page1task);
@@ -83,7 +81,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
 
             var codes = new HashSet<string>();
 
-            var company = await GetCompanyAsync(companyNumber);
+            var company = await GetCompanyAsync(companyNumber).ConfigureAwait(false);
             if (company == null) return null;
 
             if (company.SicCodes != null)
@@ -110,11 +108,11 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             {
                 SetApiKey();
 
-                var response = await _httpClient.GetAsync($"/company/{companyNumber}");
+                var response = await _httpClient.GetAsync($"/company/{companyNumber}").ConfigureAwait(false);
                 // Migration to dotnet core work around return status codes until over haul of this API client
                 if (response.StatusCode != HttpStatusCode.OK) throw new HttpException(response.StatusCode);
 
-                json = await response.Content.ReadAsStringAsync();
+                json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return JsonConvert.DeserializeObject<CompaniesHouseCompany>(json);
             }
             catch (Exception ex)
@@ -132,7 +130,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                 PageSize = pageSize, CurrentPage = page, Results = new List<OrganisationRecord>()
             };
 
-            var json = await GetCompaniesAsync(searchText, page, organisationsPage.PageSize);
+            var json = await GetCompaniesAsync(searchText, page, organisationsPage.PageSize).ConfigureAwait(false);
 
             dynamic companies = JsonConvert.DeserializeObject(json);
             if (companies != null)
@@ -153,7 +151,6 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
                         var dateOfCessation = ((string) company?.date_of_cessation).ToDateTime();
                         if (dateOfCessation > DateTime.MinValue) organisation.DateOfCessation = dateOfCessation;
 
-                        var company_type = (string) company?.company_type;
                         if (company.address != null)
                         {
                             string premises = null,
@@ -230,7 +227,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             var startIndex = page * pageSize - pageSize;
 
             var json = await _httpClient.GetStringAsync(
-                $"/search/companies/?q={companyName}&items_per_page={pageSize}&start_index={startIndex}");
+                $"/search/companies/?q={companyName}&items_per_page={pageSize}&start_index={startIndex}").ConfigureAwait(false);
             return json;
         }
 
@@ -243,15 +240,18 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             ServicePointManager.FindServicePoint(httpClient.BaseAddress).ConnectionLeaseTimeout = 60 * 1000;
         }
 
-        public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+        public static IAsyncPolicy<HttpResponseMessage> GetLinearRetryPolicy()
         {
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
-                .WaitAndRetryAsync(
-                    3,
-                    retryAttempt =>
-                        TimeSpan.FromMilliseconds(new Random().Next(1, 1000)) +
-                        TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+                .WaitAndRetryAsync(10,retryAttempt => TimeSpan.FromMilliseconds(new Random().Next(100, 1000)));
+        }
+        public static IAsyncPolicy<HttpResponseMessage> GetExponentialRetryPolicy()
+        {
+            var jitterer = new Random();
+            return HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .WaitAndRetryAsync(10, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)) + TimeSpan.FromMilliseconds(jitterer.Next(0, 1000)));
         }
     }
 }

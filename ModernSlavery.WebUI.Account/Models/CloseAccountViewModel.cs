@@ -15,6 +15,7 @@ namespace ModernSlavery.WebUI.Account.Models
         [Required(AllowEmptyStrings = false,
             ErrorMessageResourceName = nameof(AccountResources.CloseAccountEnterPasswordRequired))]
         [Display(Name = nameof(AccountResources.CloseAccountEnterPassword))]
+        [Password]
         public string EnterPassword { get; set; }
     }
 }

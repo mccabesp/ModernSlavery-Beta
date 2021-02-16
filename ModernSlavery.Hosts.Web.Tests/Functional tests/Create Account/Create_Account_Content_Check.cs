@@ -35,9 +35,8 @@ namespace ModernSlavery.Hosts.Web.Tests
         [TearDown]
         public void TearDown()
         {
-
-            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed) TestRunFailed = true;
-
+            if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Failed)
+                TestRunFailed = true;
         }
 
         [Test, Order(1), NonParallelizable]
@@ -47,85 +46,74 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click("Sign in");
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             BelowHeader("No account yet?");
             Click("Create an account");
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             ExpectHeader("Create an Account");
 
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
+
         [Test, Order(2)]
         public async Task Expect_Email_Fields()
-
         {
             ExpectHeader("Email address");
             BelowHeader("Email address").Expect("Enter an email address that you can access. The service will send you an email to verify your identity.");
             ExpectField("Email address");
             ExpectField("Confirm your email address");
 
-            
-
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
-
 
         [Test, Order(3)]
         public async Task Expect_Your_Details_Fields()
-
         {
             ExpectHeader("Your details");
             ExpectField("First name");
             ExpectField("Last name");
             ExpectField("Job title");
 
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(4)]
         public async Task Expect_Create_Password_Validation_Rules()
-
         {
             ExpectHeader("Create a password");
             Expect(What.Contains, "Your password must be at least 8 characters long.");
             //splitting due to underlined text
             Expect(What.Contains, "It must also have at least one of ");
             Expect(What.Contains, "each");
-            Expect(What.Contains," of the following:");
+            Expect(What.Contains, " of the following:");
 
             Expect(What.Contains, "lower-case letter");
             Expect(What.Contains, "capital letter");
             Expect(What.Contains, "number");
-          
-
 
             ExpectField("Password");
             ExpectField("Confirm password");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(6)]
         public async Task Expect_Create_Account_Terms_And_Conditions()
-
         {
-            ExpectLabel("I would like to receive information about webinars, events and new guidance");
-            ExpectLabel("I'm happy to be contacted for feedback on this service and take part in surveys about modern slavery");
+            ExpectLabel("I would like to receive information on resources and guidance relating to modern slavery");
+            ExpectLabel("I am happy to be contacted for feedback on this service");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(8)]
         public async Task Expect_Continue_Creation_Button()
         {
             ExpectButton("Continue");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
-    } 
-    
+    }
+
 }

@@ -26,7 +26,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Helpers
                 return propertyValue.ToString();
             if (propertyValue != null) return propertyValue.ToString();
 
-            var parameterName = $"GovUk_Text_{property.Name}";
+            var parameterName = property.Name;
             var unparsedValues = model.GetUnparsedValues(parameterName);
 
             var unparsedValueOrNull = unparsedValues.Count > 0 ? unparsedValues[0] : null;

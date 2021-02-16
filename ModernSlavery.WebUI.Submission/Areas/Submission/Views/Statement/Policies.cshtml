@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model PoliciesViewModel
 @using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
@@ -52,10 +53,10 @@
                             {
                                 <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherPolicies, "govuk-form-group--error")" id="policies-conditional-@value">
                                     <div class="govuk-form-group">
-                                        <label class="govuk-label" for="other">
+                                        <label class="govuk-label" for="OtherPolicies">
                                             Please specify
                                         </label>
-                                        <input asp-for="OtherPolicies" name="OtherPolicies" class="govuk-textarea" id="policies-other" spellcheck="false" />
+                                        <input asp-for="OtherPolicies"  class="govuk-input"  spellcheck="false" />
                                         <span asp-validation-for="OtherPolicies" class="govuk-error-message"></span>
                                     </div>
                                 </div>

@@ -1,0 +1,135 @@
+﻿@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+
+<div class="statement-section-full" id="areas-covered">
+
+    <div class="govuk-grid-column-two-thirds">
+        <h2 class="govuk-heading-m">
+            Recommended areas covered by the statement
+        </h2>
+
+        <p class="govuk-body">
+            Government guidance encourages organisations to cover a range of areas in their modern slavery statements, setting out the steps they’re taking to address modern slavery risks in their operations and supply chains.
+            <a class="govuk-link" href="https://www.gov.uk/guidance/publish-an-annual-modern-slavery-statement" rel="noreferrer">Read about the recommended areas in the statutory guidance.</a>
+        </p>
+
+        <p class="govuk-body">
+            We asked the organisation to tell us which areas its statement covers.
+        </p>
+    </div>
+
+    <div class="govuk-grid-column-full">
+        <div class="app-question-list">
+            <div class="app-question-list__header">
+                <div class="app-question-list__column app-question-list__name">
+                    Areas recommended by government guidance
+                </div>
+                <div class="app-question-list__column app-question-list__response">
+                    Organisation’s response
+                </div>
+            </div>
+            <div class="app-question-list__item">
+                <div class="app-question-list__column app-question-list__name">
+                    The organisation’s structure, business and supply chains
+                </div>
+                <div class="app-question-list__column app-question-list__response">
+                    <span class="app-question-list__response-label">
+                        Organisation’s response:
+                    </span>
+                    <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.IncludesStructure.Value ? "Covered" : "Not covered")</strong>
+                    @if (!string.IsNullOrEmpty(Model.StructureDetails))
+                    {
+                        <div class="app-question-list__response-details">
+                            @Model.StructureDetails
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="app-question-list__item">
+                <div class="app-question-list__column app-question-list__name">
+                    Policies
+                </div>
+                <div class="app-question-list__column app-question-list__response">
+                    <span class="app-question-list__response-label">
+                        Organisation’s response:
+                    </span>
+                    <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.IncludesPolicies.Value ? "Covered" : "Not covered")</strong>
+                    @if (!string.IsNullOrEmpty(Model.PolicyDetails))
+                    {
+                        <div class="app-question-list__response-details">
+                            @Model.PolicyDetails
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="app-question-list__item">
+                <div class="app-question-list__column app-question-list__name">
+                    Risk assessment
+                </div>
+                <div class="app-question-list__column app-question-list__response">
+                    <span class="app-question-list__response-label">
+                        Organisation’s response:
+                    </span>
+                    <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.IncludesRisks.Value ? "Covered" : "Not covered")</strong>
+                    @if (!string.IsNullOrEmpty(Model.RisksDetails))
+                    {
+                        <div class="app-question-list__response-details">
+                            @Model.RisksDetails
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="app-question-list__item">
+                <div class="app-question-list__column app-question-list__name">
+                    Due diligence (steps to address risk)
+                </div>
+                <div class="app-question-list__column app-question-list__response">
+                    <span class="app-question-list__response-label">
+                        Organisation’s response:
+                    </span>
+                    <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.IncludesDueDiligence.Value ? "Covered" : "Not covered")</strong>
+                    @if (!string.IsNullOrEmpty(Model.DueDiligenceDetails))
+                    {
+                        <div class="app-question-list__response-details">
+                            @Model.DueDiligenceDetails
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="app-question-list__item">
+                <div class="app-question-list__column app-question-list__name">
+                    Training about modern slavery
+                </div>
+                <div class="app-question-list__column app-question-list__response">
+                    <span class="app-question-list__response-label">
+                        Organisation’s response:
+                    </span>
+                    <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.IncludesTraining.Value ? "Covered" : "Not covered")</strong>
+                    @if (!string.IsNullOrEmpty(Model.TrainingDetails))
+                    {
+                        <div class="app-question-list__response-details">
+                            @Model.TrainingDetails
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="app-question-list__item">
+                <div class="app-question-list__column app-question-list__name">
+                    Goals and key performance indicators (KPIs) to measure the effectiveness of the organisation's actions and progress over time
+                </div>
+                <div class="app-question-list__column app-question-list__response">
+                    <span class="app-question-list__response-label">
+                        Organisation’s response:
+                    </span>
+                    <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.IncludesGoals.Value ? "Covered" : "Not covered")</strong>
+                    @if (!string.IsNullOrEmpty(Model.GoalsDetails))
+                    {
+                        <div class="app-question-list__response-details">
+                            @Model.GoalsDetails
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

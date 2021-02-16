@@ -110,7 +110,7 @@ namespace ModernSlavery.Core.Extensions
             // text or html
 
             // add mailaddresses
-            foreach (var recipient in recipients.SplitI(";")) myMail.To.Add(new MailAddress(recipient));
+            foreach (var recipient in recipients.SplitI(';')) myMail.To.Add(new MailAddress(recipient));
 
             //Add the attachment
             if (!simulate)

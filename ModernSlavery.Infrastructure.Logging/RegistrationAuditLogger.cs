@@ -23,17 +23,17 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task LogUnregisteredAsync(UserOrganisation unregisteredUserOrg, string actionByEmailAddress)
         {
-            await LogAsync(unregisteredUserOrg, "Unregistered", actionByEmailAddress);
+            await LogAsync(unregisteredUserOrg, "Unregistered", actionByEmailAddress).ConfigureAwait(false);
         }
 
         public async Task LogUnregisteredSelfAsync(UserOrganisation unregisteredUserOrg, string actionByEmailAddress)
         {
-            await LogAsync(unregisteredUserOrg, "Unregistered self", actionByEmailAddress);
+            await LogAsync(unregisteredUserOrg, "Unregistered self", actionByEmailAddress).ConfigureAwait(false);
         }
 
         public async Task LogUserAccountClosedAsync(UserOrganisation retiredUserOrg, string actionByEmailAddress)
         {
-            await LogAsync(retiredUserOrg, "Unregistered closed account", actionByEmailAddress);
+            await LogAsync(retiredUserOrg, "Unregistered closed account", actionByEmailAddress).ConfigureAwait(false);
         }
 
         private async Task LogAsync(UserOrganisation logUserOrg, string status, string actionByEmailAddress)
@@ -63,7 +63,7 @@ namespace ModernSlavery.Infrastructure.Logging
                     ContactJobTitle = logUser.ContactJobTitle,
                     ContactOrganisation = logUser.ContactOrganisation,
                     ContactPhoneNumber = logUser.ContactPhoneNumber
-                });
+                }).ConfigureAwait(false);
         }
     }
 }

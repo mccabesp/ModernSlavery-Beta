@@ -1,0 +1,88 @@
+﻿@using static Core.Entities.StatementSummary.V1.StatementSummary;
+
+@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel;
+
+<div id="indicators" class="statement-section-two-thirds">
+    <h2 class="govuk-heading-m">
+        Indicators of forced labour (optional)
+    </h2>
+
+    <div class="govuk-body">
+        We asked the organisation whether its statement refers to finding any International Labour Organization (ILO) indicators of forced labour.
+    </div>
+
+    <details class="govuk-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+                What are ILO indicators of forced labour?
+            </span>
+        </summary>
+        <div class="govuk-details__text">
+            The International Labour Organization (ILO) has produced a list of the most common signs of forced labour.
+            They’re based on the definition of forced labour as ‘all work or service which is extracted from any person under the menace of any penalty and for which the said person has not offered himself voluntarily.’
+            More details and guidance are available on the ILO website, and in their publication <a class="govuk-link" href="https://www.ilo.org/wcmsp5/groups/public/---ed_norm/---declaration/documents/publication/wcms_203832.pdf" rel="noreferrer">ILO indicators of forced labour</a>
+        </div>
+    </details>
+</div>
+
+@if (Model.Indicators.Contains(IndicatorTypes.None))
+{
+    <div class="govuk-grid-column-two-thirds">
+        <div class="nothing-included">
+            <div class="nothing-included__label">Organisation’s response</div>
+            <strong class="govuk-tag govuk-tag--blue nothing-included__tag">
+                The organisation told us its statement does not refer to finding any International Labour Organization (ILO) indicators of forced labour.
+            </strong>
+        </div>
+    </div>
+}
+else if (Model.Indicators.Any())
+{
+    <div class="govuk-grid-column-full">
+        <div class="app-question-list">
+            <div class="app-question-list__header">
+                <div class="app-question-list__column app-question-list__name">
+                    ILO indicators we asked about
+                </div>
+                <div class="app-question-list__column app-question-list__response">
+                    Organisation’s response
+                </div>
+            </div>
+            @foreach (var indicator in Enums.GetValuesExcept<IndicatorTypes>(IndicatorTypes.Unknown, IndicatorTypes.None))
+            {
+                var isOther = indicator == IndicatorTypes.Other;
+                <div class="app-question-list__item">
+                    <div class="app-question-list__column app-question-list__name">
+                        @indicator.GetEnumDescription()
+                    </div>
+                    <div class="app-question-list__column app-question-list__response">
+                        <span class="app-question-list__response-label">
+                            Organisation’s response:
+                        </span>
+                        @if (!isOther)
+                        {
+                            <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.Indicators.Contains(indicator) ? "Yes" : "No")</strong>
+                        }
+                        else
+                        {
+                            <div @(string.IsNullOrEmpty(Model.OtherIndicators) ? "aria-description='no answer provided'" : "") class="app-question-list__response-details">
+                                @if (string.IsNullOrEmpty(Model.OtherIndicators))
+                                {
+                                    <text>-</text>
+                                }
+                                else
+                                {
+                                    <text>@Model.OtherIndicators</text>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <partial name="Parts/StatementSummary/_NoResponse" />
+}

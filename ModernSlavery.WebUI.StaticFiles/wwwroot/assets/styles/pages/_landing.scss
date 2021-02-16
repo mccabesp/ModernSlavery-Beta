@@ -164,7 +164,9 @@ $app-button-inverted-hover-background-colour: govuk-tint($app-button-inverted-fo
 .govuk-phase-banner.phase-banner-beta.no-bottom-border{
     border-bottom:none;
 }
-    
 
-
-
+.accessibility-statement {
+    h5.govuk-heading-s {
+        margin-bottom: 0;
+    }
+}

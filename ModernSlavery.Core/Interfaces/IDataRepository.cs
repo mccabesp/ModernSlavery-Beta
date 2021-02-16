@@ -50,5 +50,7 @@ namespace ModernSlavery.Core.Interfaces
         Task BulkUpdateAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class;
         int? GetCommandTimeout();
         void SetCommandTimeout(int? timeout);
+
+        void Reload();
     } 
 }

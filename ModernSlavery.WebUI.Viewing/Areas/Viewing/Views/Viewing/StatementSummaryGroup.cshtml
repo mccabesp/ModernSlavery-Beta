@@ -1,6 +1,7 @@
 ﻿@model List<StatementSummaryViewModel>
 @{
     Layout = "~/Views/GdsLayout.cshtml";
+    Title = "Organisations covered in group statement";
     var first = Model.First();
     var parentName = first.ParentName;
     var reportingYear = first.SubmissionDeadlineYear;

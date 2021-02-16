@@ -84,8 +84,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
             {
                 var deletedCount = 0;
 
-                var deadline =
-                    VirtualDateTime.Now.AddDays(0 - _sharedOptions.PurgeUnconfirmedPinDays);
+                var deadline =VirtualDateTime.Now.AddDays(0 - _sharedOptions.PurgeUnconfirmedPinDays);
                 var registrations = await _dataRepository.GetAll<UserOrganisation>()
                     .Where(u => u.PINConfirmedDate == null && u.PINSentDate != null && u.PINSentDate.Value < deadline)
                     .ToListAsync().ConfigureAwait(false);
@@ -178,7 +177,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 new
                                 {
                                     org.OrganisationId,
-                                    Address = org.GetLatestAddress()?.GetAddressString(),
+                                    Address = (org.LatestAddress ?? org.GetLatestAddress())?.GetAddressString(),
                                     org.OrganisationReference,
                                     org.DUNSNumber,
                                     org.CompanyNumber,
@@ -191,7 +190,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                                 }),
                             null);
 
-                        var searchRecords = await _searchBusinessLogic.ListSearchDocumentsAsync(org);
+                        var searchRecords = await _searchBusinessLogic.ListSearchDocumentsAsync(org).ConfigureAwait(false);
 
                         await _dataRepository.ExecuteTransactionAsync(
                             async () =>

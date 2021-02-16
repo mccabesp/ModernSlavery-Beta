@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Extensions
@@ -29,6 +27,13 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             option.ModelBinderProviders.Insert(index, new ViewModelBinderProvider());
         }
 
+        public static void AddSecureSimpleModelBinderProvider(this MvcOptions option)
+        {
+            var index = option.ModelBinderProviders.ToList().FindIndex(x => x.GetType() == typeof(SimpleTypeModelBinderProvider));
+            if (index < 0) throw new ArgumentException($"Cannot find {nameof(SimpleTypeModelBinderProvider)}");
+            option.ModelBinderProviders.Insert(index, new SecureSimpleModelBinderProvider(option.ModelBinderProviders[index]));
+        }
+
         #region AntiSpam
 
         public static IHtmlContent BotProtectionTimeStamp(this IHtmlHelper helper)
@@ -38,7 +43,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             builder.MergeAttribute("id", "BotProtectionTimeStamp");
             builder.MergeAttribute("name", "BotProtectionTimeStamp");
             builder.MergeAttribute("type", "hidden");
-            builder.MergeAttribute("value", Encryption.EncryptData(VirtualDateTime.Now.ToSmallDateTime()));
+            builder.MergeAttribute("value", Encryption.Encrypt(VirtualDateTime.Now.ToSmallDateTime(), Encryption.Encodings.Base62));
             return builder.RenderSelfClosingTag();
         }
 

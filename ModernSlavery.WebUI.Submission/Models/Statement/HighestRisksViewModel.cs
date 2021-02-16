@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Entities.StatementSummary.V1;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using System;
 using System.Collections.Generic;
@@ -71,12 +72,15 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override string PageTitle => "Tell us about your modern slavery risks";
 
         [MaxLength(200)]
+        [Text] 
         public string HighRisk1 { get; set; }
 
         [MaxLength(200)]
+        [Text] 
         public string HighRisk2 { get; set; }
 
         [MaxLength(200)]
+        [Text] 
         public string HighRisk3 { get; set; }
 
         public bool NoRisks { get; set; }
@@ -85,15 +89,8 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             var validationResults = new List<ValidationResult>();
 
-            if (NoRisks)
-            {
-                if (!string.IsNullOrWhiteSpace(HighRisk1))
-                    validationResults.AddValidationError(3913, nameof(HighRisk1));
-                if (!string.IsNullOrWhiteSpace(HighRisk2))
-                    validationResults.AddValidationError(3913, nameof(HighRisk2));
-                if (!string.IsNullOrWhiteSpace(HighRisk3))
-                    validationResults.AddValidationError(3913, nameof(HighRisk3));
-            }
+            if (NoRisks && (!string.IsNullOrWhiteSpace(HighRisk1) || !string.IsNullOrWhiteSpace(HighRisk2) || !string.IsNullOrWhiteSpace(HighRisk3)))
+                validationResults.AddValidationError(3913, nameof(NoRisks));
 
             return validationResults;
         }

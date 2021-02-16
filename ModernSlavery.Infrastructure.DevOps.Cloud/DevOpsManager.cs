@@ -84,7 +84,7 @@ namespace ModernSlavery.Infrastructure.Azure
         {
             // Create instance of VssConnection using passed credentials
             var projectHttpClient = Connection.GetClient<ProjectHttpClient>();
-            foreach (var project in await projectHttpClient.GetProjects())
+            foreach (var project in await projectHttpClient.GetProjects().ConfigureAwait(false))
                 yield return project;
         }
     }

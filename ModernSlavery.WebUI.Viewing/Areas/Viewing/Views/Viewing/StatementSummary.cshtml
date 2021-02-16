@@ -2,7 +2,9 @@
 @{
     //Required for variables in Sitemap taghelpers
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = Model.OrganisationName + " Modern Slavery statement" + " / " + Model.SubmissionDeadlineYear;
+    Title = $"{Model.OrganisationName} modern slavery statement summary ({Model.SubmissionDeadlineYear})";
+    Description = $"Read summary details of {Model.OrganisationName}'{(Model.OrganisationName.EndsWithI("s")?"":"s")} modern slavery statement ({Model.SubmissionDeadlineYear}). See what steps they’re taking to address modern slavery risks in their supply chains.";
+    Robots = RobotDirectives.All;
     ViewBag.pageDescription = $"View {Model.SubmissionDeadlineYear} Modern Slavery statement for {Model.OrganisationName}";
     ViewBag.pageClass = "organisation-report-page";
 
@@ -12,350 +14,90 @@
     <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
 }
 
-<div class="govuk-grid-row">
+<div class="govuk-grid-row viewing-statement">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">
-            @Model.OrganisationName modern slavery statement summary @Model.SubmissionDeadlineYear
+            @Model.OrganisationName modern slavery statement summary (@Model.SubmissionDeadlineYear)
         </h1>
 
-        <details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
-                <span class="govuk-details__summary-text">
-                    Organisation address
-                </span>
-            </summary>
-            <div class="govuk-details__text">
-                @{ var address = Model.Address.GetAddressList(); }
-                @for (var i = 0; i < address.Count; i++)
-                {
-                    if (i < address.Count - 1)
-                    {
-                        <text>@address[i],</text>
-                        <br>
-                    }
-                    else // last element doesnt need a comma or line break
-                    {
-                        <text>@address[i]</text>
-                    }
-                }
-            </div>
-        </details>
+        <partial name="Parts/StatementSummary/_Address" model="Model.Address" />
 
         <p class="govuk-body govuk-!-font-size-24">
-            Read a summary of this organisation’s modern slavery statement, or link to the full statement on the organisation’s website.
-            The summary does not replace the full statement.
-            @if (Model.GroupSubmission==true)
-            {
-                <text>This statement covers a
-                    <a class="govuk-link"
-                       asp-controller="Viewing" asp-action="StatementSummaryGroup"
-                       asp-route-organisationIdentifier="@Model.ParentOrganisationId"
-                       asp-route-year="@Model.SubmissionDeadlineYear">group of organisations</a>.</text>
-            }
+            We asked the organisation a series of questions about its modern slavery statement.
+            Its answers are published on this page as a statement summary.
         </p>
 
         <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
                 <span class="govuk-details__summary-text">
-                    What does the summary consist of?
+                    What is a modern slavery statement?
                 </span>
             </summary>
             <div class="govuk-details__text">
-                We asked the organisation to answer a series of questions about their modern slavery statement.
-                Their answers are published below as a statement summary.
-                The questions are based on the areas that the Modern Slavery Act encourages organisations to cover in their modern slavery statement, setting out the steps they have taken to tackle modern slavery risks.
-                All answers relate to the financial year covered by the statement.
-                The organisation is responsible for the information it provided.
-                GOV.UK does not verify the accuracy of this information.
+                UK law requires certain organisations to publish an annual modern slavery statement on their website, setting out the steps they are taking to address modern slavery risks in their operations and supply chains.
+                Read more in the <a class="govuk-link" href="https://www.gov.uk/guidance/publish-an-annual-modern-slavery-statement" rel="noreferrer noopener">government guidance on publishing modern slavery statements</a>.
             </div>
         </details>
+
+        <h2 class="govuk-heading-m">
+            About this statement summary
+        </h2>
+
+        <p class="govuk-body govuk-!-font-size-19">
+            All answers relate to the financial year covered by the statement. The organisation is responsible for all the information it provided. Some of our questions are optional, so organisations may not have answered all of them. The statement summary does not replace the full modern slavery statement – below we provide a link to the full statement on the organisation’s website.
+        </p>
 
     </div>
 </div>
 
-<hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-8">
+<hr class="govuk-section-break govuk-section-break--visible">
 
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
+<div class="govuk-grid-row viewing-statement">
 
-        <div class="app-statement-summary_url">
+    <partial name="Parts/StatementSummary/_Url" model="Model" />
 
-            <div class="app-statement-summary_url-link-working">
-                <a class="govuk-link"
-                   asp-controller="Viewing"
-                   asp-action="StatementSummaryUrl"
-                   asp-route-organisationIdentifier="@Model.ParentOrganisationId"
-                   asp-route-year="@Model.SubmissionDeadlineYear">
-                    <div class="govuk-panel govuk-panel--blue">
-                        <div class="govuk-panel__body govuk-!-font-size-16">
-                            <span class="govuk-!-font-size-24 govuk-!-font-weight-bold">Link to full statement</span>
-                            <br>
-                            <p class="govuk-link govuk-!-font-size-16" href="@Model.StatementUrl" rel="noreferrer noopener">Go to full modern slavery statement on organisation’s website</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <div class="app-statement-summary_url-link-broken">
-                <div class="govuk-panel govuk-panel--grey">
-                    <div class="govuk-panel__body govuk-!-font-size-16">
-                        <strong class="govuk-!-font-size-24">Link to full statement</strong>
-                        <br>
-                        <span>The URL linking to the statement on the organisation’s website is not working.</span>
-                    </div>
-                </div>
-                <div class="app-statement-summary_hint">
-                    <details class="govuk-details" data-module="govuk-details">
-                        <summary class="govuk-details__summary">
-                            <span class="govuk-details__summary-text">
-                                What to do if the URL is not working
-                            </span>
-                        </summary>
-                        <div class="govuk-details__text">
-                            If the URL linking to the statement isn’t working, try again later – or go to the homepage of the organisation’s website and search for the statement from there.
-                        </div>
-                    </details>
-                </div>
-            </div>
-        </div>
-
-        <div class="contents govuk-!-margin-top-8">
-            <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-bottom-1">Contents</p>
-            <ul class="govuk-list govuk-list--hyphen govuk-!-font-size-16">
-                <li><a class="govuk-link" href="#statement-period">Statement period and sign-off details</a></li>
-                <li><a class="govuk-link" href="#areas-covered">Areas covered by statement</a></li>
-                <li><a class="govuk-link" href="#sectors">Organisation sector(s) and turnover</a></li>
-                <li><a class="govuk-link" href="#policies">Policies relating to modern slavery</a></li>
-                <li><a class="govuk-link" href="#risks">Assessing modern slavery risks</a></li>
-                <li><a class="govuk-link" href="#high-risks">Highest risks identified</a></li>
-                <li><a class="govuk-link" href="#geographic-risks">Geographic risks</a></li>
-                <li><a class="govuk-link" href="#monitoring">Monitoring working conditions</a></li>
-                <li><a class="govuk-link" href="#indicators">Indicators and instances of modern slavery</a></li>
-                <li><a class="govuk-link" href="#training">Training on modern slavery</a></li>
-                <li><a class="govuk-link" href="#progress">Monitoring progress</a></li>
-            </ul>
-        </div>
-
-        <div class="govuk-!-margin-top-8" id="statement-period">
-            <h2 class="govuk-heading-m">
-                Statement period and sign-off details
-            </h2>
-            @if (Model.StatementStartDate.HasValue && Model.StatementEndDate.HasValue)
+    <div class="contents statement-section-two-thirds">
+        <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-bottom-1">Contents</p>
+        <ul class="govuk-list govuk-list--hyphen govuk-!-font-size-16">
+            @if (Model.GroupSubmission==true)
             {
-                <p class="govuk-body govuk-!-font-weight-bold">
-                    The statement covers the following period:
-                </p>
-
-                <p class="govuk-body">
-                    @Model.StatementStartDate.Value.ToString("d MMMM yyyy") to @Model.StatementEndDate.Value.ToString("d MMMM yyyy")
-                </p>
+                <li><a class="govuk-link" href="#organisations-covered">Organisations covered by the statement</a></li>
             }
-            else
-            {
-                <p class="govuk-body">
-                    The organisation did not tell us which period the statement covers.
-                </p>
-            }
+            <li><a class="govuk-link" href="#statement-period">Statement period and sign-off details</a></li>
+            <li><a class="govuk-link" href="#areas-covered">Recommended areas covered by the statement</a></li>
+            <li><a class="govuk-link" href="#sectors">The organisation’s sectors and turnover</a></li>
+            <li><a class="govuk-link" href="#years">Number of years producing statements</a></li>
+            <li><a class="govuk-link" href="#policies">Policies</a></li>
+            <li><a class="govuk-link" href="#training">Training</a></li>
+            <li><a class="govuk-link" href="#monitoring">Monitoring working conditions</a></li>
 
-            @if (!string.IsNullOrWhiteSpace(Model.ApprovingPerson))
-            {
-                <p class="govuk-body govuk-!-font-weight-bold">
-                    The name of the director (or equivalent) that signed off the statement is:
-                </p>
+            <li><a class="govuk-link" href="#risks">Modern slavery risks</a></li>
 
-                <p class="govuk-body">
-                    @Model.ApprovingPerson
-                </p>
-            }
-            else
-            {
-                <p class="govuk-body">
-                    The organisation did not tell us name of the director (or equivalent) that signed off the statement.
-                </p>
-            }
-
-
-            @if (Model.ApprovedDate.HasValue)
-            {
-                <p class="govuk-body govuk-!-font-weight-bold">
-                    The statement was approved by the board or equivalent management body on:
-                </p>
-
-                <p class="govuk-body">
-                    @Model.ApprovedDate.Value.ToString("d MMMM yyyy")
-                </p>
-            }
-            else
-            {
-                <p class="govuk-body">
-                    The organisation did not tell us the date the statement was approved by the board or equivalent management body.
-                </p>
-            }
-
-        </div>
-
-        <div class="govuk-!-margin-top-8" id="areas-covered">
-            <h2 class="govuk-heading-m">
-                Areas covered by statement
-            </h2>
-
-            <p class="govuk-body">
-                Government guidance encourages organisations to cover a range of areas in their modern slavery statements.
-            </p>
-
-            @if (Model.HasAnyAreaCovered())
-            {
-                if (!Model.HasNoAreasCovered())
-                {
-                    <p class="govuk-body govuk-!-font-weight-bold">
-                        The statement covers the following recommended areas:
-                    </p>
-
-                    <ul class="govuk-list govuk-list--bullet">
-                        @if (Model.IncludesStructure.HasValue && Model.IncludesStructure.Value)
-                        {
-                            <li>The organisation’s structure, business and supply chains</li>
-                        }
-                        @if (Model.IncludesPolicies.HasValue && Model.IncludesPolicies.Value)
-                        {
-                            <li>Policies</li>
-                        }
-                        @if (Model.IncludesRisks.HasValue && Model.IncludesRisks.Value)
-                        {
-                            <li>Risk assessment and management</li>
-                        }
-                        @if (Model.IncludesDueDiligence.HasValue && Model.IncludesDueDiligence.Value)
-                        {
-                            <li>Due diligence processes</li>
-                        }
-                        @if (Model.IncludesTraining.HasValue && Model.IncludesTraining.Value)
-                        {
-                            <li>Staff training about slavery and human trafficking</li>
-                        }
-                        @if (Model.IncludesGoals.HasValue && Model.IncludesGoals.Value)
-                        {
-                            <li>Goals and key performance indicators (KPIs) to measure progress over time, and the effectiveness of the organisation’s actions</li>
-                        }
-                    </ul>
-                }
-
-                @if (!Model.HasAllAreasCovered())
-                {
-                    <p class="govuk-body govuk-!-font-weight-bold">
-                        The statement does not cover the following area(s):
-                    </p>
-
-                    <ul class="govuk-list govuk-list--bullet">
-                        @if (Model.IncludesStructure.HasValue && !Model.IncludesStructure.Value)
-                        {
-                            <li>The organisation’s structure, business and supply chains</li>
-                        }
-                        @if (Model.IncludesPolicies.HasValue && !Model.IncludesPolicies.Value)
-                        {
-                            <li>Policies</li>
-                        }
-                        @if (Model.IncludesRisks.HasValue && !Model.IncludesRisks.Value)
-                        {
-                            <li>Risk assessment and management</li>
-                        }
-                        @if (Model.IncludesDueDiligence.HasValue && !Model.IncludesDueDiligence.Value)
-                        {
-                            <li>Due diligence processes</li>
-                        }
-                        @if (Model.IncludesTraining.HasValue && !Model.IncludesTraining.Value)
-                        {
-                            <li>Staff training about slavery and human trafficking</li>
-                        }
-                        @if (Model.IncludesGoals.HasValue && !Model.IncludesGoals.Value)
-                        {
-                            <li>Goals and key performance indicators (KPIs) to measure progress over time, and the effectiveness of the organisation’s actions</li>
-                        }
-                    </ul>
-                }
-            }
-            else
-            {
-                <p class="govuk-body">
-                    The organisation did not tell us which areas the statement covered.
-                </p>
-            }
-        </div>
-
-        <div class="govuk-!-margin-top-8" id="sectors">
-            <h2 class="govuk-heading-m">
-                Organisation sector(s) and turnover
-            </h2>
-
-            @if (Model.Sectors.Any())
-            {
-                <p class="govuk-body govuk-!-font-weight-bold">
-                    The organisation operates in:
-                </p>
-
-                <ul class="govuk-list govuk-list--bullet">
-                    @foreach (var sector in Model.Sectors)
-                    {
-                        <li>@sector.Description</li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p class="govuk-body">
-                    The organisation did not tell us which sector(s) it operates in.
-                </p>
-            }
-
-            @if (Model.Turnover != null && Model.Turnover != Statement.StatementTurnoverRanges.NotProvided)
-            {
-                <p class="govuk-body govuk-!-font-weight-bold">
-                    Its turnover or budget in the financial accounting year of this statement was:
-                </p>
-                <p class="govuk-body">
-                    @Model.Turnover.Value.EnumDisplayNameFor()
-                </p>
-            }
-            else
-            {
-                <p class="govuk-body">
-                    The organisation did not tell us what its turnover or budget was in the financial accounting year of this statement.
-                </p>
-            }
-
-        </div>
-
-        <div class="govuk-!-margin-top-8" id="policies">
-            <h2 class="govuk-heading-m">
-                Policies relating to modern slavery
-            </h2>
-
-            @if (Model.Policies.Any())
-            {
-                <div class="govuk-body govuk-!-font-weight-bold">
-                    The organisation’s policies and codes during the period of this statement included the following provisions relating to modern slavery:
-                </div>
-                <ul class="govuk-list govuk-list--bullet">
-                    @foreach (var policy in Model.Policies)
-                    {
-                        <li>
-                            @policy.GetEnumDescription()
-                            @if (policy== Core.Entities.StatementSummary.V1.StatementSummary.PolicyTypes.Other)
-                            {
-                                <br>
-                                <p class="app-statement-summary_free-text">@Model.OtherPolicies</p>
-                            }
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <div class="govuk-body">
-                    The organisation did not specify any policies or codes relating to modern slavery during the period of the statement.
-                </div>
-            }
-
-        </div>
-
+            <li><a class="govuk-link" href="#indicators">Finding indicators of modern slavery</a></li>
+            <li><a class="govuk-link" href="#progress">Demonstrating progress</a></li>
+        </ul>
     </div>
+
+    <partial name="Parts/StatementSummary/_Group" model="Model" />
+
+    <partial name="Parts/StatementSummary/_PeriodAndSignOff" model="Model" />
+
+    <partial name="Parts/StatementSummary/_AreasCovered" model="Model" />
+
+    <partial name="Parts/StatementSummary/_SectorsTurnover" model="Model" />
+
+    <partial name="Parts/StatementSummary/_Years" model="Model" />
+
+    <partial name="Parts/StatementSummary/_Policies" model="Model" />
+
+    <partial name="Parts/StatementSummary/_Training" model="Model" />
+
+    <partial name="Parts/StatementSummary/_Monitoring" model="Model" />
+
+    <partial name="Parts/StatementSummary/_Risks" model="Model" />
+
+    <partial name="Parts/StatementSummary/_Indicators" model="Model" />
+
+    <partial name="Parts/StatementSummary/_Progress" model="Model" />
+
 </div>

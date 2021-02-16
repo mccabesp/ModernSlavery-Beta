@@ -1,21 +1,16 @@
-﻿using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Shared.Classes.HtmlHelper;
-using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace ModernSlavery.WebUI.Shared.Classes.ViewModelBinder
 {
@@ -70,26 +65,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.ViewModelBinder
             var controllerActionDescriptor = actionContext.ActionDescriptor as ControllerActionDescriptor;
             var controllerTypeInfo = controllerActionDescriptor.ControllerTypeInfo;
             return controllerTypeInfo.AsType();
-        }
-
-        protected override Task BindProperty(ModelBindingContext bindingContext)
-        {
-            var propName = bindingContext.ModelMetadata.PropertyName;
-            if (propName == null) return base.BindProperty(bindingContext);
-
-            var propInfo = bindingContext.ModelMetadata.ContainerType.GetProperty(propName);
-            if (propInfo == null) return base.BindProperty(bindingContext);
-
-            var secureAttribute = propInfo.GetCustomAttributes().FirstOrDefault(attr => typeof(SecuredAttribute).IsAssignableFrom(attr.GetType())) as SecuredAttribute;
-            if (secureAttribute == null) return base.BindProperty(bindingContext);
-
-            IModelBinder modelBinder;
-            if (secureAttribute.SecureMethod == SecuredAttribute.SecureMethods.Obfuscate)
-                modelBinder = ActivatorUtilities.CreateInstance<ObfuscatedModelBinder>(bindingContext.HttpContext.RequestServices);
-            else
-                modelBinder = ActivatorUtilities.CreateInstance<EncryptedModelBinder>(bindingContext.HttpContext.RequestServices);
-
-            return modelBinder.BindModelAsync(bindingContext);
         }
     }
 }

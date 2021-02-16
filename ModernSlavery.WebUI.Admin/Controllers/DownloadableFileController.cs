@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
-using ModernSlavery.Core.Interfaces.Downloadable;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
@@ -33,8 +32,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #region File Download Action
 
         [HttpGet("admin/downloadfile")]
-        [AllowOnlyTrustedDomains]
-        public async Task<IActionResult> DownloadFile(string p)
+        [IPAddressFilter]
+        public async Task<IActionResult> DownloadFile([IgnoreText] string p)
         {
             IActionResult result;
 

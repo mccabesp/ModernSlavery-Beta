@@ -66,7 +66,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary.V1
             [Description("Central or local government")] Government,
             [Description("Law enforcement, such as police, GLAA and other local labour market inspectorates")] LawEnforcement,
             [Description("Businesses in your industry or sector")] Businesses,
-            [Description("Your organisation did not engage with others to help monitor working conditions across your organisation and supply chain")] None,
+            [Description("Your organisation did not engage with others to help monitor working conditions across your operations and supply chain")] None,
         }
 
         public SortedSet<PartnerTypes> Partners { get; set; } = new SortedSet<PartnerTypes>();
@@ -82,8 +82,8 @@ namespace ModernSlavery.Core.Entities.StatementSummary.V1
             [Description("Third party audit arranged by your organisation")] ThirdPartyOrganisation,
             [Description("Audit conducted by your supplier’s staff")] SupplierStaff,
             [Description("Third party audit arranged by your supplier")] ThirdPartySupplier,
-            [Description("Announced audits")] Announced,
-            [Description("Unannounced audits")] Unannounced,
+            [Description("Announced audit")] Announced,
+            [Description("Unannounced audit")] Unannounced,
             [Description("Your organisation did not carry out any social audits during the period of the statement")] None,
         }
         public SortedSet<SocialAuditTypes> SocialAudits { get; set; } = new SortedSet<SocialAuditTypes>();
@@ -95,9 +95,9 @@ namespace ModernSlavery.Core.Entities.StatementSummary.V1
         public enum GrievanceMechanismTypes
         {
             Unknown,
-            [Description("Anonymous whistleblowing services, such as a helpline or an app")] WhistleblowingServices,
+            [Description("Using anonymous whistleblowing services, such as a helpline or mobile phone app")] WhistleblowingServices,
             [Description("Through trade unions or other worker representative groups")] WorkerVoicePlatforms,
-            [Description("Your operations and supply chain did not have grievance mechanisms in place during the period of the statement")] None,
+            [Description("There were no processes in your operations or supply chains for workers to raise concerns or make complaints")] None,
         }
         public SortedSet<GrievanceMechanismTypes> GrievanceMechanisms { get; set; } = new SortedSet<GrievanceMechanismTypes>();
 
@@ -170,6 +170,21 @@ namespace ModernSlavery.Core.Entities.StatementSummary.V1
                     && (Targets == null || Targets.Count == 0) && string.IsNullOrWhiteSpace(OtherTargets)
                     && (Countries == null || Countries.Count == 0);
             }
+
+            public static string GetTierExplanation(SupplyChainTierTypes tier)
+            {
+                switch (tier)
+                {
+                    case SupplyChainTierTypes.Tier1:
+                        return "Provide their products and services directly to your organisation.";
+                    case SupplyChainTierTypes.Tier2:
+                        return "Provide products and services to your organisation via your Tier 1 suppliers.";
+                    case SupplyChainTierTypes.Tier3:
+                        return "Provide products and services to your organisation via your Tier 2 suppliers or the next higher level in the chain.";
+                    default:
+                        return string.Empty;
+                }
+            }
             #endregion
         }
 
@@ -209,7 +224,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary.V1
             [Description("Financial remediation, including repayment of recruitment fees")] FeeRepayment,
             [Description("Change in policy")] PolicyChange,
             [Description("Change in training")] TrainingChange,
-            [Description("Referring victims to government service")] VictimReferral,
+            [Description("Referring potential victims to government services")] VictimReferral,
             [Description("Supporting victims via NGO")] NGOSupport,
             [Description("Supporting investigations by relevant authorities")] CriminalJustice,
             [Description("Other")] Other,

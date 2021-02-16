@@ -4,7 +4,7 @@
 @model EnterAnswersViewModel
 @{
     Layout = "/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Tell us why your organisation is not in scope - Modern Slavery reporting service";
+    Title = "Tell us why your organisation is not in scope";
     var reasonIndex = 0;
 }
 
@@ -16,7 +16,7 @@
         @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off", novalidate="" }))
         {
             @Html.AntiForgeryToken()
-            @await Html.GovUkValidationSummaryAsync(false);
+            @await Html.GovUkValidationSummaryAsync();
 
             <h1 class="govuk-heading-l">
                 Tell us why your organisation is not required to publish a modern slavery statement
@@ -50,14 +50,16 @@
                             }
                             @if (reason.Equals("Other"))
                             {
-                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden govuk-character-count @Html.SetErrorClass(model => model.OtherReason, "govuk-form-group--error")" id="reason-conditional-@(reasonIndex)" data-module="govuk-character-count" data-maxlength="@Model.ReasonMaxLength">
-                                    <div class="govuk-form-group">
-                                        <label class="govuk-label" for="other">
-                                            Please specify
-                                        </label>
-                                        <textarea asp-for="OtherReason" id="@nameof(EnterAnswersViewModel.OtherReason)" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="@($"{nameof(EnterAnswersViewModel.OtherReason)}-info")"></textarea>
-                                        <span id="@($"{nameof(EnterAnswersViewModel.OtherReason)}-info")" class="govuk-hint govuk-character-count__message" aria-live="polite">You can enter up to @(Model.ReasonMaxLength) characters</span>
-                                        <span asp-validation-for="OtherReason" class="govuk-error-message"></span>
+                                <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherReason, "govuk-form-group--error")" id="reason-conditional-@(reasonIndex)">
+                                    <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="@EnterAnswersViewModel.ReasonMaxLength">
+                                        <div class="govuk-form-group">
+                                            <label class="govuk-label" for="other">
+                                                Please specify
+                                            </label>
+                                            <textarea name="@nameof(EnterAnswersViewModel.OtherReason)" id="@nameof(EnterAnswersViewModel.OtherReason)" class="govuk-textarea govuk-js-character-count" rows="5" aria-describedby="@($"{nameof(EnterAnswersViewModel.OtherReason)}-info")">@Model.OtherReason</textarea>
+                                            <span id="@($"{nameof(EnterAnswersViewModel.OtherReason)}-info")" class="govuk-hint govuk-character-count__message" aria-live="polite">You can enter up to @(EnterAnswersViewModel.ReasonMaxLength) characters</span>
+                                            <span asp-validation-for="OtherReason" class="govuk-error-message"></span>
+                                        </div>
                                     </div>
                                 </div>
                             }

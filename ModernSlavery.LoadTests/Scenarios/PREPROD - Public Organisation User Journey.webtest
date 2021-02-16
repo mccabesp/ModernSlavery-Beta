@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WebTest Name="PREPROD - Public Organisation User Journey" Id="c55df561-8347-46e3-b1b7-34938109b06c" Owner="" Priority="2147483647" Enabled="True" CssProjectStructure="" CssIteration="" Timeout="60" WorkItemIds="" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" Description="" CredentialUserName="" CredentialPassword="" PreAuthenticate="True" Proxy="default" StopOnError="True" RecordedResultFile="" ResultsLocale="">
+  <Items>
+    <IncludedWebTest Name="Create User Account" Path="..\web tests\create user account.webtest" Id="4023c953-f79e-46ed-8182-ce311bb60956" IsCodedWebTest="False" InheritWebTestSettings="True" />
+    <IncludedWebTest Name="Register Public Organisation" Path="..\web tests\register public organisation.webtest" Id="7452106f-b520-4696-aa92-2f83a35c543d" IsCodedWebTest="False" InheritWebTestSettings="True" />
+    <IncludedWebTest Name="Logout" Path="..\web tests\logout.webtest" Id="ad2a6722-4678-41fc-848f-18dc51ef1346" IsCodedWebTest="False" InheritWebTestSettings="True" />
+    <IncludedWebTest Name="ApproveOrganisation" Path="..\web tests\approveorganisation.webtest" Id="96edfbeb-5095-4988-8dc8-6a97f84645d9" IsCodedWebTest="False" InheritWebTestSettings="True" />
+    <IncludedWebTest Name="Login" Path="..\web tests\login.webtest" Id="483ed062-6ecc-49b3-9e36-5800b8679530" IsCodedWebTest="False" InheritWebTestSettings="True" />
+    <IncludedWebTest Name="SubmitStatement" Path="..\web tests\submitstatement.webtest" Id="e291433d-34ee-4484-b97b-6ba49b9f58d0" IsCodedWebTest="False" InheritWebTestSettings="True" />
+    <IncludedWebTest Name="Logout" Path="..\web tests\logout.webtest" Id="ad2a6722-4678-41fc-848f-18dc51ef1346" IsCodedWebTest="False" InheritWebTestSettings="True" />
+  </Items>
+  <ContextParameters>
+    <ContextParameter Name="DeleteAccount" Value="1" />
+    <ContextParameter Name="Password" Value="Cadence2007" />
+    <ContextParameter Name="WebServer" Value="https://as-modernslavery-beta-preprod.azurewebsites.net" />
+    <ContextParameter Name="WebLink" Value="https://www.gov.uk/government/publications/uk-government-modern-slavery-statement" />
+    <ContextParameter Name="RandomGuid" Value="" />
+    <ContextParameter Name="RandomEmail" Value="TISCTEST-{{RandomGuid}}@domain.co.uk" />
+    <ContextParameter Name="RandomFirstName" Value="TISCTEST-{{RandomGuid}}_First" />
+    <ContextParameter Name="RandomLastName" Value="TISCTEST-{{RandomGuid}}_Last" />
+    <ContextParameter Name="RandomJobTitle" Value="TISCTEST-{{RandomGuid}}_Title" />
+    <ContextParameter Name="RandomOrganisation" Value="TISCTEST-{{RandomGuid}}_Org" />
+  </ContextParameters>
+  <WebTestPlugins>
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.RandomGuidPlugin, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="RandomGuidPlugin" Description="">
+      <RuleParameters>
+        <RuleParameter Name="ContextParamTarget" Value="RandomGuid" />
+        <RuleParameter Name="PerContext" Value="True" />
+      </RuleParameters>
+    </WebTestPlugin>
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.ResolveParameterPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="ResolveParameterPlugIn" Description="" />
+    <WebTestPlugin Classname="ModernSlavery.WebTestPlugins.RelativePathPlugIn, ModernSlavery.WebTestPlugins, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" DisplayName="RelativePathPlugIn" Description="" />
+  </WebTestPlugins>
+</WebTest>

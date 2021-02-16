@@ -7,7 +7,6 @@ namespace ModernSlavery.Core.Interfaces
     public interface IReportingDeadlineHelper
     {
         int FirstReportingDeadlineYear { get; set; }
-        int CurrentSnapshotYear { get; }
         DateTime PrivateReportingDeadline { get; }
         DateTime PublicReportingDeadline { get; }
         DateTime GetReportingStartDate(SectorTypes sectorType, int year = 0);

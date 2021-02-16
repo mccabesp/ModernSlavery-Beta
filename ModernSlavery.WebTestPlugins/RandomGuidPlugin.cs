@@ -11,7 +11,7 @@ namespace ModernSlavery.WebTestPlugins
 
         public override void PreWebTest(object sender, PreWebTestEventArgs e)
         {
-            if (PerContext && e.WebTest.Context.ContainsKey(ContextParamTarget) && !string.IsNullOrWhiteSpace(e.WebTest.Context[ContextParamTarget].ToString())) return;
+            if (PerContext && e.WebTest.Context.ContainsKey(ContextParamTarget) && !string.IsNullOrWhiteSpace(e.WebTest.Context[ContextParamTarget]?.ToString())) return;
 
             var guid = Guid.NewGuid().ToString().ToLower().Replace("-", "");
             e.WebTest.Context[ContextParamTarget] = guid;

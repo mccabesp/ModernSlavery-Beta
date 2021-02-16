@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.HtmlGenerators
 
             var textInputViewModel = new TextInputViewModel
             {
-                Name = $"GovUk_Text_{propertyName}",
+                Name = propertyName,
                 Id = id,
                 Value = currentValue,
                 Label = labelOptions,

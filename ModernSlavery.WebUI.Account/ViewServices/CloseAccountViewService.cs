@@ -16,8 +16,6 @@ namespace ModernSlavery.WebUI.Account.ViewServices
 {
     public class CloseAccountViewService : ICloseAccountViewService
     {
-        private readonly ISharedBusinessLogic _sharedBusinessLogic;
-
         public CloseAccountViewService(
             IUserRepository userRepository,
             IRegistrationBusinessLogic registrationBusinessLogic,
@@ -31,10 +29,12 @@ namespace ModernSlavery.WebUI.Account.ViewServices
                                         throw new ArgumentNullException(nameof(registrationBusinessLogic));
             _organisationBusinessLogic = organisationBusinessLogic;
             Logger = logger;
-            SendEmailService = sendEmailService; 
+            SendEmailService = sendEmailService;
+            _sharedBusinessLogic = sharedBusinessLogic;
         }
 
 
+        private readonly ISharedBusinessLogic _sharedBusinessLogic;
         private IUserRepository UserRepository { get; }
         private IRegistrationBusinessLogic RegistrationBusinessLogic { get; }
         private readonly IOrganisationBusinessLogic _organisationBusinessLogic;

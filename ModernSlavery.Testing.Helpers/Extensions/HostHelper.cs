@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using System;
 using Microsoft.AspNetCore.Http;
+using ModernSlavery.BusinessDomain.DevOps.Testing;
 
 namespace ModernSlavery.Testing.Helpers
 {
@@ -75,5 +76,11 @@ namespace ModernSlavery.Testing.Helpers
         {
             return serviceProvider.GetRequiredService<IFileRepository>();
         }
+
+        public static ITestBusinessLogic GetTestBusinessLogic(this IServiceProvider serviceProvider)
+        {
+            return serviceProvider.GetRequiredService<ITestBusinessLogic>();
+        }
+
     }
 }

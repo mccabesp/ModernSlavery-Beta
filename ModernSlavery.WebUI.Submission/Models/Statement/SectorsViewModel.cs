@@ -7,6 +7,7 @@ using System.Linq;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -40,11 +41,12 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         }
 
-        public override string PageTitle => "Which sector(s) does your organisation operate in?";
+        public override string PageTitle => "Which sectors does your organisation operate in?";
 
         public List<short> Sectors { get; set; } = new List<short>();
 
         [MaxLength(128)]//We need at least one validation annotation otherwise Validate wont execute
+        [Text] 
         public string OtherSectors { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

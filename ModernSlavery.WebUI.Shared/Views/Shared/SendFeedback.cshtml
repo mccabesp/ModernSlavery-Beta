@@ -3,22 +3,20 @@
 @model FeedbackViewModel
 @{Layout = "~/Views/GdsLayout.cshtml";}
 @{
-    ViewBag.Title = "Send us feedback - Modern Slavery reporting service";
+    Title = "Send us feedback";
+    var backUrl = Context.GetUrlReferrer()?.ToString();
+    if (string.IsNullOrWhiteSpace(backUrl)) backUrl = "/";
 }
 
 @section BeforeMain {
-    @(Html.GovUkBackLink(new BackLinkViewModel
-    {
-        Text = "Back",
-        OverrideWithJavascript = true
-    }))
+    <a class="govuk-back-link" href="@backUrl">Back</a>
 }
 
 <div class="govuk-grid-row cookie-settings-page">
     <div class="govuk-grid-column-two-thirds">
         <form method="POST" action="@Url.Action("SendFeedback", "Shared")" novalidate>
             @(Html.AntiForgeryToken())
-            @(await Html.GovUkValidationSummaryAsync())          
+            @(await Html.GovUkValidationSummaryAsync())
 
             <h1 class="govuk-heading-l">Send us feedback</h1>
             <div class="govuk-form-group">

@@ -1,24 +1,30 @@
 ﻿@{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Search for your organisation - Modern Slavery reporting service";
+    Title = "Search for your organisation";
 }
 @model OrganisationSearchViewModel
 @section BeforeMain {
     <a class="govuk-back-link" href="@Url.Action("OrganisationType")">Back</a>
 }
 
-<div id="organisation-search-content" class="govuk-grid-row">
+<div id="organisation-search-content" class="govuk-grid-row choose-organisation">
     <div class="govuk-grid-column-two-thirds">
         @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
             @await Html.GovUkValidationSummaryAsync()
-            <h1 class="govuk-heading-l">
+
+            <h1 class="govuk-heading-xl govuk-!-margin-bottom-5">
                 Find your organisation
             </h1>
+
+            <label for="SearchText" class="govuk-hint">
+                Organisation name or company number
+            </label>
+
             @Html.ValidationMessageFor(model => model.SearchText, null, new { @class = "govuk-error-message" })
 
-            <div class="gov-uk-c-searchbar govuk-!-margin-bottom-8">
+            <div class="gov-uk-c-searchbar">
                 <div class="gov-uk-l-searchbar__table">
                     <div class="gov-uk-l-searchbar__cell">
                         @Html.CustomEditorFor(model => model.SearchText, new { @class = "gov-uk-c-searchbar__input", aria_label = "SearchText", placeholder = Model.SectorType == SectorTypes.Public ? "Organisation name" : "Organisation name or company no" })
@@ -28,6 +34,36 @@
                     </div>
                 </div>
             </div>
+
+            if (Model.SectorType == SectorTypes.Private)
+            {
+                <div class="govuk-!-margin-top-5">
+                    <div class="govuk-warning-text">
+                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                        <strong class="govuk-warning-text__text">
+                            <span class="govuk-warning-text__assistive">Warning</span>
+                            If your organisation’s headquarters are outside the UK, it may not appear in the search results.
+                            In this case, you’ll need to <a class="govuk-link" asp-controller="Registration" asp-action="AddOrganisation">provide us with its details</a>.
+                        </strong>
+                    </div>
+
+                    <h2 class="govuk-heading-m govuk-!-font-weight-regular">Select your organisation</h2>
+
+                    <details class="govuk-details" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">
+                                Can't find your organisation?
+                            </span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            If your organisation is registered at Companies House, entering the company number will bring up its details.
+                            <br>
+                            <br>
+                            If your organisation is not listed in the search results you’ll need to <a class="govuk-link" asp-controller="Registration" asp-action="AddOrganisation">provide us with its details</a>.
+                        </div>
+                    </details>
+                </div>
+            }
 
             @if (!string.IsNullOrWhiteSpace(Model.SearchText) && Model.Organisations != null && Model.Organisations.Results.Count < 1)
             {
@@ -39,17 +75,8 @@
                         <li>searching again using a different organisation name</li>
 
                     </ul>
-                    <details class="govuk-details" data-module="govuk-details">
-                        <summary class="govuk-details__summary">
-                            <span class="govuk-deatils__summary-text">Can't find your organisation?</span>
-                        </summary>
-                        <div class="govuk-details__text" id="details-content-0">
-                            @Html.ActionLink("Tell us about your organisation", "AddOrganisation")
-                        </div>
-                    </details>
                 </div>
             }
-
         }
     </div>
 </div>

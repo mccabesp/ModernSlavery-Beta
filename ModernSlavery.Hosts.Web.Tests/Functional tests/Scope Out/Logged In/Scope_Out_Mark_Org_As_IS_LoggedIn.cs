@@ -48,26 +48,26 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task RegisterOrgAndSetScope()
         {
            
-            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail);
-            await this.GetOrganisationBusinessLogic().CreateOrganisationSecurityCodeAsync(org.OrganisationReference, new DateTime(2030, 1, 10));
+            await this.RegisterUserOrganisationAsync(org.OrganisationName, UniqueEmail).ConfigureAwait(false);
+            await this.GetOrganisationBusinessLogic().CreateOrganisationSecurityCodeAsync(org.OrganisationReference, new DateTime(2030, 1, 10)).ConfigureAwait(false);
 
-            User CurrentUser = await ServiceScope.GetDataRepository().SingleOrDefaultAsync<User>(o => o.EmailAddress == UniqueEmail);
-            await this.GetOrganisationBusinessLogic().SetAsScopeAsync(org.OrganisationReference, 2020, "Updated by test case", CurrentUser, ScopeStatuses.OutOfScope, true);
+            User CurrentUser = await ServiceScope.GetDataRepository().SingleOrDefaultAsync<User>(o => o.EmailAddress == UniqueEmail).ConfigureAwait(false);
+            await this.GetOrganisationBusinessLogic().SetAsScopeAsync(org.OrganisationReference, 2020, "Updated by test case", CurrentUser, ScopeStatuses.OutOfScope, true).ConfigureAwait(false);
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(30)]
         public async Task GoToManageOrgPage()
         {
             Goto("/manage-organisations");
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
-            Click("Manage organisations");
-            ExpectHeader(That.Contains, "Select an organisation");
+            Click("Your organisations");
+            Expect("Your registered organisations");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(31)]
@@ -76,21 +76,21 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             Click(org.OrganisationName);
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             SubmissionHelper.MoreInformationRequiredComplete(this, true, OrgName: org.OrganisationName);
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
+            ExpectHeader(That.Contains, "Manage your modern slavery statements");
 
-            RightOfText("2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "No");
-            await Task.CompletedTask;
+            RightOfText("2020").BelowText("Do you have to publish a statement on your website by law?").Expect(What.Contains, "No");
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(32)]
         public async Task ChangeOrgStatus()
         {
             Click(The.Top, "Change"); 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
             ExpectHeader("Confirm your organisation is required to publish a modern slavery statement");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         
@@ -103,7 +103,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             //RightOfText("Registered address").Expect("");
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(34)]
@@ -114,7 +114,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectLink(That.Contains, "modernslaverystatements@homeoffice.gov.uk");
             Expect(What.Contains, "and let us know the correct information.");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
        
@@ -123,17 +123,17 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ConfirmChange()
         {
             Click("Confirm");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
-            ExpectHeader(That.Contains, "Manage your modern slavery statement submissions");
-            await Task.CompletedTask;
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
+            ExpectHeader(That.Contains, "Manage your modern slavery statements");
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(40)]
         public async Task VerifyChange()
         {
 
-            RightOfText("2020").BelowText("Required by law to publish a statement on your website?").Expect(What.Contains, "Yes");
-            await Task.CompletedTask;
+            RightOfText("2020").BelowText("Do you have to publish a statement on your website by law?").Expect(What.Contains, "Yes");
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         

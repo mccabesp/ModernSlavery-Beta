@@ -1,7 +1,7 @@
 ﻿@inject SharedOptions sharedOptions
 @{
     Layout = "/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Confirm your organisation - Modern Slavery reporting service";
+    Title = "Confirm your organisation";
     var emailAdd = sharedOptions.MsuReportingEmail;
     var emailSubject = WebUtility.UrlEncode(string.Format("Wrong Organisation Details - {0} - {1}", Model.OrganisationName, Model.EnterCodes.OrganisationReference));
 

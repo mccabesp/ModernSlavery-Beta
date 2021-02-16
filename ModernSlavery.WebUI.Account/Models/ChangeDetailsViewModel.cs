@@ -11,15 +11,18 @@ namespace ModernSlavery.WebUI.Account.Models
     {
         [Required(AllowEmptyStrings = false, ErrorMessageResourceName = nameof(AccountResources.FirstNameRequired))]
         [Display(Name = nameof(FirstName))]
+        [Text] 
         public string FirstName { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessageResourceName = nameof(AccountResources.LastNameRequired))]
         [Display(Name = nameof(LastName))]
+        [Text] 
         public string LastName { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessageResourceName = nameof(AccountResources.JobTitleRequired))]
         [StringLength(50, ErrorMessageResourceName = nameof(AccountResources.JobTitleLength))]
         [Display(Name = nameof(JobTitle))]
+        [Text] 
         public string JobTitle { get; set; }
 
         [MaxLength(20, ErrorMessageResourceName = nameof(AccountResources.ContactPhoneNumberLength))]

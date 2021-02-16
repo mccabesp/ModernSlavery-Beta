@@ -1,9 +1,9 @@
 ﻿@{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "PIN confirmation - Modern Slavery reporting service";
+    Title = "PIN confirmation";
 }
-@model string
-
+@model RequestPinViewModel
+@inject IObfuscator Obfuscator
 @await Html.PartialAsync("_ServiceInfo")
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -11,18 +11,18 @@
         @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
         {
             @Html.AntiForgeryToken()
+            @await Html.GovUkValidationSummaryAsync();
 
             <h1 class="govuk-heading-l">
                 Request a new PIN
             </h1>
             <p class="govuk-body">A PIN will be posted to the following name and address:</p>
-            <p class="govuk-body">@ViewBag.UserFullName (@ViewBag.UserJobTitle),<br> @ViewBag.Organisation, <br />@Html.Raw(ViewBag.Address)</p>
-
+            <p class="govuk-body">@Model.UserFullName (@Model.UserJobTitle),<br> @Model.OrganisationName, <br />@Html.Linebreak(Model.Address, Environment.NewLine, ",")</p>
 
             <button type="submit" class="govuk-button" name="command" value="Resend">Request a new pin</button>
 
             <p class="govuk-body">
-                @Html.ActionLink("Cancel", "ActivateService", new { id = Model, @class = "govuk-link" })
+                @Html.ActionLink("Cancel", "ActivateService", new { id = Obfuscator.Obfuscate(Model.OrganisationId), @class = "govuk-link" })
             </p>
         }
     </div>

@@ -1,6 +1,7 @@
 ﻿@using System.Linq;
 @{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model SectorsViewModel
 
@@ -42,7 +43,7 @@
                             {
                                 <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden @Html.SetErrorClass(model => model.OtherSectors, "govuk-form-group--error")" id="organisation-conditional-@(sectorType.Id)">
                                     <div class="govuk-form-group">
-                                        <label class="govuk-label" for="other">
+                                        <label class="govuk-label" for="OtherSectors">
                                             Please specify
                                         </label>
                                         <input asp-for="OtherSectors" class="govuk-input" />

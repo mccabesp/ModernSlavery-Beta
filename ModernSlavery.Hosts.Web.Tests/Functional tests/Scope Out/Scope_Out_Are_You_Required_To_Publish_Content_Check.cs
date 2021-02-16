@@ -37,10 +37,10 @@ namespace ModernSlavery.Hosts.Web.Tests
             SignOutDeleteCookiesAndReturnToRoot(this);
 
             Goto(TestData.ScopeUrl);
-            AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             ExpectHeader("Are you legally required to publish a modern slavery statement on your website?");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         
@@ -61,7 +61,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect(What.Contains, "is available to help you work out whether your organisation is required to publish a modern slavery statement.");
 
             ExpectButton("Continue");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
 

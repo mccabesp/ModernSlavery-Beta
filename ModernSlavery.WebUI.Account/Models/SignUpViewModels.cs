@@ -11,15 +11,18 @@ namespace ModernSlavery.WebUI.Account.Models
     {
         [Required(AllowEmptyStrings = false)]
         [Display(Name = "First name")]
+        [Text]
         public string FirstName { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [Display(Name = "Last name")]
+        [Text] 
         public string LastName { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [Display(Name = "Job title")]
         [StringLength(50, ErrorMessage = "Your job title cannot be longer than {1} characters.")]
+        [Text] 
         public string JobTitle { get; set; }
 
         [Required(AllowEmptyStrings = false)]

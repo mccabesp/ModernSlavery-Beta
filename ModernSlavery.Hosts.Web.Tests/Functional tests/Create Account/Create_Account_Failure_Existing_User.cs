@@ -20,20 +20,20 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task NavigateToCreateAccountPage()
         {
 
-            await GoToCreateAccountPage();
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await GoToCreateAccountPage().ConfigureAwait(false);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
         }
 
         [Test, Order(12)]
         public async Task EnterDuplicateDetails()
         {
-            await EnterPersonalDetails();
+            await EnterPersonalDetails().ConfigureAwait(false);
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -44,7 +44,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect("There's a problem with your registration");
 
             Expect("This email address has already been registered. Please sign in or enter a different email address");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

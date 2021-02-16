@@ -26,14 +26,14 @@ namespace ModernSlavery.WebUI.Shared.Classes
             //Load data from distributed data store asynchronously
             if (!_httpContextAccessor.HttpContext.Session.IsAvailable)
             {
-                await _httpContextAccessor.HttpContext.Session.LoadAsync().ConfigureAwait(false);
+                await _httpContextAccessor.HttpContext.Session.LoadAsync();
                 Dirty = false;
             }
         }
 
         public async Task SaveAsync()
         {
-            if (Dirty) await _httpContextAccessor.HttpContext.Session.CommitAsync().ConfigureAwait(false);
+            if (Dirty) await _httpContextAccessor.HttpContext.Session.CommitAsync();
 
             Dirty = false;
         }

@@ -29,7 +29,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
         public async Task<User> FindBySubjectIdAsync(string subjectId, params UserStatuses[] filterStatuses)
         {
-            return await FindBySubjectIdAsync(subjectId.ToInt64(), filterStatuses);
+            return await FindBySubjectIdAsync(subjectId.ToInt64(), filterStatuses).ConfigureAwait(false);
         }
 
         public async Task<User> FindBySubjectIdAsync(long userId, params UserStatuses[] filterStatuses)
@@ -38,7 +38,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                 // filter by user id
                 u.UserId == userId
                 // skip or filter by user status
-                && (filterStatuses.Length == 0 || filterStatuses.Contains(u.Status)));
+                && (filterStatuses.Length == 0 || filterStatuses.Contains(u.Status))).ConfigureAwait(false);
         }
 
         public async Task<User> FindByEmailAsync(string email, params UserStatuses[] filterStatuses)
@@ -51,7 +51,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                     // filter by email address
                     u.EmailAddress == encryptedEmail
                     // skip or filter by user status
-                    && (filterStatuses.Length == 0 || filterStatuses.Contains(u.Status)));
+                    && (filterStatuses.Length == 0 || filterStatuses.Contains(u.Status))).ConfigureAwait(false);
 
                 if (user != null) return user;
             }
@@ -60,7 +60,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                 // filter by email address
                 u.EmailAddress.ToLower() == email.ToLower()
                 // skip or filter by user status
-                && (filterStatuses.Length == 0 || filterStatuses.Contains(u.Status)));
+                && (filterStatuses.Length == 0 || filterStatuses.Contains(u.Status))).ConfigureAwait(false);
         }
 
         public async Task<List<User>> FindAllUsersByNameAsync(string name)
@@ -68,7 +68,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             var nameForSearch = name?.ToLower();
 
             return await DataRepository.ToListAsync<User>(x =>
-                x.Fullname.ToLower().Contains(nameForSearch) || x.ContactFullname.ToLower().Contains(nameForSearch));
+                x.Fullname.ToLower().Contains(nameForSearch) || x.ContactFullname.ToLower().Contains(nameForSearch)).ConfigureAwait(false);
         }
 
         public async Task<bool> CheckPasswordAsync(User user, string password)
@@ -91,7 +91,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             finally
             {
                 //Save the changes
-                await DataRepository.SaveChangesAsync();
+                await DataRepository.SaveChangesAsync().ConfigureAwait(false);
             }
         }
 
@@ -113,11 +113,11 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             userToUpdate.Modified = now;
 
             // save
-            await DataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync().ConfigureAwait(false);
 
             // log email change
             await UserAuditLog.LogEmailChangedAsync(oldEmailAddress, newEmailAddress, userToUpdate,
-                userToUpdate.EmailAddress);
+                userToUpdate.EmailAddress).ConfigureAwait(false);
         }
 
         public async Task UpdatePasswordAsync(User userToUpdate, string newPassword)
@@ -135,10 +135,10 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             userToUpdate.Modified = VirtualDateTime.Now;
 
             // save
-            await DataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync().ConfigureAwait(false);
 
             // log password changed
-            await UserAuditLog.LogPasswordChangedAsync(userToUpdate, userToUpdate.EmailAddress);
+            await UserAuditLog.LogPasswordChangedAsync(userToUpdate, userToUpdate.EmailAddress).ConfigureAwait(false);
         }
 
         public async Task<bool> UpdateDetailsAsync(User userToUpdate, UpdateDetailsModel changeDetails)
@@ -167,11 +167,11 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             userToUpdate.Modified = VirtualDateTime.Now;
 
             // save
-            await DataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync().ConfigureAwait(false);
 
             // log details changed
             await UserAuditLog.LogDetailsChangedAsync(originalDetails, changeDetails, userToUpdate,
-                userToUpdate.EmailAddress);
+                userToUpdate.EmailAddress).ConfigureAwait(false);
 
             // success
             return true;
@@ -189,10 +189,10 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             userToRetire.Modified = VirtualDateTime.Now;
 
             // save
-            await DataRepository.SaveChangesAsync();
+            await DataRepository.SaveChangesAsync().ConfigureAwait(false);
 
             // log status changed
-            await UserAuditLog.LogUserRetiredAsync(userToRetire, userToRetire.EmailAddress);
+            await UserAuditLog.LogUserRetiredAsync(userToRetire, userToRetire.EmailAddress).ConfigureAwait(false);
         }
 
         public Task<User> AutoProvisionUserAsync(string provider, string providerUserId, List<Claim> list)
@@ -253,7 +253,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
         public async Task ExecuteTransactionAsync(Func<Task> delegateAction)
         {
-            await DataRepository.ExecuteTransactionAsync(delegateAction);
+            await DataRepository.ExecuteTransactionAsync(delegateAction).ConfigureAwait(false);
         }
 
         public void BeginTransaction()

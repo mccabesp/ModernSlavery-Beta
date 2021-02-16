@@ -154,7 +154,7 @@ namespace ModernSlavery.Core.Extensions
             var remoteIpAddress = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();//The the forwarded IP first
             if (string.IsNullOrWhiteSpace(remoteIpAddress)) remoteIpAddress = context.Connection.RemoteIpAddress?.ToString();
             //Obsolete: if (string.IsNullOrWhiteSpace(remoteIpAddress)) remoteIpAddress = context.Features.Get<IHttpConnectionFeature>()?.RemoteIpAddress?.ToString();
-            remoteIpAddress=remoteIpAddress?.BeforeFirst(":");//This is because application gateway adds port number onto IP address
+            if (!remoteIpAddress.StartsWith("::"))remoteIpAddress = remoteIpAddress?.BeforeFirst(":");//This is because application gateway adds port number onto IP address
             return remoteIpAddress;
         }
 

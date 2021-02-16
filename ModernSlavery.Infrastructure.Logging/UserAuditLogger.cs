@@ -35,7 +35,7 @@ namespace ModernSlavery.Infrastructure.Logging
                     nameof(User.EmailAddress),
                     oldEmailAddress,
                     newEmailAddress,
-                    actionByEmailAddress));
+                    actionByEmailAddress)).ConfigureAwait(false);
         }
 
         public async Task LogPasswordChangedAsync(User userToUpdate, string actionByEmailAddress)
@@ -48,7 +48,7 @@ namespace ModernSlavery.Infrastructure.Logging
                     nameof(User.PasswordHash),
                     null,
                     null,
-                    actionByEmailAddress));
+                    actionByEmailAddress)).ConfigureAwait(false);
         }
 
         public async Task LogDetailsChangedAsync(UpdateDetailsModel originalDetails,
@@ -62,9 +62,9 @@ namespace ModernSlavery.Infrastructure.Logging
                     userToUpdate.EmailAddress,
                     UserAction.ChangedDetails,
                     nameof(UserAction.ChangedDetails),
-                    Core.Extensions.Json.SerializeObject(originalDetails),
-                    Core.Extensions.Json.SerializeObject(changeDetails),
-                    actionByEmailAddress));
+                    Json.SerializeObject(originalDetails),
+                    Json.SerializeObject(changeDetails),
+                    actionByEmailAddress)).ConfigureAwait(false);
         }
 
         public async Task LogUserRetiredAsync(User retiredUser, string actionByEmailAddress)
@@ -77,7 +77,7 @@ namespace ModernSlavery.Infrastructure.Logging
                     nameof(User.Status),
                     UserStatuses.Active.ToString(),
                     UserStatuses.Retired.ToString(),
-                    actionByEmailAddress));
+                    actionByEmailAddress)).ConfigureAwait(false);
         }
     }
 }

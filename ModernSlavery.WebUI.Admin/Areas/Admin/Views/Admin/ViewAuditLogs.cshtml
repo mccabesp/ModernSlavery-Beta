@@ -1,13 +1,15 @@
 @using ModernSlavery.Core
 @model AdminViewAuditLogsViewModel
-@{Layout = "~/Views/GdsLayout.cshtml";}
+@{Layout = "~/Views/GdsLayout.cshtml";
+    Title = "Audit logs";
+    }
 @{
     var userOrOrganisationName =
         Model.Organisation == null
             ? Model.User.Fullname
             : Model.Organisation.OrganisationName;
 
-    ViewBag.Title = $"Audit logs - {userOrOrganisationName} - Administration - Modern Slavery Reporting service";
+    Title = $"Audit logs - {userOrOrganisationName} - Administration - Modern Slavery Reporting service";
 }
 
 @section BeforeMain {

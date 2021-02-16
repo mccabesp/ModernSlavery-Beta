@@ -14,10 +14,10 @@ namespace ModernSlavery.WebTestPlugins
         {
             if (string.IsNullOrWhiteSpace(MaxParamSource) || !e.WebTest.Context.ContainsKey(MaxParamSource)) return;
 
-            var min = !string.IsNullOrWhiteSpace(MinParamSource) && e.WebTest.Context.ContainsKey(MinParamSource) ? Int32.Parse(e.WebTest.Context[MinParamSource].ToString()) : 1;
+            var min = !string.IsNullOrWhiteSpace(MinParamSource) && e.WebTest.Context.ContainsKey(MinParamSource) ? Int32.Parse(e.WebTest.Context[MinParamSource]?.ToString()) : 1;
             if (min < 1) min = 1;
 
-            var max = int.Parse(e.WebTest.Context[MaxParamSource].ToString());
+            var max = int.Parse(e.WebTest.Context[MaxParamSource]?.ToString());
             if (max < min) max = min;
             e.WebTest.Context[ContextParamTarget] = max == min ? min : new Random().Next(min, max+1);
         }

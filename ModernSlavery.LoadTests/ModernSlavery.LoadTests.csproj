@@ -54,32 +54,26 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Load Tests\10 min 10 users.loadtest">
+    <None Include="Load Tests\Peak load 254k daily.loadtest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Load Tests\Normal Load - 54k.loadtest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Load Tests\P2V2 Saturation.loadtest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Load Tests\P1V2 Saturation.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Load Tests\MSU increment to 1k - core.loadtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Load Tests\MSU increment to 20k in 3 hr - core.loadtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Load Tests\MSU Quick Load2.loadtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Load Tests\MSU Quick Soak.loadtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Load Tests\MSU Quick Load.loadtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Load Tests\MSU increment to 20k in 3 hr.loadtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Load Tests\MSU Quick Soak2.loadtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="Scenarios\PREPROD - Anonymous User Journey.webtest" />
     <None Include="Scenarios\Anonymous User Journey.webtest" />
+    <None Include="Scenarios\PREPROD - Private Organisation User Journey.webtest" />
     <None Include="Scenarios\Private Organisation User Journey.webtest" />
+    <None Include="Scenarios\PREPROD - Public Organisation User Journey.webtest" />
     <None Include="Scenarios\Public Organisation User Journey.webtest" />
     <None Include="Web Tests\ApproveOrganisation.webtest">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

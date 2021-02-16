@@ -1,12 +1,9 @@
 ﻿@model IEnumerable<ModernSlavery.Core.Interfaces.Downloadable.IDownloadableItem>
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
-    ViewBag.Title = "Administration: Website Logs";
+    Layout = "~/Views/Gdslayout.cshtml";
+    Title = "Administration: Website Logs";
 
     ViewData["logType"] = "Website";
     ViewData["actionName"] = "WebsiteLogs";
 }
-
-<main id="content" role="main">
-    <partial name="Parts/MainLogContent" model="Model" view-data="ViewData"/>
-</main>
+  <partial name="Parts/MainLogContent" model="Model" view-data="ViewData"/>

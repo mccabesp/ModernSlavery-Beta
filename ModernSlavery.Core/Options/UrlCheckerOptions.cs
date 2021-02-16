@@ -13,10 +13,11 @@ namespace ModernSlavery.Core.Options
         /// The timeout in seconds for checking a url.
         /// </summary>
         public int Timeout { get; set; }
+        public bool Disabled { get; set; }
 
         public void Validate()
         {
-            if (Timeout <= 0)
+            if (!Disabled && Timeout <= 0)
                 throw new ConfigurationErrorsException("UrlChecker:Timeout must be greater than 0");
         }
     }

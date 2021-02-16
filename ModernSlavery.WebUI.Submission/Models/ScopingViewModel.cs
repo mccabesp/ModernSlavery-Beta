@@ -27,6 +27,6 @@ namespace ModernSlavery.WebUI.Submission.Models
         public ScopeViewModel LastScope { get; set; }
         public ScopeViewModel ThisScope { get; set; }
 
-        public string OrgAddressHtml => OrganisationAddress?.Replace(",", "<br />");
+        public string OrgAddressHtml => OrganisationAddress?.Replace(",", Environment.NewLine);
     }
 }

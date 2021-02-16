@@ -49,7 +49,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect("Confirm and Continue");
             Expect("Select more organisations");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(2)]
@@ -61,7 +61,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Back");
             ExpectHeader("Review the organisations included in your group statement");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(3)]
@@ -71,7 +71,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Confirm and continue");
             ExpectHeader("Your modern slavery statement");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

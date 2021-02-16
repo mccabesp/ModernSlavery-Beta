@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 {
@@ -15,7 +16,6 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
         public static void SetModelCustomErrors<TModel>(this Controller controller, TModel model = default)
         {
             var modelType = typeof(TModel);
-
             //Save the old modelstate
             var oldModelState = new ModelStateDictionary();
             foreach (var modelState in controller.ModelState)
@@ -33,7 +33,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
 
             //Clear the model state ready for refill
             controller.ModelState.Clear();
-
+            
             foreach (var modelState in oldModelState)
             {
                 //Get the property name
@@ -62,28 +62,54 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                 {
                     var title = string.IsNullOrWhiteSpace(propertyName) ? error.ErrorMessage : null;
                     var description = !string.IsNullOrWhiteSpace(propertyName) ? error.ErrorMessage : null;
-
                     if (error.ErrorMessage.Like("The value * is not valid for *."))
                     {
                         title = "There's a problem with your values.";
                         description = "The value here is invalid.";
                     }
 
-                    if (attributes == null || !attributes.Any()) goto addModelError;
+                    if (!string.IsNullOrWhiteSpace(propertyName))
+                    {
+                        var metaData = controller.MetadataProvider.GetMetadataForProperty(modelType, propertyName);
 
-                    var attribute =
-                        attributes.FirstOrDefault(a => a.FormatErrorMessage(displayName) == error.ErrorMessage);
-                    if (attribute == null) goto addModelError;
-
-                    var validatorKey =
-                        $"{modelType.Name}.{propertyName}:{attribute.GetType().Name.TrimSuffix("Attribute")}";
-                    var customError = CustomErrorMessages.GetValidationError(validatorKey);
-                    if (customError == null) goto addModelError;
-
-                    title = attribute.FormatError(customError.Title, displayName);
-                    description = attribute.FormatError(customError.Description, displayName);
-
-                addModelError:
+                        var modelValidationAttribute = metaData?.ValidatorMetadata.OfType<XssValidationAttribute>().SingleOrDefault(v => v.ErrorMessage == error.ErrorMessage);
+                        string validatorKey;
+                        CustomErrorMessage customError;
+                        if (modelValidationAttribute != null)
+                        {
+                            validatorKey = $"{modelType.Name}.{propertyName}:{modelValidationAttribute.GetType().Name.TrimSuffix("Attribute")}";
+                            customError = CustomErrorMessages.GetValidationError(validatorKey);
+                            if (customError == null)
+                            {
+                                validatorKey = $"{modelType.Name}.{propertyName}:*";
+                                customError = CustomErrorMessages.GetValidationError(validatorKey);
+                                if (customError != null)
+                                {
+                                    title = modelValidationAttribute.FormatError(customError.Title, displayName);
+                                }
+                            }
+                            else
+                            {
+                                title = modelValidationAttribute.FormatError(customError.Title, displayName);
+                                description = modelValidationAttribute.FormatError(string.IsNullOrWhiteSpace(customError.Description) ? error.ErrorMessage : customError.Description, displayName);
+                            }
+                        }
+                        else
+                        {
+                            var attribute = metaData?.ValidatorMetadata.OfType<ValidationAttribute>().SingleOrDefault(v => attributes.Any(a => a.GetType() == v.GetType() && v.ErrorMessage == error.ErrorMessage));
+                            if (attribute == null) attribute = attributes.FirstOrDefault(a => a.FormatErrorMessage(displayName) == error.ErrorMessage);
+                            if (attribute != null)
+                            {
+                                validatorKey = $"{modelType.Name}.{propertyName}:{attribute.GetType().Name.TrimSuffix("Attribute")}";
+                                customError = CustomErrorMessages.GetValidationError(validatorKey);
+                                if (customError != null)
+                                {
+                                    title = attribute.FormatError(customError.Title, displayName);
+                                    description = attribute.FormatError(string.IsNullOrWhiteSpace(customError.Description) ? error.ErrorMessage : customError.Description, displayName);
+                                }
+                            }
+                        }
+                    }
 
                     //add the summary message if it doesnt already exist
                     if (!string.IsNullOrWhiteSpace(title)
@@ -138,15 +164,15 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
         public static void AddModelError(this ModelStateDictionary modelState,
             int errorCode,
             string propertyName = null,
-            object parameters = null)
+            object parameters = null, string title=null)
         {
             //Try and get the custom error
-            var customError = CustomErrorMessages.GetError(errorCode);
+            var customError = CustomErrorMessages.GetPageError(errorCode);
             if (customError == null)
                 throw new ArgumentException("errorCode", "Cannot find custom error message with this code");
 
             //Add the error to the modelstate
-            var title = customError.Title;
+            if (string.IsNullOrWhiteSpace(title)) title = customError.Title;
             var description = customError.Description;
 
             //Resolve the parameters
@@ -185,7 +211,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
             object parameters = null)
         {
             //Try and get the custom error
-            var customError = CustomErrorMessages.GetError(errorCode);
+            var customError = CustomErrorMessages.GetPageError(errorCode);
             if (customError == null)
                 throw new ArgumentException("errorCode", "Cannot find custom error message with this code");
 

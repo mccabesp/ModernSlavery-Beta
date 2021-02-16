@@ -40,17 +40,17 @@ namespace ModernSlavery.Hosts.Web.Tests
             //AtField("Address 2").Expect(OrgAdress.TownCity);
             //AtField("Address 3").Expect(OrgAdress.County);
             //AtField("Postcode").Expect(OrgAdress.PostCode);
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(31)]
         public async Task ClickingContinueNavigatesToContactDetailsPage()
         {
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             ExpectHeader("Your contact details");
             ExpectText("Enter your contact details.");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(32)]
@@ -62,7 +62,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             AtField("Email address").Expect(UniqueEmail);
             AtField("Job title").Expect(Create_Account.roger_job_title);
             Set("Telephone number").To("01414453344");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -70,10 +70,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         public async Task ClickingContinueNavigatesToOrgDetailsPage()
         {
             Click("Continue");
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             ExpectHeader("Confirm your organisation’s details");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
 
@@ -88,7 +88,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             RightOfText("Your name").Expect(Create_Account.roger_first + " " + Create_Account.roger_last + " (" + Create_Account.roger_job_title + ")");
             RightOfText("Email").Expect(UniqueEmail);
             RightOfText("Telephone").Expect("01414453344");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
         [Test, Order(36)]
@@ -100,9 +100,9 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Confirm");
 
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
             //todo await confirmation of international workflow
         }

@@ -1,6 +1,6 @@
 ﻿@{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Add your organisation - Modern Slavery reporting service";
+    Title = "Add your organisation";
 }
 @model AddOrganisationViewModel
 @section BeforeMain {
@@ -12,10 +12,12 @@
         {
             @Html.AntiForgeryToken()
             @await Html.GovUkValidationSummaryAsync()
+
             <h1 class="govuk-heading-l">
                 Details of the organisation you want to register
             </h1>
             <div class="govuk-form-group">
+
 
                 <p class="govuk-body">Enter the name for the organisation whose Modern Slavery statement you’re reporting.</p>
 

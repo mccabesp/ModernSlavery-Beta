@@ -56,8 +56,8 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
 
                     if (inScopeOrganisationsThatStillNeedToReport.Count > 0)
                     {
-                        await SendReminderEmailsForSectorTypeAsync(user, inScopeOrganisationsThatStillNeedToReport, SectorTypes.Public, log);
-                        await SendReminderEmailsForSectorTypeAsync(user, inScopeOrganisationsThatStillNeedToReport, SectorTypes.Private, log);
+                        await SendReminderEmailsForSectorTypeAsync(user, inScopeOrganisationsThatStillNeedToReport, SectorTypes.Public, log).ConfigureAwait(false);
+                        await SendReminderEmailsForSectorTypeAsync(user, inScopeOrganisationsThatStillNeedToReport, SectorTypes.Private, log).ConfigureAwait(false);
                     }
                 }
 
@@ -84,7 +84,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                     && ReminderEmailWasNotSentAfterLatestReminderDate(user, sectorType))
                     try
                     {
-                        await SendReminderEmailAsync(user, sectorType, organisationsOfSectorType);
+                        await SendReminderEmailAsync(user, sectorType, organisationsOfSectorType).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -132,7 +132,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 Personalisation = personalisation
             };
 
-            await _govNotifyApi.SendEmailAsync(notifyEmail);
+            await _govNotifyApi.SendEmailAsync(notifyEmail).ConfigureAwait(false);
             SaveReminderEmailRecord(user, sectorType);
         }
 

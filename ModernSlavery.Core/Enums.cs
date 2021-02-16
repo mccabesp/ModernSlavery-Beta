@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 namespace ModernSlavery.Core
 {
+
     public enum ManualActions : byte
     {
         Unknown = 0,
@@ -53,5 +54,12 @@ namespace ModernSlavery.Core
         DuplicateName = 5,
         CoHoTransientError = 6,
         CoHoPermanentError = 7
+    }
+
+    public enum RetryPolicyTypes
+    {
+        None,
+        Linear,
+        Exponential
     }
 }

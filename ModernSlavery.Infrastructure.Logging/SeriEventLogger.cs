@@ -10,12 +10,12 @@ namespace ModernSlavery.Infrastructure.Logging
     public class SeriEventLogger : IEventLogger
     {
         private readonly Logger log;
-        public SeriEventLogger(SharedOptions sharedOptions, TelemetryConfiguration telemetryConfiguration)
+        public SeriEventLogger(SharedOptions sharedOptions, TelemetryConfiguration telemetryConfiguration=null)
         {
             if (sharedOptions.IsDevelopment())
                 log = new LoggerConfiguration().WriteTo.Console().CreateLogger();
             else
-                log = new LoggerConfiguration().WriteTo.ApplicationInsights(TelemetryConfiguration.Active, TelemetryConverter.Traces).CreateLogger();
+                log = new LoggerConfiguration().WriteTo.ApplicationInsights(telemetryConfiguration ?? TelemetryConfiguration.Active, TelemetryConverter.Traces).CreateLogger();
 
             Log.Logger = log;
         }

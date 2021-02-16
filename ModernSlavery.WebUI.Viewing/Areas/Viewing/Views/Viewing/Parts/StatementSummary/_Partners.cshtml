@@ -1,0 +1,57 @@
+﻿@using static Core.Entities.StatementSummary.V1.StatementSummary;
+@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+
+<div class="govuk-grid-column-two-thirds">
+    <h3 class="govuk-heading-m">
+        Engaging with others
+    </h3>
+
+    <div class="govuk-body">
+        We asked the organisation to tell us who it engaged with to help monitor working conditions across its operations and supply chains.
+    </div>
+</div>
+
+@if (Model.Partners.Contains(PartnerTypes.None))
+{
+    <div class="govuk-grid-column-two-thirds">
+        <div class="nothing-included">
+            <div class="nothing-included__label">Organisation’s response</div>
+            <strong class="govuk-tag govuk-tag--blue nothing-included__tag">
+                The organisation told us it did not engage with any of the people we asked about during the period of the statement.
+            </strong>
+        </div>
+    </div>
+}
+else if (Model.Partners.Any())
+{
+    <div class="govuk-grid-column-full">
+        <div class="app-question-list">
+            <div class="app-question-list__header">
+                <div class="app-question-list__column app-question-list__name">
+                    We asked who the organisation engaged with
+                </div>
+                <div class="app-question-list__column app-question-list__response">
+                    Organisation’s response
+                </div>
+            </div>
+            @foreach (var partner in Enums.GetValuesExcept<PartnerTypes>(PartnerTypes.Unknown, PartnerTypes.None))
+            {
+                <div class="app-question-list__item">
+                    <div class="app-question-list__column app-question-list__name">
+                        @partner.GetEnumDescription()
+                    </div>
+                    <div class="app-question-list__column app-question-list__response">
+                        <span class="app-question-list__response-label">
+                            Organisation’s response:
+                        </span>
+                        <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.Partners.Contains(partner) ? "Yes" : "No")</strong>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <partial name="Parts/StatementSummary/_NoResponse" />
+}

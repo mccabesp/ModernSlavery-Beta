@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model GrievancesViewModel
 @using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
@@ -22,6 +23,8 @@
                             @Model.PageTitle
                         </h1>
                     </legend>
+
+                    <div class="govuk-body">Tell us how workers in your operations or supply chains could raise concerns or make complaints.</div>
 
                     <div id="conditions-hint" class="govuk-hint">
                         Select all that apply

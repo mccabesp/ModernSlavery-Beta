@@ -1,9 +1,7 @@
 ﻿@model ManageAccountViewModel
 @{
     Layout = "~/Views/GdsLayout.cshtml";
-}
-@section BeforeMain {
-    @await Html.PartialAsync("AccountNavigation")
+    Title = "Manage your account";
 }
 
 @if (string.IsNullOrWhiteSpace(ViewBag.ChangeSuccessMessage) == false)

@@ -30,18 +30,6 @@ details.advanced-search-details .govuk-details__text {
     padding-left: 0px;
 }
 
-.two-columns {
-    columns: 2;
-    margin-bottom: 0px;
-
-   @supports (break-inside: avoid){
-       .govuk-checkboxes__item {
-        break-inside: avoid;     
-     
-    }
-   }
-}
-
 .right{
     float: right;
     margin-bottom:10px;

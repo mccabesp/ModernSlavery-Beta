@@ -19,7 +19,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
                 if (_sharedOptions.CertExpiresWarningDays > 0)
                 {
                     //Get the cert thumbprint
-                    var certThumbprint = _sharedOptions.CertThumbprint.SplitI(";")
+                    var certThumbprint = _sharedOptions.CertThumbprint.SplitI(';')
                         .FirstOrDefault();
 
                     if (!string.IsNullOrWhiteSpace(certThumbprint))

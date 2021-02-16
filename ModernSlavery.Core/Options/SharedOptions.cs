@@ -33,8 +33,10 @@ namespace ModernSlavery.Core.Models
         public string AdminEmails { get; set; }
         public string SuperAdminEmails { get; set; }
         public string DatabaseAdminEmails { get; set; }
+        public string DevOpsAdminEmails { get; set; }
 
-        public int SessionTimeOutMinutes { get; set; } = 20;
+        public double SessionTimeOutMinutes { get; set; } = 20;
+        public int SessionTimeOutSeconds => (int)(SessionTimeOutMinutes * 60);
 
         public int ObfuscationSeed { get; set; } = 127;
 
@@ -79,7 +81,7 @@ namespace ModernSlavery.Core.Models
         public string SecurityCodeChars { get; set; } = "123456789ABCDEFGHKLMNPQRSTUXYZ";
         public int SecurityCodeLength { get; set; } = 8;
         public int SecurityCodeExpiryDays { get; set; } = 90;
-        public string OrganisationCodeChars { get; set; }
+        public string OrganisationCodeChars { get; set; } = "123456789ABCDEFGHKLMNPQRSTUXYZ";
         public string PasswordRegex { get; set; }
         public string PasswordRegexError { get; set; }
         public string PinChars { get; set; }
@@ -162,8 +164,8 @@ namespace ModernSlavery.Core.Models
 
         #region Files and Directories
 
-        public string DataPath { get; set; }
-        public string DownloadsPath => Path.Combine(DataPath, "Downloads");
+        public string AppDataPath { get; set; }
+        public string DownloadsPath => "Downloads";
 
         public string LogPath { get; set; }
 
@@ -208,7 +210,7 @@ namespace ModernSlavery.Core.Models
                 while (PublicReportingDeadline.Date.AddDays(1) < VirtualDateTime.Now)
                     PublicReportingDeadline = new DateTime(PublicReportingDeadline.Year + 1, PublicReportingDeadline.Month, PublicReportingDeadline.Day);
 
-            if (string.IsNullOrWhiteSpace(DataPath)) throw new ConfigurationErrorsException($"{nameof(DataPath)} cannot be empty");
+            if (string.IsNullOrWhiteSpace(AppDataPath)) throw new ConfigurationErrorsException($"{nameof(AppDataPath)} cannot be empty");
 
             if (!string.IsNullOrWhiteSpace(TrustedDomainsOrIPs))
             {
@@ -228,7 +230,7 @@ namespace ModernSlavery.Core.Models
 
         public bool IsTrustedAddress(string testIPAddress)
         {
-            if (_trustedDomainsOrIPs == null) return true;
+            if (_trustedDomainsOrIPs == null || _trustedDomainsOrIPs.Length==0) return true;
             if (string.IsNullOrWhiteSpace(testIPAddress)) throw new ArgumentNullException(nameof(testIPAddress));
             var trusted=Networking.IsTrustedAddress(testIPAddress, _trustedDomainsOrIPs);
             return trusted;

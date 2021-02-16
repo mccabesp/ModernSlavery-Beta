@@ -23,7 +23,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 
             try
             {
-                var remoteTime = Encryption.DecryptData(filterContext.HttpContext.GetParams("BotProtectionTimeStamp")).FromSmallDateTime(true);
+                var remoteTime = Encryption.Decrypt(filterContext.HttpContext.GetParams("BotProtectionTimeStamp"), Encryption.Encodings.Base62).FromSmallDateTime(true);
                 if (remoteTime.AddSeconds(_minimumSeconds) < VirtualDateTime.Now) return;
             }
             catch

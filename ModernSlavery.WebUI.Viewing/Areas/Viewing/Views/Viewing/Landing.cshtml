@@ -1,0 +1,95 @@
+﻿@inject SharedOptions sharedOptions
+@{
+    Layout = "/Views/GdsLayout.cshtml";
+    Title = sharedOptions.ServiceName;
+    Description = "Find modern slavery statements and see what organisations are doing to tackle modern slavery. If you’re an organisation with a statement, add it to the registry.";
+    Robots = RobotDirectives.All;
+}
+
+@section Masthead{
+    <div class="masthead">
+        <div class="hero">
+            <div class="hero__content">
+                <div class="hero__body">
+                    <h1 class="hero__title">
+                        See what organisations are doing to tackle modern slavery
+                    </h1>
+                    <p class="hero__description">
+                        Use the Modern slavery statement registry to find or add statements. See what organisations are doing to eliminate modern slavery from their operations and supply chains.
+                    </p>
+                    <a rel="track" data-track-category="pageElementInteraction" href="@Url.ActionArea("Search","Viewing", "Viewing")" role="button" draggable="false" class="govuk-button govuk-button--start app-button--inverted" data-module="govuk-button" data-click-events data-click-category="Hero" data-click-action="Button clicked">
+                        Find statements
+                        <image src="/assets/images/arrow.png" xlink:href="" class="arrow" role="presentation" alt=""></image>
+                    </a>
+                    <span class="hero-alternative-action">
+                        or <a rel="track" data-track-category="pageElementInteraction" class="govuk-link" href="@Url.ActionArea("Login", "Identity", "Identity")" data-click-events data-click-category="Hero" data-click-action="Internal link clicked"> add a statement</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div id="landingpage-content">
+    <section class="product-page-!-border-bottom ">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-half govuk-!-padding-bottom-5">
+                <h2 class="govuk-heading-l govuk-!-margin-bottom-3">Find statements</h2>
+                <p class="govuk-body">Search for statements using a range of filters. You can also download statement data as CSV files.</p>
+                <p class="govuk-body govuk-!-font-weight-bold"><a rel="track" data-track-category="pageElementInteraction" href="@(Url.ActionArea("Search", "Viewing", "Viewing"))" class="govuk-link">Search the registry</a></p>
+                <p class="govuk-body govuk-!-font-weight-bold"><a rel="download" href="@(Url.ActionArea("Download", "Viewing", "Viewing"))" class="govuk-link">Download statement data</a></p>
+            </div>
+            <div class="govuk-grid-column-one-half govuk-!-padding-bottom-5">
+                <h2 class="govuk-heading-l govuk-!-margin-bottom-3">Add a statement to the registry</h2>
+                <p class="govuk-body govuk-!-margin-bottom-7 mobile-no-margin">
+                    To add your organisation’s statement to the registry, you’ll need to create an account. To get started, go to the sign-in page.
+                </p>
+                <p class="govuk-body"><a rel="track" data-track-category="pageElementInteraction" href="@(Url.ActionArea("Login", "Identity", "Identity"))" class="govuk-link govuk-!-font-weight-bold">Create an account or sign in</a></p>
+            </div>
+        </div>
+    </section>
+
+    <section class="product-page-!-border-bottom">
+        <div class="govuk-grid-row ">
+            <div class="govuk-grid-column-two-thirds govuk-!-margin-bottom-5 govuk-!-margin-top-9 ">
+                <h2 class="govuk-heading-l">Who can add their statement to the registry</h2>
+                <p class="govuk-body">Any organisation with a modern slavery statement can add it to the registry, including:</p>
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>those that have to publish a statement by law, and want to show they’ve met their legal obligations</li>
+                    <li>those that have produced a statement voluntarily</li>
+                </ul>
+                <details class="govuk-details" data-module="govuk-details">
+                    <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">
+                            Who has to publish a statement by law?
+                        </span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        <p class="govuk-body">Under section 54 of the Modern Slavery Act 2015, organisations that meet certain criteria are legally required to publish an annual modern slavery statement in a prominent place on their website. They are also encouraged to make statements from previous years available online.</p>
+                        <p class="govuk-body">In addition, organisations are strongly encouraged to publish their statements on the Modern slavery statement registry, as this will be mandatory in the future.</p>
+                        <p class="govuk-body">Currently, the legislation applies to commercial organisations that:</p>
+                        <ul class="govuk-list govuk-list--bullet">
+                            <li>are a body corporate or a partnership (described as an ‘organisation’ in this service), wherever incorporated</li>
+                            <li>carry on a business, or part of a business, in the UK</li>
+                            <li>supply goods or services</li>
+                            <li>have an annual turnover of £36m or more</li>
+                        </ul>
+                        <p class="govuk-body">Many other organisations produce a modern slavery statement voluntarily. In the future, the requirement to publish a statement will be extended to public sector organisations with a budget of £36 million or more.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds govuk-!-margin-bottom-5 govuk-!-margin-top-9 ">
+                <h2 class="govuk-heading-l content-section__first-heading">Find resources on modern slavery statements</h2>
+                <p class="govuk-body">Resources and guidance on modern slavery statements are available on the GOV.UK modern slavery collection page. </p>
+                <a href="https://www.gov.uk/government/collections/modern-slavery" class="govuk-link govuk-!-font-weight-bold">Find resources and guidance</a>
+            </div>
+        </div>
+    </section>
+</div>
+
+

@@ -13,5 +13,5 @@
     }
 }
 @await Html.PartialModelAsync(new CheckYourAnswers(
-    new CheckYourAnswer(deadlineName, deadlineDateFmt, "DeadlineDate")
+    new StringCheckYourAnswer(deadlineName, deadlineDateFmt, "DeadlineDate")
     ))

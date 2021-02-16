@@ -33,25 +33,19 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             _PostcodeChecker = postcodeChecker;
         }
 
-        public OrganisationAddress CreateOrganisationAddressFromCompaniesHouseAddress(
-            CompaniesHouseAddress companiesHouseAddress)
+        public async Task<OrganisationAddress> CreateOrganisationAddressFromCompaniesHouseAddressAsync(CompaniesHouseAddress companiesHouseAddress)
         {
             var premisesAndLine1 = GetAddressLineFromPremisesAndAddressLine1(companiesHouseAddress);
             bool? isUkAddress = null;
-            if (_PostcodeChecker.IsValidPostcode(companiesHouseAddress?.PostalCode).Result) isUkAddress = true;
+            if (companiesHouseAddress!=null && !string.IsNullOrWhiteSpace(companiesHouseAddress.PostalCode) && await _PostcodeChecker.CheckPostcodeAsync(companiesHouseAddress.PostalCode)) isUkAddress = true;
 
-            return new OrganisationAddress
+            var address = new OrganisationAddress
             {
-                Address1 = FirstHundredChars(companiesHouseAddress?.CareOf ?? premisesAndLine1),
-                Address2 =
-                    FirstHundredChars(companiesHouseAddress?.CareOf != null
-                        ? premisesAndLine1
-                        : companiesHouseAddress?.AddressLine2),
-                Address3 = FirstHundredChars(companiesHouseAddress?.CareOf != null
-                    ? companiesHouseAddress?.AddressLine2
-                    : null),
-                TownCity = FirstHundredChars(companiesHouseAddress?.Locality),
-                County = FirstHundredChars(companiesHouseAddress?.Region),
+                Address1 = companiesHouseAddress?.CareOf ?? premisesAndLine1,
+                Address2 = companiesHouseAddress?.CareOf != null ? premisesAndLine1 : companiesHouseAddress?.AddressLine2,
+                Address3 = companiesHouseAddress?.CareOf != null ? companiesHouseAddress?.AddressLine2 : null,
+                TownCity = companiesHouseAddress?.Locality,
+                County = companiesHouseAddress?.Region,
                 Country = companiesHouseAddress?.Country,
                 PostCode = companiesHouseAddress?.PostalCode,
                 PoBox = companiesHouseAddress?.PoBox,
@@ -63,6 +57,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
                 Source = SourceOfChange,
                 IsUkAddress = isUkAddress
             };
+            address.Trim();
+            return address;
         }
 
         public async Task UpdateOrganisationsAsync()
@@ -83,9 +79,8 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
 
             try
             {
-                var organisationFromCompaniesHouse = _CompaniesHouseAPI.GetCompanyAsync(organisation.CompanyNumber).Result;
+                var organisationFromCompaniesHouse = await _CompaniesHouseAPI.GetCompanyAsync(organisation.CompanyNumber);
 
-                if (organisation.OrganisationId == 1041) System.Diagnostics.Debugger.Break();
                 try
                 {
                     await UpdateSicCodeAsync(organisation, organisationFromCompaniesHouse);
@@ -122,20 +117,22 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
         public async Task UpdateAddressAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse)
         {
             var companiesHouseAddress = organisationFromCompaniesHouse.RegisteredOfficeAddress;
-            var newOrganisationAddressFromCompaniesHouse =
-                CreateOrganisationAddressFromCompaniesHouseAddress(companiesHouseAddress);
-            var oldOrganisationAddress = _organisationBusinessLogic.GetOrganisationAddress(organisation);
-            if (oldOrganisationAddress.AddressMatches(newOrganisationAddressFromCompaniesHouse)
-                || IsNewOrganisationAddressNullOrEmpty(newOrganisationAddressFromCompaniesHouse))
-                return;
+            var newOrganisationAddressFromCompaniesHouse = await CreateOrganisationAddressFromCompaniesHouseAddressAsync(companiesHouseAddress);
+            if (newOrganisationAddressFromCompaniesHouse.IsEmpty())return;
+
+            var oldOrganisationAddress = organisation.GetLatestAddress();
+
+            if (oldOrganisationAddress != null)
+            {
+                if (oldOrganisationAddress.AddressMatches(newOrganisationAddressFromCompaniesHouse)) return;
+                oldOrganisationAddress.Status = AddressStatuses.Retired;
+                oldOrganisationAddress.StatusDate = VirtualDateTime.Now;
+                oldOrganisationAddress.Modified = VirtualDateTime.Now;
+            }
 
             newOrganisationAddressFromCompaniesHouse.OrganisationId = organisation.OrganisationId;
             organisation.OrganisationAddresses.Add(newOrganisationAddressFromCompaniesHouse);
             organisation.LatestAddress = newOrganisationAddressFromCompaniesHouse;
-
-            oldOrganisationAddress.Status = AddressStatuses.Retired;
-            oldOrganisationAddress.StatusDate = VirtualDateTime.Now;
-            oldOrganisationAddress.Modified = VirtualDateTime.Now;
 
             _dataRepository.Insert(newOrganisationAddressFromCompaniesHouse);
         }
@@ -143,7 +140,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
         public async Task UpdateNameAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse)
         {
             var companyNameFromCompaniesHouse = organisationFromCompaniesHouse.CompanyName;
-            companyNameFromCompaniesHouse = FirstHundredChars(companyNameFromCompaniesHouse);
+            companyNameFromCompaniesHouse = companyNameFromCompaniesHouse?.Left(100);
 
             if (IsCompanyNameEqual(_organisationBusinessLogic.GetOrganisationName(organisation), companyNameFromCompaniesHouse)) return;
 
@@ -245,38 +242,11 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
                 }
         }
 
-        private bool IsNewOrganisationAddressNullOrEmpty(OrganisationAddress address)
-        {
-            // Some organisations are not required to provide information to Companies House, and so we might get an empty
-            // address. See https://wck2.companieshouse.gov.uk/goWCK/help/en/stdwc/excl_ch.html for more details. In other cases
-            // organisations may have deleted their information when closing an organisation or merging with another.
-            if (
-                string.IsNullOrEmpty(address.Address1)
-                && string.IsNullOrEmpty(address.Address2)
-                && string.IsNullOrEmpty(address.Address3)
-                && string.IsNullOrEmpty(address.TownCity)
-                && string.IsNullOrEmpty(address.County)
-                && string.IsNullOrEmpty(address.Country)
-                && string.IsNullOrEmpty(address.PoBox)
-                && string.IsNullOrEmpty(address.PostCode)
-            )
-                return true;
-
-            return false;
-        }
-
         private string GetAddressLineFromPremisesAndAddressLine1(CompaniesHouseAddress companiesHouseAddress)
         {
             return companiesHouseAddress?.Premises == null
                 ? companiesHouseAddress?.AddressLine1
                 : companiesHouseAddress?.Premises + "," + companiesHouseAddress?.AddressLine1;
-        }
-
-        private string FirstHundredChars(string str)
-        {
-            if (str == null) return null;
-
-            return str.Substring(0, Math.Min(str.Length, 100));
         }
 
         #endregion

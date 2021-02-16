@@ -7,6 +7,7 @@ using System.Transactions;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.Infrastructure.Database.Classes
@@ -16,13 +17,15 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         private IDbContextTransaction Transaction;
 
         private bool TransactionStarted;
+        private readonly IServiceProvider _serviceProvider;
 
-        public SqlRepository(IDbContext context)
+        public SqlRepository(IDbContext context, IServiceProvider serviceProvider)
         {
             DbContext = context;
+            _serviceProvider = serviceProvider;
         }
 
-        public IDbContext DbContext { get; }
+        public IDbContext DbContext { get; private set; }
 
         public IQueryable<TEntity> GetAll<TEntity>() where TEntity : class
         {
@@ -32,54 +35,54 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         public async Task<bool> AnyAsync<TEntity>(Expression<Func<TEntity, bool>> predicate = null)
             where TEntity : class
         {
-            return await DbContext.Set<TEntity>().AnyAsync(predicate);
+            return await DbContext.Set<TEntity>().AnyAsync(predicate).ConfigureAwait(false);
         }
 
         public async Task<int> CountAsync<TEntity>(Expression<Func<TEntity, bool>> predicate = null)
             where TEntity : class
         {
-            return await DbContext.Set<TEntity>().CountAsync(predicate);
+            return await DbContext.Set<TEntity>().CountAsync(predicate).ConfigureAwait(false);
         }
 
         public async Task<TEntity> FirstOrDefaultAsync<TEntity>(Expression<Func<TEntity, bool>> predicate = null)
             where TEntity : class
         {
-            return await DbContext.Set<TEntity>().FirstOrDefaultAsync(predicate);
+            return await DbContext.Set<TEntity>().FirstOrDefaultAsync(predicate).ConfigureAwait(false);
         }
 
         public async Task<TEntity> SingleOrDefaultAsync<TEntity>(Expression<Func<TEntity, bool>> predicate = null)
             where TEntity : class
         {
-            return await DbContext.Set<TEntity>().SingleOrDefaultAsync(predicate);
+            return await DbContext.Set<TEntity>().SingleOrDefaultAsync(predicate).ConfigureAwait(false);
         }
 
         public async Task<TEntity> FirstOrDefaultByAscendingAsync<TEntity, TKey>(
             Expression<Func<TEntity, TKey>> keySelector, Expression<Func<TEntity, bool>> filterPredicate = null)
             where TEntity : class
         {
-            return await DbContext.Set<TEntity>().OrderBy(keySelector).FirstOrDefaultAsync(filterPredicate);
+            return await DbContext.Set<TEntity>().OrderBy(keySelector).FirstOrDefaultAsync(filterPredicate).ConfigureAwait(false);
         }
 
         public async Task<TEntity> FirstOrDefaultByDescendingAsync<TEntity, TKey>(
             Expression<Func<TEntity, TKey>> keySelector, Expression<Func<TEntity, bool>> filterPredicate = null)
             where TEntity : class
         {
-            return await DbContext.Set<TEntity>().OrderByDescending(keySelector).FirstOrDefaultAsync(filterPredicate);
+            return await DbContext.Set<TEntity>().OrderByDescending(keySelector).FirstOrDefaultAsync(filterPredicate).ConfigureAwait(false);
         }
 
         public async Task<List<TEntity>> ToListAsync<TEntity>(Expression<Func<TEntity, bool>> predicate = null)
             where TEntity : class
         {
-            if (predicate == null) return await DbContext.Set<TEntity>().ToListAsync();
-            return await DbContext.Set<TEntity>().Where(predicate).ToListAsync();
+            if (predicate == null) return await DbContext.Set<TEntity>().ToListAsync().ConfigureAwait(false);
+            return await DbContext.Set<TEntity>().Where(predicate).ToListAsync().ConfigureAwait(false);
         }
 
         public async Task<List<TEntity>> ToListAscendingAsync<TEntity, TKey>(
             Expression<Func<TEntity, TKey>> keySelector, Expression<Func<TEntity, bool>> filterPredicate = null)
             where TEntity : class
         {
-            if (filterPredicate == null) return await DbContext.Set<TEntity>().OrderBy(keySelector).ToListAsync();
-            return await DbContext.Set<TEntity>().Where(filterPredicate).OrderBy(keySelector).ToListAsync();
+            if (filterPredicate == null) return await DbContext.Set<TEntity>().OrderBy(keySelector).ToListAsync().ConfigureAwait(false);
+            return await DbContext.Set<TEntity>().Where(filterPredicate).OrderBy(keySelector).ToListAsync().ConfigureAwait(false);
         }
 
         public async Task<List<TEntity>> ToListDescendingAsync<TEntity, TKey>(
@@ -87,8 +90,8 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             where TEntity : class
         {
             if (filterPredicate == null)
-                return await DbContext.Set<TEntity>().OrderByDescending(keySelector).ToListAsync();
-            return await DbContext.Set<TEntity>().Where(filterPredicate).OrderByDescending(keySelector).ToListAsync();
+                return await DbContext.Set<TEntity>().OrderByDescending(keySelector).ToListAsync().ConfigureAwait(false);
+            return await DbContext.Set<TEntity>().Where(filterPredicate).OrderByDescending(keySelector).ToListAsync().ConfigureAwait(false);
         }
 
         public TEntity Get<TEntity>(params object[] keyValues) where TEntity : class
@@ -98,7 +101,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
         public async Task<TEntity> GetAsync<TEntity>(params object[] keyValues) where TEntity : class
         {
-            return await GetEntities<TEntity>().FindAsync(keyValues);
+            return await GetEntities<TEntity>().FindAsync(keyValues).ConfigureAwait(false);
         }
 
         public void Insert<TEntity>(TEntity entity) where TEntity : class
@@ -120,28 +123,28 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         {
             if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
 
-            await DbContext.SaveChangesAsync();
+            await DbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task BulkInsertAsync<TEntity>(IEnumerable<TEntity> entities, bool setOutputIdentity = false, int batchSize = 2000, int? timeout = null) where TEntity : class
         {
             if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
 
-            await DbContext.BulkInsertAsync(entities,setOutputIdentity,batchSize,timeout);
+            await DbContext.BulkInsertAsync(entities,setOutputIdentity,batchSize,timeout).ConfigureAwait(false);
         }
 
         public async Task BulkDeleteAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class
         {
             if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
 
-            await DbContext.BulkDeleteAsync(entities, batchSize, timeout);
+            await DbContext.BulkDeleteAsync(entities, batchSize, timeout).ConfigureAwait(false);
         }
 
         public async Task BulkUpdateAsync<TEntity>(IEnumerable<TEntity> entities, int batchSize = 2000, int? timeout = null) where TEntity : class
         {
             if (TransactionStarted && Transaction == null) Transaction = DbContext.GetDatabase().BeginTransaction();
 
-            await DbContext.BulkUpdateAsync(entities, batchSize,timeout);
+            await DbContext.BulkUpdateAsync(entities, batchSize,timeout).ConfigureAwait(false);
         }
 
         public async Task ExecuteTransactionAsync(Func<Task> delegateAction)
@@ -154,7 +157,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             try
             {
                 TransactionStarted = true;
-                await strategy.ExecuteAsync(delegateAction);
+                await strategy.ExecuteAsync(delegateAction).ConfigureAwait(false);
                 if (Transaction != null)throw new TransactionException("An SQL transaction has started which you must commit or rollback");
             }
             finally
@@ -205,6 +208,11 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         public void SetCommandTimeout(int? timeout)
         {
             DbContext.GetDatabase().SetCommandTimeout(timeout);
+        }
+
+        public void Reload()
+        {
+            DbContext = ActivatorUtilities.CreateInstance<DatabaseContext>(_serviceProvider);
         }
     }
 }

@@ -1,0 +1,155 @@
+﻿@using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary.StatementRisk;
+@model ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary.StatementRisk;
+
+<div class="statement-section-full">
+    <h3 class="govuk-heading-m">
+        Priority risks for this organisation (@ViewData["index"] of @ViewData["total"])
+    </h3>
+
+    <div class="govuk-inset-text">
+        @Model.Description
+    </div>
+
+    <div class="govuk-grid-column-full">
+        <div class="app-question-list">
+            <div class="app-question-list__header">
+                <div class="app-question-list__column app-question-list__name risk">
+                    Questions we asked about this risk
+                </div>
+                <div class="app-question-list__column app-question-list__response risk">
+                    Organisation’s response
+                </div>
+            </div>
+
+            <div class="app-question-list__item">
+                <div class="app-question-list__column app-question-list__name risk">
+                    Where it was most likely to occur
+                </div>
+                <div class="app-question-list__column app-question-list__response risk">
+                    <span class="app-question-list__response-label">
+                        Organisation’s response:
+                    </span>
+                    @{
+                        switch (Model.LikelySource)
+                        {
+                            case RiskSourceTypes.Unknown:
+                                <strong class="govuk-tag govuk-tag--grey">
+                                    NO DETAILS PROVIDED
+                                </strong>
+                                break;
+                            case RiskSourceTypes.OwnOperations:
+                                <text>@RiskSourceTypes.OwnOperations.GetEnumDescription().</text>
+                                break;
+                            case RiskSourceTypes.Other:
+                                <text>Organisation selected ‘Other’ and wrote: <br> @Model.OtherLikelySource</text>
+                                break;
+                            case RiskSourceTypes.SupplyChains:
+                                <text>@RiskSourceTypes.SupplyChains.GetEnumDescription().</text>
+                                if (!Model.SupplyChainTiers.Any())
+                                {
+                                    <text>Supplier tier not specified</text>
+                                }
+                                else
+                                {
+                                    <ul class="govuk-list govuk-list--bullet">
+                                        @foreach (var tier in Model.SupplyChainTiers)
+                                        {
+                                            <li>@tier.GetEnumDescription()<br><span class="govuk-hint">@GetTierExplanation(tier)</span></li>
+                                        }
+                                    </ul>
+                                }
+                                break;
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="app-question-list__item">
+                <div class="app-question-list__column app-question-list__name risk">
+                    Who was it most likely to affect
+                </div>
+                <div class="app-question-list__column app-question-list__response risk">
+                    <span class="app-question-list__response-label">
+                        Organisation’s response:
+                    </span>
+                    @if (Model.Targets.Any())
+                    {
+                        <ul class="govuk-list govuk-list--bullet">
+                            @foreach (var target in Model.Targets)
+                            {
+                                var isOther = target == RiskTargetTypes.Other;
+                                @if (!isOther)
+                                {
+                                    <li>@target.GetEnumDescription()</li>
+                                }
+                                else
+                                {
+                                    <li>@Model.OtherTargets</li>
+                                }
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <strong class="govuk-tag govuk-tag--grey">
+                            NO DETAILS PROVIDED
+                        </strong>
+                    }
+                </div>
+            </div>
+
+            <div class="app-question-list__item">
+                <div class="app-question-list__column app-question-list__name risk">
+                    In which country
+                </div>
+                <div class="app-question-list__column app-question-list__response risk">
+                    <span class="app-question-list__response-label">
+                        Organisation’s response:
+                    </span>
+                    @if (!Model.Countries.Any())
+                    {
+                        <strong class="govuk-tag govuk-tag--grey">
+                            NO DETAILS PROVIDED
+                        </strong>
+                    }
+                    else if (Model.Countries.Count == 1)
+                    {
+                        @Model.Countries.Single().Name
+                    }
+                    else
+                    {
+                        <ul class="govuk-list govuk-list--bullet">
+                            @foreach (var country in Model.Countries)
+                            {
+                                <li>@country.Name</li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+
+            <div class="app-question-list__item">
+                <div class="app-question-list__column app-question-list__name risk">
+                    Actions or plans to address this risk
+                </div>
+                <div class="app-question-list__column app-question-list__response risk">
+                    <span class="app-question-list__response-label">
+                        Organisation’s response:
+                    </span>
+                    @if (string.IsNullOrEmpty(Model.ActionsOrPlans))
+                    {
+                        <strong class="govuk-tag govuk-tag--grey">
+                            NO DETAILS PROVIDED
+                        </strong>
+                    }
+                    else
+                    {
+                        @Model.ActionsOrPlans
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>

@@ -1,4 +1,5 @@
-﻿using ModernSlavery.Core.Entities;
+﻿using System.Security.Claims;
+using ModernSlavery.Core.Entities;
 
 namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 {
@@ -7,6 +8,12 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         bool IsAdministrator(User user);
         bool IsSuperAdministrator(User user);
         bool IsDatabaseAdministrator(User user);
+        bool IsDevOpsAdministrator(User user);
         bool IsSystemUser(User user);
+        bool IsAdministrator(ClaimsPrincipal  principle);
+        bool IsSuperAdministrator(ClaimsPrincipal principle);
+        bool IsDatabaseAdministrator(ClaimsPrincipal principle);
+        bool IsDevOpsAdministrator(ClaimsPrincipal principle);
+        bool IsSystemUser(ClaimsPrincipal principle);
     }
 }

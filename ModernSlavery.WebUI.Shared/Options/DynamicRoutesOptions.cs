@@ -26,7 +26,7 @@ namespace ModernSlavery.WebUI.Shared.Options
                     endpoints.MapFallbackToPage(key, this[key]);
                     continue;
                 }
-                var parts = this[key].SplitI(":");
+                var parts = this[key].SplitI(':');
                 var actionName = parts.Length > 0 ? parts[0] : null;
                 var controllerName = parts.Length > 1 ? parts[1] : null;
                 var areaName = parts.Length > 2 ? parts[2] : null;

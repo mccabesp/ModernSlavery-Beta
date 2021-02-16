@@ -79,7 +79,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             var pendingFasttrackCodes = PendingFasttrackCodes;
             if (pendingFasttrackCodes != null)
             {
-                var args = pendingFasttrackCodes?.SplitI(":");
+                var args = pendingFasttrackCodes?.SplitI(':');
                 if (args.Length > 2) model.FirstName = args[2];
 
                 if (args.Length > 3) model.LastName = args[3];
@@ -191,7 +191,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             var pendingFasttrackCodes = PendingFasttrackCodes;
             if (pendingFasttrackCodes != null)
             {
-                var args = pendingFasttrackCodes?.SplitI(":");
+                var args = pendingFasttrackCodes?.SplitI(':');
                 pendingFasttrackCodes = $"{args[0]}:{args[1]}";
                 virtualUser.SetSetting(UserSettingKeys.PendingFasttrackCodes, pendingFasttrackCodes);
                 await SharedBusinessLogic.DataRepository.SaveChangesAsync();
@@ -231,8 +231,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             //Send a verification link to the email address
             try
             {
-                var verifyCode =
-                    Encryption.EncryptQuerystring(VirtualUser.UserId + ":" + VirtualUser.Created.ToSmallDateTime());
+                var verifyCode = Encryption.Encrypt($"{VirtualUser.UserId}:{VirtualUser.Created.ToSmallDateTime()}", Encryption.Encodings.Base62);
                 var verifyUrl = Url.Action("VerifyEmail", "NewAccount", new { code = verifyCode }, "https");
                 if (!await SharedBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl,
                     VirtualUser.EmailAddress))
@@ -258,7 +257,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
         }
 
         [HttpGet("verify-email/{code?}")]
-        public async Task<IActionResult> VerifyEmail(string code = null)
+        public async Task<IActionResult> VerifyEmail([IgnoreText] string code = null)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();

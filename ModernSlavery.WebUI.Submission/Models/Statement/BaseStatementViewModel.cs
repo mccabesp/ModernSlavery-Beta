@@ -56,8 +56,10 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public string ContinueUrl { get; set; }
 
         [IgnoreMap]
+        [BindNever] 
         public abstract string PageTitle { get; }
         [IgnoreMap]
+        [BindNever] 
         public virtual string SubTitle { get; }
 
         public DateTime SubmissionDeadline { get; set; }

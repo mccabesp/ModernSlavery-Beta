@@ -37,23 +37,23 @@ namespace ModernSlavery.Hosts.Web.Tests
             //Create the test host usign the default dependency module and override with a test module
             TestWebHost = HostHelper.CreateTestWebHost<TestDependencyModule>(applicationName: "ModernSlavery.Hosts.Web");
 
-            //Create SQL firewall rule for the build agent
-            TestWebHost.OpenSQLFirewall();
-
             //Start the test host
             await TestWebHost.StartAsync().ConfigureAwait(false);
 
+            //Create SQL firewall rule for the build agent
+            TestWebHost.OpenSQLFirewall();
+
             //Reset the database - this must be after host start so seed data files are copied
-            await TestWebHost.ResetDatabaseAsync();
+            await TestWebHost.ResetDatabaseAsync().ConfigureAwait(false);
 
             //Reset the search indexes
-            await TestWebHost.ResetSearchIndexesAsync();
+            await TestWebHost.ResetSearchIndexesAsync().ConfigureAwait(false);
 
             //Delete all the draft files
-            await TestWebHost.Services.DeleteDraftsAsync();
+            await TestWebHost.Services.DeleteDraftsAsync().ConfigureAwait(false);
 
             //Clear all message queues 
-            await TestWebHost.Services.ClearQueuesAsync();
+            await TestWebHost.Services.ClearQueuesAsync().ConfigureAwait(false);
 
             //Start the Selenium client
             var baseUrl = TestWebHost.GetHostAddress();
@@ -79,7 +79,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             AzureHelpers.CloseSQLFirewall();
 
             //Stop the webhost
-            await TestWebHost?.StopAsync();
+            await (TestWebHost?.StopAsync()).ConfigureAwait(false);
 
             //Release the webhost resources
             TestWebHost?.Dispose();

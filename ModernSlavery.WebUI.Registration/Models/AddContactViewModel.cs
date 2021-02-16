@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using ModernSlavery.WebUI.Shared.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Registration.Models
 {
@@ -9,21 +9,22 @@ namespace ModernSlavery.WebUI.Registration.Models
     {
         [MaxLength(50)]
         [Required(AllowEmptyStrings = false)]
+        [Text] 
         public string ContactFirstName { get; set; }
 
         [MaxLength(50)]
         [Required(AllowEmptyStrings = false)]
+        [Text] 
         public string ContactLastName { get; set; }
 
         [MaxLength(50)]
         [Required(AllowEmptyStrings = false)]
+        [Text] 
         public string ContactJobTitle { get; set; }
 
         [Required(AllowEmptyStrings = false)]
-        [DataType(DataType.EmailAddress)]
+        [EmailAddress]
         public string ContactEmailAddress { get; set; }
-
-        public string EmailAddress { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [Phone]

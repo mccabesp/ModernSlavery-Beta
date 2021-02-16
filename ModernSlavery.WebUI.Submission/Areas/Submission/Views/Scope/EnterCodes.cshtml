@@ -1,39 +1,42 @@
 ﻿
 @{
     Layout = "/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Identifying your organisation - Modern Slavery reporting service";
+    Title = "Identifying your organisation";
 }
 @model EnterCodesViewModel
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off", novalidate="" }))
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off", novalidate = "" }))
         {
             @Html.AntiForgeryToken()
             @Html.BotProtectionTimeStamp()
-            @await Html.GovUkValidationSummaryAsync();           
+            @await Html.GovUkValidationSummaryAsync();
 
-            <h1 class="govuk-heading-l">
-                <span>Are you legally required to publish a modern slavery statement on your website?</span>
-            </h1>
-
-            <p class="govuk-body-l">
-                We sent you a letter telling you we think your organisation is legally required to publish an annual modern slavery statement on your website. If this is not correct please let us know so we can update our records.
-            </p>
-            <p class="govuk-body">
-                Enter the organisation reference and security code provided in the letter we sent you. We will then ask you to confirm your organisation is not required to publish a modern slavery statement and give a reason.
-            </p>
 
             <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h1 class="govuk-fieldset__heading">
+                        <span>Are you legally required to publish a modern slavery statement on your website?</span>
+                    </h1>
+                </legend>
+
+                <p class="govuk-body-l">
+                    We sent you a letter telling you we think your organisation is legally required to publish an annual modern slavery statement on your website. If this is not correct please let us know so we can update our records.
+                </p>
+                <p class="govuk-body">
+                    Enter the organisation reference and security code provided in the letter we sent you. We will then ask you to confirm your organisation is not required to publish a modern slavery statement and give a reason.
+                </p>
+
                 <div id="OrganisationReferenceGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterCodesViewModel.OrganisationReference), "govuk-form-group--error")">
                     <label asp-for="OrganisationReference" class="govuk-label">Organisation reference</label>
-                    <input asp-for="OrganisationReference" class="govuk-input govuk-!-width-two-thirds" style="text-transform:uppercase" />
                     <span asp-validation-for="OrganisationReference" class="govuk-error-message"></span>
+                    <input asp-for="OrganisationReference" class="govuk-input govuk-!-width-two-thirds" style="text-transform:uppercase" />
                 </div>
-                
+
                 <div id="SecurityTokenGroup" class="govuk-form-group @Html.SetErrorClass(nameof(EnterCodesViewModel.SecurityToken), "govuk-form-group--error")">
                     <label asp-for="SecurityToken" class="govuk-label">Security code</label>
-                    <input asp-for="SecurityToken" class="govuk-input govuk-!-width-two-thirds" style="text-transform:uppercase" />
                     <span asp-validation-for="SecurityToken" class="govuk-error-message"></span>
+                    <input asp-for="SecurityToken" class="govuk-input govuk-!-width-two-thirds" style="text-transform:uppercase" />
                 </div>
             </fieldset>
 

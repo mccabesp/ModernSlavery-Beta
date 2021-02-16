@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model HighRiskViewModel
 @using ModernSlavery.Core.Entities.StatementSummary.V1;
@@ -25,7 +26,7 @@
             </h1>
             <div class="govuk-inset-text govuk-!-margin-bottom-7">
                 <div class="risk-description-edit">
-                    <a href="@Model.BackUrl">Edit</a>
+                    <a class="govuk-link" href="@Model.EditDescriptionUrl">Edit</a>
                 </div>
                 <div class="risk-description">
                     @Model.Description
@@ -80,20 +81,7 @@
                                                     @if (!isNone)
                                                     {
                                                         <div id="tier-hint-@tierValue" class="govuk-hint govuk-!-margin-left-3">
-                                                            @switch (tier)
-                                                            {
-                                                                case SupplyChainTierTypes.Tier1:
-                                                                    <text>Provide their products and services directly to your organisation.</text>
-                                                                    break;
-                                                                case SupplyChainTierTypes.Tier2:
-                                                                    <text>Provide products and services to your organisation via your Tier 1 suppliers.</text>
-                                                                    break;
-                                                                case SupplyChainTierTypes.Tier3:
-                                                                    <text>Provide products and services to your organisation via your Tier 2 suppliers or the next higher level in the chain.</text>
-                                                                    break;
-                                                                default:
-                                                                    break;
-                                                            }
+                                                            @GetTierExplanation(tier)
                                                         </div>
                                                     }
                                                 </div>
@@ -157,36 +145,33 @@
             </div>
 
             <div class="govuk-form-group govuk-!-margin-bottom-5">
-                <fieldset class="govuk-fieldset">
-                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                        <h2 class="govuk-fieldset__heading">
-                            In which country?
-                        </h2>
-                    </legend>
+                <label asp-for="SelectedCountry" class="govuk-label govuk-label--m">
+                    In which country?
+                </label>
 
-                    <partial name="Parts/_RiskCountries" model="Model" />
-
-                    <div class="govuk-grid-row">
-                        <div class="govuk-grid-column-one-half">
-                            <select class="govuk-select" asp-for="SelectedCountry" asp-items="new SelectList(CountryProvider.GetAll(), nameof(GovUkCountry.FullReference), nameof(GovUkCountry.Name))">
-                                <option value="" disabled selected>Select a country</option>
-                            </select>
-                        </div>
-                        <div class="govuk-grid-column-one-half">
-                            <button id="add-country-button" class="govuk-button govuk-button--secondary" type="submit" name="command" value="@BaseStatementViewModel.CommandType.AddCountry">Add</button>
-                        </div>
+                <div class="country-row">
+                    <div class="country-input">
+                        <select class="govuk-select" asp-for="SelectedCountry" asp-items="new SelectList(CountryProvider.GetAll(), nameof(GovUkCountry.FullReference), nameof(GovUkCountry.Name))">
+                            <option value="" disabled selected></option>
+                        </select>
                     </div>
-                </fieldset>
+                    <div class="country-button">
+                        <button id="add-country-button" class="govuk-button govuk-button--secondary" type="submit" name="command" value="@BaseStatementViewModel.CommandType.AddCountry">Add country</button>
+                    </div>
+                </div>
+
+                <partial name="Parts/_RiskCountries" model="Model" />
             </div>
+
 
             <div class="govuk-character-count govuk-!-margin-bottom-7" data-module="govuk-character-count" data-maxlength="500">
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.ActionsOrPlans, "govuk-form-group--error")">
                     <label class="govuk-label govuk-label--m" for="more-detail">
                         Tell us about your actions or plans to address this risk
                     </label>
-                    <textarea name="ActionsOrPlans" class="govuk-textarea" rows="5" aria-describedby="actions-info">@Model.ActionsOrPlans</textarea>
+                    <textarea name="ActionsOrPlans" class="govuk-textarea govuk-js-character-count" id="more-detail" rows="5" aria-describedby="more-detail-info">@(Model.ActionsOrPlans)</textarea>
                 </div>
-                <div id="actions-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                <div id="more-detail-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
                     You can enter up to 500 characters
                 </div>
                 <span asp-validation-for="ActionsOrPlans" class="govuk-error-message"></span>
@@ -203,106 +188,6 @@
     </div>
 
 </div>
-@section AfterLoadedCompiledScripts {
-    <script type="text/javascript" nonce="@Html.GetNonce()">
-        (function ($) {
-            "use strict";
-
-            var selectElement = document.getElementById('SelectedCountry');
-
-            openregisterLocationPicker({
-                selectElement: selectElement,
-                url: '/assets/json/location-autocomplete-graph.json',
-                // override onconfirm to disable the add button until item selected
-                onConfirm: function (result) {
-                    var requestedOption = Array.prototype.filter.call(selectElement.options, o => o.innerText === (result && result.name))[0];
-                    if (requestedOption) {
-                        requestedOption.selected = true;
-
-                        if (document.getElementById("country-line-" + requestedOption.value) == null)
-                            $('#add-country-button').prop('disabled', false);
-                    }
-                }
-            });
-
-            var removeButtonClickHandler = function (e) {
-                e.preventDefault();
-
-                var table = $(e.target).parents('table');
-
-                // remove row from document
-                $(e.target).parents('tr').remove();
-
-                if (table.find('tr').length == 0)
-                    table.hide();
-                else {
-                    // Re-index the hidden input on each row so the server side isnt confused by the indexing
-                    table.find('tr').each(function (i, e) {
-                        var hiddenInput = $(e).find('input[type=hidden]')
-                        hiddenInput.prop('id', 'CountryReferences_' + i + '_');
-                        hiddenInput.prop('name', 'CountryReferences[' + i + ']');
-                    });
-                }
-
-                return false;
-            }
-
-            var addButtonClickHandler = function (e) {
-                e.preventDefault();
-
-                if (selectElement.selectedOptions.length == 0 || selectElement.selectedOptions[0].disabled) {
-                    // nothing selected, show error
-                    return false;
-                }
-
-                var option = selectElement.selectedOptions[0];
-                var reference = option.value;
-                var rows = $('#selected-countries tr');
-
-                if (rows.length == 0) {
-                    // show the table
-                    $('#selected-countries table').show();
-                }
-                else if (document.getElementById("country-line-" + reference) != null) {
-                    // already in table
-                    // show error
-                    return false;
-                }
-
-                var name = option.innerText;
-                var index = rows.length;
-
-                var newRow = "<tr id='country-line-" + reference + "' class='govuk-table__row'>" +
-                    "<td class='govuk-table__cell'>" + name + "</td>" +
-                    "<td class='govuk-table__cell buttons'>" +
-                    "<button class='link-button' type='submit' name='toRemove' value='" + reference + "'>Remove</button>" +
-                    "<input id='CountryReferences_" + index + "_' name='CountryReferences[" + index + "]' type='hidden' value='" + reference + "'>" +
-                    "</td>" +
-                    "</tr>";
-
-                $('#selected-countries table tbody').append(newRow);
-
-                // clear selected from autocomplete
-                // taken from https://github.com/alphagov/accessible-autocomplete/issues/334#issuecomment-621356224 03/12/2020
-                var $enhancedElement = $(selectElement).parent().find('input')
-                $enhancedElement.val('');
-                $(selectElement).val('');
-
-                $enhancedElement.click();
-                $enhancedElement.focus();
-                $enhancedElement.blur();
-
-                $('#add-country-button').prop('disabled', true);
-
-                return false;
-            }
-
-            $('#add-country-button').prop('disabled', true);
-
-            $(document).on("click", '#selected-countries tr button[name=toRemove]', removeButtonClickHandler)
-
-            $('#add-country-button').click(addButtonClickHandler);
-
-        }(jQuery));
-    </script>
+@section BeforeLoadedCompiledScripts {
+    <script asp-append-version="true" src="/assets/javascripts/location-autocomplete.min.js" type="text/javascript"></script>
 }

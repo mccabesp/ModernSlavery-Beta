@@ -17,8 +17,7 @@ using ModernSlavery.Testing.Helpers.Classes;
 namespace ModernSlavery.Hosts.Web.Tests
 {
 
-    [TestFixture, Ignore("S+F")]
-
+    [TestFixture]
     public class User_Searches_By_Org_Name_And_Filters : BaseUITest
     {
         public User_Searches_By_Org_Name_And_Filters() : base(TestRunSetup.TestWebHost, TestRunSetup.WebDriverService)
@@ -37,10 +36,12 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             SignOutDeleteCookiesAndReturnToRoot(this);
 
-            // Route to Search and compare feature to be clarified.
-            ExpectHeader("Search modern slavery statements");
+            Click("Find statements");
 
-            await Task.CompletedTask;
+            // Route to Search and compare feature to be clarified.
+            ExpectHeader("Find modern slavery statements");
+
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(2)]
@@ -52,7 +53,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect("Amazon statement");
             AtRow("Amazon statement").Column("Statement year").Expect("2020");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(3)]
@@ -62,7 +63,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect("Amazing Ltd statement");
             ExpectNo("Kinder");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(4)]
@@ -70,7 +71,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             AboveRow("Amazing Ltd statement").ExpectRow("Amazon statement");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(5)]
@@ -79,7 +80,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Below("Amazon statement").Expect(" Royal Grammar School, High Street, Guildford, Surrey, GU1 3BB");
             Below("Amazing ltd statement").Expect("Hestercombe House, Cheddon Fitzpaine, Taunton, Somerset, TA2 8LG");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(6)]
@@ -92,7 +93,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             ExpectNo("Kinder statement");
             //Expect message with prompt as to why there are no results (to be confirmed what messages).
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(7)]
@@ -102,7 +103,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Click("Search");
             Expect("Pepsi statement");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(7)]
@@ -120,7 +121,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect("Fly Jet Australia statement");
             Above("Fly Jet Switzerland statement").Below("Fly Jet statement").Expect("Submitted as group");
 
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
     }
 }

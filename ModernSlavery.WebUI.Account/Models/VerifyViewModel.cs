@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace ModernSlavery.WebUI.Account.Models
 {
@@ -7,7 +8,7 @@ namespace ModernSlavery.WebUI.Account.Models
     {
         public long UserId { get; set; }
         public bool Resend { get; set; }
-        public string EmailAddress { get; set; }
+        [BindNever]public string EmailAddress { get; set; }
         public bool Sent { get; set; }
     }
 }

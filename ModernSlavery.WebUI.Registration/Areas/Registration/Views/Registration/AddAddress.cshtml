@@ -1,6 +1,6 @@
 ﻿@{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Add your organisation's address - Modern Slavery reporting service";
+    Title = "Add your organisation's address";
 }
 @model AddAddressViewModel
 @section BeforeMain {
@@ -20,40 +20,66 @@
         {
             @Html.AntiForgeryToken()
             @await Html.GovUkValidationSummaryAsync()
-            <h1 class="govuk-heading-l">
-                Your organisation's address
-            </h1>
-            <div class="govuk-form-group">
+
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h1 class="govuk-fieldset__heading">
+                        Your organisation’s address
+                    </h1>
+                </legend>
+
                 <p class="govuk-body">Enter the correspondence address of the organisation you want to register.</p>
 
-                <div class="govuk-form-group @Html.SetErrorClass(model => model.Address1, "govuk-form-group--error") form-group-compound">
-                    @Html.LabelFor(model => model.Address1, "Address 1", new { @class = "govuk-label" })
-                    @Html.ValidationMessageFor(model => model.Address1, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
-                    @Html.CustomEditorFor(model => model.Address1, new { @class = "govuk-input govuk-!-width-one-half" })
-
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.Address1, "govuk-form-group--error")">
+                    <label asp-for="Address1">
+                        Building and street <span class="govuk-visually-hidden">line 1 of 2</span>
+                    </label>
+                    <span asp-validation-for="Address1" class="govuk-error-message"></span>
+                    <input asp-for="Address1" class="govuk-input" autocomplete="address-line1" />
                 </div>
+
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.Address2, "govuk-form-group--error")">
-                    @Html.LabelFor(model => model.Address2, "Address 2", new { @class = "govuk-label" })
-                    @Html.ValidationMessageFor(model => model.Address2, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
-                    @Html.CustomEditorFor(model => model.Address2, new { @class = "govuk-input govuk-!-width-one-half", placeholder = "optional" })
-
+                    <label asp-for="Address2">
+                        <span class="govuk-visually-hidden">Building and street line 2 of 2</span>
+                    </label>
+                    <span asp-validation-for="Address2" class="govuk-error-message"></span>
+                    <input asp-for="Address2" class="govuk-input" autocomplete="address-line2" />
                 </div>
-                <div class="govuk-form-group @Html.SetErrorClass(model => model.Address3, "govuk-form-group--error")">
-                    @Html.LabelFor(model => model.Address3, "Address 3", new { @class = "govuk-label" })
-                    @Html.ValidationMessageFor(model => model.Address3, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
-                    @Html.CustomEditorFor(model => model.Address3, new { @class = "govuk-input govuk-!-width-one-half" })
 
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.City, "govuk-form-group--error")">
+                    <label asp-for="City">
+                        Town or city
+                    </label>
+                    <span asp-validation-for="City" class="govuk-error-message"></span>
+                    <input asp-for="City" class="govuk-input govuk-!-width-two-thirds" autocomplete="address-level2" />
+                </div>
+
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.County, "govuk-form-group--error")">
+                    <label asp-for="County">
+                        County
+                    </label>
+                    <span asp-validation-for="County" class="govuk-error-message"></span>
+                    <input asp-for="County" class="govuk-input govuk-!-width-two-thirds" />
+                </div>
+
+                <div class="govuk-form-group @Html.SetErrorClass(model => model.Country, "govuk-form-group--error")">
+                    <label asp-for="Country">
+                        Country
+                    </label>
+                    <span asp-validation-for="Country" class="govuk-error-message"></span>
+                    <input asp-for="Country" class="govuk-input govuk-!-width-two-thirds" autocomplete="country-name" />
                 </div>
 
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.Postcode, "govuk-form-group--error")">
-                    @Html.LabelFor(model => model.Postcode, new { @class = "govuk-label" })
-                    @Html.ValidationMessageFor(model => model.Postcode, "", new { @class = "govuk-error-message govuk-!-margin-bottom-0" })
-                    @Html.CustomEditorFor(model => model.Postcode, new { @class = "govuk-input govuk-!-width-one-third" })
-
+                    <label asp-for="Postcode">
+                        Postcode or zip code
+                    </label>
+                    <span asp-validation-for="Postcode" class="govuk-error-message"></span>
+                    <input asp-for="Postcode" class="govuk-input govuk-input--width-10" autocomplete="postal-code" />
                 </div>
-                <br />
-                <input class="govuk-button" type="submit" role="button" name="command" value="Continue" aria-label="Continue" />
-            </div>
+            </fieldset>
+
+            <input class="govuk-button" type="submit" role="button" name="command" value="Continue" aria-label="Continue" />
         }
     </div>
 </div>

@@ -18,6 +18,7 @@ namespace ModernSlavery.WebUI.Account.Models
             ErrorMessageResourceName = nameof(AccountResources.ConfirmEmailAddressRequired))]
         [Compare(nameof(EmailAddress), ErrorMessageResourceName = nameof(AccountResources.ConfirmEmailAddressCompare))]
         [Display(Name = nameof(ConfirmEmailAddress))]
+        [EmailAddress]
         public string ConfirmEmailAddress { get; set; }
     }
 }

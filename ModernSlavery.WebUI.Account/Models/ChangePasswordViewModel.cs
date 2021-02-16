@@ -13,6 +13,7 @@ namespace ModernSlavery.WebUI.Account.Models
         [Required(AllowEmptyStrings = false,
             ErrorMessageResourceName = nameof(AccountResources.CurrentPasswordRequired))]
         [Display(Name = nameof(CurrentPassword))]
+        [Password]
         public string CurrentPassword { get; set; }
 
         [DataType(DataType.Password)]
@@ -27,6 +28,7 @@ namespace ModernSlavery.WebUI.Account.Models
             ErrorMessageResourceName = nameof(AccountResources.ConfirmNewPasswordRequired))]
         [Display(Name = nameof(ConfirmNewPassword))]
         [Compare(nameof(NewPassword), ErrorMessageResourceName = nameof(AccountResources.ConfirmPasswordCompare))]
+        [Password]
         public string ConfirmNewPassword { get; set; }
     }
 }

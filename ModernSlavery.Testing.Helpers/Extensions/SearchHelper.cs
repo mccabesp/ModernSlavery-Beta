@@ -17,9 +17,9 @@ namespace ModernSlavery.Testing.Helpers.Extensions
          /// <param name="host"></param>
         public static async Task ResetSearchIndexesAsync(this IHost host)
         {
+            var testBusinessLogic = host.Services.GetTestBusinessLogic();
             //Delete and recreate the search index
-            var searchRepository = host.Services.GetRequiredService<ISearchRepository<OrganisationSearchModel>>();
-            await searchRepository.DeleteIndexIfExistsAsync();
+            await testBusinessLogic.ResetSearchIndexesAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -29,8 +29,8 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         public static async Task RefreshSearchDocuments(this IHost host)
         {
             //Recreate the search documents
-            var searchBusinessLogic = host.Services.GetRequiredService<ISearchBusinessLogic>();
-            await searchBusinessLogic.RefreshSearchDocumentsAsync();
+            var testBusinessLogic = host.Services.GetTestBusinessLogic();
+            await testBusinessLogic.RefreshSearchDocumentsAsync().ConfigureAwait(false);
         }
     }
 }

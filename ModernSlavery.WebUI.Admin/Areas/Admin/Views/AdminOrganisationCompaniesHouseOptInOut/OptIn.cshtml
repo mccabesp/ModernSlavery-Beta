@@ -3,7 +3,7 @@
 @{Layout = "~/Views/GdsLayout.cshtml";}
 @inject ICompaniesHouseService CompaniesHouseService
 @{
-    ViewBag.Title = "Opt in - Administration - Modern Slavery Reporting service";
+    Title = "Opt in - Administration";
 }
 
 @section BeforeMain {
@@ -89,7 +89,7 @@
             </tr>
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header govuk-!-width-one-third">New address</th>
-                @{ var addressFromCoHo = CompaniesHouseService.CreateOrganisationAddressFromCompaniesHouseAddress(Model.CompaniesHouseCompany.RegisteredOfficeAddress); }
+                @{ var addressFromCoHo = await CompaniesHouseService.CreateOrganisationAddressFromCompaniesHouseAddressAsync(Model.CompaniesHouseCompany.RegisteredOfficeAddress); }
                 <td class="govuk-table__cell">@(CompaniesHouseService.AddressMatches(addressFromCoHo, Model.Organisation.LatestAddress) ? "(Not changed)" : addressFromCoHo.GetAddressString())</td>
             </tr>
             <tr class="govuk-table__row">

@@ -43,7 +43,7 @@ namespace ModernSlavery.Infrastructure.Database
 
             builder.RegisterType<ShortCodesRepository>().As<IShortCodesRepository>().InstancePerLifetimeScope();
 
-            builder.RegisterType<DataImporter>().As<IDataImporter>().SingleInstance();
+            builder.RegisterType<DataImporter>().As<IDataImporter>().InstancePerLifetimeScope();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)
@@ -60,12 +60,12 @@ namespace ModernSlavery.Infrastructure.Database
                 //Ensure import files exist on remote storage
                 var fileRepository = lifetimeScope.Resolve<IFileRepository>();
                 Task.WaitAll(
-                    fileRepository.PushRemoteFileAsync(Filenames.ShortCodes, _sharedOptions.DataPath),
-                    Task.Run(async () => { importSicSections = await fileRepository.PushRemoteFileAsync(Filenames.SicSections, _sharedOptions.DataPath); }),
-                    Task.Run(async () => { importSicCodes = await fileRepository.PushRemoteFileAsync(Filenames.SicCodes, _sharedOptions.DataPath); }),
-                    Task.Run(async () => { importStatementSectorTypes = await fileRepository.PushRemoteFileAsync(Filenames.StatementSectorTypes, _sharedOptions.DataPath); }),
-                    Task.Run(async () => { importImportPrivateOrganisations = await fileRepository.PushRemoteFileAsync(Filenames.ImportPrivateOrganisations, _sharedOptions.DataPath); }),
-                    Task.Run(async () => { importImportPublicOrganisations = await fileRepository.PushRemoteFileAsync(Filenames.ImportPublicOrganisations, _sharedOptions.DataPath); })
+                    fileRepository.PushRemoteFileAsync(Filenames.ShortCodes, _sharedOptions.AppDataPath),
+                    Task.Run(async () => { importSicSections = await fileRepository.PushRemoteFileAsync(Filenames.SicSections, _sharedOptions.AppDataPath).ConfigureAwait(false); }),
+                    Task.Run(async () => { importSicCodes = await fileRepository.PushRemoteFileAsync(Filenames.SicCodes, _sharedOptions.AppDataPath).ConfigureAwait(false); }),
+                    Task.Run(async () => { importStatementSectorTypes = await fileRepository.PushRemoteFileAsync(Filenames.StatementSectorTypes, _sharedOptions.AppDataPath).ConfigureAwait(false); }),
+                    Task.Run(async () => { importImportPrivateOrganisations = await fileRepository.PushRemoteFileAsync(Filenames.ImportPrivateOrganisations, _sharedOptions.AppDataPath).ConfigureAwait(false); }),
+                    Task.Run(async () => { importImportPublicOrganisations = await fileRepository.PushRemoteFileAsync(Filenames.ImportPublicOrganisations, _sharedOptions.AppDataPath).ConfigureAwait(false); })
                 );
 
                 if (_databaseOptions.ImportSeedData)

@@ -1,0 +1,46 @@
+﻿@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel;
+
+<div id="risks" class="statement-section-two-thirds">
+    <h2 class="govuk-heading-m">
+        Modern slavery risks (optional)
+    </h2>
+
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            Identifying modern slavery risks is a vital step towards eradicating it.
+            The government encourages organisations to be as open and transparent as possible, to improve understanding, collaboration and best practice around tackling this worldwide problem.
+        </strong>
+    </div>
+    <div class="govuk-body">
+        We asked the organisation to describe up to 3 priority risks it focused on during the period of the statement, including details of the affected workers, the activity involved, and the location.
+    </div>
+</div>
+
+@if (Model.Risks.Any())
+{
+
+    @for(var i = 0; i < Model.Risks.Count; i++)
+    {
+        var risk = Model.Risks[i];
+        var data = new ViewDataDictionary(ViewData) { { "index", i + 1 }, { "total", Model.Risks.Count } };
+        <partial name="Parts/StatementSummary/_HighRisk" model="risk" view-data="data" />
+    }
+}
+else if (Model.NoRisks)
+{
+
+    <div class="govuk-grid-column-two-thirds">
+        <div class="nothing-included">
+            <div class="nothing-included__label">Organisation’s response</div>
+            <strong class="govuk-tag govuk-tag--blue nothing-included__tag">
+                The organisation told us it did not identify any modern slavery risks in its operations or supply chains during the period of the statement.
+            </strong>
+        </div>
+    </div>
+}
+else
+{
+    <partial name="Parts/StatementSummary/_NoResponse" />
+}

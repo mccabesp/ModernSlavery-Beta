@@ -3,99 +3,113 @@
 @inject SharedOptions sharedOptions
 @{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Privacy Policy - Modern Slavery reporting service";
+    Title = "Privacy Policy";
+    var backUrl = Context.GetUrlReferrer()?.ToString();
+    if (string.IsNullOrWhiteSpace(backUrl)) backUrl = "/";
 }
-
-
+@section BeforeMain {
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a class="govuk-back-link" href="@backUrl">Back</a>
+    }
+}
 @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
 {
     @Html.AntiForgeryToken()
 
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-l">Privacy Policy</h1>
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">Privacy policy</h1>
 
-            <p class="govuk-body">This page explains what kind of personal information the Modern Slavery Unit (MSU) holds about you, how it's protected and how you can find out about it.</p>
+            <p class="govuk-body">This page explains what kind of personal information the Home Office holds about you, how it's protected and how you can find out about it.</p>
 
-            <h2 class="govuk-heading-m">What personal information MSU holds about you</h2>
+            <h2 class="govuk-heading-m">What personal information we hold about you</h2>
 
-            <p class="govuk-body">If you create an account on our service, MSU will hold the following information about you:</p>
+            <p class="govuk-body">If you create an account on our service, we will hold the following information about you:</p>
 
             <ul class="govuk-list govuk-list--bullet">
                 <li>your personal details: your name, email address and job title</li>
-                <li>whether you've signed up to be contacted for feedback purposes or to receive information on webinars, events and new guidance relating to modern slavery</li>
+                <li>whether you've signed up to be contacted for feedback purposes or to receive information on resources and guidance relating to modern slavery</li>
             </ul>
 
-            <p class="govuk-body">In addition, if you register a public sector organisation on your account, or if you manually register any organisation (as opposed to selecting an organisation from our database), we will ask for and retain your telephone number. Users can edit this information within the service, via ‘Manage your account’. </p>
+            <p class="govuk-body">In addition, if you register a public sector organisation on your account, or manually register any organisation (as opposed to selecting an organisation from our database), we will ask for and retain your telephone number.</p>
+
+            <h2 class="govuk-heading-m">What personal information we hold about others in your organisation</h2>
 
             <p class="govuk-body">
-                Furthermore, when you submit a modern slavery statement to our service, MSU
-                will hold the name and job title of the director (or equivalent) who signed off the modern slavery for your organisation.
+                When you submit your organisation’s modern slavery statement to our service, we will hold the name and job title of the director (or equivalent) who signed off that statement.
             </p>
+
+            <p class="govuk-body">If your organisation’s statement cannot be accessed via a link on your website, we will also ask for and retain a contact email address for your organisation that members of the public can use to request a copy of your statement. </p>
 
             <h2 class="govuk-heading-m">Purpose</h2>
-            <p class="govuk-body">We use your personal data to enable the creation of user accounts, and to publish data about the individuals responsible for signing off modern slavery statements in line with legal obligations. </p>
+            <p class="govuk-body">This is a government-run registry allowing businesses and organistions that fall under section 54 of the Modern Slavery Act 2015 to submit information about their modern slavery statements to GOV.UK so that the public can view it on the web, in one place.</p>
+            <p class="govuk-body">We use your personal data so we can identify and authorise you to set up and operate a user account on our service. </p>
+            <p class="govuk-body">We publish data about the individuals responsible for signing off modern slavery statements on GOV.UK in line with our legal basis of data processing. </p>
 
-            <h2 class="govuk-heading-m">Legal basis of processing</h2>
+            <h2 class="govuk-heading-m">Legal basis of data processing</h2>
+            <p class="govuk-body">We hold and process your information to perform a task in the public interest and in the exercise of official authority vested in the Home Office, in particular:</p>
+            <p class="govuk-body">Allowing organisations to submit information about their modern slavery statements and publish this information on GOV.UK.</p>
+            <p class="govuk-body">Our official authority derives from section 54 of the Modern Slavery Act 2015 which requires certain businesses to publish an annual modern slavery statement on their organisation’s website - this should outline what they’re doing to prevent modern slavery in their organisation and supply chains. </p>
 
-            <h3 class="govuk-heading-s">For the publication of the name and job title of the director (or equivalent) who signed off the modern slavery statement:</h3>
+            <h2 class="govuk-heading-m">How long we keep your personal data</h2>
+            <p class="govuk-body">When you create an account we will send you an email with a verification link. You will need to verify your account within 7 days otherwise we will securely delete all your personal details.</p>
+            <p class="govuk-body">Once you have verified your account, we will retain your data as long as we have an ongoing legitimate business need to do so, according to the following rules:</p>
 
-            <p class="govuk-body">Processing is necessary to comply with a legal obligation placed on us as the data controller under regulation 15(2) of the Equality Act (Modern Slavery Information) Regulations 2017. </p>
-
-            <h3 class="govuk-heading-s">For processing of user account data:</h3>
-            <p class="govuk-body">Processing is necessary for the performance of a task carried out in the public interest or in the exercise of official authority vested in the data controller, in particular:</p>
-            <p class="govuk-body">
-                Allowing organisations to submit information about their modern slavery statements and publish this information on GOV.UK.
-            </p>
-
-            <h2 class="govuk-heading-m">How long MSU keeps your personal data</h2>
-            <p class="govuk-body">When you create an account you will be sent an email with a verification link. You will need to verify your account within seven days otherwise we will securely delete all your personal details.</p>
-            <p class="govuk-body">Once you have verified your account, we will retain your data as long as we have an ongoing legitimate business need to do so. Where we have no legitimate business need we will securely delete all your personal details.</p>
-
-            <p class="govuk-body">A legitimate business needs means:</p>
-            <ul class="govuk-list govuk-list--bullet">
-                <li>we have a need to retain your details in order to provide services to you or to your organisation</li>
-                <li>Information we publish about the name and job title of the director (or equivalent) who signed off the modern slavery statement submitted to the service will be retained for as long is necessary to allow us to perform this public task.</li>
-            </ul>
+            <p class="govuk-body">If you create an account but do not carry out any activities on behalf of an organisation, we will delete your details securely from the SQL database and related backups after 18 months of inactivity. We will notify you in advance, giving you 30 days to sign back in to the service should you wish to keep your account.</p>
+            <p class="govuk-body">If you have registered and carried out activity on behalf of an organisation, we will retain your personal data in our database for a period of 5 years beyond your last activity. This is done as a duty of care to the organisations registered should they need to know who carried out an action.</p>
 
             <h2 class="govuk-heading-m">Sharing your information</h2>
             <p class="govuk-body">The name and job title of the director (or equivalent) who signed off the modern slavery statement submitted for your organisation will be published on GOV.UK.</p>
-            <p class="govuk-body">If you register as a user on behalf of your organisation, your name will be shared with other users registered to submit modern slavery statements for your organisation. Your name will not be shared with any other users.</p>
-            <p class="govuk-body">Your information will be shared with our mail and email service providers where this is needed to process your registration and with our hosting suppliers and third party IT support companies for the purposes of managing the site. It will also be shared with the Home Office, who currently provide some IT services for us. </p>
+            <p class="govuk-body">If you register as a user on behalf of your organisation, your name will be shared with other users who are registered to submit modern slavery statements for your organisation. Your name will not be shared with any other users.</p>
+            <p class="govuk-body">Your information will be shared with our mail and email service providers where this is needed to process your registration and with our hosting suppliers and third-party IT support companies for the purposes of managing the site. It will also be shared with the Home Office, who currently provide some IT services for us.</p>
             <p class="govuk-body">There are some cases when your information can be shared for other reasons, for example to prevent crime, respond to legal obligations or cooperate with public inquiries.</p>
+            <p class="govuk-body">No personal data will be processed outside the United Kingdom.</p>
 
             <h2 class="govuk-heading-m">Where personal data has not been obtained from you</h2>
-            <p class="govuk-body">Your personal data was obtained by us from your employer or organisation.</p>
+            <p class="govuk-body">Personal data may be obtained from another person in your organisation if:</p>
 
-            <h2 class="govuk-heading-m">Your rights</h2>
             <ul class="govuk-list govuk-list--bullet">
-                <li>You can ask to see and rectify the personal information MSU holds about you. Users can do this by logging into their account on the service via the manage account page.</li>
-                <li>In certain circumstances, you may also object to or restrict the processing of your data by MSU by making a request to the <a href="mailto:@(sharedOptions.MsuReportingEmail)" target="_blank">@sharedOptions.MsuReportingEmail</a> mailbox.</li>
-                <li>You may close your account within the service, however MSU may retain details about your account in line with legitimate business needs and your rights under the General Data Protection Regulation.</li>
+                <li>you are the director (or equivalent) who signed off your organisation’s modern slavery statement</li>
+                <li>you are the person whose contact email addess has been provided so that a member of the public can request a full copy of your organisation's statement should a website link not be accessible</li>
             </ul>
 
-            <h2 class="govuk-heading-m">Contact Details</h2>
-            <p class="govuk-body">
-                The data controller for your personal data is the Home Office. The contact details for the data controller are: Home Office, 2 Marsham Street, London, SW1P 4DF, or 0207 7035 4848, or <a href="mailto:@(sharedOptions.DataControllerEmail)" target="_blank">@(sharedOptions.DataControllerEmail)</a>.
-                The contact details for the data controller’s Data Protection Officer are: Data Protection Officer, 2 Marsham Street, London, SW1P 4DF, or 020 7035 6999, or dpo@homeoffice.gov.uk.
-            </p>
+            <h2 class="govuk-heading-m">Your rights</h2>
+            <p class="govuk-body">The data protection legislation gives you the right to ask:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>whether we hold any of your personal data (and if so to receive a copy)</li>
+                <li>what we are using your personal data for</li>
+                <li>to whom we have disclosed or intend to disclose any of your personal data</li>
+                <li>for how long we intend to hold your personal data</li>
+                <li>for innacurate personal data to be rectified</li>
+                <li>for the processing of your personal data to be restricted</li>
+                <li>for your personal data to be erased (the 'right to be forgotten')</li>
+            </ul>
+            <p class="govuk-body">These rights are not absolute and may be subject to exemptions or restrictions. You can see and rectify the personal information we hold about you via the manage account page when you log in to your account on the service.</p>
+            <p class="govuk-body">You may also close your account within the service, but we will retain details about your account in line with our data retention policies, subject to any request for erasure.</p>
 
+            <h2 class="govuk-heading-m">Contact details</h2>
+            <p class="govuk-body">The data controller for your personal data is the Home Office. The contact details for the data controller are:</p>
+            <p class="govuk-body">Phone 0207 7035 4848, or email: <a class="govuk-link" href="mailto:@(sharedOptions.DataControllerEmail)" target="_blank">@(sharedOptions.DataControllerEmail)</a></p>
+
+            <p class="govuk-body">The contact details for the data controller’s Data Protection Officer are:</p>
+            <p class="govuk-body">Phone 020 7035 6999, or email: <a class="govuk-link" href="mailto:dpo@homeoffice.gov.uk" target="_blank">dpo@homeoffice.gov.uk</a></p>
             <p class="govuk-body">The Data Protection Officer provides independent advice and monitoring of the Home Office’s use of personal information.</p>
 
             <h2 class="govuk-heading-m">How to make a complaint</h2>
-            <p class="govuk-body">If you're unhappy with the way MSU handled your personal information, you can contact us at modernslaverystatements@homeoffice.gov.uk or:<br /> </p>
+            <p class="govuk-body">If you're unhappy with the way we have handled your personal information, you can contact us at <a class="govuk-link" href="mailto:modernslaverystatements@homeoffice.gov.uk">modernslaverystatements@homeoffice.gov.uk</a> or:<br /> </p>
 
             <div class="govuk-inset-text">
-                <address class="govuk-body">
-                    Modern Slavery Unit<br />
-                    4th Floor, Peel<br />
-                    2 Marsham Street<br />
-                    London<br />
-                    SW1P 4DF
-                </address>
+
+                Modern Slavery Unit<br />
+                4th Floor, Peel<br />
+                2 Marsham Street<br />
+                London<br />
+                SW1P 4DF
+
             </div>
 
-            <p class="govuk-body">If you consider that your personal data has been misused or mishandled, you may make a complaint to the Information Commissioner, who is an independent regulator. The Information Commissioner can be contacted at: Information Commissioner's Office, Wycliffe House, Water Lane, Wilmslow, Cheshire, SK9 5AF, or 0303 123 1113, or casework@ico.org.uk. Any complaint to the Information Commissioner is without prejudice to your right to seek redress through the courts.</p>
+            <p class="govuk-body">If you consider that your personal data has been misused or mishandled, you can make a complaint to the Information Commissioner, who is an independent regulator. Contact information for the Information Commissioner can be found at <a class="govuk-link" href="https://ico.org.uk/">https://ico.org.uk/</a>.</p>
 
             @if (User.Identity.IsAuthenticated)
             {

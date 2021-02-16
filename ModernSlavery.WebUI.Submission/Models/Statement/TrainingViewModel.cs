@@ -6,6 +6,7 @@ using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContex
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using static ModernSlavery.Core.Entities.StatementSummary.V1.StatementSummary;
 using ModernSlavery.BusinessDomain.Shared.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
 {
@@ -33,6 +34,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public List<TrainingTargetTypes> TrainingTargets { get; set; } = new List<TrainingTargetTypes>();
 
         [MaxLength(256)]
+        [Text]
         public string OtherTrainingTargets { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

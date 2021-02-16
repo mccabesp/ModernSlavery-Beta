@@ -5,9 +5,9 @@
 @if (Model.StatementOrganisations.Count > 0)
 {
     <div class="govuk-inset-text floating-summary">
-        <h3 class="govuk-heading-m">@Model.StatementOrganisations.Count  @(Model.StatementOrganisations.Count == 1 ? "organisation" : "organisations") included</h3>
+        <h2 class="govuk-heading-m">@Model.StatementOrganisations.Count  @(Model.StatementOrganisations.Count == 1 ? "organisation" : "organisations") included</h2>
         <p class="govuk-body"> in @Model.OrganisationName group statement (@(Model.ReportingDeadlineYear)) </p>
-        <a class="govuk-body" href="@Url.Action(nameof(StatementController.GroupReview), new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = Model.ReportingDeadlineYear})">See which organisations you've selected</a>
+        <a class="govuk-link" href="@Url.Action(nameof(StatementController.GroupReview), new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year = Model.ReportingDeadlineYear})">See which organisations you've selected</a>
     </div>
 }
 else

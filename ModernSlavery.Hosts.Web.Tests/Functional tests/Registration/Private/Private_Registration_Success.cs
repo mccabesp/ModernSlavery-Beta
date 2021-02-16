@@ -30,106 +30,98 @@ namespace ModernSlavery.Hosts.Web.Tests
         }
 
         protected Organisation org;
+
         [OneTimeSetUp]
         public async Task OTSetUp()
         {
             //HostHelper.ResetDbScope();
             org = this.Find<Organisation>(org => org.GetLatestActiveScope().ScopeStatus.IsAny(ScopeStatuses.PresumedOutOfScope, ScopeStatuses.PresumedInScope) && org.LatestRegistrationUserId == null && !org.UserOrganisations.Any());
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
+
         [Test, Order(20)]
         public async Task GoToPrivateRegistrationPage()
         {
             Goto("/manage-organisations");
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             Click("Register an organisation");
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
-
-            ExpectHeader("Registration Options");
-
-            ClickLabel(That.Contains, "Private or voluntary sector organisation");
+            ClickLabel("No");
+            ClickLabel("Private or voluntary sector organisation");
             Click("Continue");
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             ExpectHeader("Find your organisation");
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(21)]
-
         public async Task SearchForOrganisation()
-        { 
+        {
             SetXPath("//*[@id='SearchText']").To(org.OrganisationName);
             Click("Search");
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             ExpectRow(That.Contains, org.OrganisationName);
 
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
+
         [Test, Order(22)]
-
         public async Task ChooseOrganisation()
-        { 
-         BelowHeader("Choose your organisation").AtRow(That.Contains, org.OrganisationName).Click(What.Contains, "Choose");
+        {
+            BelowHeader("Select your organisation").AtRow(That.Contains, org.OrganisationName).Click(What.Contains, "Choose");
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             ExpectHeader("Confirm your organisation’s details");
 
             AtRow("Organisation name").Expect(org.OrganisationName);
-            
+
             //todo investigate address issue
             AtRow("Registered address").Expect(org.GetAddressString(DateTime.Now));
             Click("Confirm");
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
             ExpectHeader("We're sending a PIN by post to the following name and address:");
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
-        [Test, Order(23)]
 
-        public async Task ExtractPin() {
-            Pin = WebDriver.FindElement(By.XPath("(//b)[2]")).Text;
-            await Task.CompletedTask;
+        [Test, Order(23)]
+        public async Task ExtractPin()
+        {
+            Pin = WebDriver.FindElement(By.XPath("(//b)")).Text;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(24)]
-
         public async Task ExpectOrgDetails()
         {
-
             Expect(What.Contains, Create_Account.roger_first + " " + Create_Account.roger_last + " (" + Create_Account.roger_job_title + ")");
             //Expect(What.Contains, TestData.RegisteredAddress;
 
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
-        [Test, Order(25)]
 
+        [Test, Order(25)]
         public async Task VerifyPin()
         {
-
             Goto("/manage-organisations");
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
-            //Click("Manage Organisations");
-            ExpectHeader("Select an organisation");
-
+            //Click("Your organisations");
+            ExpectHeader("Register or select organisations you want to add statements for");
 
             ClickText(org.OrganisationName);
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             ExpectHeader("Enter your registration PIN");
 
@@ -140,14 +132,12 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ClickText("Activate and continue");
 
-            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST");
+            await AxeHelper.CheckAccessibilityAsync(this, httpMethod: "POST").ConfigureAwait(false);
 
-            AtRow(org.OrganisationName).Expect("Registration complete");
+            ExpectHeader("You can now submit a modern slavery statement for this organisation.");
+            RightOf("Organisation name").Expect(org.OrganisationName);
 
-            await Task.CompletedTask;
-
+            await Task.CompletedTask.ConfigureAwait(false);
         }
-
-
     }
 }

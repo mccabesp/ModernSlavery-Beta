@@ -15,14 +15,19 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             CreateMap<StatementModel, IndicatorsViewModel>()
                 .ForMember(d => d.Indicators, opt => opt.MapFrom(s => s.Summary.Indicators));
-            //.ForMember(d => d.OtherIndicators, opt => opt.MapFrom(s => s.Summary.OtherIndicators));
 
             CreateMap<IndicatorsViewModel, StatementModel>(MemberList.None)
                 .ForMember(d => d.OrganisationId, opt => opt.Ignore())
                 .ForMember(d => d.OrganisationName, opt => opt.Ignore())
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
-                .ForPath(d => d.Summary.Indicators, opt => opt.MapFrom(s => s.Indicators));
-            //.ForPath(d => d.Summary.OtherIndicators, opt => opt.MapFrom(s=>s.OtherIndicators));
+                .ForPath(d => d.Summary.Indicators, opt => opt.MapFrom(s => s.Indicators))
+                .BeforeMap((s, d) => {
+                    if (!s.Indicators.Any())
+                    {
+                        d.Summary.Remediations = null;
+                        d.Summary.OtherRemediations = null;
+                    }
+                });
         }
     }
 
@@ -32,15 +37,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public List<IndicatorTypes> Indicators { get; set; } = new List<IndicatorTypes>();
 
-        //[MaxLength(256)]
-        //public string OtherIndicators { get; set; }
-
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
-
-            //if (Indicators.Contains(IndicatorTypes.Other) && string.IsNullOrWhiteSpace(OtherIndicators))
-            //    validationResults.AddValidationError(4400, nameof(OtherIndicators));
 
             if (Indicators.Contains(IndicatorTypes.None) && Indicators.Count() > 1)
                 validationResults.AddValidationError(4401);
@@ -52,7 +51,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         {
             if (Indicators.Any())
             {
-                //if (Indicators.Contains(IndicatorTypes.Other) && string.IsNullOrWhiteSpace(OtherIndicators)) return Status.InProgress;
                 return Status.Complete;
             }
 

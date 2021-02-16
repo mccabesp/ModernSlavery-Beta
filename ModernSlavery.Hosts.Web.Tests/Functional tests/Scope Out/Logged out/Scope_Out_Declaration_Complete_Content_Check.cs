@@ -42,7 +42,7 @@ namespace ModernSlavery.Hosts.Web.Tests
                 Expect("If you need to tell us whether another organisation is required to publish a modern slavery statement, click on the ‘start again’ button.");
 
                 Expect("Start again");
-                await Task.CompletedTask;
+                await Task.CompletedTask.ConfigureAwait(false);
             }
 
 

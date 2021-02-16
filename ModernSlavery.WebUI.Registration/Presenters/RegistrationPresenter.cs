@@ -46,11 +46,10 @@ namespace ModernSlavery.WebUI.Registration.Presenters
             model.IsRegistered = org.UserOrganisations.Any(uo => uo.User == currentUser && uo.PINConfirmedDate != null);
 
             model.Organisations = new PagedResult<OrganisationRecord>();
-            model.Organisations.Results = new List<OrganisationRecord> { _organisationBusinessLogic.CreateOrganisationRecord(org) };
+            model.Organisations.Results = new List<OrganisationRecord> { _organisationBusinessLogic.CreateOrganisationRecord(org,false) };
             model.SelectedOrganisationIndex = 0;
 
             //Mark the organisation as authorised
-            model.IsSelectedAuthorised = true;
             model.IsFastTrackAuthorised = true;
 
             return model;

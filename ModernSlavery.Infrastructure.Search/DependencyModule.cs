@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 using ModernSlavery.Core.Options;
+using ModernSlavery.Core.Extensions;
+using System.Net.Http;
 
 namespace ModernSlavery.Infrastructure.Search
 {
@@ -21,21 +23,23 @@ namespace ModernSlavery.Infrastructure.Search
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //TODO: Register service dependencies here
+            //Add a dedicated httpclient for Companies house API with retry policy
+            services.AddHttpClient<ISearchRepository<OrganisationSearchModel>, AzureOrganisationSearchRepository>(
+                    nameof(AzureOrganisationSearchRepository),
+                    httpClient => httpClient.SetupConnectionLease($"https://{_options.ServiceName}.search.windows.net/"))
+                .SetHandlerLifetime(TimeSpan.FromMinutes(10));
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
             // Setup azure search
-            builder.Register(c =>
-                    new SearchServiceClient(_options.ServiceName,
-                        new SearchCredentials(_options.AdminApiKey)))
-                .As<ISearchServiceClient>()
-                .SingleInstance();
-
             builder.RegisterType<AzureOrganisationSearchRepository>()
                 .As<ISearchRepository<OrganisationSearchModel>>()
-                .SingleInstance().WithAttributeFiltering();
+                    .WithParameter(
+                    (p, ctx) => p.ParameterType == typeof(HttpClient),
+                    (p, ctx) => ctx.Resolve<IHttpClientFactory>().CreateClient(nameof(AzureOrganisationSearchRepository)))
+                .SingleInstance()
+                .WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

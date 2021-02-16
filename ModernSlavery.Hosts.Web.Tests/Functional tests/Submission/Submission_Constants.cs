@@ -43,7 +43,7 @@ namespace ModernSlavery.Hosts.Web.Tests
         //codes 1, 84110
         public const string SicCodes_InterFloor = "Public Sector, General public administration activities";
 
-        public static readonly string[] Sectors = new string[] { "Automotive, machinery and heavy electrical equipment", "Charitable / not-for-profit activities", "Cleaning and security services", "Construction, civil engineering and building products", "Consumer services, including accommodation, hospitality, tourism and leisure", "Cosmetics and toiletries", "Defence and aerospace", "Durable consumer goods, including electronics and appliances, home furnishings and other accessories", "Education and research", "Fashion, textiles, apparel and luxury goods", "Financial, insurance and real estate activities", "Food and beverages, agriculture and fishing", "Forestry, timber products, paper and containers and packaging", "Healthcare and pharmaceuticals", "Information technology and telecommunication", "Media, publishing, arts and entertainment", "Mining, metals, chemicals and resources (including oil and gas)", "Professional and administrative services and supplies, including legal, consulting and accounting services", "Public sector", "Transportation, logistics, and storage", "Utilities: gas, water and electricity", "Waste management and recycling", "Other" } ;
+        public static readonly string[] Sectors = new string[] { "Automotive, machinery and heavy electrical equipment", "Charitable / not-for-profit activities", "Cleaning and security services", "Construction, civil engineering and building products", "Consumer services, including accommodation, hospitality, tourism and leisure", "Cosmetics and toiletries", "Defence and aerospace", "Durable consumer goods, including electronics and appliances, home furnishings and other accessories", "Education and research", "Fashion, textiles, apparel and luxury goods", "Financial, insurance and real estate activities", "Food and beverages, agriculture and fishing", "Forestry, timber products, paper and containers and packaging", "Healthcare and pharmaceuticals", "Information technology and telecommunication", "Media, publishing, arts and entertainment", "Mining, metals, chemicals and resources (including oil and gas)", "Professional and administrative services and supplies, including legal, consulting and accounting services", "Public sector", "Transportation, logistics, and storage", "Utilities: gas, water and electricity", "Waste management and recycling", "Other" };
 
 
         public static readonly string[] GoodsAndServices = new string[] { "Goods for resale", "Goods not for resale", "Services for sale", "Services used for operational purposes" };
@@ -55,7 +55,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
 
         public static readonly string[] Financials = new string[] { "Under £36 million", "£36 million to £60 million", "£60 million to £100 million", "£100 million to £500 million", "Over £500 million" };
-        
+
 
         public static readonly string[] SupplyChainSectors = new string[] { "Domestic work", "Construction", "Manufacturing", "Agriculture, forestries and fishing", "Accommodation and food service activities", "Wholesale and trade", "Personal services", "Mining and quarrying", "Other sector" };
 
@@ -74,16 +74,57 @@ namespace ModernSlavery.Hosts.Web.Tests
         public const string YourMSStatement_ApprovalDate_Month = "06";
         public const string YourMSStatement_ApprovalDate_Year = "2020";
 
-        public static readonly string[] AreaHeaders = new string[] {  "Your organisation’s structure, business and supply chains", "Policies", "Risk assessment and management", "Due diligence processes", "Staff training about slavery and human trafficking", "Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions", null};
+        public static readonly string[] AreaHeaders = new string[] { "Your organisation’s structure, business and supply chains", "Policies", "Risk assessment and management", "Due diligence processes", "Staff training about slavery and human trafficking", "Goals and key performance indicators (KPIs) to measure your progress over time, and the effectiveness of your actions", null };
 
-        public static readonly string[] YourOrganisation_Sectors = new string[] { "Automotive, machinery and heavy electrical equipment", "Charitable / not-for-profit activities", "Cleaning and security services", "Construction, civil engineering and building products", "Consumer services, including accommodation, hospitality, tourism and leisure", "Cosmetics and toiletries", "Defence and aerospace", "Durable consumer goods, including electronics and appliances, home furnishings and other accessories", "Education and research", "Fashion, textiles, apparel and luxury goods", "Financial, insurance and real estate activities", "Food and beverages, agriculture and fishing", "Forestry, timber products, paper and containers and packaging", "Healthcare and pharmaceuticals", "Information technology and telecommunication", "Media, publishing, arts and entertainment", "Mining, metals, chemicals and resources (including oil and gas)", "Professional and administrative services and supplies, including legal, consulting and accounting services", "Public sector", "Transportation, logistics, and storage", "Utilities: gas, water and electricity", "Waste management and recycling", "Other" };
+        public static readonly string[] YourOrganisation_Sectors = new string[] {
+            "Accommodation and food service activities",
+            "Activities of extraterritorial organisations and bodies",
+            "Activities of households as employers",
+            "Administrative and support service activities",
+            "Agriculture, Forestry and Fishing",
+            "Arts, entertainment and recreation",
+            "Construction",
+            "Education",
+            "Electricity, gas, steam and air conditioning supply",
+            "Financial and insurance activities",
+            "Human health and social work activities",
+            "Information and communication",
+            "Manufacturing",
+            "Mining and Quarrying",
+            "Other service activities",
+            "Professional scientific and technical activities",
+            "Public administration and defence",
+            "Public sector",
+            "Real estate activities",
+            "Transportation and storage",
+            "Water supply, sewerage, waste management and remediation activities",
+            "Wholesale and retail trade",
+            "Other" };
         public const string YourOrganisation_Turnover = "£60 million to £100 million";
 
-        public static readonly string[] Policies_SelectedPolicies = new string[] { "Freedom of association", "Prohibits discrimination", "Other" };
-        public  const string Policies_OtherDetails = "We have many other policies in place";
+        public const string YourOrganistion_YearsProducing = "1 to 5 years";
+
+        public static readonly string[] Policies_SelectedPolicies = new string[] {
+            "Freedom of workers to terminate employment",
+            "Freedom of movement",
+            "Freedom of association",
+            "Prohibits any threat of violence, harassment and intimidation",
+            "Prohibits the use of worker-paid recruitment fees",
+            "Prohibits compulsory overtime",
+            "Prohibits child labour",
+            "Prohibits discrimination",
+            "Prohibits confiscation of workers original identification documents",
+            "Provides access to remedy, compensation and justice for victims of modern slavery",
+            "Other" };
+        public const string Policies_OtherDetails = "We have many other policies in place";
+
+        public static readonly string[] MonitoringProgress_SelectedWhoDidYouEngageWith = new string[] { "Professional auditors", "Your suppliers", "Central or local government" };
+        public static readonly string[] MonitoringProgress_SelectedSocialAudits = new string[] { "Audit conducted by your staff", "Third party audit arranged by your supplier", "Unannounced audit" };
+        public static readonly string[] MonitoringProgress_SelectedGrievanceMechanisms = new string[] { "Using anonymous whistleblowing services, such as a helpline or mobile phone app", "Through trade unions or other worker representative groups" };
+        public const string MonitoringProgress_OtherWays = "Watched very closely.";
 
 
-        public static readonly string[] SupplyChainRisks_SelectedGoodsAndServices = new string[] { "Goods not for resale", "Services for sale"};
+        public static readonly string[] SupplyChainRisks_SelectedGoodsAndServices = new string[] { "Goods not for resale", "Services for sale" };
 
         public static readonly string[] SupplyChainRisks_SelectedVulnerableGroups = new string[] { "Migrants", "Children", "Other vulnerable group(s)" };
         public const string SupplyChainRisks_OtherVulernableGroupsDetails = "People who are at risk.";
@@ -99,16 +140,16 @@ namespace ModernSlavery.Hosts.Web.Tests
         public static readonly string[] SupplyChainRisks_SelectedCountriesAsia = new string[] { "Afghanistan, Islamic Republic of", "Japan", "Mongolia", "Turkmenistan", "United Nations Neutral Zone" };
         public static readonly string[] SupplyChainRisks_SelectedCountriesEurope = new string[] { "Georgia", "Romania", "United Kingdom of Great Britain & Northern Ireland" };
         public static readonly string[] SupplyChainRisks_SelectedCountriesNorthAmerica = new string[] { "Anguilla", "Martinique", "Cuba, Republic of" };
-        public static readonly string[] SupplyChainRisks_SelectedCountriesOceania = new string[] { "New Zealand"};
-        public static readonly string[] SupplyChainRisks_SelectedCountriesSouthAmerica = new string[] { "French Guiana", "Peru, Republic of"};
-        public static readonly string[] SupplyChainRisks_SelectedCountriesAntarctica= new string[] { "Antarctica (the territory South of 60 deg S)", "Bouvet Island (Bouvetoya)", "South Georgia and the South Sandwich Islands", "Heard Island and McDonald Islands" };
+        public static readonly string[] SupplyChainRisks_SelectedCountriesOceania = new string[] { "New Zealand" };
+        public static readonly string[] SupplyChainRisks_SelectedCountriesSouthAmerica = new string[] { "French Guiana", "Peru, Republic of" };
+        public static readonly string[] SupplyChainRisks_SelectedCountriesAntarctica = new string[] { "Antarctica (the territory South of 60 deg S)", "Bouvet Island (Bouvetoya)", "South Georgia and the South Sandwich Islands", "Heard Island and McDonald Islands" };
 
         public static readonly string[] SupplyChainRisks_SelectedPartnerships = new string[] { "with civil society organisations", "with central or local government", "with multi-stakeholder initiatives" };
 
-        public static readonly string[] SupplyChainRisks_SelectedSocialAudits= new string[] { "by a third party", "other type of social audit" };
+        public static readonly string[] SupplyChainRisks_SelectedSocialAudits = new string[] { "by a third party", "other type of social audit" };
         public const string SupplyChainRisks_OtherSocialAudits = "Another audit";
 
-        public static readonly string[] SupplyChainRisks_SelectedGrievanceMechanisms = new string[] { "whistleblowing services", "worker voice technology"};
+        public static readonly string[] SupplyChainRisks_SelectedGrievanceMechanisms = new string[] { "whistleblowing services", "worker voice technology" };
 
         public const string SupplyChainRisks_IndicatorDetails = "There have been signs.";
 
@@ -116,11 +157,15 @@ namespace ModernSlavery.Hosts.Web.Tests
 
         public static readonly string[] SupplyChainRisks_SelectedRemediationActions = new string[] { "repayment of recruitment fees", "other" };
 
-        public static readonly string[] SelectedTrainings = new string[] { "Procurement", "Whole organisation", "Suppliers", "Other" };
+        public static readonly string[] SelectedTrainings = new string[] { "Procurement staff", "Your Whole organisation", "Your Suppliers", "Other" };
         public const string OtherTrainings = "We had a group session.";
 
         public const string MonitoringProgress = "Keeping detailed notes";
         public const string MonitoringAchievements = "We didn't have any";
+
+        public static readonly string[] FindingIndicators_SelectedIndicators = new string[] { "Abuse of vulnerability", "Isolation", "Retention of identity documents", "Debt bondage" };
+
+        public static readonly string[] FindingIndicators_SelectedActions = new string[] { "Change in policy", "Referring potential victims to government services", "Supporting investigations by relevant authorities" };
 
 
         public static readonly string[] African_Countries = new string[] { "Algeria, People's Democratic Republic of", "Angola, Republic of", "Botswana, Republic of", "British Indian Ocean Territory", "Burundi, Republic of", "Cameroon, Republic of", "Cape Verde, Republic of", "Central African Republic", "Chad, Republic of", "Comoros, Union of the", "Mayotte, Department of", "Congo, Republic of the", "Congo, Democratic Republic of the", "Benin, Republic of", "Equatorial Guinea, Republic of", "Ethiopia, Federal Democratic Republic of", "Eritrea, State of", "French Southern Territories", "Djibouti, Republic of", "Gabon, Gabonese Republic", "Gambia, Republic of the", "Ghana, Republic of", "Guinea, Republic of", "Côte d'Ivoire, Republic of", "Kenya, Republic of", "Lesotho, Kingdom of", "Liberia, Republic of", "Libya, State of", "Madagascar, Republic of", "Malawi, Republic of", "Mali, Republic of", "Mauritania, Islamic Republic of", "Mauritius, Republic of", "Morocco, Kingdom of", "Mozambique, Republic of", "Namibia, Republic of", "Niger, Republic of", "Nigeria, Federal Republic of", "Guinea - Bissau, Republic of", "Reunion", "Rwanda, Republic of", "Saint Helena", "São Tomé and Príncipe, Democratic Republic of", "Senegal, Republic of", "Seychelles, Republic of", "Sierra Leone, Republic of", "Somalia, Federal Republic of", "South Africa, Republic of", "Zimbabwe, Republic of", "South Sudan, Republic of", "Sudan, Republic of the", "Sahrawi Arab Democratic Republic", "Eswatini, Kingdom of", "Togo, Togolese Republic", "Tunisia, Republic of", "Uganda, Republic of", "Egypt, Arab Republic of", "Tanzania, United Republic of", "Burkina Faso", "Zambia, Republic of" };

@@ -14,10 +14,10 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("feedback");
 
-            await AxeHelper.CheckAccessibilityAsync(this);
+            await AxeHelper.CheckAccessibilityAsync(this).ConfigureAwait(false);
 
             ExpectHeader("Send us feedback");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
         [Test, Order(42)]
         public async Task What_Did_You_Do()
@@ -25,7 +25,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Try(() => { Below("What did you do on this service?").ExpectLabel("Submitted a statement"); },
                     () => { Below("What did you do on this service?").ExpectLabel("Viewed 1 or more statements"); },
                     () => { Below("What did you do on this service?").ExpectLabel("Submitted and viewed statements"); });
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(44)]
@@ -36,7 +36,7 @@ namespace ModernSlavery.Hosts.Web.Tests
                     () => { Below("How easy or difficult was it to use the service?").ExpectLabel("Neither easy nor difficult"); },
                     () => { Below("How easy or difficult was it to use the service?").ExpectLabel("Difficult"); },
                     () => { Below("How easy or difficult was it to use the service?").ExpectLabel("Very difficult"); });
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(46)]
@@ -47,14 +47,19 @@ namespace ModernSlavery.Hosts.Web.Tests
             Set("How can we improve the service?").To("Keep on keeping on");
 
             BelowField("How can we improve the service?").Expect("You have 1982 characters remaining");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(48)]
         public async Task Further_Feedback()
         {
             Expect("Further feedback");
-            ExpectXPath("//*[contains(.,'If you`re happy for us to get in touch with you about your feedback, please provide your details below.')]");
+            //ExpectXPath("//*[contains(.,'If you`re happy for us to get in touch with you about your feedback, please provide your details below.')]");
+
+            Expect(What.Contains, "If you`re happy for us to get in touch with you about your feedback, please provide your details below.");
+            Expect(What.Contains, "To find out how we'll handle your data, see our");
+
+            ExpectLink("Privacy policy");
 
             ExpectLabel("Your email address (optional)");
             ExpectLabel("Your phone number (optional)");
@@ -62,7 +67,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             Expect(What.Contains, "If you're having difficulty using this service, please email ");
             ExpectLink("modernslaverystatements@homeoffice.gov.uk");
             Expect(What.Contains, "and we'll get back to you quickly.");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
 

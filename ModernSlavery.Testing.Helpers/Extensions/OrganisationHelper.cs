@@ -30,7 +30,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             if (result.Failed)throw new Exception("Unable to set security code");
 
             var dataRepository = uiTest.ServiceScope.GetDataRepository();
-            await dataRepository.SaveChangesAsync();
+            await dataRepository.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public static T Find<T>(this BaseUITest uiTest, Func<T, bool> query)
@@ -142,7 +142,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
                 userOrganisation.PINSentDate = pinSendDate.HasValue ? pinSendDate.Value : VirtualDateTime.Now;
                 userOrganisation.PINConfirmedDate = null;
             }
-            await dataRepository.SaveChangesAsync();
+            await dataRepository.SaveChangesAsync().ConfigureAwait(false);
 
             return userOrganisation;
         }

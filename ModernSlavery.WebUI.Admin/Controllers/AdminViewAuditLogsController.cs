@@ -1,23 +1,28 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Controllers;
+using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "GPGadmin")]
+    [Authorize(Roles = UserRoleNames.Admin)]
     [Route("admin")]
     [NoCache]
-    public class AdminViewAuditLogsController : Controller
+    public class AdminViewAuditLogsController : BaseController
     {
         private readonly IAdminService _adminService;
         public AdminViewAuditLogsController(
-            IAdminService adminService)
+            IAdminService adminService,
+            ILogger<AdminViewAuditLogsController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             _adminService = adminService;
         }

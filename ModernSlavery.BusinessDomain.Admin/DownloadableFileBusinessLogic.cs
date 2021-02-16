@@ -22,7 +22,7 @@ namespace ModernSlavery.BusinessDomain.Admin
         {
             var result = new DownloadableFileModel(filePath);
 
-            result.DataTable = await _fileRepository.ReadDataTableAsync(result.Filepath);
+            result.DataTable = await _fileRepository.ReadDataTableAsync(result.Filepath).ConfigureAwait(false);
 
             RemoveColumnFromDataTable(result.DataTable, "SecurityCode");
             RemoveColumnFromDataTable(result.DataTable, "SecurityCodeExpiryDateTime");
@@ -40,10 +40,10 @@ namespace ModernSlavery.BusinessDomain.Admin
             var parentDirectoryFolderFileInfo = DownloadableDirectory.GetSpecialParentFolderInfo(processedLogsPath);
             result.Add(parentDirectoryFolderFileInfo);
 
-            foreach (var dirPath in await _fileRepository.GetDirectoriesAsync(processedLogsPath))
+            foreach (var dirPath in await _fileRepository.GetDirectoriesAsync(processedLogsPath).ConfigureAwait(false))
                 result.Add(new DownloadableDirectory(dirPath.Replace("\\", "/")));
 
-            foreach (var filePath in await _fileRepository.GetFilesAsync(processedLogsPath))
+            foreach (var filePath in await _fileRepository.GetFilesAsync(processedLogsPath).ConfigureAwait(false))
                 result.Add(new DownloadableFile(filePath.Replace("\\", "/")));
 
             return result;

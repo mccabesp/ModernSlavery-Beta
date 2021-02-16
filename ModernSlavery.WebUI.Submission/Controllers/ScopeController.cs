@@ -106,7 +106,8 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
                     await IncrementRetryCountAsync("lastScopeCode", SharedBusinessLogic.SharedOptions.LockoutMinutes);
 
-                ModelState.AddModelError(3027);
+                ModelState.AddModelError(3027, nameof(EnterCodesViewModel.OrganisationReference));
+                ModelState.AddModelError(3027, nameof(EnterCodesViewModel.SecurityToken));
                 this.SetModelCustomErrors<EnterCodesViewModel>();
                 return View("EnterCodes", model);
             }
@@ -165,7 +166,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
         [HttpPost("in/confirm")]
-        public async Task<IActionResult> ConfirmInScope(string command)
+        public async Task<IActionResult> ConfirmInScope([IgnoreText]string command)
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
@@ -204,7 +205,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [HttpPost("out/confirm-organisation")]
-        public async Task<IActionResult> ConfirmOutOfScopeDetails(string command)
+        public async Task<IActionResult> ConfirmOutOfScopeDetails([IgnoreText]string command)
         {
             // When User is Admin then redirect to Admin\Home
             if (CurrentUser != null && _sharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(CurrentUser))
@@ -434,7 +435,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         [Authorize]
         [HttpGet("~/declare-scope/{organisationIdentifier}")]
-        public async Task<IActionResult> DeclareScope(string organisationIdentifier)
+        public async Task<IActionResult> DeclareScope([Obfuscated]string organisationIdentifier)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -489,7 +490,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [Authorize]
         [ValidateAntiForgeryToken]
         [HttpPost("~/declare-scope/{organisationIdentifier}")]
-        public async Task<IActionResult> DeclareScope(DeclareScopeModel model, string organisationIdentifier)
+        public async Task<IActionResult> DeclareScope(DeclareScopeModel model, [Obfuscated]string organisationIdentifier)
         {
             // Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -525,8 +526,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return new HttpBadRequestResult("Explicit scope is already set");
 
             //Validate the submitted fields
-            ModelState.Clear();
-
             if (model.ScopeStatus == null || model.ScopeStatus == ScopeStatuses.Unknown)
                 AddModelError(3033, "ScopeStatus");
 
@@ -558,7 +557,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
         [Authorize]
         [HttpGet("~/change-organisation-scope/{organisationIdentifier}/{reportingDeadlineYear}")]
-        public async Task<IActionResult> ChangeOrganisationScope(string organisationIdentifier, int reportingDeadlineYear)
+        public async Task<IActionResult> ChangeOrganisationScope([Obfuscated]string organisationIdentifier, int reportingDeadlineYear)
         {
             // Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();

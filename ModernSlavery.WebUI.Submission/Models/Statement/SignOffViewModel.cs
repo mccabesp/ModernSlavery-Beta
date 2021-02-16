@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ModernSlavery.BusinessDomain.Shared.Models;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using Newtonsoft.Json;
 using System;
@@ -54,10 +55,13 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         }
 
         [MaxLength(50)]
+        [Text]
         public string ApproverJobTitle { get; set; }
         [MaxLength(50)]
+        [Text]
         public string ApproverFirstName { get; set; }
         [MaxLength(50)]
+        [Text]
         public string ApproverLastName { get; set; }
 
         public DateTime? ApprovedDate => ToDateTime(ApprovedYear, ApprovedMonth, ApprovedDay);
@@ -104,9 +108,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (ApprovedYear != null && (ApprovedYear.Value > MaxApprovedYear || ApprovedYear.Value < MinApprovedYear))
                 validationResults.AddValidationError(3305, nameof(ApprovedYear), new { minYear = MinApprovedYear, maxYear = MaxApprovedYear });
 
-            // Cannot be before the statment end date
+            // Cannot be before the statement end date
             if (ApprovedDate.HasValue && StatementEndDate.HasValue && ApprovedDate.Value < StatementEndDate.Value)
-                validationResults.AddValidationError(3309, nameof(ApprovedDate));
+                validationResults.AddValidationError(3309, nameof(ApprovedDate), new { maxDate = StatementEndDate.Value.ToShortDateString() });
 
             #endregion    
 

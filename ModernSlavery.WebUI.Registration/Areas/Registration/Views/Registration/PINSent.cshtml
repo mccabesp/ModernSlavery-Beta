@@ -3,7 +3,7 @@
 @inject IWebService WebService
 @{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = $"PIN confirmation - {sharedOptions.ServiceName}";
+    Title = $"PIN confirmation";
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
@@ -16,7 +16,7 @@
             </div>
 
             <div id="default-content">
-                <p>@ViewBag.UserFullName (@ViewBag.UserJobTitle),<br> @ViewBag.Organisation, <br />@Html.Raw(ViewBag.Address)</p>
+                <p>@ViewBag.UserFullName (@ViewBag.UserJobTitle),<br> @ViewBag.Organisation, <br />@Html.Linebreak((string)ViewBag.Address, Environment.NewLine,",")</p>
 
             </div>
             @if (!string.IsNullOrWhiteSpace(ViewBag.PinCode))

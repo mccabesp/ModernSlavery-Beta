@@ -37,7 +37,6 @@ namespace ModernSlavery.Core.Classes
 
         public DateTime PrivateReportingDeadline => _sharedOptions.PrivateReportingDeadline;
         public DateTime PublicReportingDeadline => _sharedOptions.PublicReportingDeadline;
-        public int CurrentSnapshotYear => GetReportingStartDate(SectorTypes.Private).Year;
 
         public DateTime GetReportingStartDate(SectorTypes sectorType, int year = 0)
         {
@@ -92,7 +91,7 @@ namespace ModernSlavery.Core.Classes
 
             var reportingDeadline = new DateTime(now.Year, tempMonth, tempDay).Date;
 
-            return reportingDeadline < now ? reportingDeadline.AddYears(1) : reportingDeadline;
+            return reportingDeadline.AddDays(1) < now ? reportingDeadline.AddYears(1) : reportingDeadline;
         }
 
         public bool IsReportingYearEditable(SectorTypes sectorType, int year)

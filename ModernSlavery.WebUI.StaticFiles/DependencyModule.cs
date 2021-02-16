@@ -22,15 +22,18 @@ namespace ModernSlavery.WebUI.StaticFiles
     public class DependencyModule : IDependencyModule
     {
         private readonly ILogger _logger;
+        private readonly StaticHeaderOptions _staticHeaderOptions;
         private readonly SharedOptions _sharedOptions;
         private readonly ResponseCachingOptions _responseCachingOptions;
 
         public DependencyModule(
             ILogger<DependencyModule> logger,
+            StaticHeaderOptions staticHeaderOptions,
             SharedOptions sharedOptions,
             ResponseCachingOptions responseCachingOptions)
         {
             _logger = logger;
+            _staticHeaderOptions = staticHeaderOptions;
             _sharedOptions = sharedOptions;
             _responseCachingOptions = responseCachingOptions;
         }
@@ -49,16 +52,14 @@ namespace ModernSlavery.WebUI.StaticFiles
         {
             var app = lifetimeScope.Resolve<IApplicationBuilder>();
 
-            var fileRepository = lifetimeScope.Resolve<IFileRepository>();
-
             //Set the static file options
             var staticFileOptions = new StaticFileOptions
             {
                 OnPrepareResponse = context =>
                 {
+                    //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
                     if (_responseCachingOptions.Enabled && _responseCachingOptions.StaticCacheSeconds > 0)
                     {
-                        //Caching static files is required to reduce connections since the default behavior of checking if a static file has changed and returning a 304 still requires a connection.
                         var headers = context.Context.Response.GetTypedHeaders();
 
                         headers.CacheControl = new CacheControlHeaderValue
@@ -66,6 +67,15 @@ namespace ModernSlavery.WebUI.StaticFiles
                             Public = true,
                             MaxAge = TimeSpan.FromSeconds(_responseCachingOptions.StaticCacheSeconds)
                         };
+                    }
+
+                    foreach (var key in _staticHeaderOptions.Keys)
+                    {
+                        //Get the header value
+                        var value = _staticHeaderOptions[key];
+                        
+                        //Add the header
+                        context.Context.SetResponseHeader(key, value);
                     }
                 }
             };

@@ -1,0 +1,63 @@
+﻿@model LoadTestingViewModel
+@{Layout = "/Views/GdsLayout.cshtml";}
+@{
+    Title = "DevOps: Load Testing";
+}
+@inject Microsoft.Extensions.Hosting.IHostEnvironment hostEnvironment;
+@section BeforeMain {
+    <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Url.Action("Home")">Back to DevOps home</a>
+}
+<h2 style="float:right">DevOps</h2>
+<h1 class="heading-large" style="margin-top: 0.3em;">
+    <span id="companyname">Load Testing</span>
+</h1>
+
+<main id="content" role="main">
+    <div class="grid-row">
+        <div class="column-full">
+
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+            {
+                @await Html.GovUkValidationSummaryAsync()
+
+                @Html.AntiForgeryToken()
+
+                <h3>
+                    <span>Current Environment:</span>
+                    <span style="font-weight:normal">@hostEnvironment.EnvironmentName</span>
+                </h3>
+
+                <label for="Action" class="govuk-heading-s">Action:</label>
+                <select id="Action" name="Action" class="govuk-select">
+                    <option value="None" selected="selected">[Select action]</option>
+                    <option value="FullReset">Full Reset of files, queues, cache, search, and logs (except AppInsights)</option>
+                    <option value="ResetDatabase">Clear database, reseed and reset</option>
+                    <option value="SetUKAddresses">Set UK addresses</option>
+                    <option value="DeleteFiles">Delete files</option>
+                    <option value="DeleteDrafts">Delete Draft files</option>
+                    <option value="ClearQueues">Clear queues</option>
+                    <option value="ResetSearch">Delete and recreate search indexes </option>
+                    <option value="ClearAppInsights">Clear Application Inslights telemetry logs</option>
+                    <option value="ClearCache">Clear Distributed Cache and Session</option>
+                    <option value="DeleteLocalLogs">Delete local log files</option>
+                    <option value="DeleteSettingsDump">Delete local file containing dump of app settings</option>
+                </select>
+                <p class="govuk-body govuk-!-margin-top-3">
+                    <button type="submit" class="govuk-button" role="button">Execute</button>
+                </p>
+            }
+        </div>
+
+    </div>
+</main>
+@section AfterLoadedCompiledScripts {
+
+    <script type="text/javascript" nonce="@Html.GetNonce()">
+        $(function () {
+            "use strict";
+            jQuery(":submit").click(function () {
+                if (!confirm('Are you sure you want to execute this action?')) return false;
+            });
+        });
+    </script>
+}

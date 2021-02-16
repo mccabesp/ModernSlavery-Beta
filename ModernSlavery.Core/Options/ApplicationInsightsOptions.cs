@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using ModernSlavery.Core.Attributes;
-using ModernSlavery.Core.Extensions;
+﻿using ModernSlavery.Core.Attributes;
 
 namespace ModernSlavery.Core.Options
 {
@@ -9,6 +6,7 @@ namespace ModernSlavery.Core.Options
     public class ApplicationInsightsOptions : IOptions
     {
         public string InstrumentationKey { get; set; }
+        public bool EnableAdaptiveSampling { get; set; } = true;
 
         public string RoleName { get; set; }
 

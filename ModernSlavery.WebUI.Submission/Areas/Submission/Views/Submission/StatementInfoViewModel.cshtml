@@ -5,13 +5,14 @@
     var reportDateFormatter = new GDSDateFormatter(reportingDeadline);
     var groupSubmissionWord = Model.StatementInfo.SubmittedStatementModifiedDate == null ? (Model.DraftAvailable ? "Also" : "Already") : "Also";
 }
-<div class="gpg-manage-reports__row">
 
-    <div class="gpg-manage-reports__cell gpg-manage-reports__cell--year">
+<tr class="govuk-table__row">
+
+    <th scope="row" class="govuk-table__header">
         @reportingDeadline.Year
-    </div>
+    </th>
 
-    <div class="gpg-manage-reports__cell">
+    <td class="govuk-table__cell">
         <div>
             @if (!Model.StatementInfo.RequiredToReport)
             {
@@ -25,12 +26,12 @@
         @if (Model.StatementInfo.IsStatementEditable)
         {
             <div>
-                <a id="ChangeScope@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@(Url.ActionArea("ChangeOrganisationScope", "Scope", "Submission", new {organisationIdentifier = Model.OrganisationIdentifier, reportingDeadlineYear=reportDateFormatter.StartYear}))">Change</a>
+                <a class="govuk-link" id="ChangeScope@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@(Url.ActionArea("ChangeOrganisationScope", "Scope", "Submission", new {organisationIdentifier = Model.OrganisationIdentifier, reportingDeadlineYear=reportDateFormatter.StartYear}))">Change</a>
             </div>
         }
-    </div>
+    </td>
 
-    <div class="gpg-manage-reports__cell">
+    <td class="govuk-table__cell">
         <div>
 
             @if (Model.StatementInfo.SubmittedStatementModifiedDate == null)
@@ -76,14 +77,14 @@
                 </div>
             }
         </div>
-    </div>
+    </td>
 
-    <div class="gpg-manage-reports__cell gpg-manage-reports__cell--action">
+    <td class="govuk-table__cell app-manage-statements__cell--action">
         @if (Model.StatementInfo.IsStatementEditable)
         {
-            <a class="button" id="NewReport@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@Model.EditUrl">
+            <a class="govuk-button" id="NewReport@(reportDateFormatter.StartYear)-@(Model.OrganisationIdentifier)" href="@Model.EditUrl">
                 <span>@Model.ButtonText</span>
             </a>
         }
-    </div>
-</div>
+    </td>
+</tr>

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Submission.Models
 {
@@ -20,6 +21,7 @@ namespace ModernSlavery.WebUI.Submission.Models
         };
 
         [MinLength(1)]
+        [IgnoreText]
         public List<string> SelectedReasonOptions { get; set; } = new List<string>();
 
         public IEnumerable<string> FriendlyReasonOptions
@@ -44,14 +46,17 @@ namespace ModernSlavery.WebUI.Submission.Models
         }
 
         [Required]
-        [MaxLength(1000)]
+        [MaxLength(ReasonMaxLength)]
+        [Text]
         public string OtherReason { get; set; }
 
-        public long ReasonMaxLength = 1000;
+        public const int ReasonMaxLength = 200;
 
         [Required]
+        [Text]
         public string TurnOver { get; set; }
 
+        [Text]
         public string Reason
         {
             get
@@ -68,7 +73,7 @@ namespace ModernSlavery.WebUI.Submission.Models
             }
             set
             {
-                var selectedReasonOptions = new List<string>(value.SplitI(Environment.NewLine).Where(s => !string.IsNullOrWhiteSpace(s)));
+                var selectedReasonOptions = new List<string>(value.SplitI(Environment.NewLine.ToCharArray()).Where(s => !string.IsNullOrWhiteSpace(s)));
 
                 //Set the selected types
                 SelectedReasonOptions.Clear();
@@ -86,12 +91,15 @@ namespace ModernSlavery.WebUI.Submission.Models
         }
 
         [Required]
+        [Text]
         public string FirstName { get; set; }
 
         [Required]
+        [Text]
         public string LastName { get; set; }
 
         [Required]
+        [Text]
         public string JobTitle { get; set; }
 
         [Required]

@@ -5,69 +5,87 @@ using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
 using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using System.Threading.Tasks;
+using System.Net.Http.Headers;
 
 namespace ModernSlavery.Infrastructure.Azure
 {
     public class AzureManager
     {
+        private readonly AzureOptions _azureOptions;
+        public AzureManager(AzureOptions azureOptions)
+        {
+            _azureOptions = azureOptions;
+        }
 
         public const string ConfigSubscriptionId = "SubscriptionId";
         public const string ConfigTenantId = "TenantId";
         public const string ConfigClientId = "ClientId";
         public const string ConfigClientSecret = "ClientSecret";
-        public static IAzure Azure = null;
+        public IAzure Azure = null;
+        public string AccessToken = null;
+        public AuthenticationHeaderValue AuthenticationHeader;
 
-        private AzureCredentials GetCredentials(string clientId = null, string clientSecret = null, string tenantId = null)
+
+        private AzureCredentials GetAppRegistrationCredentials()
         {
-            if (string.IsNullOrWhiteSpace(clientId)) clientId = Environment.GetEnvironmentVariable(ConfigClientId);
-            if (string.IsNullOrWhiteSpace(clientId)) throw new ArgumentNullException(nameof(clientId), $"You must provide a '{nameof(clientId)}' or specify '{ConfigClientId}' as an environment variable");
+            if (string.IsNullOrWhiteSpace(_azureOptions.ClientId)) throw new ArgumentNullException(nameof(_azureOptions.ClientId), $"You must provide a '{nameof(_azureOptions.ClientId)}' or specify '{ConfigClientId}' as an environment variable");
+            if (string.IsNullOrWhiteSpace(_azureOptions.ClientSecret)) throw new ArgumentNullException(nameof(_azureOptions.ClientSecret), $"You must provide a '{nameof(_azureOptions.ClientSecret)}' or specify '{ConfigClientSecret}' as an environment variable");
+            if (string.IsNullOrWhiteSpace(_azureOptions.TenantId)) throw new ArgumentNullException(nameof(_azureOptions.TenantId), $"You must provide a '{nameof(_azureOptions.TenantId)}' or specify '{ConfigTenantId}' as an environment variable");
 
-            if (string.IsNullOrWhiteSpace(clientSecret)) clientSecret = Environment.GetEnvironmentVariable(ConfigClientSecret);
-            if (string.IsNullOrWhiteSpace(clientSecret)) throw new ArgumentNullException(nameof(clientSecret), $"You must provide a '{nameof(clientSecret)}' or specify '{ConfigClientSecret}' as an environment variable");
-
-            if (string.IsNullOrWhiteSpace(tenantId)) tenantId = Environment.GetEnvironmentVariable(ConfigTenantId);
-            if (string.IsNullOrWhiteSpace(tenantId)) throw new ArgumentNullException(nameof(tenantId), $"You must provide a '{nameof(tenantId)}' or specify '{ConfigTenantId}' as an environment variable");
-
-            return SdkContext.AzureCredentialsFactory.FromServicePrincipal(clientId, clientSecret, tenantId, AzureEnvironment.AzureGlobalCloud);
+            return SdkContext.AzureCredentialsFactory.FromServicePrincipal(_azureOptions.ClientId, _azureOptions.ClientSecret, _azureOptions.TenantId, AzureEnvironment.AzureGlobalCloud);
         }
 
-        public IAzure Authenticate(AzureOptions azureOptions)
+        private AzureCredentials GetAppServiceCredentials()
+        {
+            return SdkContext.AzureCredentialsFactory.FromSystemAssignedManagedServiceIdentity(MSIResourceType.AppService, AzureEnvironment.AzureGlobalCloud);
+        }
+
+        private ClientCredential GetClientCredential()
+        {
+            if (string.IsNullOrWhiteSpace(_azureOptions.ClientId)) throw new ArgumentNullException(nameof(_azureOptions.ClientId), $"You must provide a '{nameof(_azureOptions.ClientId)}' or specify '{ConfigClientId}' as an environment variable");
+
+            if (string.IsNullOrWhiteSpace(_azureOptions.ClientSecret)) throw new ArgumentNullException(nameof(_azureOptions.ClientSecret), $"You must provide a '{nameof(_azureOptions.ClientSecret)}' or specify '{ConfigClientSecret}' as an environment variable");
+
+            return new ClientCredential(_azureOptions.ClientId,_azureOptions.ClientSecret);
+        }
+
+        public IAzure Authenticate()
         {
             if (Azure == null)
             {
                 //=================================================================
                 // Authenticate
-                var credentials = GetCredentials(azureOptions.ClientId, azureOptions.ClientSecret, azureOptions.TenantId);
+                var credentials = _azureOptions.HasCredentials() ? GetAppRegistrationCredentials() : GetAppServiceCredentials();
 
-                Azure = Authenticate(credentials, azureOptions.SubscriptionId);
+                Azure = Authenticate(credentials);
             }
             return Azure;
         }
 
-        public IAzure Authenticate(string clientId, string clientSecret, string tenantId = null, string subscriptionId = null)
+        public IAzure AuthenticateAppService()
         {
             if (Azure == null)
             {
                 //=================================================================
                 // Authenticate
-                var credentials = GetCredentials(clientId, clientSecret, tenantId);
+                var credentials = GetAppServiceCredentials();
 
-                Azure = Authenticate(credentials, subscriptionId);
+                Azure = Authenticate(credentials);
             }
             return Azure;
         }
 
-        public IAzure Authenticate(AzureCredentials credentials, string subscriptionId = null)
+        public IAzure Authenticate(AzureCredentials credentials)
         {
             if (Azure == null)
             {
-                if (string.IsNullOrWhiteSpace(subscriptionId)) subscriptionId = Environment.GetEnvironmentVariable(ConfigSubscriptionId);
-                if (!string.IsNullOrWhiteSpace(subscriptionId))
+                if (!string.IsNullOrWhiteSpace(_azureOptions.SubscriptionId))
                     Azure = Microsoft.Azure.Management.Fluent.Azure
                         .Configure()
                         .WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic)
                         .Authenticate(credentials)
-                        .WithSubscription(subscriptionId);
+                        .WithSubscription(_azureOptions.SubscriptionId);
                 else
                     Azure = Microsoft.Azure.Management.Fluent.Azure
                         .Configure()
@@ -78,13 +96,11 @@ namespace ModernSlavery.Infrastructure.Azure
             return Azure;
         }
 
-        private static AuthenticationContext GetAuthenticationContext(string tenantId = null)
+        private AuthenticationContext GetAuthenticationContext()
         {
-            if (string.IsNullOrWhiteSpace(tenantId)) tenantId = Environment.GetEnvironmentVariable(ConfigTenantId);
-
             AuthenticationContext ctx = null;
-            if (tenantId != null)
-                ctx = new AuthenticationContext("https://login.microsoftonline.com/" + tenantId);
+            if (_azureOptions.TenantId != null)
+                ctx = new AuthenticationContext("https://login.microsoftonline.com/" + _azureOptions.TenantId);
             else
             {
                 ctx = new AuthenticationContext("https://login.windows.net/common");
@@ -97,5 +113,25 @@ namespace ModernSlavery.Infrastructure.Azure
 
             return ctx;
         }
+
+        public async Task<string> GetAccessTokenAsync()
+        {
+            if (!string.IsNullOrWhiteSpace(AccessToken)) return AccessToken;
+
+            var clientCredential = GetClientCredential();
+            var authenticationContext = GetAuthenticationContext();
+
+            var result = await authenticationContext.AcquireTokenAsync("https://management.azure.com/", clientCredential).ConfigureAwait(false);
+
+            if (result == null)throw new InvalidOperationException("Failed to obtain the JWT token");
+            return result.AccessToken;
+        }
+
+        public async Task<AuthenticationHeaderValue> GetAuthenticationHeaderAsync()
+        {
+            return AuthenticationHeader ?? (AuthenticationHeader = new AuthenticationHeaderValue("Bearer", await GetAccessTokenAsync().ConfigureAwait(false)));
+        }
+        
+
     }
 }

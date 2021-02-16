@@ -2,7 +2,7 @@
 @inject ModernSlavery.Core.Interfaces.IObfuscator Obfuscator
 @{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Confirm removal of organisation - Modern Slavery reporting service";
+    Title = "Confirm removal of organisation";
     var controller = ViewData["Controller"] as BaseController;
 
     var userId = Obfuscator.DeObfuscate(Model.EncUserId).ToInt64();
@@ -51,7 +51,7 @@
                         Address
                     </dt>
                     <dd id="OrgAddressAnswer" class="govuk-summary-list__value">
-                        @Html.Raw(Model.OrganisationAddress.Replace(",", "&#44;<br/>"))
+                        @Html.Linebreak(Model.OrganisationAddress,", ",",")
                     </dd>
                 </div>
             </dl>

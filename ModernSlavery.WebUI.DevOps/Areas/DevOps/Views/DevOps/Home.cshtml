@@ -1,0 +1,28 @@
+﻿@model HomeViewModel
+@{Layout = "/Views/GdsLayout.cshtml";}
+@{
+    Title = "DevOps - Modern Slavery Reporting service";
+}
+
+<h1 class="govuk-heading-xl">DevOps</h1>
+
+<h2 class="govuk-heading-l"><a href="@(Url.Action("TriggerWebjobs"))" class="govuk-link govuk-!-font-weight-bold">Trigger Webjobs</a></h2>
+<p class="govuk-body">
+    Manually force immediate execution of scheduled webjobs
+</p>
+
+<h2 class="govuk-heading-l"><a href="@(Url.Action("LoadTesting"))" class="govuk-link govuk-!-font-weight-bold">Load Testing</a></h2>
+<p class="govuk-body">
+    Setup configuration preferences and reset data for load testing
+</p>
+
+<h2 class="govuk-heading-l"><a href="@(Url.Action("Environments"))" class="govuk-link govuk-!-font-weight-bold">Environments</a></h2>
+<p class="govuk-body">
+    View environments and reconfigure, scale, build and tear down cloud resources.
+</p>
+
+<h2 class="govuk-heading-l"><a href="@(Url.Action("DisasterRecovery"))" class="govuk-link govuk-!-font-weight-bold">Disaster Recovery</a></h2>
+<p class="govuk-body">
+    Check availability status and recovery readiness, test and recovery from disaster scenarios.
+</p>
+

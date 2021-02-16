@@ -10,6 +10,34 @@ namespace ModernSlavery.Infrastructure.Storage.MessageQueues
 {
     public class AzureQueue : IQueue
     {
+        #region Dependencies
+        private readonly Lazy<Task<CloudQueue>> lazyQueue;
+        private readonly string connectionString;
+        private readonly IFileRepository fileRepository;
+        public string Name { get; }
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        ///     Enables large message support when providing a FileRepository.
+        /// </summary>
+        public AzureQueue(string connectionString, string queueName, IFileRepository fileRepository)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullException(nameof(connectionString));
+
+            if (string.IsNullOrWhiteSpace(queueName)) throw new ArgumentNullException(nameof(queueName));
+
+            this.connectionString = connectionString;
+            Name = queueName;
+            lazyQueue = new Lazy<Task<CloudQueue>>(async () => await ConnectToAzureQueueLazyAsync().ConfigureAwait(false));
+
+            this.fileRepository = fileRepository;
+        }
+
+        #endregion
+
+
         public virtual async Task AddMessageAsync<TInstance>(TInstance instance)
         {
             if (instance == null || Equals(instance, default(TInstance)))
@@ -17,7 +45,7 @@ namespace ModernSlavery.Infrastructure.Storage.MessageQueues
 
             var json = Core.Extensions.Json.SerializeObject(instance);
 
-            await AddMessageAsync(json);
+            await AddMessageAsync(json).ConfigureAwait(false);
         }
 
         public virtual async Task AddMessageAsync(string message)
@@ -36,7 +64,7 @@ namespace ModernSlavery.Infrastructure.Storage.MessageQueues
                 // Create a "message ID"
                 var filePath = $"LargeQueueFiles\\{Name}\\{Guid.NewGuid()}.json";
                 var bytes = Encoding.UTF8.GetBytes(message);
-                await fileRepository.WriteAsync(filePath, bytes);
+                await fileRepository.WriteAsync(filePath, bytes).ConfigureAwait(false);
                 message = $"file:{filePath}";
             }
 
@@ -44,10 +72,9 @@ namespace ModernSlavery.Infrastructure.Storage.MessageQueues
             var queueMessage = new CloudQueueMessage(message);
 
             // Get the queue via lazy loading
-            var queue = await lazyQueue.Value;
-
+            var queue = await lazyQueue.Value.ConfigureAwait(false);
             // Write the message to the azure queue
-            await queue.AddMessageAsync(queueMessage);
+            await queue.AddMessageAsync(queueMessage).ConfigureAwait(false);
         }
 
         private async Task<CloudQueue> ConnectToAzureQueueLazyAsync()
@@ -65,34 +92,5 @@ namespace ModernSlavery.Infrastructure.Storage.MessageQueues
 
             return queue;
         }
-
-        #region Constructors
-
-        /// <summary>
-        ///     Enables large message support when providing a FileRepository.
-        /// </summary>
-        public AzureQueue(string connectionString, string queueName, IFileRepository fileRepository)
-        {
-            if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullException(nameof(connectionString));
-
-            if (string.IsNullOrWhiteSpace(queueName)) throw new ArgumentNullException(nameof(queueName));
-
-            this.connectionString = connectionString;
-            Name = queueName;
-            lazyQueue = new Lazy<Task<CloudQueue>>(async () => await ConnectToAzureQueueLazyAsync());
-
-            this.fileRepository = fileRepository;
-        }
-
-        #endregion
-
-        #region Dependencies
-
-        private readonly Lazy<Task<CloudQueue>> lazyQueue;
-        private readonly string connectionString;
-        private readonly IFileRepository fileRepository;
-        public string Name { get; }
-
-        #endregion
     }
 }

@@ -1,0 +1,24 @@
+﻿@using static Core.Entities.StatementSummary.V1.StatementSummary;
+
+@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel;
+
+<div class="govuk-!-margin-top-8 govuk-grid-column-two-thirds">
+    <h3 class="govuk-heading-m">
+        Other ways of monitoring working conditions
+    </h3>
+
+    <div class="govuk-body">
+        We asked the organisation whether it had any other ways of monitoring working conditions across its operations and supply chains:
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.OtherWorkConditionsMonitoring))
+    {
+        <div class="govuk-body">
+            @Model.OtherWorkConditionsMonitoring
+        </div>
+    }
+</div>
+@if (string.IsNullOrWhiteSpace(Model.OtherWorkConditionsMonitoring))
+{
+    <partial name="Parts/StatementSummary/_NoResponse" />
+}

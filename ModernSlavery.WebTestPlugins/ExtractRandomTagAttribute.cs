@@ -1,12 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.WebTesting;
-using Microsoft.VisualStudio.TestTools.WebTesting.Rules;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ModernSlavery.WebTestPlugins
 {
@@ -14,7 +9,6 @@ namespace ModernSlavery.WebTestPlugins
     [Description("Extract an attribute value of a random tag which matches an attribute value.")]
     public class ExtractRandomAttribute : ExtractionRule
     {
-        DisplayNameAttribute x;
         public string TagName { get; set; }
         public string AttributeName { get; set; }
         public string MatchAttributeName { get; set; }

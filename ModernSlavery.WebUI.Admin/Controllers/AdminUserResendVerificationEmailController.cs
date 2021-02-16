@@ -1,25 +1,24 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
+using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Interfaces;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
-using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.UrlHelper;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
-using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "GPGadmin")]
+    [Authorize(Roles = UserRoleNames.Admin)]
     [Route("admin")]
     public class AdminUserResendVerificationEmailController : BaseController
     {
@@ -67,6 +66,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
+
+            if (!ModelState.IsValid)
+                foreach (var state in ModelState.Where(state => state.Value.ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid))
+                    foreach (var error in state.Value.Errors)
+                        viewModel.AddErrorFor(state.Key, error.ErrorMessage);
+
             if (viewModel.HasAnyErrors()) return View("ResendVerificationEmail", viewModel);
 
             auditLogger.AuditChangeToUser(
@@ -79,7 +84,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
             );
 
-            var verifyCode = Encryption.EncryptQuerystring(user.UserId + ":" + user.Created.ToSmallDateTime());
+            var verifyCode = Encryption.Encrypt($"{user.UserId}:{user.Created.ToSmallDateTime()}", Encryption.Encodings.Base62);
 
             user.EmailVerifyHash = Crypto.GetSHA512Checksum(verifyCode);
             user.EmailVerifySendDate = VirtualDateTime.Now;
@@ -87,7 +92,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             var verifyUrl = Url.ActionArea("VerifyEmail", "Account","Account",new {vcode = verifyCode},"https");
 
-            if (!_adminService.SharedBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, user.EmailAddress).Result)
+            if (!await _adminService.SharedBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, user.EmailAddress))
             {
                 viewModel.AddErrorFor<AdminResendVerificationEmailViewModel, object>(
                     m => m.OtherErrorMessagePlaceholder,

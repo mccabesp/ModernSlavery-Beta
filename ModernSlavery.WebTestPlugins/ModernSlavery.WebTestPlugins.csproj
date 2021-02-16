@@ -51,6 +51,7 @@
     <Compile Include="IncrementIntPlugin.cs" />
     <Compile Include="ExtractRandomTagAttribute.cs" />
     <Compile Include="RandomAdminPlugin.cs" />
+    <Compile Include="AddressFixPlugin.cs" />
     <Compile Include="RandomEmailPlugin.cs" />
     <Compile Include="DecrementIntPlugin.cs" />
     <Compile Include="RandomPagePlugin.cs" />

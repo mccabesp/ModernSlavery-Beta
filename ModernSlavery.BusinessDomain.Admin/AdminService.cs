@@ -67,7 +67,7 @@ namespace ModernSlavery.BusinessDomain.Admin
 
         public async Task LogSubmission(IOrderedEnumerable<SubmissionLogModel> logRecords)
         {
-            await StatementBusinessLogic.SubmissionLog.WriteAsync(logRecords);
+            await StatementBusinessLogic.SubmissionLog.WriteAsync(logRecords).ConfigureAwait(false);
         }
     }
 }

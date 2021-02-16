@@ -15,6 +15,11 @@ namespace ModernSlavery.Core.Extensions
             Offset = initialisationTimeSpan;
         }
 
+        public static void Set(DateTime dateTime)
+        {
+            Offset = dateTime-DateTime.Now;
+        }
+
         public static void Initialise(string dateTimeOffset)
         {
             Offset = string.IsNullOrWhiteSpace(dateTimeOffset) ? TimeSpan.Zero : TimeSpan.Parse(dateTimeOffset);

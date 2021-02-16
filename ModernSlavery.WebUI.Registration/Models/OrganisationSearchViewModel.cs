@@ -1,18 +1,25 @@
 ﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Models;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Registration.Models
 {
     [Serializable]
     public class OrganisationSearchViewModel
     {
+        [BindNever]
         public PagedResult<OrganisationRecord> Organisations { get; set; }
-        public SectorTypes? SectorType { get; set; }
+        [BindNever]
         public int LastPrivateSearchRemoteTotal { get; set; }
+
+        [BindNever] 
+        public SectorTypes? SectorType { get; set; }
+        
 
         public int OrganisationStartIndex
         {
@@ -38,11 +45,11 @@ namespace ModernSlavery.WebUI.Registration.Models
         {
             get
             {
-                if (Organisations == null || Organisations.PageCount <= 5) return 1;
+                if (Organisations == null || Organisations.VirtualPageCount <= 5) return 1;
 
                 if (Organisations.CurrentPage < 4) return 1;
 
-                if (Organisations.CurrentPage + 2 > Organisations.PageCount) return Organisations.PageCount - 4;
+                if (Organisations.CurrentPage + 2 > Organisations.VirtualPageCount) return Organisations.VirtualPageCount - 4;
 
                 return Organisations.CurrentPage - 2;
             }
@@ -54,9 +61,9 @@ namespace ModernSlavery.WebUI.Registration.Models
             {
                 if (Organisations == null) return 1;
 
-                if (Organisations.PageCount <= 5) return Organisations.PageCount;
+                if (Organisations.VirtualPageCount <= 5) return Organisations.VirtualPageCount;
 
-                if (PagerStartIndex + 4 > Organisations.PageCount) return Organisations.PageCount;
+                if (PagerStartIndex + 4 > Organisations.VirtualPageCount) return Organisations.VirtualPageCount;
 
                 return PagerStartIndex + 4;
             }
@@ -70,6 +77,7 @@ namespace ModernSlavery.WebUI.Registration.Models
             ErrorMessage = "You must enter an organisations name or company number between 3 and 100 characters in length",
             MinimumLength = 3)]
         [DisplayName("Search")]
+        [Text]
         public string SearchText { get; set; }
 
         #endregion

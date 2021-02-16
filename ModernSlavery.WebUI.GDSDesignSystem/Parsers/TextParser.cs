@@ -15,7 +15,7 @@ namespace ModernSlavery.WebUI.GDSDesignSystem.Parsers
             PropertyInfo property,
             HttpRequest httpRequest)
         {
-            var parameterName = $"GovUk_Text_{property.Name}";
+            var parameterName = property.Name;
 
             var parameterValues = httpRequest.Form[parameterName];
 

@@ -1,0 +1,44 @@
+﻿@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+
+<div class="statement-section-two-thirds app-statement-summary_url">
+
+    @if (!string.IsNullOrEmpty(Model.StatementEmail))
+    {
+        <div class="govuk-panel govuk-panel--blue">
+            <div class="govuk-panel__body">
+                <span class="link-header">Get the full statement</span>
+                <br>
+                <span class="link-text">To request a copy of the organisation’s full statement, email:</span>
+                <br>
+                <a class="link-text link-text--action" href="mailto:@Model.StatementEmail">@Model.StatementEmail</a>
+            </div>
+        </div>
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    Why do I need to request a full statement for this organisation?
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                This organisation does not have a website, so we cannot provide a URL linking to the full statement on its website.
+                Organisations that do not have a website, but are required by law to publish a modern slavery statement, must provide a copy of the statement in writing to anyone who requests one within 30 days.
+            </div>
+        </details>
+    }
+    else
+    {
+        <a class="govuk-link"
+           asp-controller="Viewing"
+           asp-action="StatementSummaryUrl"
+           asp-route-organisationIdentifier="@Model.ParentOrganisationId"
+           asp-route-year="@Model.SubmissionDeadlineYear">
+            <div class="govuk-panel govuk-panel--blue">
+                <div class="govuk-panel__body">
+                    <span class="link-header">Link to full statement</span>
+                    <br>
+                    <span class="link-text link-text--action">Go to full modern slavery statement on organisation’s website</span>
+                </div>
+            </div>
+        </a>
+    }
+</div>

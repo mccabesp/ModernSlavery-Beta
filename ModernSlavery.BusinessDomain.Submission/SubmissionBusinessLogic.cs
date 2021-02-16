@@ -30,7 +30,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public virtual async Task<Statement> GetStatementByIdAsync(long statementId)
         {
-            return await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Statement>(o => o.StatementId == statementId);
+            return await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Statement>(o => o.StatementId == statementId).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var orgSubmission = await _sharedBusinessLogic.DataRepository.FirstOrDefaultAsync<Statement>(
                 s => s.SubmissionDeadline.Year == deadlineYear
                      && s.OrganisationId == organisationId
-                     && s.Status == StatementStatuses.Submitted);
+                     && s.Status == StatementStatuses.Submitted).ConfigureAwait(false);
 
             return orgSubmission;
         }
@@ -70,7 +70,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             var statements = _sharedBusinessLogic.DataRepository.GetAll<Statement>()
                 .Where(r => r.SubmissionDeadline.Year == year && r.Status == StatementStatuses.Submitted).ToList();
 
-#if DEBUG
+#if DEBUG || DEBUGLOCAL
             if (Debugger.IsAttached) statements = statements.Take(100).ToList();
 #endif
 

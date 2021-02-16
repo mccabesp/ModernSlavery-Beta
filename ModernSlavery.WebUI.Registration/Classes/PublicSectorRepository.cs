@@ -44,7 +44,7 @@ namespace ModernSlavery.WebUI.Registration.Classes
             result.VirtualRecordTotal = searchResultsList.Count;
             result.CurrentPage = page;
             result.PageSize = pageSize;
-            result.Results = searchResultsList.Page(pageSize, page).Select(o => _organisationBusinessLogic.CreateOrganisationRecord(o)).ToList();
+            result.Results = _organisationBusinessLogic.CreateOrganisationRecords(searchResultsList.Page(pageSize, page),false).ToList();
             return result;
         }
 

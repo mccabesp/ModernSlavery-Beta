@@ -32,24 +32,24 @@ namespace ModernSlavery.Hosts.Web.Tests
         {
             Click("Register an organisation");
 
-
-            ExpectHeader("Registration Options");
-            await Task.CompletedTask;
+            ExpectHeader("Did you receive a letter from us?");
+            ClickLabel("Yes");
+            Click("Continue");
+            ExpectHeader("Fast track registration");
+            await Task.CompletedTask.ConfigureAwait(false);
 
         }
         [Test, Order(21)]
 
         public async Task EnterInvalidDetails()
         {
-            ClickLabel("Fast Track");
-            Click("Continue");
 
             ExpectHeader("Fast track registration");
 
             //todo ensure valid security code added here
             Set("Organisation reference").To(RegistrationTestData.InvalidEmployerReference);
             Set("Security code").To(RegistrationTestData.ValidSecurityCode);
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         [Test, Order(22)]
@@ -60,7 +60,7 @@ namespace ModernSlavery.Hosts.Web.Tests
 
             ExpectHeader("There is a problem");
             Expect("There's a problem with your organisation reference or security code");
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         }

@@ -19,47 +19,35 @@ namespace ModernSlavery.WebUI.Registration.Controllers
     {
         [Authorize]
         [HttpGet("activate-service/{id}")]
-        public async Task<IActionResult> ActivateService(string id)
+        public async Task<IActionResult> ActivateService([Obfuscated] long id)
         {
             //Ensure user has completed the registration process
+            ReportingOrganisationId = id;
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
-            // Decrypt org id
-            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(id);
-            if (organisationId==0)return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
-
             // Check the user has permission for this organisation
-            var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
-            if (userOrg == null)
-                return new HttpForbiddenResult(
-                    $"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
+            var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == id);
+            if (userOrg == null)return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {id}");
+            if (userOrg.Organisation.SectorType != SectorTypes.Private)return new HttpBadRequestResult($"Cannot active public organisation {userOrg.Organisation.OrganisationName} using PIN code");
 
             // Ensure this organisation needs activation on the users account
-            if (userOrg.PINConfirmedDate != null)
-                throw new Exception(
-                    $"Attempt to activate organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}' for {VirtualUser.EmailAddress} by '{(OriginalUser == null ? VirtualUser.EmailAddress : OriginalUser.EmailAddress)}' which has already been activated");
+            if (userOrg.IsRegisteredOK)throw new Exception($"Attempt to activate organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}' for {VirtualUser.EmailAddress} by '{(OriginalUser == null ? VirtualUser.EmailAddress : OriginalUser.EmailAddress)}' which has already been activated");
 
-            //Ensure they havent entered wrong pin too many times
-            var remaining = userOrg.ConfirmAttemptDate == null
-                ? TimeSpan.Zero
-                : userOrg.ConfirmAttemptDate.Value.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) -
-                  VirtualDateTime.Now;
-            if (userOrg.ConfirmAttempts >= SharedBusinessLogic.SharedOptions.MaxPinAttempts && remaining > TimeSpan.Zero
-            )
-                return View("CustomError",
-                    WebService.ErrorViewModelFactory.Create(1113,
-                        new {remainingTime = remaining.ToFriendly(maxParts: 2)}));
+            //Check the user has not exceeded their pin attempts
+            if (userOrg.IsPINAttemptsExceeded(SharedBusinessLogic.SharedOptions.MaxPinAttempts))
+            {
+                var remaining = userOrg.GetTimeToNextPINAttempt(SharedBusinessLogic.SharedOptions.LockoutMinutes);
+                if (remaining > TimeSpan.Zero) return View("CustomError", WebService.ErrorViewModelFactory.Create(1113, new { remainingTime = remaining.ToFriendly(maxParts: 2) }));
+            }
 
-            remaining = userOrg.PINSentDate == null
-                ? TimeSpan.Zero
-                : userOrg.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostMinRepostDays) -
-                  VirtualDateTime.Now;
+            //Create the model
+            var timeToNextPINResend = userOrg.GetTimeToNextPINResend(SharedBusinessLogic.SharedOptions.PinInPostMinRepostDays);
             var model = new CompleteViewModel();
-
             model.PIN = null;
-            model.AllowResend = remaining <= TimeSpan.Zero;
-            model.Remaining = remaining.ToFriendly(maxParts: 2);
+            model.AllowResend = timeToNextPINResend <= TimeSpan.Zero;
+            model.Remaining = timeToNextPINResend.ToFriendly(maxParts: 2);
+            model.OrganisationId = userOrg.OrganisationId;
 
             //Show the PIN textbox and button
             return View("ActivateService", model);
@@ -69,10 +57,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [Authorize]
         [ValidateAntiForgeryToken]
         [HttpPost("activate-service/{id}")]
-        public async Task<IActionResult> ActivateService(CompleteViewModel model, string id)
+        public async Task<IActionResult> ActivateService(CompleteViewModel model, [Obfuscated] long id)
         {
             //Ensure user has completed the registration process
-
+            ReportingOrganisationId = id;
             var checkResult = await CheckUserRegisteredOkAsync();
             if (checkResult != null) return checkResult;
 
@@ -83,53 +71,34 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 return View("ActivateService", model);
             }
 
-            //Get the user organisation
-
-            // Decrypt org id
-            long organisationId = SharedBusinessLogic.Obfuscator.DeObfuscate(id);
-            if (organisationId == 0)
-                return new HttpBadRequestResult($"Cannot decrypt organisation id {id}");
-
             // Check the user has permission for this organisation
-            var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
-            if (userOrg == null)
-                return new HttpForbiddenResult(
-                    $"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
+            var userOrg = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == id);
+            if (userOrg == null) return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {id}");
 
-            ActionResult result1;
-
-            var remaining = userOrg.ConfirmAttemptDate == null
-                ? TimeSpan.Zero
-                : userOrg.ConfirmAttemptDate.Value.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes) -
-                  VirtualDateTime.Now;
-            if (userOrg.ConfirmAttempts >= SharedBusinessLogic.SharedOptions.MaxPinAttempts && remaining > TimeSpan.Zero
-            )
-                return View("CustomError",
-                    WebService.ErrorViewModelFactory.Create(1113,
-                        new {remainingTime = remaining.ToFriendly(maxParts: 2)}));
+            //Check the user has not exceeded his pin attempts
+            if (userOrg.IsPINAttemptsExceeded(SharedBusinessLogic.SharedOptions.MaxPinAttempts))
+            {
+                var remaining = userOrg.GetTimeToNextPINAttempt(SharedBusinessLogic.SharedOptions.LockoutMinutes);
+                if (remaining > TimeSpan.Zero)return View("CustomError",WebService.ErrorViewModelFactory.Create(1113,new { remainingTime = remaining.ToFriendly(maxParts: 2) }));
+            }
 
             var updateSearchIndex = false;
-            if (PinMatchesPinInDatabase(userOrg, model.PIN))
+            ActionResult result1;
+            if (userOrg.IsCorrectPin(model.PIN))
             {
                 //Set the user org as confirmed
                 userOrg.PINConfirmedDate = VirtualDateTime.Now;
 
                 //Set the pending organisation to active
                 //Make sure the found organisation is active or pending
-
                 if (userOrg.Organisation.Status.IsAny(OrganisationStatuses.Pending, OrganisationStatuses.Active))
                 {
-                    userOrg.Organisation.SetStatus(
-                        OrganisationStatuses.Active,
-                        OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,
-                        "PIN Confirmed");
+                    userOrg.Organisation.SetStatus(OrganisationStatuses.Active,OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,"PIN Confirmed");
                     updateSearchIndex = true;
                 }
                 else
                 {
-                    Logger.LogWarning(
-                        $"Attempt to PIN activate a {userOrg.Organisation.Status} organisation",
-                        $"Organisation: '{userOrg.Organisation.OrganisationName}' Reference: '{userOrg.Organisation.OrganisationReference}' User: '{VirtualUser.EmailAddress}'");
+                    Logger.LogWarning($"Attempt to PIN activate a {userOrg.Organisation.Status} organisation",$"Organisation: '{userOrg.Organisation.OrganisationName}' Reference: '{userOrg.Organisation.OrganisationReference}' User: '{VirtualUser.EmailAddress}'");
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1149));
                 }
 
@@ -137,21 +106,14 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 userOrg.Organisation.LatestRegistration = userOrg;
 
                 //Retire the old address 
-                if (userOrg.Organisation.LatestAddress != null &&
-                    userOrg.Organisation.LatestAddress.AddressId != userOrg.Address.AddressId)
+                if (userOrg.Organisation.LatestAddress != null && userOrg.Organisation.LatestAddress.AddressId != userOrg.Address.AddressId)
                 {
-                    userOrg.Organisation.LatestAddress.SetStatus(
-                        AddressStatuses.Retired,
-                        OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,
-                        "Replaced by PIN in post");
+                    userOrg.Organisation.LatestAddress.SetStatus(AddressStatuses.Retired,OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,"Replaced by PIN in post");
                     updateSearchIndex = true;
                 }
 
                 //Activate the address the pin was sent to
-                userOrg.Address.SetStatus(
-                    AddressStatuses.Active,
-                    OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,
-                    "PIN Confirmed");
+                userOrg.Address.SetStatus(AddressStatuses.Active,OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,"PIN Confirmed");
                 userOrg.Organisation.LatestAddress = userOrg.Address;
                 userOrg.ConfirmAttempts = 0;
 
@@ -165,7 +127,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             else
             {
                 userOrg.ConfirmAttempts++;
-                AddModelError(3015, "PIN");
+                AddModelError(3015, "PIN", new { OrganisationIdentifier=SharedBusinessLogic.Obfuscator.Obfuscate(id) });
                 result1 = View("ActivateService", model);
             }
 
@@ -176,8 +138,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //Log the registration
             await _registrationService.RegistrationLog.WriteAsync(
-                new RegisterLogModel
-                {
+                new RegisterLogModel {
                     StatusDate = VirtualDateTime.Now,
                     Status = "PIN Confirmed",
                     ActionBy = VirtualUser.EmailAddress,
@@ -221,20 +182,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             ClearStash();
 
             //Show the confirmation view
-            return View("ServiceActivated",model);
-        }
-
-        private static bool PinMatchesPinInDatabase(UserOrganisation userOrg, string modelPin)
-        {
-            if (modelPin == null) return false;
-
-            var normalisedPin = modelPin.Trim().ToUpper();
-            if (!string.IsNullOrWhiteSpace(userOrg.PIN) && userOrg.PIN == normalisedPin) return true;
-
-            var hashedPin = Crypto.GetSHA512Checksum(normalisedPin);
-            if (userOrg.PINHash == hashedPin) return true;
-
-            return false;
+            return View("ServiceActivated", model);
         }
     }
 }

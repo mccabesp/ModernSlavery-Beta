@@ -21,12 +21,14 @@ namespace ModernSlavery.Infrastructure.Telemetry.AppInsights
         {
             if (!string.IsNullOrWhiteSpace(_applicationInsightsOptions.InstrumentationKey))
             {
-                //Add app insights initialiser to set role name
-                services.AddSingleton<ITelemetryInitializer, AppInsightsRoleNameTelemetryInitializer>();
-
-                //Add filter to removes Http 404 (NotFound) errors received from file storage from telemetry sent to Application Insights
-                services.AddApplicationInsightsTelemetryProcessor<FileNotFoundTelemetryFilter>();
+                //Add app insights initialiser to set role name and set file 404 error codes to successful
+                //Should be superceded by AppInsightsTelemetryProcessor but doesnt work for webjobs so using this here
+                services.AddSingleton<ITelemetryInitializer, AppInsightsTelemetryInitializer>();
+                
+                //Set telemetry role and remove telemetry sent to Application Insights
+                services.AddApplicationInsightsTelemetryProcessor<AppInsightsTelemetryProcessor>();
             }
+
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

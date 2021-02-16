@@ -10,7 +10,7 @@ namespace ModernSlavery.Hosts.Webjob.Jobs
     {
         //Ensure all addresses have are known to be UK or not
         [Disable(typeof(DisableWebjobProvider))]
-        public async Task FixLatestAsync([TimerTrigger("%FixLatestAsync%")] TimerInfo timer, ILogger log)
+        public async Task FixLatestAsync([TimerTrigger("%FixLatestAsync%",RunOnStartup =true)] TimerInfo timer, ILogger log)
         {
             try
             {

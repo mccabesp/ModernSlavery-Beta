@@ -1,0 +1,168 @@
+﻿@using ModernSlavery.Core.Models
+@inject SharedOptions sharedOptions
+@{
+    Layout = "~/Views/GdsLayout.cshtml";
+    Title = "Accessibility Statement";
+}
+
+@section BeforeMain {
+    <a class="govuk-back-link" href="@Context.Request.Headers["Referer"].ToString()">Back</a>
+}
+
+@Html.AntiForgeryToken()
+
+<div class="govuk-grid-row accessibility-statement">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Accessibility statement for the @sharedOptions.ServiceName</h1>
+
+        <p class="govuk-body">This accessibility statement applies to the Modern slavery statement registry, at <a class="govuk-link" href="/">@(sharedOptions.WEBSITE_HOSTNAME)</a>.</p>
+
+        <p class="govuk-body">This website is run by the Home Office. We want as many people as possible to be able to use this website. For example, that means you should be able to:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>change colours, contrast levels and fonts</li>
+            <li>zoom in up to 400% without the text spilling off the screen</li>
+            <li>navigate most of the website using just a keyboard</li>
+            <li>navigate most of the website using speech recognition software</li>
+            <li>listen to most of the website using a screen reader (including the most recent versions of JAWS, NVDA and VoiceOver)</li>
+        </ul>
+
+        <p class="govuk-body">We’ve also made the website text as simple as possible to understand.</p>
+
+        <p class="govuk-body"><a class="govuk-link" href="https://mcmw.abilitynet.org.uk/" rel="noreferrer noopener">AbilityNet</a> has advice on making your device easier to use if you have a disability.</p>
+
+
+        <h2 class="govuk-heading-l">How accessible this website is</h2>
+        <p class="govuk-body">We know some parts of this website are not yet fully accessible:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>users who are logged into the service are automatically logged out 20 minutes after the page was last refreshed – there is no warning, and no way to adjust the length of time before the session expires</li>
+            <li>our service includes some radio buttons that reveal content when the user selects them - users are not always notified when conditionally revealed content is expanded or collapsed (this is a known issue across GOV.UK and should be fixed by March 2021)</li>
+            <li>not all browser tabs have descriptive and unique titles</li>
+            <li>the search filters on Find a modern slavery statement are not fully accessible</li>
+            <li>some tables are not fully accessible</li>
+        </ul>
+
+        <p class="govuk-body">
+            In addition, we provide links to modern slavery statements, guidance and resources published on other websites – we do not own or manage these sites and cannot guarantee their accessibility.
+        </p>
+
+
+        <h2 class="govuk-heading-l">Feedback and contact information</h2>
+
+        <p class="govuk-body">If you need information on this website in a different format like accessible PDF, large print, easy read, audio recording or braille:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>email <a class="govuk-link" href="mailto:@(sharedOptions.MsuReportingEmail)" target="_blank">@sharedOptions.MsuReportingEmail</a></li>
+            <li>write to Modern Slavery Unit, 4th Floor, Peel, 2 Marsham Street, London SW1P 4DF </li>
+        </ul>
+        <p class="govuk-body">We’ll consider your request and get back to you in 5 days.</p>
+
+        <h2 class="govuk-heading-l">Reporting accessibility problems with this website</h2>
+        <p class="govuk-body">We’re always looking to improve the accessibility of this website. If you find any problems not listed on this page or think we’re not meeting accessibility requirements, contact <a class="govuk-link" href="mailto:@(sharedOptions.MsuReportingEmail)" target="_blank">@sharedOptions.MsuReportingEmail</a>.</p>
+
+        <h2 class="govuk-heading-l">Enforcement procedure</h2>
+
+        <p class="govuk-body">The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ‘accessibility regulations’). If you’re not happy with how we respond to your complaint, <a class="govuk-link" href="https://www.equalityadvisoryservice.com/" rel="noreferrer noopener">contact the Equality Advisory and Support Service (EASS)</a>.</p>
+        <p class="govuk-body">If you are in Northern Ireland and are not happy with how we respond to your complaint you can contact the <a href="https://www.equalityni.org/Home" class="govuk-link" rel="noreferrer noopener">Equalities Commission for Northern Ireland</a> who are responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ‘accessibility regulations’) in Northern Ireland.</p>
+
+
+        <h2 class="govuk-heading-l">Technical information about this website’s accessibility</h2>
+
+        <p class="govuk-body">
+            The Home Office is committed to making its website accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.
+        </p>
+
+        <h3 class="govuk-heading-m">Compliance status</h3>
+        <p class="govuk-body">This website is partially compliant with the <a href="https://www.w3.org/TR/WCAG21/" class="govuk-link" rel="noreferrer noopener">Web Content Accessibility Guidelines version 2.1</a> AA standard, due to the non-compliances listed below.</p>
+
+
+        <h2 class="govuk-heading-l">Non-accessible content</h2>
+        <p class="govuk-body">The content listed below is non-accessible for the following reasons.</p>
+
+        <h3 class="govuk-heading-m">Non-compliance with the accessibility regulations</h3>
+        <h4 class="govuk-heading-s">Across the service</h4>
+        <p class="govuk-body">Logged-in users are timed out after 20 minutes of inactivity on the server – there is no warning, and no way to adjust the length of time before the session expires. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#timing-adjustable" rel="noreferrer noopener">WCAG 2.1 success criterion 2.2.1 (timing adjustable)</a>.</p>
+
+        <h4 class="govuk-heading-s">Creating an account, registering organisations and managing statements</h4>
+        <h5 class="govuk-heading-s">Using the organisation reference and security code to register an organisation – no hint text and error messages are not helpful</h5>
+        <p class="govuk-body">If the organisation has received a letter from this service, the user can register the organisation by entering the reference and security code provided in the letter. Currently this page is not fully accessible as there is no hint text for these fields, and error messages do not provide useful information on how to resolve the issue. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#error-identification" rel="noreferrer noopener">WCAG 2.1 success criterion 3.3.1 (Error Identification)</a>.</p>
+
+        <h5 class="govuk-heading-s">Create an account – error messages not read out when using screen readers</h5>
+        <p class="govuk-body">When creating an account, if an error occurs the page reloads and displays an error message, but the message is not read out when using a screen reader and the links which should take the user directly to where the errors are on the page do not work. The links are instead just plain text. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#error-identification" rel="noreferrer noopener">WCAG 2.1 success criterion 3.3.1 (Error Identification)</a>.</p>
+
+        <h5 class="govuk-heading-s">Your details/ Manage your account – ‘change’ links are not differentiated by screen readers</h5>
+        <p class="govuk-body">Screen readers do not differentiate between the different ‘change’ links on this page, and read them all aloud in the same way instead of describing the specific task (‘change password’ or ‘change email address’, for example). This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#link-purpose-in-context" rel="noreferrer noopener">WCAG 2.1 success criterion 2.4.4 (Link purpose)</a> and <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#parsing" rel="noreferrer noopener">WCAG 2.1 success criterion 4.1.1 (Parsing)</a>.</p>
+
+        <h5 class="govuk-heading-s">Your details/ Manage your account – sub navigation is duplicated</h5>
+        <p class="govuk-body">Currently, the page where users manage their account details contains a duplicated sub navigation which says ‘Manage organisations’ and ‘Manage account’. These are left over components from a previous design and will be deleted. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#consistent-identification" rel="noreferrer noopener">WCAG 2.1 success criterion 3.2.4 Consistent Identification</a>.</p>
+
+        <h5 class="govuk-heading-s">Find your organisation – ‘choose organisation’ links are not differentiated by screen readers </h5>
+        <p class="govuk-body">When users search for and select the organisations they want to register, each of the ‘Choose organisation’ links listed on the page are read out same way by screen readers. Instead, screen readers should read out the name of the organisation associated with the link so the user is certain which organisation they’re selecting. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#link-purpose-in-context" rel="noreferrer noopener">WCAG 2.1 success criterion 2.4.4 (Link purpose)</a> and <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#parsing" rel="noreferrer noopener">WCAG 2.1 success criterion 4.1.1 (Parsing)</a>.</p>
+
+        <h5 class="govuk-heading-s">‘We need more information’ – unclear what the yes/no radio buttons relate to</h5>
+        <p class="govuk-body">The first time a user selects an organisation they’ve registered, the service asks the user whether this organisation was required to publish a modern slavery statement on its website in the previous year, by selecting yes or no radio buttons. When the user tabs into the radio button group the question that the radio buttons are associated with is not read out by screen readers. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#labels-or-instructions" rel="noreferrer noopener">WCAG 2.1 success criterion 3.3.2 (Labels and instructions)</a>.</p>
+
+        <h5 class="govuk-heading-s">Manage your modern slavery statements – table has an empty table header</h5>
+        <p class="govuk-body">After registering an organisation, users can select that organisation and manage its modern slavery statements on the service. The table on this page is not fully accessible because it is missing a table header. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#info-and-relationships" rel="noreferrer noopener">WCAG 2.1 success criterion 1.3.1 (Info and relationships)</a>.</p>
+
+        <h4 class="govuk-heading-s">Adding statements to the registry – answering questions about the statement </h4>
+        <p class="govuk-body">Users add their modern slavery statements to the service by providing a URL linking to the statement on their website and answering a series of questions about the statement.</p>
+
+        <h5 class="govuk-heading-s">Some of the submission questions include conditionally revealed content within radio buttons or checkboxes</h5>
+        <p class="govuk-body">Users are not always notified when conditionally revealed content associated with a radio button or checkbox is expanded or collapsed - this fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#name-role-value" rel="noreferrer noopener">WCAG 2.1 success criterion 4.1.2 Name, Role, Value</a>.</p>
+
+        <h5 class="govuk-heading-s">Statement URL, dates and sign off - What period does this statement cover? - no labels above date fields</h5>
+        <p class="govuk-body">Users are asked to state the dates of the period covered by the statement. The input fields do not clearly label the start date and end date - this fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#labels-or-instructions" rel="noreferrer noopener">WCAG 2.1 success criterion 3.3.2 (Labels and instructions)</a>. If the user enters an invalid date it is unclear which date the error message relates to, which fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#error-identification" rel="noreferrer noopener">WCAG 2.1 success criterion 3.3.1 (Error identification)</a>.</p>
+
+        <h5 class="govuk-heading-s">Modern slavery risks – Tell us about your modern slavery risks</h5>
+        <p class="govuk-body">The user is asked to describe up to 3 modern slavery risks in 3 different text boxes, and each text box has the same label. Screen reader users cannot differentiate between each of the risk fields without their own input first. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#parsing" rel="noreferrer noopener">WCAG 2.1 success criterion 4.1.1 (Parsing)</a>.</p>
+
+        <h5 class="govuk-heading-s">Modern slavery risks – About this risk – country picker - ‘remove’ links are not differentiated by screen readers</h5>
+        <p class="govuk-body">Users are asked to state the countries in which their specified risks take place. The way countries are selected and the tables they’re displayed in are not fully accessible. Screen readers read out the ‘Remove’ links the same way for each country, instead of specifying the country each link relates to. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#link-purpose-in-context" rel="noreferrer noopener">WCAG 2.1 success criterion 2.4.4 (Link purpose)</a> and <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#parsing" rel="noreferrer noopener">WCAG 2.1 success criterion 4.1.1 (Parsing)</a>.</p>
+
+        <h5 class="govuk-heading-s">Group statements - Which organisations are included in your group statement? – colour contrast does not meet WCAG 2.1 contrast ratio thresholds</h5>
+        <p class="govuk-body">When users specify which organisations are included in their group statement, a link displays inside a blue banner saying ‘See which organisations you’ve selected’. This link does not have enough colour contrast, which fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#contrast-minimum" rel="noreferrer noopener">WCAG 2.1 success criterion 1.4.3 (Contrast)</a>.</p>
+
+        <h5 class="govuk-heading-s">Group statements - Review the organisations in your group statement</h5>
+        <p class="govuk-body">Users are asked to review the list of organisations they’ve said are included in their group statement. This page highlights organisations that are already included in other statements on the service. The design of this page could be improved for a screen reader so that it reads the organisation’s name before saying which other statement it’s included in. The use of blue to highlight the organisation doesn’t work as well when colour filters are applied to the page, such as yellow on black. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#use-of-color" rel="noreferrer noopener">WCAG 2.1 success criterion 1.4.1 (Use of colour)</a>.</p>
+
+        <h4 class="govuk-heading-s">Find a modern slavery statement</h4>
+        <h5 class="govuk-heading-s">See what organisations are doing to tackle modern slavery (landing page) – right chevron icon on the ‘Find statements’ button is broken on some browsers</h5>
+        <p class="govuk-body">The icon for ‘Find statements’ is broken on some browsers. In addition, the alt text for this icon is incorrect, saying ‘right-arrow’ instead of ‘null’ (as it is decorative). This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#parsing" rel="noreferrer noopener">WCAG 2.1 success criterion 4.1.1 (Parsing)</a>.</p>
+
+        <h5 class="govuk-heading-s">Find modern slavery statements – search button not included in keyboard navigation in Chromium Edge</h5>
+        <p class="govuk-body">When a user is searching for statements using Chromium Edge as their browser, the search button is not included in keyboard navigation. It works as expected on other browsers. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#keyboard" rel="noreferrer noopener">WCAG 2.1 success criterion 2.1.1 (Keyboard)</a>.</p>
+
+        <h5 class="govuk-heading-s">Find modern slavery statements – ‘or use search filters’ link does not receive visual focus</h5>
+        <p class="govuk-body">When a user is using the filters to search for a statement, the link does not receive visual focus. On other links on the service, a link gets a yellow visual focus on click. This is missing here which doesn’t show on click or when tabbing through.This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#focus-visible" rel="noreferrer noopener">WCAG 2.1 success criterion 2.4.7 (Focus Visible)</a>.</p>
+
+        <h5 class="govuk-heading-s">Find modern slavery statements – filters for search results – missing legends</h5>
+        <p class="govuk-body">When searching for statements, users can click on the ‘or use search filters’ link to display a range of search filters (statement year, turnover or budget, and sectors). A legend should be provided when a higher-level description is necessary for groups of check boxes, radio buttons, or other form controls. These filters do not have have legends, which fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#non-text-content" rel="noreferrer noopener">WCAG 2.1 success criterion 1.1.1 (Non-text Content)</a> and <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#info-and-relationships" rel="noreferrer noopener">WCAG 2.1 success criterion 1.3.1 (Info and Relationships)</a>.</p>
+
+        <h5 class="govuk-heading-s">Find modern slavery statements – search results table is not coded as a table</h5>
+        <p class="govuk-body">Search results are presented visually as a table with 2 headings: ‘Modern slavery statements’ and ‘Statement year’. Both of these headings are read out initially as the user moves through the content with a screen reader - but as this content has not been coded as a table, the column headings are not read out repeatedly as the user moves down the list. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#info-and-relationships" rel="noreferrer noopener">WCAG 2.1 success criterion 1.3.1 (Info and Relationships)</a>.</p>
+
+        <h5 class="govuk-heading-s">Organisation’s modern slavery statement summary – the ‘Link to full statement’ blue box does not receive visual focus</h5>
+        <p class="govuk-body">When a user is on an organisation’s statement summary page, the ‘Link to full statement’ link text within blue box does not receive visual focus. It is read out by a screen reader and can be accessed by keyboard, but it does not receive visual focus indication. This fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#focus-visible" rel="noreferrer noopener">WCAG 2.1 success criterion 2.4.7 (Focus Visible)</a>.</p>
+
+        <h5 class="govuk-heading-s">Organisation’s modern slavery statement summary – tables are not coded appropriately</h5>
+        <p class="govuk-body">Tables are all done in &lt;div&gt; tags and do not use correct table structure such as &lt;th&gt; tags so that the headings are read out with each cell to maintain context. Although this is not an essential requirement in this case, as the reading order is acceptable because of the small amount of information contained within this table, it fails <a class="govuk-link" href="https://www.w3.org/WAI/WCAG21/quickref/#info-and-relationships" rel="noreferrer noopener">WCAG 2.1 success criterion 1.3.1 (Info and Relationships)</a>.</p>
+
+        <h3 class="govuk-heading-m">Disproportionate burden</h3>
+        <p class="govuk-body">At this time, we have not made any disproportionate burden claims.</p>
+
+        <h3 class="govuk-heading-m">Content that’s not within the scope of the accessibility regulations</h3>
+        <p class="govuk-body">At this time, we have not identified any content that is not within the scope of the accessibility regulations.</p>
+
+
+        <h2 class="govuk-heading-l">Preparation of this accessibility statement</h2>
+        <p class="govuk-body">This statement was prepared on 15 February 2021. It will be periodically reviewed during the public beta phase of the service.</p>
+        <p class="govuk-body">This website was last tested on 2 December 2020. </p>
+        <p class="govuk-body">Testing was carried out internally by the Home Office.</p>
+
+
+        <h2 class="govuk-heading-l">What we're doing to improve accessibility</h2>
+        <p class="govuk-body">At the time of writing this statement, our service was in private beta and had not yet gone live. We plan to address the issues listed in the ‘Non-accessible content’ section of this statement during the public beta phase, and aim to fix them by December 2021. We will also continue to monitor the accessibility of this website as it is iterated during public beta. </p>
+
+    </div>
+</div>

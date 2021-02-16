@@ -21,6 +21,16 @@ namespace ModernSlavery.Core
         }
     }
 
+    public static class UserRoleNames
+    {
+        public const string Submitter = "SubmitterRole";
+        public const string Admin = "AdminRole";
+        public const string DatabaseAdmin = "DatabaseAdminRole";
+        public const string SuperAdmin = "SuperAdminRole";
+        public const string DevOpsAdmin = "DevOpsAdminRole";
+        public const string SuperOrDatabaseAdmins = "SuperAdminRole,DatabaseAdminRole";
+    }
+
     public static class Filenames
     {
         public const string Organisations = "MSU-Organisations.csv";
@@ -47,7 +57,7 @@ namespace ModernSlavery.Core
         public const string RegistrationLog = "MSU-RegistrationLog.csv";
         public const string SubmissionLog = "MSU-SubmissionLog.csv";
         public const string EmailSendLog = "MSU-EmailSendLog.csv";
-        public const string SearchLog = "MSU-searchLog.csv";
+        public const string SearchLog = "MSU-SearchLog.csv";
         public const string UserLog = "MSU-UserLog.csv";
         public const string ImportPrivateOrganisations = "MSU-ImportPrivateOrganisations.csv";
         public const string ImportPublicOrganisations = "MSU-ImportPublicOrganisations.csv";

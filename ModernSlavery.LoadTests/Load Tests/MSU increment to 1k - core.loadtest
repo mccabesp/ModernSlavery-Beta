@@ -1,12 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<LoadTest Name="MSU increment to 1k - core" Description="" Owner="" storage="c:\users\mccab\source\dfe-gov\ModernSlavery\ModernSlavery.loadtests\msu increment to 1k - core.loadtest" Priority="2147483647" Enabled="true" CssProjectStructure="" CssIteration="" DeploymentItemsEditable="" WorkItemIds="" TraceLevel="None" CurrentRunConfig="MSUTestSettings" Id="3538379b-76ac-4df9-ab3a-9958f13c3068" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<LoadTest Name="MSU increment to 1k - core" Description="" Owner="" storage="c:\users\testadmin\source\repos\modernslavery\modernslavery.loadtests\load tests\msu increment to 1k - core.loadtest" Priority="2147483647" Enabled="true" CssProjectStructure="" CssIteration="" DeploymentItemsEditable="" WorkItemIds="" TraceLevel="None" CurrentRunConfig="MSUTestSettings" Id="3538379b-76ac-4df9-ab3a-9958f13c3068" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Scenarios>
-    <Scenario Name="Step to 20,000" DelayBetweenIterations="0" PercentNewUsers="100" IPSwitching="false" TestMixType="PercentageOfUsersRunning" ApplyDistributionToPacingDelay="true" MaxTestIterations="0" DisableDuringWarmup="false" DelayStartTime="0" AllowedAgents="">
+    <Scenario Name="Step to 1000" DelayBetweenIterations="0" PercentNewUsers="100" IPSwitching="false" TestMixType="PercentageOfUsersRunning" ApplyDistributionToPacingDelay="true" MaxTestIterations="0" DisableDuringWarmup="false" DelayStartTime="0" AllowedAgents="">
       <ThinkProfile Value="0.2" Pattern="NormalDistribution" />
-      <LoadProfile Pattern="Step" InitialUsers="100" MaxUsers="5000" StepUsers="200" StepDuration="60" StepRampTime="60" />
+      <LoadProfile Pattern="Step" InitialUsers="50" MaxUsers="1000" StepUsers="50" StepDuration="30" StepRampTime="30" />
       <TestMix>
-        <TestProfile Name="SearchTest" Path="searchtest.webtest" Id="259a791d-9c54-4ca5-9738-bbaa07ec7b96" Percentage="70" Type="Microsoft.VisualStudio.TestTools.WebStress.DeclarativeWebTestElement, Microsoft.VisualStudio.QualityTools.LoadTest, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-        <TestProfile Name="SmokeTest" Path="smoketest.webtest" Id="711b8f09-6ab3-4463-af4e-62b461add91c" Percentage="30" Type="Microsoft.VisualStudio.TestTools.WebStress.DeclarativeWebTestElement, Microsoft.VisualStudio.QualityTools.LoadTest, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+        <TestProfile Name="PREPROD - Anonymous User Journey" Path="..\scenarios\preprod - anonymous user journey.webtest" Id="7d20cf79-ab45-47f4-bfd0-0f76443c6056" Percentage="90" Type="Microsoft.VisualStudio.TestTools.WebStress.DeclarativeWebTestElement, Microsoft.VisualStudio.QualityTools.LoadTest, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+        <TestProfile Name="PREPROD - Private Organisation User Journey" Path="..\scenarios\preprod - private organisation user journey.webtest" Id="72b30c64-fbeb-4d80-b518-bb6c1a6f47c5" Percentage="5" Type="Microsoft.VisualStudio.TestTools.WebStress.DeclarativeWebTestElement, Microsoft.VisualStudio.QualityTools.LoadTest, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+        <TestProfile Name="PREPROD - Public Organisation User Journey" Path="..\scenarios\preprod - public organisation user journey.webtest" Id="c55df561-8347-46e3-b1b7-34938109b06c" Percentage="5" Type="Microsoft.VisualStudio.TestTools.WebStress.DeclarativeWebTestElement, Microsoft.VisualStudio.QualityTools.LoadTest, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
       </TestMix>
       <BrowserMix>
         <BrowserProfile Percentage="7">
@@ -235,7 +236,7 @@
             <Counter Name="Avg. Response Time" />
             <Counter Name="Avg. Connection Wait Time">
               <ThresholdRules>
-                <ThresholdRule Classname="Microsoft.VisualStudio.TestTools.WebStress.Rules.ThresholdRuleCompareCounters, Microsoft.VisualStudio.QualityTools.LoadTest, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+                <ThresholdRule Classname="Microsoft.VisualStudio.TestTools.WebStress.Rules.ThresholdRuleCompareCounters, Microsoft.VisualStudio.QualityTools.LoadTest, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
                   <RuleParameters>
                     <RuleParameter Name="DependentCategory" Value="LoadTest:Page" />
                     <RuleParameter Name="DependentCounter" Value="Avg. Page Time" />
@@ -300,7 +301,7 @@
             <Counter Name="Current Bandwidth" RangeGroup="Network Bytes" />
             <Counter Name="Bytes Total/sec" RangeGroup="Network Bytes">
               <ThresholdRules>
-                <ThresholdRule Classname="Microsoft.VisualStudio.TestTools.WebStress.Rules.ThresholdRuleCompareCounters, Microsoft.VisualStudio.QualityTools.LoadTest, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+                <ThresholdRule Classname="Microsoft.VisualStudio.TestTools.WebStress.Rules.ThresholdRuleCompareCounters, Microsoft.VisualStudio.QualityTools.LoadTest, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
                   <RuleParameters>
                     <RuleParameter Name="DependentCategory" Value="Network Interface" />
                     <RuleParameter Name="DependentCounter" Value="Current Bandwidth" />
@@ -447,7 +448,7 @@
             <Counter Name="Current Bandwidth" RangeGroup="Network Bytes" />
             <Counter Name="Bytes Total/sec" RangeGroup="Network Bytes">
               <ThresholdRules>
-                <ThresholdRule Classname="Microsoft.VisualStudio.TestTools.WebStress.Rules.ThresholdRuleCompareCounters, Microsoft.VisualStudio.QualityTools.LoadTest, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+                <ThresholdRule Classname="Microsoft.VisualStudio.TestTools.WebStress.Rules.ThresholdRuleCompareCounters, Microsoft.VisualStudio.QualityTools.LoadTest, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
                   <RuleParameters>
                     <RuleParameter Name="DependentCategory" Value="Network Interface" />
                     <RuleParameter Name="DependentCounter" Value="Current Bandwidth" />
@@ -564,7 +565,7 @@
     </CounterSet>
   </CounterSets>
   <RunConfigurations>
-    <RunConfiguration Name="MSUTestSettings" Description="" ResultsStoreType="Database" TimingDetailsStorage="AllIndividualDetails" SaveTestLogsOnError="true" SaveTestLogsFrequency="0" MaxErrorDetails="2000" MaxErrorsPerType="5000" MaxThresholdViolations="5000" MaxRequestUrlsReported="1000" UseTestIterations="false" RunDuration="21600" WarmupTime="0" CoolDownTime="0" TestIterations="100" WebTestConnectionModel="ConnectionPool" WebTestConnectionPoolSize="50" SampleRate="15" ValidationLevel="Low" SqlTracingConnectString="" SqlTracingConnectStringDisplayValue="" SqlTracingDirectory="" SqlTracingEnabled="false" SqlTracingFileCount="2" SqlTracingRolloverEnabled="true" SqlTracingMinimumDuration="500" RunUnitTestsInAppDomain="true" CoreCount="20" ResourcesRetentionTimeInMinutes="60" AgentDiagnosticsLevel="Warning">
+    <RunConfiguration Name="MSUTestSettings" Description="" ResultsStoreType="Database" TimingDetailsStorage="AllIndividualDetails" SaveTestLogsOnError="false" SaveTestLogsFrequency="1" MaxErrorDetails="20000" MaxErrorsPerType="5000" MaxThresholdViolations="5000" MaxRequestUrlsReported="20000" UseTestIterations="false" RunDuration="1800" WarmupTime="0" CoolDownTime="0" TestIterations="1" WebTestConnectionModel="ConnectionPool" WebTestConnectionPoolSize="50" SampleRate="15" ValidationLevel="Low" SqlTracingConnectString="" SqlTracingConnectStringDisplayValue="" SqlTracingDirectory="" SqlTracingEnabled="false" SqlTracingFileCount="5" SqlTracingRolloverEnabled="true" SqlTracingMinimumDuration="500" RunUnitTestsInAppDomain="true" CoreCount="20" ResourcesRetentionTimeInMinutes="60" AgentDiagnosticsLevel="Warning">
       <CounterSetMappings>
         <CounterSetMapping ComputerName="[CONTROLLER MACHINE]">
           <CounterSetReferences>
@@ -582,8 +583,7 @@
         <GeoLocation Location="West Europe" Percentage="100" />
       </LoadGeneratorLocations>
       <ContextParameters>
-        <ContextParameter Name="WebServer1" Value="https://wa-t1te-msu.azurewebsites.net" />
-        <ContextParameter Name="WebServer2" Value="https://wa-t1te-msu.azurewebsites.net" />
+        <ContextParameter Name="WebServer" Value="https://as-modernslavery-beta-preprod.azurewebsites.net" />
       </ContextParameters>
     </RunConfiguration>
   </RunConfigurations>

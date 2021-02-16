@@ -72,7 +72,7 @@ namespace ModernSlavery.Core.Classes
             if (string.IsNullOrWhiteSpace(AdminEmails))
                 throw new ArgumentException("Missing AdminEmails from web.config");
 
-            return emailAddress.LikeAny(AdminEmails.SplitI(";"));
+            return emailAddress.LikeAny(AdminEmails.SplitI(';'));
         }
     }
 }

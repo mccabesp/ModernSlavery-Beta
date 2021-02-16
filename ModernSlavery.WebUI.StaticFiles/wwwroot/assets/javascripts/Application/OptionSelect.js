@@ -27,7 +27,7 @@
                 .html(filterEl.innerHTML)
                 .insertBefore(this.$optionsContainer)
 
-            this.$filter = this.$optionSelect.find('input[id="input-select-filter"]')
+            this.$filter = this.$optionSelect.find('input[id^="input-select-filter"]')
             this.$filterCount = $('#' + this.$filter.attr('aria-describedby'))
             this.filterTextSingle = ' ' + this.$filterCount.data('single')
             this.filterTextMultiple = ' ' + this.$filterCount.data('multiple')

@@ -1,64 +1,57 @@
 ﻿@using System.Data
 @model DownloadViewModel.Download
 @{
-    Layout = "~/Views/DfeTemplate.cshtml";
-    ViewBag.Title = "Administration: " + Model.Filename;
+    Layout = "~/Views/GdsLayout.cshtml";
+    Title = "Administration: " + Model.Filename;
 }
 <style type="text/css" nonce="@Html.GetNonce()">
     #content { max-width: 98% !important; }
 </style>
-<main id="content" role="main" style="clear: both;">
-    <div class="breadcrumbs dynamic-content default-content" style="display: block; float: none;">
-        <ol>
-            <li style="display: block; padding-bottom: 0; padding-top: 0.75em;">
-                &lt;
 
-                <a href="javascript:window.history.back()">Back to previous page</a>
-            </li>
-        </ol>
-    </div>
+@section BeforeMain {
+    <a class="govuk-back-link govuk-!-margin-bottom-0"  href="@(Context.GetUrlReferrer())">Back to previous page</a>
+}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
 
-    <div class="grid-row">
-        <div class="column-full">
+        <div style="float: right; font-size: smaller; text-align: right;">
+            <span>
+                <a class="govuk-link" href="@Url.Action("Read", "Admin", new {filePath = Context.Request.Query["filePath"], v = Guid.NewGuid().ToShortString()})" title="Show more recent content">@VirtualDateTime.Now.ToString("d MMM HH:mm")</a>
+            </span><br />
+            <span class="heading-secondary">
+                <a class="govuk-link" download="true" href="@Url.Action("Download", new {filePath = Model.Filepath})" target="_blank" title="Download this data in CSV format">Download</a>
+            </span>
+        </div>
+        <h1 class="govuk-heading-l" style="margin-top: 0.3em;">
+            <span id="companyname">@System.IO.Path.GetFileName(Model.Filename)</span>
+        </h1>
 
-            <div style="float: right; font-size: smaller; text-align: right;">
-                <span>
-                    <a href="@Url.Action("Read", "Admin", new {filePath = Context.Request.Query["filePath"], v = Guid.NewGuid().ToShortString()})" title="Show more recent content">@VirtualDateTime.Now.ToString("d MMM HH:mm")</a>
-                </span><br/>
-                <span class="heading-secondary">
-                    <a download="true" href="@Url.Action("Download", new {filePath = Model.Filepath})" target="_blank"title="Download this data in CSV format">Download</a>
-                </span>
-            </div>
-            <h1 class="heading-large" style="margin-top: 0.3em;">
-                <span id="companyname">@System.IO.Path.GetFileName(Model.Filename)</span>
-            </h1>
-
-            <div style="border: solid 1px; left: 0; overflow-x: auto; overflow-y: visible; width: 100%;" class="double-scroll">
-                @if (Model.Datatable != null)
-                {
-                    <table border="1" cellpadding="5">
-                        <thead>
-                        <tr>
+        <div style="border: solid 1px; left: 0; overflow-x: auto; overflow-y: visible; width: 100%;" class="double-scroll">
+            @if (Model.Datatable != null)
+            {
+                <table class="govuk-table" border="1" cellpadding="5">
+                    <thead class="govuk-table__head">
+                        <tr  class="govuk-table__row">
                             @foreach (DataColumn col in Model.Datatable.Columns)
                             {
-                                <th>@col.Caption</th>
+                                <th class="govuk-table__header">@col.Caption</th>
                             }
                         </tr>
-                        </thead>
-                        <tbody>
+                    </thead>
+                    <tbody  class="govuk-table__body">
                         @foreach (DataRow row in Model.Datatable.Rows)
                         {
-                            <tr>
+                            <tr class="govuk-table__row">
                                 @foreach (var cell in row.ItemArray)
                                 {
                                     var value = cell.ToString();
                                     if (value.StartsWithI("http://", "https://"))
                                     {
-                                        <td><a href="@value" target="_blank">@value</a>)</td>
+                                        <td class="govuk-table__cell"><a class ="govuk-link" href="@value" target="_blank">@value</a>)</td>
                                     }
                                     else
                                     {
-                                        <td>@Html.ToHtml(value)</td>
+                                        <td class="govuk-table__cell">@Html.ToHtml(value)</td>
                                     }
                                 }
                             </tr>

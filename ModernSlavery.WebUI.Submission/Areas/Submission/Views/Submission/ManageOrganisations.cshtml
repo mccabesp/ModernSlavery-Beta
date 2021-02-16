@@ -5,33 +5,52 @@
 @model IEnumerable<UserOrganisation>
 @{
     Layout = "~/Views/GdsLayout.cshtml";
-    ViewBag.Title = "Manage your organisation - Modern Slavery reporting service";
+    Title = "Select an organisation";
     var hasRegisteredOrgs = Model.Any();
 }
 
-@section BeforeMain {
-    @await Html.PartialAsync("AccountNavigation")
-}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">
+            Register or select organisations you want to add statements for
+        </h1>
 
+        <p class="govuk-body govuk-!-font-size-24">Before you can add an organisation’s statement to the registry, you need to register the organisation on your account.</p>
+
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    Read about multiple users for the same organisation
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                <p class="govuk-body">If multiple people want to be able to use this service on behalf of the same organisation (for example, to collaborate on providing information):</p>
+
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>each person must create their own account</li>
+                    <li>each person must then register the organisation on their account</li>
+                    <li>everyone who has registered the same organisation on their account is visible to one another</li>
+                    <li>everyone who has registered the same organisation on their account can remove the other users from the list of people able to submit for that organisaiton (when this happens, the ‘removed’ person will receive an email notification)</li>
+                </ul>
+            </div>
+        </details>
+
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                If your statement is for a group of organisations you only need to register the parent organisation.
+            </strong>
+        </div>
+
+    </div>
+
+</div>
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h1 class="govuk-heading-l">
-            Select an organisation
-        </h1>
-        <p class="govuk-body">Use this page to access your registered organisations or to register a new organisation.</p>
 
-        <p class="govuk-body">Once you've selected an organisation (by clicking on its name, below) you can:</p>
-
-        <ul class="govuk-list govuk-list--bullet">
-            <li>state whether this organisation is required to publish an annual modern slavery statement</li>
-            <li>provide a link to the full modern slavery statement published on the organisation's website</li>
-            <li>enter information about this organisation's modern slavery statement</li>
-            <li>save this information as a draft, and complete it at a later date before submitting it</li>
-        </ul>
-
-        <p class="govuk-body">The information you submit will be published on our viewing service as a summary of your modern slavery statement.</p>
-
-        <table class="govuk-table" summary="A list of organisations registered to your account" style="margin-top: 30px">
+        <table class="govuk-table">
+            <caption class="govuk-table__caption govuk-!-font-size-24">Your registered organisations</caption>
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th class="govuk-table__header" scope="col">Organisation name</th>
@@ -48,7 +67,7 @@
                     var encOrgId = Obfuscator.Obfuscate(userOrg.OrganisationId.ToString());
                     var latestStatement = userOrg.Organisation.LatestStatement;
                     var scopeStatus = userOrg.Organisation.GetActiveScopeStatus(accountingDate);
-                    var address = userOrg.Organisation.GetLatestAddress()?.GetAddressString();
+                    var address = (userOrg.Organisation.LatestAddress ?? userOrg.Organisation.GetLatestAddress())?.GetAddressString();
 
                     <tr class="govuk-table__row">
                         @if (userOrg.PINSentDate != null && userOrg.PINConfirmedDate == null)
@@ -88,7 +107,7 @@
                 @if (hasRegisteredOrgs == false)
                 {
                     <tr class="govuk-table__row">
-                        <td class="govuk-table__cell" colspan="2" style="border-bottom: none">There are no organisations registered to your account.</td>
+                        <td class="govuk-table__cell govuk-!-padding-top-4 govuk-!-padding-bottom-4" colspan="2">No registered organisations</td>
                     </tr>
                 }
 
@@ -111,13 +130,10 @@
         {
             <h2 class="govuk-heading-s">Need to close your account?</h2>
             <p class="govuk-body">
-                If you created an account by mistake or no longer responsible
-                for reporting Modern Slavery statement you can close your account in <a asp-action="home" asp-controller="Account" asp-area="Account">manage account</a>.
+                You only need an account if you want to add a statment to the registry. If you do not need an account, go to <a asp-action="ManageAccount" asp-controller="Account" asp-area="Account">manage your account</a> to close it.
             </p>
         }
 
     </div>
 
 </div>
-<hr style="background: black; border: 1px solid black;" />
-<partial name="~/Views/Shared/ServiceSurveyIntroAndLink.cshtml" />

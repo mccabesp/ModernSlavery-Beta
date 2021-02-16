@@ -1,0 +1,90 @@
+﻿@using static Core.Entities.StatementSummary.V1.StatementSummary;
+
+@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel
+
+<div class="statement-section-full" id="training">
+    <div class="govuk-grid-column-two-thirds">
+        <h2 class="govuk-heading-m">
+            Training (optional)
+        </h2>
+
+        <div class="govuk-body">
+            We asked the organisation whether it provided training on modern slavery, and who it was for.
+        </div>
+
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">
+                    What counts as training?
+                </span>
+            </summary>
+            <div class="govuk-details__text">
+                We explained that by ‘training’ we meant anything designed to increase knowledge and skills around identifying, addressing or preventing modern slavery risks.
+                This could range from formal training courses to broader awareness-raising activities such as workshops or webinars.
+            </div>
+        </details>
+    </div>
+
+    @if (Model.TrainingTargets.Contains(TrainingTargetTypes.None))
+    {
+        <div class="govuk-grid-column-two-thirds">
+            <div class="nothing-included">
+                <div class="nothing-included__label">Organisation’s response</div>
+                <strong class="govuk-tag govuk-tag--blue nothing-included__tag">
+                    The organisation told us it did not did not provide training on modern slavery during the period of the statement.
+                </strong>
+            </div>
+        </div>
+    }
+    else if (Model.TrainingTargets.Any())
+    {
+        <div class="govuk-grid-column-full">
+            <div class="app-question-list">
+                <div class="app-question-list__header">
+                    <div class="app-question-list__column app-question-list__name">
+                        We asked who the training was for
+                    </div>
+                    <div class="app-question-list__column app-question-list__response">
+                        Organisation’s response
+                    </div>
+                </div>
+                @foreach (var training in Enums.GetValuesExcept<TrainingTargetTypes>(TrainingTargetTypes.Unknown, TrainingTargetTypes.None))
+                {
+                    var isOther = training == TrainingTargetTypes.Other;
+                    <div class="app-question-list__item">
+                        <div class="app-question-list__column app-question-list__name">
+                            @training.GetEnumDescription()
+                        </div>
+                        <div class="app-question-list__column app-question-list__response">
+                            <span class="app-question-list__response-label">
+                                Organisation’s response:
+                            </span>
+                            @if (!isOther)
+                            {
+                                <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.TrainingTargets.Contains(training) ? "Yes" : "No")</strong>
+                            }
+                            else
+                            {
+                                <div @(string.IsNullOrEmpty(Model.OtherTrainingTargets) ? "aria-description='no answer provided'" : "") class="app-question-list__response-details">
+                                    @if (string.IsNullOrEmpty(Model.OtherTrainingTargets))
+                                    {
+                                        <text>-</text>
+                                    }
+                                    else
+                                    {
+                                        <text>@Model.OtherTrainingTargets</text>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <partial name="Parts/StatementSummary/_NoResponse" />
+    }
+
+</div>

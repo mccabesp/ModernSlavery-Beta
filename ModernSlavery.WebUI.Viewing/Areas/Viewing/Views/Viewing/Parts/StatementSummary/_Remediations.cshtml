@@ -1,0 +1,79 @@
+﻿@using static Core.Entities.StatementSummary.V1.StatementSummary;
+
+@model ModernSlavery.WebUI.Shared.Models.StatementSummaryViewModel;
+
+<div class="govuk-!-margin-top-8 govuk-grid-column-two-thirds">
+    <h2 class="govuk-heading-m">
+        Actions taken in response to finding ILO indicators
+    </h2>
+
+    <div class="govuk-body">
+        We asked the organisation to tell us whether its statement refers to any actions it took after finding indicators of forced labour
+    </div>
+</div>
+
+@if (Model.Remediations.Contains(RemediationTypes.None))
+{
+    <div class="govuk-grid-column-two-thirds">
+        <div class="nothing-included">
+            <div class="nothing-included__label">Organisation’s response</div>
+            <strong class="govuk-tag govuk-tag--blue nothing-included__tag">
+                The organisation told us its statement does not refer to actions it took after finding indicators of forced labour.
+            </strong>
+        </div>
+    </div>
+}
+else if (Model.Remediations.Any())
+{
+    <div class="govuk-grid-column-full">
+        <div class="app-question-list">
+            <div class="app-question-list__header">
+                <div class="app-question-list__column app-question-list__name">
+                    Actions we asked about
+                </div>
+                <div class="app-question-list__column app-question-list__response">
+                    Organisation’s response
+                </div>
+            </div>
+            @foreach (var remediation in Enums.GetValuesExcept<RemediationTypes>(RemediationTypes.Unknown, RemediationTypes.None))
+            {
+                var isOther = remediation == RemediationTypes.Other;
+                <div class="app-question-list__item">
+                    <div class="app-question-list__column app-question-list__name">
+                        @remediation.GetEnumDescription()
+                    </div>
+                    <div class="app-question-list__column app-question-list__response">
+                        <span class="app-question-list__response-label">
+                            Organisation’s response:
+                        </span>
+                        @if (!isOther)
+                        {
+                            <strong class="govuk-tag govuk-tag--blue app-question-list__tag">@(Model.Remediations.Contains(remediation) ? "Yes" : "No")</strong>
+                        }
+                        else
+                        {
+                            <div @(string.IsNullOrEmpty(Model.OtherTrainingTargets) ? "aria-description='no answer provided'" : "") class="app-question-list__response-details">
+                                @if (string.IsNullOrEmpty(Model.OtherTrainingTargets))
+                                {
+                                    <text>-</text>
+                                }
+                                else
+                                {
+                                    <text>@Model.OtherTrainingTargets</text>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="govuk-grid-column-two-thirds">
+        <strong class="govuk-tag govuk-tag--grey">
+            The organisation did not answer this question.
+        </strong>
+    </div>
+}

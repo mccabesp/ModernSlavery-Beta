@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
-using Autofac.Features.AttributeFilters;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
@@ -32,6 +30,8 @@ namespace ModernSlavery.WebUI.Admin
         {
             //Register dependencies here
             builder.RegisterType<AdminSearchService>().As<AdminSearchService>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<AdminHistory>().As<IAdminHistory>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<AuditLogger>().As<AuditLogger>()
                 .InstancePerLifetimeScope();

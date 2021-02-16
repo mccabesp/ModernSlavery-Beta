@@ -9,7 +9,7 @@
 @inject IObfuscator Obfuscator;
 @inject IOrganisationBusinessLogic _organisationBusinessLogic;
 @{
-    ViewBag.Title = $"Organisation Details - {Model.OrganisationName} - Administration - Modern Slavery Reporting service";
+    Title = $"Organisation Details - {Model.OrganisationName} - Administration";
 }
 
 @section BeforeMain {
@@ -29,7 +29,7 @@
             crumbs.Add(new CrumbViewModel
             {
                 Text = "Search results",
-                Href = "javascript:window.history.back();"
+                Href = Context.GetUrlReferrer().ToString()
             });
         }
 
@@ -73,7 +73,12 @@
             <td class="govuk-table__cell">
                 <a href="@Url.Action("ViewNameHistory", "AdminOrganisationName", new {id = Model.OrganisationId})"
                    class="govuk-link">
-                    History <span class="govuk-visually-hidden"> of names</span> / change<span class="govuk-visually-hidden"> name</span>
+                    History <span class="govuk-visually-hidden"> of names</span>
+                    @if (IsSuperAdministrator || IsDatabaseAdministrator)
+                    {
+                        <span> / change</span>
+                    }
+                    <span class="govuk-visually-hidden"> name</span>
                 </a>
             </td>
         </tr>
@@ -85,7 +90,12 @@
             <td class="govuk-table__cell">
                 <a href="@(Url.Action("ViewAddressHistory", "AdminOrganisationAddress", new {id = Model.OrganisationId}))"
                    class="govuk-link">
-                    History <span class="govuk-visually-hidden"> of addresses</span> / change<span class="govuk-visually-hidden"> address</span>
+                    History <span class="govuk-visually-hidden"> of addresses</span>
+                    @if (IsSuperAdministrator || IsDatabaseAdministrator)
+                    {
+                        <span> / change</span>
+                    }
+                    <span class="govuk-visually-hidden"> address</span>
                 </a>
             </td>
         </tr>
@@ -116,19 +126,22 @@
                     @(Model.OptedOutFromCompaniesHouseUpdate ? "Opted out" : "Opted in")
                 </td>
                 <td class="govuk-table__cell">
-                    @if (Model.OptedOutFromCompaniesHouseUpdate)
+                    @if (IsSuperAdministrator || IsDatabaseAdministrator)
                     {
-                        <a href="@Url.Action("OptIn", "AdminOrganisationCompaniesHouseOptInOut", new {id = Model.OrganisationId})"
-                           class="govuk-link">
-                            Change <span class="govuk-visually-hidden"> Companies House sync to opted in</span>
-                        </a>
-                    }
-                    else
-                    {
-                        <a href="@Url.Action("OptOut", "AdminOrganisationCompaniesHouseOptInOut", new {id = Model.OrganisationId})"
-                           class="govuk-link">
-                            Change <span class="govuk-visually-hidden"> Companies House sync to opted out</span>
-                        </a>
+                        @if (Model.OptedOutFromCompaniesHouseUpdate)
+                        {
+                            <a href="@Url.Action("OptIn", "AdminOrganisationCompaniesHouseOptInOut", new { id = Model.OrganisationId })"
+                               class="govuk-link">
+                                Change <span class="govuk-visually-hidden"> Companies House sync to opted in</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("OptOut", "AdminOrganisationCompaniesHouseOptInOut", new { id = Model.OrganisationId })"
+                               class="govuk-link">
+                                Change <span class="govuk-visually-hidden"> Companies House sync to opted out</span>
+                            </a>
+                        }
                     }
                 </td>
             }
@@ -163,10 +176,13 @@
                     @(Model.LatestPublicSectorType?.PublicSectorType?.Description ?? "(none)")
                 </td>
                 <td class="govuk-table__cell">
-                    <a href="@Url.Action("ChangePublicSectorClassificationGet", "AdminOrganisationSector", new {id = Model.OrganisationId})"
-                       class="govuk-link">
-                        Change <span class="govuk-visually-hidden">public sector classification</span>
-                    </a>
+                    @if (IsSuperAdministrator || IsDatabaseAdministrator)
+                    {
+                        <a href="@Url.Action("ChangePublicSectorClassificationGet", "AdminOrganisationSector", new { id = Model.OrganisationId })"
+                           class="govuk-link">
+                            Change <span class="govuk-visually-hidden">public sector classification</span>
+                        </a>
+                    }
                 </td>
             </tr>
         }
@@ -187,7 +203,12 @@
             <td class="govuk-table__cell">
                 <a href="@Url.Action("ViewSicCodesHistory", "AdminOrganisationSicCodes", new {id = Model.OrganisationId})"
                    class="govuk-link">
-                    History <span class="govuk-visually-hidden"> of SIC codes</span> / change<span class="govuk-visually-hidden"> SIC codes</span>
+                    History <span class="govuk-visually-hidden"> of SIC codes</span>
+                    @if (IsSuperAdministrator || IsDatabaseAdministrator)
+                    {
+                        <span> / change</span>
+                    }
+                    <span class="govuk-visually-hidden"> SIC codes</span>
                 </a>
             </td>
         </tr>
@@ -211,7 +232,12 @@
             <td class="govuk-table__cell">
                 <a href="@Url.Action("ViewScopeHistory", "AdminOrganisationScope", new {id = Model.OrganisationId})"
                    class="govuk-link">
-                    History <span class="govuk-visually-hidden"> of scopes</span> / change<span class="govuk-visually-hidden"> scope</span>
+                    History <span class="govuk-visually-hidden"> of scopes</span>
+                    @if (IsSuperAdministrator || IsDatabaseAdministrator)
+                    {
+                        <span> / change</span>
+                    }
+                    <span class="govuk-visually-hidden"> scope</span>
                 </a>
             </td>
         </tr>
@@ -366,7 +392,7 @@
                     }
                 </td>
                 <td class="govuk-table__cell">
-                    @if (userStatus == "REGISTERED")
+                    @if (userStatus == "REGISTERED" && (IsSuperAdministrator || IsDatabaseAdministrator))
                     {
                         <form method="POST" action="@Url.Action("ImpersonatePost", "Admin")">
                             @Html.AntiForgeryToken()
@@ -374,7 +400,7 @@
                             <input type="submit" class="govuk-button" data-module="govuk-button" value="Impersonate" />
                         </form>
                     }
-                    else if (userStatus == "AWAITING_PIN")
+                    else if (userStatus == "AWAITING_PIN" && (IsSuperAdministrator || IsDatabaseAdministrator))
                     {
                         <a href="@(Url.Action("SendPinWarning", "AdminUnconfirmedPins",
                                  new {userId = userOrganisation.User.UserId, organisationId = userOrganisation.Organisation.OrganisationId}))"
@@ -382,9 +408,9 @@
                             Send PIN <span class="govuk-visually-hidden"> to @(userOrganisation.User.Fullname) at @(userOrganisation.Organisation.OrganisationName)</span>
                         </a>
                     }
-                    else
+                    else if (userStatus == "AWAITING_APPROVAL" && IsTrustedIP)
                     {
-                        <a href="@(Url.Action("ReviewRequest", new {code = userOrganisation.GetReviewCode()}))"
+                        <a href="@(Url.Action("ReviewRequest","Admin", new {code = userOrganisation.GetReviewCode()}))"
                            class="govuk-link">
                             Review request
                         </a>

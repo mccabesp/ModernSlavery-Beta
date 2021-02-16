@@ -13,6 +13,13 @@ namespace ModernSlavery.Core.Extensions
 {
     public static class Encryption
     {
+        public enum Encodings
+        {
+            None,
+            Base64,
+            Base62
+        }
+
         public static string DefaultEncryptionKey = "BA9138B8C0724F168A05482456802405";
 
         public static Encoding EncryptionEncoding = Encoding.UTF8;
@@ -110,7 +117,7 @@ namespace ModernSlavery.Core.Extensions
             return bytes.IsWrapped(PrimerBytes, PrimerBytes);
         }
 
-        public static byte[] Encrypt(byte[] bytes, string password = null)
+        private static byte[] Encrypt(byte[] bytes, string password = null)
         {
             password = DefaultEncryptionKey + password;
 
@@ -126,7 +133,7 @@ namespace ModernSlavery.Core.Extensions
             return Compress(bytes);
         }
 
-        public static string Encrypt(string text, string password = null, bool base64Encode = true)
+        public static string Encrypt(string text, Encodings encoding = Encodings.Base64, string password = null)
         {
             if (string.IsNullOrWhiteSpace(text)) return text;
 
@@ -136,44 +143,10 @@ namespace ModernSlavery.Core.Extensions
             // Get encrypted bytes.
             var encryptedBytes = Encrypt(bytes, password);
 
-            if (base64Encode) return Convert.ToBase64String(encryptedBytes);
+            if (encoding == Encodings.Base64) return Convert.ToBase64String(encryptedBytes);
+            if (encoding == Encodings.Base62) encryptedBytes=Base62Converter.Encode(encryptedBytes);
 
             return EncryptionEncoding.GetString(encryptedBytes);
-        }
-
-        /// <summary>
-        ///     Decrypt string with AES-256 by using password key.
-        /// </summary>
-        /// <param name="password">String password.</param>
-        /// <param name="base64reply">Encrypted Base64 string.</param>
-        /// <returns>Decrypted string.</returns>
-        public static string EncryptQuerystring(string querystring, string password = null,
-            params string[] excludeNames)
-        {
-            if (string.IsNullOrWhiteSpace(querystring)) return querystring;
-
-            var nsEncrypted = querystring.FromQueryString();
-            var nsDecrypted = new NameValueCollection();
-            if (excludeNames != null)
-                foreach (var name in excludeNames)
-                {
-                    if (string.IsNullOrWhiteSpace(name)) continue;
-
-                    nsDecrypted[name] = nsEncrypted[name];
-                    nsEncrypted.Remove(name);
-                }
-
-            querystring = Encrypt(nsEncrypted.ToQueryString(), password);
-            if (!string.IsNullOrEmpty(querystring))
-            {
-                querystring = querystring.Replace('+', '-');
-                querystring = querystring.Replace('/', '_');
-                querystring = querystring.Replace('=', '!');
-            }
-
-            nsDecrypted[null] = string.IsNullOrWhiteSpace(nsEncrypted[null]) ? querystring : "," + querystring;
-
-            return nsDecrypted.ToQueryString();
         }
 
         public static string EncryptModel<TModel>(TModel model)
@@ -256,13 +229,13 @@ namespace ModernSlavery.Core.Extensions
         }
 
         [DebuggerStepThrough]
-        public static string Decrypt(string text, bool base64Encoded = true, params string[] passwords)
+        public static string Decrypt(string text, Encodings encoding = Encodings.Base64, params string[] passwords)
         {
             if (string.IsNullOrWhiteSpace(text)) return text;
 
             // Convert Base64 string into a byte array. 
             byte[] bytes;
-            if (base64Encoded)
+            if (encoding == Encodings.Base64)
             {
                 text = text.Replace("\n", "");
                 text = text.Replace("\r", "");
@@ -276,40 +249,15 @@ namespace ModernSlavery.Core.Extensions
                 bytes = EncryptionEncoding.GetBytes(text);
             }
 
+            if (encoding == Encodings.Base62)
+                bytes = Base62Converter.Decode(bytes);
+
             // Return decrypted string.   
             bytes = Decrypt(bytes, passwords);
 
             return EncryptionEncoding.GetString(bytes);
         }
 
-        /// <summary>
-        ///     Decrypt string with AES-256 by using password key.
-        /// </summary>
-        /// <param name="password">String password.</param>
-        /// <param name="querystring">Encrypted Base64 string.</param>
-        /// <returns>Decrypted string.</returns>
-        //[DebuggerStepThrough]
-        public static string DecryptQuerystring(string querystring, params string[] passwords)
-        {
-            if (string.IsNullOrWhiteSpace(querystring)) return querystring;
-
-            var ns = querystring.FromQueryString();
-            querystring = ns[null];
-            ns.Remove(null);
-            ns = new NameValueCollection(ns);
-            foreach (var qs in querystring.SplitI(","))
-            {
-                querystring = qs.Replace('-', '+');
-                querystring = querystring.Replace('_', '/');
-                querystring = querystring.Replace('!', '=');
-
-                querystring = Decrypt(querystring, true, passwords);
-                var ns2 = querystring.FromQueryString();
-                foreach (string key in ns2.Keys) ns.Add(key, ns2[key]);
-            }
-
-            return ns.ToQueryString();
-        }
 
         public static TModel DecryptModel<TModel>(string encText)
         {
@@ -425,7 +373,7 @@ namespace ModernSlavery.Core.Extensions
         {
             if (string.IsNullOrWhiteSpace(data)) return false;
 
-            if (IsEncryptedData(data)) data = Decrypt(data.Substring(3, data.Length - 6), true, passwords);
+            if (IsEncryptedData(data)) data = Decrypt(data.Substring(3, data.Length - 6), Encodings.Base64, passwords);
 
             if (data.StartsWithI("##mkPrivatePassword:")) return true;
 
@@ -436,13 +384,13 @@ namespace ModernSlavery.Core.Extensions
 
         public static string EncryptData(string data, bool isPrivate = false, string password = null)
         {
-            if (IsEncryptedData(data)) data = Decrypt(data.Substring(3, data.Length - 6), true, password);
+            if (IsEncryptedData(data)) data = Decrypt(data.Substring(3, data.Length - 6), Encodings.Base64, password);
 
             if (string.IsNullOrWhiteSpace(data)) return null;
 
-            if (isPrivate && !IsPrivateData(data, password)) data = "##mkPrivatePassword:" + data;
+            if (isPrivate && !IsPrivateData(data, password)) data = $"##mkPrivatePassword:{data}";
 
-            return "===" + Encrypt(data, password) + "===";
+            return $"==={Encrypt(data, Encodings.Base64, password)}===";
         }
 
         public static string DecryptData(string data)
@@ -459,7 +407,7 @@ namespace ModernSlavery.Core.Extensions
                 return null;
             }
 
-            if (IsEncryptedData(data)) data = Decrypt(data.Substring(3, data.Length - 6), true, passwords);
+            if (IsEncryptedData(data)) data = Decrypt(data.Substring(3, data.Length - 6), Encodings.Base64, passwords);
 
             isPrivate = data.IsPrivateData(passwords);
             if (isPrivate) return data.Substring(20);

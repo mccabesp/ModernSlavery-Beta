@@ -1,5 +1,6 @@
 ﻿@{
     Layout = "/Views/GdsLayout.cshtml";
+    Title = Model.PageTitle;
 }
 @model SignOffViewModel
 
@@ -23,8 +24,7 @@
                 @Model.PageTitle
             </h1>
 
-            <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset">
+            <div class="govuk-form-group">          
                     <div class="govuk-form-group @Html.SetErrorClass(model => model.ApproverFirstName, "govuk-form-group--error")">
                         <label asp-for="ApproverFirstName" class="govuk-label">First name</label>
                         <input asp-for="ApproverFirstName" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
@@ -41,8 +41,7 @@
                         <label asp-for="ApproverJobTitle" class="govuk-label">Job title</label>
                         <input asp-for="ApproverJobTitle" class="govuk-input govuk-input--width-20" type="text" spellcheck="false">
                         <span asp-validation-for="ApproverJobTitle" class="govuk-error-message"></span>
-                    </div>
-                </fieldset>
+                    </div>               
             </div>
 
             <div class="govuk-form-group @Html.SetErrorClass(new[] {nameof(Model.ApprovedDate), nameof(Model.ApprovedDay),nameof(Model.ApprovedMonth),nameof(Model.ApprovedYear)}, "govuk-form-group--error")">

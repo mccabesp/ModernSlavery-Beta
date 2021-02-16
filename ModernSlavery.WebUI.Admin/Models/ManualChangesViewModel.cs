@@ -1,17 +1,19 @@
 ﻿using System;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {
     [Serializable]
     public class ManualChangesViewModel
     {
-        public string LastTestedInput { get; set; }
-        public string LastTestedCommand { get; set; }
-        public string Command { get; set; }
-        public string Parameters { get; set; }
-        public string Results { get; set; }
-        public string Comment { get; set; }
+        [IgnoreText] public string LastTestedInput { get; set; }
+        [IgnoreText] public string LastTestedCommand { get; set; }
+        [IgnoreText] public string Command { get; set; }
+        [Text] public string Parameters { get; set; }
+        [BindNever] public string Results { get; set; }
+        [Text] public string Comment { get; set; }
         public bool Tested { get; set; }
-        public string SuccessMessage { get; set; }
+        [BindNever] public string SuccessMessage { get; set; }
     }
 }
