@@ -3,6 +3,7 @@
 
 # Compiled CSS / JS files
 **/wwwroot/assets/javascripts/application.min.js
+**/wwwroot/assets/javascripts/page/*.min.js
 **/wwwroot/assets/stylesheets/application.min.css
 **/wwwroot/assets/scripts/*.min.js
 **/wwwroot/assets/styles/*.css

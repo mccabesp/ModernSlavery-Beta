@@ -31,7 +31,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override string PageTitle => "Which organisations are included in your group statement?";
 
         [Required(AllowEmptyStrings = false)]
-        [StringLength(100, ErrorMessage = "You must enter an organisations name or company number between 3 and 100 characters in length", MinimumLength = 3)]
+        [StringLength(160, ErrorMessage = "You must enter an organisations name or company number between 3 and 160 characters in length", MinimumLength = 3)]
         [Text] 
         public string SearchKeywords { get; set; }
 

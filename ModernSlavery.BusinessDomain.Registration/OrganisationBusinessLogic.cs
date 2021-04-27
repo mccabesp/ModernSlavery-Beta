@@ -23,12 +23,10 @@ namespace ModernSlavery.BusinessDomain.Registration
         public IDataRepository DataRepository { get; }
         private readonly IScopeBusinessLogic _scopeLogic;
         private readonly ISecurityCodeBusinessLogic _securityCodeLogic;
-        private readonly ISubmissionBusinessLogic _submissionLogic;
         private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
         private readonly IAuditLogger _badSicLog;
         public OrganisationBusinessLogic(SharedOptions sharedOptions,
             IDataRepository dataRepository, IReportingDeadlineHelper reportingDeadlineHelper,
-            ISubmissionBusinessLogic submissionLogic,
             IScopeBusinessLogic scopeLogic,
             ISecurityCodeBusinessLogic securityCodeLogic,
             [KeyFilter(Filenames.BadSicLog)] IAuditLogger badSicLog)
@@ -36,7 +34,6 @@ namespace ModernSlavery.BusinessDomain.Registration
             _sharedOptions = sharedOptions;
             DataRepository = dataRepository;
             _reportingDeadlineHelper = reportingDeadlineHelper;
-            _submissionLogic = submissionLogic;
             _scopeLogic = scopeLogic;
             _securityCodeLogic = securityCodeLogic;
             _badSicLog = badSicLog;
@@ -273,7 +270,6 @@ namespace ModernSlavery.BusinessDomain.Registration
             if (string.IsNullOrWhiteSpace(organisationName)) throw new ArgumentNullException(nameof(organisationName));
             if (sectorType == SectorTypes.Unknown) throw new ArgumentOutOfRangeException(nameof(sectorType));
             if (!status.IsAny(OrganisationStatuses.Active, OrganisationStatuses.Pending)) throw new ArgumentOutOfRangeException(nameof(status), $"Organisation status must be active or pending but was {status}");
-            if (addressModel == null || addressModel.IsEmpty()) throw new ArgumentNullException(nameof(addressModel), "Cannot save an organisation with no address");
             #endregion
 
             #region Create the basic organisation
@@ -285,6 +281,9 @@ namespace ModernSlavery.BusinessDomain.Registration
                 DateOfCessation = dateOfCessation,
             };
             DataRepository.Insert(organisation);
+
+            var orgName = new OrganisationName { Organisation=organisation, Name = organisation.OrganisationName, Source = source };
+            organisation.OrganisationNames.Add(orgName);
 
             //Set the organisation status
             organisation.SetStatus(status, userId);
@@ -341,20 +340,23 @@ namespace ModernSlavery.BusinessDomain.Registration
             #region Add the organisation address
             //Use the old address for this registration
             //Create address received from user
-            var address = new OrganisationAddress();
-            address.Organisation = organisation;
-            address.CreatedByUserId = userId;
-            address.Address1 = addressModel.Address1;
-            address.Address2 = addressModel.Address2;
-            address.Address3 = addressModel.Address3;
-            address.TownCity = addressModel.City;
-            address.County = addressModel.County;
-            address.Country = addressModel.Country;
-            address.PostCode = addressModel.PostCode;
-            address.PoBox = addressModel.PoBox;
-            address.IsUkAddress = addressModel.IsUkAddress;
-            address.Source = source;
+            var address = new OrganisationAddress {
+                Organisation = organisation,
+                CreatedByUserId = userId,
+                Address1 = addressModel.Address1,
+                Address2 = addressModel.Address2,
+                Address3 = addressModel.Address3,
+                TownCity = addressModel.City,
+                County = addressModel.County,
+                Country = addressModel.Country,
+                PostCode = addressModel.PostCode,
+                PoBox = addressModel.PoBox,
+                IsUkAddress = addressModel.IsUkAddress,
+                Source = source
+            };
+            address.Trim();
             address.SetStatus(addressStatus, userId);
+
             DataRepository.Insert(address);
             #endregion
 

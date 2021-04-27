@@ -31,6 +31,10 @@
             <h1 class="heading-large">
                 <span>Approve registration request</span>
             </h1>
+            @if (!string.IsNullOrWhiteSpace(Model.Details))
+            {
+                <p style="color:red;font-weight:bold">@Model.Details</p>
+            }
             <table class="confirm-details">
                 <tbody>
                     <tr>
@@ -113,6 +117,15 @@
                         </td>
                         <td></td>
                     </tr>
+                    <tr>
+                        <td style="vertical-align: top;">
+                            Is UK Address
+                        </td>
+                        <td>
+                            @(Model.IsUKAddress==true ? "Yes" : Model.IsUKAddress == false ? "No" : "Unknown")
+                        </td>
+                        <td></td>
+                    </tr>
                     @if (!string.IsNullOrWhiteSpace(Model.RegisteredAddress))
                     {
                         <tr>
@@ -125,7 +138,7 @@
                             <td></td>
                         </tr>
                     }
-                    
+
                     <tr>
                         <td colspan="3">
                             <br>

@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
-using ModernSlavery.WebUI.Shared.Options;
+using ModernSlavery.Core.Options;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace ModernSlavery.WebAPI.Public
@@ -94,11 +94,6 @@ namespace ModernSlavery.WebAPI.Public
                 var app = lifetimeScope.Resolve<IApplicationBuilder>();
 
                 string documentName = "V1";
-
-                if (_sharedOptions.UseDeveloperExceptions)
-                    app.UseDeveloperExceptionPage();
-
-                app.UseDeveloperExceptionPage();
 
                 //Configure dependencies here
                 // Enable middleware to serve generated Swagger as a JSON endpoint.

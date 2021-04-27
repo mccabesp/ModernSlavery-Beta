@@ -15,17 +15,14 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="organisationId"></param>
         /// <param name="snapshotYear"></param>
         /// <returns></returns>
-        Task<Statement> GetLatestStatementByDeadlineYearAsync(long organisationId, int snapshotYear);
-
-        IEnumerable<Statement> GetAllStatementsByOrganisationIdAndReportingDeadlineYear(long organisationId,
-            int snapshotYear);
+        Task<Statement> GetLatestStatementByDeadlineYearAsync(long organisationId, int deadlineYear);
 
         /// <summary>
         ///     Gets a list of submissions with scopes for Submissions download file
         /// </summary>
         /// <param name="year"></param>
         /// <returns></returns>
-        IEnumerable<StatementsFileModel> GetStatementsFileModelByYear(int year);
+        IEnumerable<StatementsFileModel> GetStatementsFileModelByYear(int deadlineYear);
 
         /// <summary>
         ///     Gets a list of late submissions that were in scope
@@ -33,6 +30,5 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <returns></returns>
         IEnumerable<LateSubmissionsFileModel> GetLateSubmissions();
 
-        CustomResult<Statement> GetSubmissionByOrganisationAndYear(Organisation organisation, int year);
     }
 }

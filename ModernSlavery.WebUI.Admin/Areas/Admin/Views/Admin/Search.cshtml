@@ -11,43 +11,43 @@
         var endComment = Html.Raw("-->");
 
         Func<object, object> html =
-            @<text>
-                <span class="admin-search-highlighted">
+    @<text>
+        <span class="admin-search-highlighted">
+            @(startComment)
+            @{
+                var name = searchMatch.Text;
+                var matchGroups = searchMatch.MatchGroups;
+
+                var previousMatchEnd = 0;
+                foreach (var matchGroup in matchGroups)
+                {
+                    var nonBoldText = name.Substring(previousMatchEnd, matchGroup.Start - previousMatchEnd);
+                    var boldText = name.Substring(matchGroup.Start, matchGroup.Length);
+
+                    // The HTML / C# below looks a bit odd and oddly-formatted
+                    // This is deliberate
+                    // We do this because we want to avoid spaces between the text
+                    @(endComment)@(nonBoldText)<b>@(boldText)</b>
                     @(startComment)
-                    @{
-                        var name = searchMatch.Text;
-                        var matchGroups = searchMatch.MatchGroups;
 
-                        var previousMatchEnd = 0;
-                        foreach (var matchGroup in matchGroups)
-                        {
-                            var nonBoldText = name.Substring(previousMatchEnd, matchGroup.Start - previousMatchEnd);
-                            var boldText = name.Substring(matchGroup.Start, matchGroup.Length);
+                    previousMatchEnd = matchGroup.Start + matchGroup.Length;
+                }
 
-                            // The HTML / C# below looks a bit odd and oddly-formatted
-                            // This is deliberate
-                            // We do this because we want to avoid spaces between the text
-                            @(endComment)@(nonBoldText)<b>@(boldText)</b>
-                            @(startComment)
+                var finalNonBoldText = name.Substring(previousMatchEnd, name.Length - previousMatchEnd);
+            }
+            @(endComment)@(finalNonBoldText)
+        </span>
+    </text>;
 
-                            previousMatchEnd = matchGroup.Start + matchGroup.Length;
-                        }
-
-                        var finalNonBoldText = name.Substring(previousMatchEnd, name.Length - previousMatchEnd);
-                    }
-                    @(endComment)@(finalNonBoldText)
-                </span>
-             </text>;
-
-        return html(new object());
-    }
+return html(new object());
+}
 
 }
 
 @section BeforeMain {
     @{
         var crumbs = new List<CrumbViewModel>
-        {
+{
             new CrumbViewModel
             {
                 Text = "Admin",
@@ -67,29 +67,35 @@
 }
 
 <div class="govuk-grid-row admin-search-page">
+    @await Html.GovUkValidationSummaryAsync()
     <div class="govuk-grid-column-full">
         <span class="govuk-caption-xl">Administration</span>
         <h1 class="govuk-heading-xl">Search</h1>
 
-        <form method="GET" action="@(Url.Action("SearchGet", "AdminSearch"))">
-            <div class="govuk-form-group @(Model.Error != null ? "govuk-form-group--error" : "")">
-                <label class="govuk-label" for="search-query">
-                    <b>Organisation:</b> current name, previous name, organisation reference, company number
-                    <br />
-                    <b>User:</b> name, email address
-                </label>
-                @if (Model.Error != null)
-                {
-                    <span class="govuk-error-message">
-                        <span class="govuk-visually-hidden">Error:</span> @(Model.Error)
-                    </span>
-                }
-                <div class="admin-search-box">
-                    <input class="govuk-input @(Model.Error != null ? "govuk-input--error" : "") admin-search-input" id="search-query" name="query" type="text" value="@(Model.SearchQuery)">
-                    <input type="submit" value="Search" class="admin-search-button"/>
-                </div>
-            </div>
-        </form>
+        @using (Html.BeginForm("SearchGet", "AdminSearch", FormMethod.Get, new { novalidate = "" }))
+        {
+    <div class="govuk-form-group @Html.SetErrorClass(model => model.Search, "govuk-form-group--error")">
+        <label class="govuk-label" for="search-query">
+            <b>Organisation:</b> current name, previous name, organisation reference, company number
+            <br />
+            <b>User:</b> name, email address
+        </label>
+
+        @Html.ValidationMessageFor(model => model.Search, null, new { @class = "govuk-error-message" })
+        <div class="admin-search-box">
+
+            <input type="search"
+                   id="search-query"
+                   value="@(Model.Search)"
+                   class="govuk-input @Html.SetErrorClass(model => model.Search, "govuk-input--error") admin-search-input"
+                   name="Search"
+                   spellcheck="false"
+                   title="Search" />
+
+            <input type="submit" value="Search" class="admin-search-button" />
+        </div>
+    </div>
+        }
 
         @if (Model.SearchResults != null)
         {
@@ -114,41 +120,41 @@
                         </span>
                         organisations containing
                         <span class="govuk-!-font-weight-bold">
-                            @(Model.SearchQuery)
+                            @(Model.Search)
                         </span>
                     </span>
                 </summary>
                 <div class="govuk-details__text">
                     <table class="govuk-table">
                         <tbody class="govuk-table__body">
-                        @foreach (var organisation in Model.SearchResults.OrganisationResults)
-                        {
-                            <tr class="govuk-table__row">
-                                <td class="govuk-table__cell">
-                                    <a href="@(Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = organisation.OrganisationId}))"
-                                       class="govuk-link">
-                                        @(HighlightMatches(organisation.OrganisationName))
-                                    </a>
+                            @foreach (var organisation in Model.SearchResults.OrganisationResults)
+                            {
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell">
+                                        <a href="@(Url.Action("ViewOrganisation", "AdminViewOrganisation", new {id = organisation.OrganisationId}))"
+                                           class="govuk-link">
+                                            @(HighlightMatches(organisation.OrganisationName))
+                                        </a>
 
-                                    @foreach (var previousName in organisation.OrganisationPreviousNames)
-                                    {
-                                        <br />
-                                        @:previously @(HighlightMatches(previousName))
-                                    }
+                                        @foreach (var previousName in organisation.OrganisationPreviousNames)
+                                        {
+                                            <br />
+                                            @:previously @(HighlightMatches(previousName))
+                                        }
 
-                                    @if (organisation.OrganisationRef != null)
-                                    {
-                                        <br />
-                                        @:Organisation ref: <b>@(organisation.OrganisationRef)</b>
-                                    }
-                                    @if (organisation.CompanyNumber != null)
-                                    {
-                                        <br />
-                                        @:Company number: <b>@(organisation.CompanyNumber)</b>
-                                    }
-                                </td>
-                            </tr>
-                        }
+                                        @if (organisation.OrganisationRef != null)
+                                        {
+                                            <br />
+                                            @:Organisation ref: <b>@(organisation.OrganisationRef)</b>
+                                        }
+                                        @if (organisation.CompanyNumber != null)
+                                        {
+                                            <br />
+                                            @:Company number: <b>@(organisation.CompanyNumber)</b>
+                                        }
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -162,26 +168,26 @@
                         </span>
                         users containing
                         <span class="govuk-!-font-weight-bold">
-                            @(Model.SearchQuery)
+                            @(Model.Search)
                         </span>
                     </span>
                 </summary>
                 <div class="govuk-details__text">
                     <table class="govuk-table">
                         <tbody class="govuk-table__body">
-                        @foreach (var user in Model.SearchResults.UserResults)
-                        {
-                            <tr class="govuk-table__row">
-                                <td class="govuk-table__cell">
-                                    <a href="@Url.Action("ViewUser", "AdminViewUser", new {id = user.UserId})"
-                                       class="govuk-link">
-                                        @(HighlightMatches(user.UserFullName))
-                                    </a>
-                                    <br/>
-                                    @(HighlightMatches(user.UserEmailAddress))
-                                </td>
-                            </tr>
-                        }
+                            @foreach (var user in Model.SearchResults.UserResults)
+                            {
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell">
+                                        <a href="@Url.Action("ViewUser", "AdminViewUser", new {id = user.UserId})"
+                                           class="govuk-link">
+                                            @(HighlightMatches(user.UserFullName))
+                                        </a>
+                                        <br />
+                                        @(HighlightMatches(user.UserEmailAddress))
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>

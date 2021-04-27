@@ -1,19 +1,19 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
-using ModernSlavery.Core.Options;
 using StackExchange.Redis;
 
 namespace ModernSlavery.Infrastructure.Hosts
@@ -96,10 +96,36 @@ namespace ModernSlavery.Infrastructure.Hosts
                         options.Events.OnRedirectToIdentityProvider = context => 
                         {
                             var referrer = context.HttpContext?.GetUri();
-                            if (referrer != null)
-                                context.ProtocolMessage.SetParameter("Referrer", referrer.PathAndQuery);
+                            if (referrer != null)context.ProtocolMessage.SetParameter("Referrer", referrer.PathAndQuery);
 
                             return Task.CompletedTask;
+                        };
+                        options.Events.OnAuthenticationFailed = context => {
+
+                            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<AuthenticationFailedContext>>();
+                            logger.LogError(context.Exception, "Authentication Failed");
+                            context.Response.Redirect("/Error/400");
+                            context.HandleResponse();
+                            return Task.CompletedTask;
+                        };
+                        options.Events.OnRemoteFailure = async context => {
+                            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<RemoteFailureContext>>();
+                            var redirectUrl = context?.Properties?.Items!=null && context.Properties.Items.ContainsKey(".redirect") ? context.Properties.Items[".redirect"] : "/sign-in";
+                            if (context.Failure.Message == "Correlation failed.")
+                                /* NOTE: These are normally caused by email clients using safe links which bypass the original url call which creates the correlation cookie, 
+                                 then opening the browser for the first time on the final redirected sign-in page - but with no previous correlation cookie created.
+                                this cookies is then needed by /signin-oidc page but not available so hence this failure. */
+
+                                //Log as warning
+                                logger.LogWarning(context.Failure, $"Correlation Failure: Redirected to '{redirectUrl}'");
+                            else
+                                //Log as failure
+                                logger.LogError(context.Failure, $"Authentication Remote Failure: Redirected to '{redirectUrl}'");
+                            
+                            //Sign out and redirect to error page with continue button redirecting to original url
+                            context.Response.Redirect($"/Error/{1008}?redirectUrl={WebUtility.UrlEncode(redirectUrl)}");
+                            await context.HttpContext.SignOutAsync();
+                            context.HandleResponse();
                         };
 
                         //Ignore self-signed or invalid certificates from identity server

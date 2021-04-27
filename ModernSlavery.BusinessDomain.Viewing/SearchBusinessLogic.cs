@@ -174,19 +174,56 @@ namespace ModernSlavery.BusinessDomain.Viewing
         }
 
         /// <summary>
-        /// Returns a list of fully populated search index documents for a specific organisation for a specific reporting year
+        /// Returns a list of search index documents for the parent organisation and group organisations of a submitted statement
         /// </summary>
-        /// <param name="organisation">The organisation whos index documents we want to return</param>
-        /// <param name="reportingDeadlineYear">The reporting year</param>
-        /// <returns>The list of fully populated search index documents for the specified year</returns>
+        /// <param name="submittedStatement">The submitted statement for a parent organisations</param>
+        /// <returns>The list of search index documents for the parent organisation and group organisations</returns>
         private IEnumerable<OrganisationSearchModel> CreateOrganisationSearchModels(Statement submittedStatement)
         {
+
             if (submittedStatement==null) throw new ArgumentNullException(nameof(submittedStatement));
             if (submittedStatement.Status != StatementStatuses.Submitted) throw new ArgumentException($"Cannot create search model for statement with status={submittedStatement.Status}",nameof(submittedStatement));
             if (submittedStatement.Organisation.Status != OrganisationStatuses.Active) throw new ArgumentException($"Cannot create search model for statement with organisation status={submittedStatement.Organisation.Status}",nameof(submittedStatement));
 
-            var parentStatementModel = new OrganisationSearchModel
+            var parentStatementModel = CreateParentOrganisationSearchModel(submittedStatement);
+            yield return parentStatementModel;
+
+            foreach (var childOrganisation in submittedStatement.StatementOrganisations.Where(go => go.Included))
             {
+                var childStatementModel = _autoMapper.Map<OrganisationSearchModel>(parentStatementModel);
+
+                childStatementModel.OrganisationName = childOrganisation.OrganisationName;
+                childStatementModel.ParentName = parentStatementModel.OrganisationName;
+                childStatementModel.ChildStatementOrganisationId = childOrganisation.StatementOrganisationId;
+                childStatementModel.ChildOrganisationId = childOrganisation.OrganisationId;
+
+                if (childOrganisation.Organisation != null)
+                {
+                    childStatementModel.OrganisationName = childOrganisation.Organisation.OrganisationName;
+                    childStatementModel.CompanyNumber = childOrganisation.Organisation.CompanyNumber;
+                    childStatementModel.Address = AddressModel.Create(childOrganisation.Organisation.LatestAddress);
+                    childStatementModel.SectorType = new OrganisationSearchModel.KeyName { Key = (int)submittedStatement.Organisation.SectorType, Name = submittedStatement.Organisation.SectorType.ToString() };
+                }
+                childStatementModel.Abbreviations = CreateOrganisationNameAbbreviations(childStatementModel.OrganisationName);
+                childStatementModel.PartialNameForCompleteTokenSearches = childStatementModel.OrganisationName;
+                childStatementModel.PartialNameForSuffixSearches = childStatementModel.OrganisationName;
+
+                yield return childStatementModel.SetSearchDocumentKey();
+            }
+        }
+
+        /// <summary>
+        /// Returns the search index document for the parent organisation of a submitted statement
+        /// </summary>
+        /// <param name="submittedStatement">The submitted statement for a parent organisations</param>
+        /// <returns>The search index document for the parent organisation</returns>
+        private OrganisationSearchModel CreateParentOrganisationSearchModel(Statement submittedStatement)
+        {
+            if (submittedStatement == null) throw new ArgumentNullException(nameof(submittedStatement));
+            if (submittedStatement.Status != StatementStatuses.Submitted) throw new ArgumentException($"Cannot create search model for statement with status={submittedStatement.Status}", nameof(submittedStatement));
+            if (submittedStatement.Organisation.Status != OrganisationStatuses.Active) throw new ArgumentException($"Cannot create search model for statement with organisation status={submittedStatement.Organisation.Status}", nameof(submittedStatement));
+
+            var parentStatementModel = new OrganisationSearchModel {
                 GroupSubmission = submittedStatement.StatementOrganisations.Any(),
                 GroupOrganisationCount = submittedStatement.StatementOrganisations.Count + 1, // add one for parent
 
@@ -232,30 +269,7 @@ namespace ModernSlavery.BusinessDomain.Viewing
                 PartialNameForSuffixSearches = submittedStatement.Organisation.OrganisationName
             };
 
-            yield return parentStatementModel.SetSearchDocumentKey();
-
-            foreach (var childOrganisation in submittedStatement.StatementOrganisations.Where(go => go.Included))
-            {
-                var childStatementModel = _autoMapper.Map<OrganisationSearchModel>(parentStatementModel);
-
-                childStatementModel.OrganisationName = childOrganisation.OrganisationName;
-                childStatementModel.ParentName = parentStatementModel.OrganisationName;
-                childStatementModel.ChildStatementOrganisationId = childOrganisation.StatementOrganisationId;
-                childStatementModel.ChildOrganisationId = childOrganisation.OrganisationId;
-
-                if (childOrganisation.Organisation != null)
-                {
-                    childStatementModel.OrganisationName = childOrganisation.Organisation.OrganisationName;
-                    childStatementModel.CompanyNumber = childOrganisation.Organisation.CompanyNumber;
-                    childStatementModel.Address = AddressModel.Create(childOrganisation.Organisation.LatestAddress);
-                    childStatementModel.SectorType = new OrganisationSearchModel.KeyName { Key = (int)submittedStatement.Organisation.SectorType, Name = submittedStatement.Organisation.SectorType.ToString() };
-                }
-                childStatementModel.Abbreviations = CreateOrganisationNameAbbreviations(childStatementModel.OrganisationName);
-                childStatementModel.PartialNameForCompleteTokenSearches = childStatementModel.OrganisationName;
-                childStatementModel.PartialNameForSuffixSearches = childStatementModel.OrganisationName;
-
-                yield return childStatementModel.SetSearchDocumentKey();
-            }
+            return parentStatementModel.SetSearchDocumentKey();
         }
 
         /// <summary>
@@ -332,21 +346,6 @@ namespace ModernSlavery.BusinessDomain.Viewing
         }
         #endregion
 
-        #region GetOrganisationAsync
-        public async Task<OrganisationSearchModel> GetOrganisationAsync(long parentOrganisationId, int submissionDeadlineYear)
-        {
-            //Ensure we have an organisation
-            if (parentOrganisationId == 0) throw new ArgumentOutOfRangeException(nameof(parentOrganisationId));
-
-            //Ensure we have an year
-            if (submissionDeadlineYear == 0) throw new ArgumentOutOfRangeException(nameof(submissionDeadlineYear));
-
-            //Create the key for parent organisation
-            var key = $"{parentOrganisationId}-{submissionDeadlineYear}";
-
-            return await _organisationSearchRepository.GetDocumentAsync(key).ConfigureAwait(false);
-        }
-        #endregion
 
         #region SearchOrganisationsAsync
         public async Task<PagedSearchResult<OrganisationSearchModel>> SearchOrganisationsAsync(
@@ -447,6 +446,32 @@ namespace ModernSlavery.BusinessDomain.Viewing
         }
         #endregion
 
+        #region GetOrganisationAsync
+        public async Task<OrganisationSearchModel> GetOrganisationAsync(long parentOrganisationId, int submissionDeadlineYear)
+        {
+            //Ensure we have an organisation
+            if (parentOrganisationId == 0) throw new ArgumentOutOfRangeException(nameof(parentOrganisationId));
+
+            //Ensure we have an year
+            if (submissionDeadlineYear == 0) throw new ArgumentOutOfRangeException(nameof(submissionDeadlineYear));
+
+            //Check there is a statement in the database
+            var statement = _dataRepository.GetAll<Statement>().FirstOrDefault(s => s.Status == StatementStatuses.Submitted && s.OrganisationId == parentOrganisationId && s.SubmissionDeadline.Year == submissionDeadlineYear);
+            if (statement == null) return default;
+
+            //Create the key for parent organisation
+            var key = $"{parentOrganisationId}-{submissionDeadlineYear}";
+
+            var statementSummary = await _organisationSearchRepository.GetDocumentAsync(key).ConfigureAwait(false);
+
+            //If the document isnt yet on the searh index then create from database
+            if (statementSummary == null) statementSummary = CreateParentOrganisationSearchModel(statement);
+
+            return statementSummary;
+
+        }
+        #endregion
+
         #region ListGroupOrganisationsAsync
         public async Task<IEnumerable<OrganisationSearchModel>> ListGroupOrganisationsAsync(long parentOrganisationId, int submissionDeadlineYear)
         {
@@ -456,10 +481,19 @@ namespace ModernSlavery.BusinessDomain.Viewing
             //Ensure we have an year
             if (submissionDeadlineYear == 0) throw new ArgumentOutOfRangeException(nameof(submissionDeadlineYear));
 
+            //Check there is a statement in the database
+            var statement = _dataRepository.GetAll<Statement>().FirstOrDefault(s => s.Status == StatementStatuses.Submitted && s.OrganisationId == parentOrganisationId && s.SubmissionDeadline.Year == submissionDeadlineYear);
+            if (statement == null || !statement.StatementOrganisations.Any()) return default;
+
             //Create the filter for all parent organisations
             var filter = $"{nameof(OrganisationSearchModel.ParentName)} ne null and {nameof(OrganisationSearchModel.ParentOrganisationId)} eq {parentOrganisationId} and {nameof(OrganisationSearchModel.SubmissionDeadlineYear)} eq {submissionDeadlineYear}";
 
-            return await _organisationSearchRepository.ListDocumentsAsync(filter: filter).ConfigureAwait(false);
+            var groupSummaries = await _organisationSearchRepository.ListDocumentsAsync(filter: filter).ConfigureAwait(false);
+
+            //If the document isnt yet on the searh index then create from database
+            if (!groupSummaries.Any()) groupSummaries = CreateOrganisationSearchModels(statement).Skip(1).ToList();//Skip the first parent organisation
+
+            return groupSummaries;
         }
         #endregion
 

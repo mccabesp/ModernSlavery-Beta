@@ -15,6 +15,17 @@ namespace ModernSlavery.Core
         Expire = 6
     }
 
+    public enum UserRoleTypes
+    {
+        Unknown,
+        Anonymous,
+        Submitter,
+        BasicAdmin,
+        DatabaseAdmin,
+        SuperAdmin,
+        DevOpsAdmin
+    }
+
     public enum UserAction : byte
     {
         CreatedAccount = 0,

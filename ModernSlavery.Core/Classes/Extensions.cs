@@ -5,6 +5,7 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -55,11 +56,13 @@ namespace ModernSlavery.Core.Classes
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
 
             var content = await fileRepository.ReadAsync(filePath).ConfigureAwait(false);
+
             return ReadCSV<T>(content,validateHeaders);
         }
 
         public static List<T> ReadCSV<T>(string content, bool validateHeaders=true)
         {
+            content = content?.CheckEncoding().ReplaceSpaceSeparators();
             using (TextReader textReader = new StringReader(content))
             {
                 var config = new CsvConfiguration(CultureInfo.CurrentCulture);
@@ -88,6 +91,8 @@ namespace ModernSlavery.Core.Classes
 
         public static DataTable ToDataTable(this string csvContent)
         {
+            csvContent = csvContent?.CheckEncoding().ReplaceSpaceSeparators();
+
             var table = new DataTable();
 
             using (TextReader sr = new StringReader(csvContent))
@@ -118,27 +123,26 @@ namespace ModernSlavery.Core.Classes
         /// <param name="records">collection of records to write</param>
         /// <param name="filePath">the remote location of the file to save overwrite</param>
         /// <param name="oldfilePath">the previous file (if any) to be deleted on successful copy</param>
-        public static async Task<long> SaveCSVAsync(this IFileRepository fileRepository,
-            IEnumerable records,
+        public static async Task<long> SaveCSVAsync<T>(this IFileRepository fileRepository,
+            IEnumerable<T> records,
             string filePath,
             string oldfilePath = null)
         {
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
+            if (!records.Any()) throw new ArgumentNullException(nameof(records));
 
             long size = 0;
             var tempfile = new FileInfo(Path.GetTempFileName());
             try
             {
-                using (var textWriter = tempfile.CreateText())
+                using (var textWriter = new StreamWriter(tempfile.FullName, false, new UTF8Encoding(true)))
                 {
-                    var config = new CsvConfiguration(CultureInfo.CurrentCulture);
-                    config.ShouldQuote = (field, context) => true;
-                    config.TrimOptions = TrimOptions.InsideQuotes | TrimOptions.Trim;
-
-                    using (var writer = new CsvWriter(textWriter, config))
-                    {
-                        writer.WriteRecords(records);
-                    }
+                    var config = new CsvConfiguration(CultureInfo.CurrentCulture) {
+                        ShouldQuote = (field, context) => true,
+                        TrimOptions = TrimOptions.InsideQuotes | TrimOptions.Trim
+                    };
+                    using var writer = new CsvWriter(textWriter, config);
+                    writer.WriteRecords(records);
                 }
 
                 //Save CSV to storage
@@ -173,7 +177,7 @@ namespace ModernSlavery.Core.Classes
             {
                 using (var reader = new StreamReader(stream))
                 {
-                    using (var textWriter = new StreamWriter(stream))
+                    using (var textWriter = new StreamWriter(stream, new UTF8Encoding(true)))
                     {
                         var config = new CsvConfiguration(CultureInfo.CurrentCulture);
                         config.ShouldQuote = (field, context) => true;
@@ -214,15 +218,17 @@ namespace ModernSlavery.Core.Classes
 
             var table = records.ToDataTable();
 
-            using (var textWriter = new StringWriter())
+            var fileExists = await fileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false);
+
+            var memoryStream = new MemoryStream();
+            using (var textWriter = new StreamWriter(memoryStream, new UTF8Encoding(!fileExists)))
             {
                 var config = new CsvConfiguration(CultureInfo.CurrentCulture);
                 config.ShouldQuote = (field, context) => true;
                 config.TrimOptions = TrimOptions.InsideQuotes | TrimOptions.Trim;
-
                 using (var writer = new CsvWriter(textWriter, config))
                 {
-                    if (!await fileRepository.GetFileExistsAsync(filePath).ConfigureAwait(false))
+                    if (!fileExists)
                     {
                         for (var c = 0; c < table.Columns.Count; c++) writer.WriteField(table.Columns[c].ColumnName);
 
@@ -236,15 +242,14 @@ namespace ModernSlavery.Core.Classes
                     foreach (DataRow row in table.Rows)
                     {
                         for (var c = 0; c < table.Columns.Count; c++) writer.WriteField(row[c].ToString());
-
                         writer.NextRecord();
                     }
                 }
 
-                var appendString = textWriter.ToString().Trim();
+                var appendString = textWriter.Encoding.GetString(memoryStream.ToArray());
                 if (!string.IsNullOrWhiteSpace(appendString))
                 {
-                    await fileRepository.AppendAsync(filePath, appendString + Environment.NewLine).ConfigureAwait(false);
+                    await fileRepository.AppendAsync(filePath, appendString).ConfigureAwait(false);
 
                     //Increase the count in the metadata file
                     var metaData = await fileRepository.GetMetaDataAsync(filePath, "RecordCount").ConfigureAwait(false);

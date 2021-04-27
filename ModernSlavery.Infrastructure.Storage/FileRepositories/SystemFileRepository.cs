@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Extensions;
@@ -91,7 +92,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
 
             if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
 
-            return await Task.Run(() => File.ReadAllText(filePath)).ConfigureAwait(false);
+            return FileSystem.ReadTextWithEncoding(filePath);
         }
 
         public async Task ReadAsync(string filePath, Stream stream)
@@ -314,8 +315,12 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
         private IEnumerable<string> GetFiles(string filePath, string searchPattern = null, bool recursive = false)
         {
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
+            
+            if (filePath=="\\") 
+                filePath= _rootDir.FullName;
 
-            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
+            else if (!Path.IsPathRooted(filePath)) 
+                filePath = Path.Combine(_rootDir.FullName, filePath);
 
             if (!Directory.Exists(filePath))Directory.CreateDirectory(filePath);
 
@@ -387,6 +392,44 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             try
             {
                 File.AppendAllText(filePath, text);
+            }
+            catch (IOException)
+            {
+                if (retries >= 10) throw;
+
+                retries++;
+                Thread.Sleep(500);
+                goto Retry;
+            }
+        }
+
+        public async Task WriteAsync(string filePath, string text)
+        {
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));
+
+            if (!Path.IsPathRooted(filePath)) filePath = Path.Combine(_rootDir.FullName, filePath);
+
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullException(nameof(text));
+
+            //Ensure the directory exists
+            var directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
+            var encoding = Encoding.UTF8;
+
+            using var stream = new MemoryStream();            
+            stream.Write(encoding.GetPreamble());
+            stream.Write(encoding.GetBytes(text));
+            stream.Position = 0;
+            var bytes = stream.ToArray();
+
+            var retries = 0;
+            Retry:
+            try
+            {
+                
+                File.WriteAllBytes(filePath, bytes);
             }
             catch (IOException)
             {
@@ -472,7 +515,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             Retry:
             try
             {
-                File.WriteAllText(filePath, File.ReadAllText(uploadFile.FullName));
+                File.WriteAllBytes(filePath, File.ReadAllBytes(uploadFile.FullName));
             }
             catch (IOException)
             {
@@ -493,7 +536,7 @@ namespace ModernSlavery.Infrastructure.Storage.FileRepositories
             if (!File.Exists(filePath)) throw new FileNotFoundException("Cant find file", filePath);
 
             var metaPath = filePath + ".metadata";
-            var metaJson = File.Exists(metaPath) ? File.ReadAllText(metaPath) : null;
+            var metaJson = File.Exists(metaPath) ? FileSystem.ReadTextWithEncoding(metaPath) : null;
             if (!string.IsNullOrWhiteSpace(metaJson))
             {
                 var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(metaJson);

@@ -1,9 +1,11 @@
 ﻿@model LoadTestingViewModel
-@{Layout = "/Views/GdsLayout.cshtml";}
+@inject ModernSlavery.Core.Options.FeatureSwitchOptions featureSwitchOptions;
+@inject Microsoft.Extensions.Hosting.IHostEnvironment hostEnvironment;
+@inject DevOpsOptions devopsOptions;
 @{
+    Layout = "/Views/GdsLayout.cshtml";
     Title = "DevOps: Load Testing";
 }
-@inject Microsoft.Extensions.Hosting.IHostEnvironment hostEnvironment;
 @section BeforeMain {
     <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Url.Action("Home")">Back to DevOps home</a>
 }
@@ -27,24 +29,55 @@
                     <span style="font-weight:normal">@hostEnvironment.EnvironmentName</span>
                 </h3>
 
-                <label for="Action" class="govuk-heading-s">Action:</label>
-                <select id="Action" name="Action" class="govuk-select">
-                    <option value="None" selected="selected">[Select action]</option>
-                    <option value="FullReset">Full Reset of files, queues, cache, search, and logs (except AppInsights)</option>
-                    <option value="ResetDatabase">Clear database, reseed and reset</option>
-                    <option value="SetUKAddresses">Set UK addresses</option>
-                    <option value="DeleteFiles">Delete files</option>
-                    <option value="DeleteDrafts">Delete Draft files</option>
-                    <option value="ClearQueues">Clear queues</option>
-                    <option value="ResetSearch">Delete and recreate search indexes </option>
-                    <option value="ClearAppInsights">Clear Application Inslights telemetry logs</option>
-                    <option value="ClearCache">Clear Distributed Cache and Session</option>
-                    <option value="DeleteLocalLogs">Delete local log files</option>
-                    <option value="DeleteSettingsDump">Delete local file containing dump of app settings</option>
-                </select>
-                <p class="govuk-body govuk-!-margin-top-3">
-                    <button type="submit" class="govuk-button" role="button">Execute</button>
-                </p>
+                <fieldset>
+                    <label for="Action" class="govuk-heading-s">Action:</label>
+                    <select id="Action" name="Action" class="govuk-select">
+                        <option value="None" selected="selected">[Select action]</option>
+                        @if (devopsOptions.AllowDatabaseReset)
+                        {
+                            <option value="ResetDatabase">Clear database, reseed and reset</option>
+                        }
+                        @if (devopsOptions.AllowDeleteDownloadFiles)
+                        {
+                            <option value="DeleteDownloadFiles">Delete download files</option>
+                        }
+                        @if (devopsOptions.AllowDeleteDraftFiles)
+                        {
+                            <option value="DeleteDraftFiles">Delete draft files</option>
+                        }
+                        @if (devopsOptions.AllowDeleteAuditLogFiles)
+                        {
+                            <option value="DeleteAuditLogFiles">Delete audit log files</option>
+                        }
+                        @if (devopsOptions.AllowClearQueues)
+                        {
+                            <option value="ClearQueues">Clear queues</option>
+                        }
+                        @if (devopsOptions.AllowClearAppInsights)
+                        {
+                            <option value="ClearAppInsights">Clear Application Insights telemetry logs</option>
+                        }
+                        @if (devopsOptions.AllowClearCache)
+                        {
+                            <option value="ClearCache">Clear distributed cache and session</option>
+                        }
+                        @if (devopsOptions.AllowResetSearch)
+                        {
+                            <option value="ResetSearch">Delete and recreate search indexes </option>
+                        }
+                        @if (devopsOptions.AllowDeleteLocalLogs)
+                        {
+                            <option value="DeleteLocalLogs">Delete local log files</option>
+                        }
+                        @if (devopsOptions.AllowDeleteSettingsDump)
+                        {
+                            <option value="DeleteSettingsDump">Delete local file containing dump of app settings</option>
+                        }
+                    </select>
+                    <p class="govuk-body govuk-!-margin-top-3">
+                        <button type="submit" class="govuk-button" role="button">Execute</button>
+                    </p>
+                </fieldset>
             }
         </div>
 
@@ -53,6 +86,13 @@
 @section AfterLoadedCompiledScripts {
 
     <script type="text/javascript" nonce="@Html.GetNonce()">
+        $(document).on("submit",
+            "form",
+            function (e) {
+
+                //Must use a timout here otherwise the 'value' field of submitted buttons is never submitted
+                setTimeout(function () { $("button").attr("disabled", true); }, 0);
+            });
         $(function () {
             "use strict";
             jQuery(":submit").click(function () {

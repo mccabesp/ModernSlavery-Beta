@@ -12,7 +12,21 @@ namespace ModernSlavery.Core.Entities
     {
         [NotMapped] public string Fullname => (Firstname + " " + Lastname).TrimI();
 
+        public string GetNameAndTitle()
+        {
+            var fullname = Fullname;
+            if (string.IsNullOrWhiteSpace(fullname)) return null;
+            return string.IsNullOrWhiteSpace(JobTitle) ? fullname : $"{fullname} ({JobTitle})";
+        }
+
         [NotMapped] public string ContactFullname => (ContactFirstName + " " + ContactLastName).TrimI();
+
+        public string GetContactNameAndTitle()
+        {
+            var fullname = ContactFullname;
+            if (string.IsNullOrWhiteSpace(fullname)) return null;
+            return string.IsNullOrWhiteSpace(ContactJobTitle) ? fullname : $"{fullname} ({ContactJobTitle})";
+        }
 
         [NotMapped] public bool IsVerifyEmailSent => EmailVerifySendDate>DateTime.MinValue;
         [NotMapped] public bool IsVerifiedEmail => EmailVerifiedDate>DateTime.MinValue;

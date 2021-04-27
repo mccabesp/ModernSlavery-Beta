@@ -37,7 +37,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
         public string UserHostAddress => HttpContext.GetUserHostAddress();
 
-        public bool IsTrustedIP => SharedBusinessLogic.SharedOptions.IsTrustedAddress(UserHostAddress);
+        public bool IsTrustedIP => SharedBusinessLogic.AuthorisationBusinessLogic.IsTrustedAddress(UserHostAddress);
 
         public bool IsAdministrator => SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(User);
         public bool IsSuperAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(User);

@@ -6,47 +6,55 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
+using ModernSlavery.Core.Classes.StatementTypeIndexes;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Infrastructure.Database.Migrations;
 
 namespace ModernSlavery.Infrastructure.Database.Classes
 {
     public class DataImporter : IDataImporter
     {
+        private readonly ILogger _logger;
         private readonly SharedOptions _sharedOptions;
         private readonly IDataRepository _dataRepository;
+        private readonly IDbContext _dbContext;
         private readonly IFileRepository _fileRepository;
-        private readonly IReportingDeadlineHelper _reportingDeadlineHelper;
-        private readonly IPostcodeChecker _postcodeChecker;
+        private readonly SectorTypeIndex _sectorTypeIndex;
         private static readonly int? CommandTimeout = 500;
 
-        public DataImporter(SharedOptions sharedOptions, IDataRepository dataRepository, IFileRepository fileRepository, IReportingDeadlineHelper reportingDeadlineHelper, IPostcodeChecker postcodeChecker)
+        public DataImporter(ILogger<DataImporter> logger, SharedOptions sharedOptions, IDbContext dbContext, IDataRepository dataRepository, IFileRepository fileRepository, SectorTypeIndex sectorTypeIndex)
         {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             _dataRepository = dataRepository ?? throw new ArgumentNullException(nameof(dataRepository));
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             _fileRepository = fileRepository ?? throw new ArgumentNullException(nameof(fileRepository));
-            _reportingDeadlineHelper = reportingDeadlineHelper ?? throw new ArgumentNullException(nameof(reportingDeadlineHelper));
-            _postcodeChecker = postcodeChecker ?? throw new ArgumentNullException(nameof(postcodeChecker));
+            _sectorTypeIndex = sectorTypeIndex ?? throw new ArgumentNullException(nameof(sectorTypeIndex));
         }
 
         #region Seed the SIC Codes and Categories
-        public async Task ImportSICSectionsAsync(bool force = false)
+        public async Task<int> ImportSICSectionsAsync(bool importWhenAny = false)
         {
             var filepath = Path.Combine(_sharedOptions.AppDataPath, Filenames.SicSections);
 
             if (!await _fileRepository.GetDirectoryExistsAsync(_sharedOptions.AppDataPath).ConfigureAwait(false)) await _fileRepository.CreateDirectoryAsync(_sharedOptions.AppDataPath).ConfigureAwait(false);
 
             var databaseRecords = _dataRepository.GetAll<SicSection>();
-            if (!force && databaseRecords.Any()) return;
+            if (!importWhenAny && databaseRecords.Any()) return 0;
 
             var fileRecords = await _fileRepository.ReadCSVAsync<SicSection>(filepath, false).ConfigureAwait(false);
             if (!fileRecords.Any()) throw new Exception($"No records found in {filepath}");
 
             //Add or update the new records
+            int insertCount = 0;
+            int updateCount = 0;
+
             foreach (var fileRecord in fileRecords)
             {
                 var oldRecord = _dataRepository.Get<SicSection>(fileRecord.SicSectionId);
@@ -59,9 +67,16 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
                 oldRecord.Description = fileRecord.Description;
                 if (isnew)
+                {
                     _dataRepository.Insert(oldRecord);
+                    insertCount++;
+                }
                 else
+                {
+                    oldRecord.Created = VirtualDateTime.Now;
                     _dataRepository.Update(oldRecord);
+                    updateCount++;
+                }
             }
 
             //Delete the old records
@@ -70,21 +85,27 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                 _dataRepository.Delete(deletedRecord);
 
             await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
+            _logger.LogInformation($"{nameof(ImportSICSectionsAsync)}: Inserted {insertCount} and updated {updateCount} of {fileRecords.Count} records");
+
+            return insertCount + updateCount;
         }
 
-        public async Task ImportSICCodesAsync(bool force = false)
+        public async Task<int> ImportSICCodesAsync(bool importWhenAny = false)
         {
             var filepath = Path.Combine(_sharedOptions.AppDataPath, Filenames.SicCodes);
 
             if (!await _fileRepository.GetDirectoryExistsAsync(_sharedOptions.AppDataPath).ConfigureAwait(false)) await _fileRepository.CreateDirectoryAsync(_sharedOptions.AppDataPath).ConfigureAwait(false);
 
             var databaseRecords = await _dataRepository.GetAll<SicCode>().ToListAsync().ConfigureAwait(false);
-            if (!force && databaseRecords.Any()) return;
+            if (!importWhenAny && databaseRecords.Any()) return 0;
 
             var fileRecords = await _fileRepository.ReadCSVAsync<SicCode>(filepath, false).ConfigureAwait(false);
             if (!fileRecords.Any()) throw new Exception($"No records found in {filepath}");
 
             //Add or update the new records
+            int insertCount = 0;
+            int updateCount = 0;
+
             foreach (var fileRecord in fileRecords)
             {
                 var oldRecord = _dataRepository.Get<SicCode>(fileRecord.SicCodeId);
@@ -100,10 +121,18 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                 oldRecord.SicCodeId = fileRecord.SicCodeId;
 
                 oldRecord.Description = fileRecord.Description;
+                
                 if (isnew)
+                {
                     _dataRepository.Insert(oldRecord);
+                    insertCount++;
+                }
                 else
+                {
+                    oldRecord.Created = VirtualDateTime.Now;
                     _dataRepository.Update(oldRecord);
+                    updateCount++;
+                }
             }
 
             //Delete the old records
@@ -112,23 +141,37 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                 _dataRepository.Delete(deletedRecord);
 
             await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
+            _logger.LogInformation($"{nameof(ImportSICCodesAsync)}: Inserted {insertCount} and updated {updateCount} of {fileRecords.Count} records");
+
+            return insertCount + updateCount;
         }
         #endregion
 
+        public async Task EnsureSystemUserExistsAsync()
+        {
+            //Ensure we have a system user
+            if (_dataRepository.Get<User>((long)-1) == null)
+            {
+                await _dbContext.GetDatabase().ExecuteSqlRawAsync(AddSystemUser.AddSystemUserSql);
+            }
+        }
+
         #region Seed Statement types
-        public async Task ImportStatementSectorTypesAsync(bool force = false)
+        public async Task<int> ImportStatementSectorTypesAsync(bool importWhenAny = false)
         {
             var filepath = Path.Combine(_sharedOptions.AppDataPath, Filenames.StatementSectorTypes);
 
             if (!await _fileRepository.GetDirectoryExistsAsync(_sharedOptions.AppDataPath).ConfigureAwait(false)) await _fileRepository.CreateDirectoryAsync(_sharedOptions.AppDataPath).ConfigureAwait(false);
 
             var databaseRecords = _dataRepository.GetAll<StatementSectorType>();
-            if (!force && databaseRecords.Any()) return;
+            if (!importWhenAny && databaseRecords.Any()) return 0;
 
             var newRecords = await _fileRepository.ReadCSVAsync<StatementSectorType>(filepath, false).ConfigureAwait(false);
             if (!newRecords.Any()) throw new Exception($"No records found in {filepath}");
 
             //Add or update the new records
+            int insertCount=0;
+            int updateCount=0;
             foreach (var newRecord in newRecords)
             {
                 var oldRecord = _dataRepository.Get<StatementSectorType>(newRecord.StatementSectorTypeId);
@@ -141,9 +184,16 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
                 oldRecord.Description = newRecord.Description;
                 if (isnew)
+                {
                     _dataRepository.Insert(oldRecord);
+                    insertCount++;
+                }
                 else
+                {
+                    oldRecord.Created = VirtualDateTime.Now;
                     _dataRepository.Update(oldRecord);
+                    updateCount++;
+                }
             }
 
             //Delete the old records
@@ -152,6 +202,13 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                 _dataRepository.Delete(deletedRecord);
 
             await _dataRepository.SaveChangesAsync().ConfigureAwait(false);
+
+            //Reload the new sector types into memory
+            _sectorTypeIndex.Load();
+
+            _logger.LogInformation($"{nameof(ImportStatementSectorTypesAsync)}: Inserted {insertCount} and updated {updateCount} of {newRecords.Count} records");
+
+            return insertCount+updateCount;
         }
         #endregion
 
@@ -159,22 +216,22 @@ namespace ModernSlavery.Infrastructure.Database.Classes
         /// <summary>
         ///     //Seed the private organisations in the database
         /// </summary>
-        /// <param name="force">When true always imports. When false only when no private organisation records in db</param>
-        public async Task ImportPrivateOrganisationsAsync(long userId, int maxRecords = 0, bool force = false)
+        /// <param name="importWhenAny">When true always imports. When false only when no private organisation records in db</param>
+        public async Task<int> ImportPrivateOrganisationsAsync(long userId, int maxRecords = 0, bool importWhenAny = false, bool throwWhenExists = false)
         {
-            await ImportOrganisationsAsync(Filenames.ImportPrivateOrganisations, SectorTypes.Private, userId, maxRecords, force).ConfigureAwait(false);
+            return await ImportOrganisationsAsync(Filenames.ImportPrivateOrganisations, SectorTypes.Private, userId, maxRecords, importWhenAny, throwWhenExists).ConfigureAwait(false);
         }
 
         /// <summary>
         ///     //Seed the public organisations in the database
         /// </summary>
-        /// <param name="force">When true always imports. When false only when no public organisation records in db</param>
-        public async Task ImportPublicOrganisationsAsync(long userId, int maxRecords = 0, bool force = false)
+        /// <param name="importWhenAny">When true always imports. When false only when no public organisation records in db</param>
+        public async Task<int> ImportPublicOrganisationsAsync(long userId, int maxRecords = 0, bool importWhenAny = false, bool throwWhenExists=false)
         {
-            await ImportOrganisationsAsync(Filenames.ImportPublicOrganisations, SectorTypes.Public, userId, maxRecords, force).ConfigureAwait(false);
+            return await ImportOrganisationsAsync(Filenames.ImportPublicOrganisations, SectorTypes.Public, userId, maxRecords, importWhenAny, throwWhenExists).ConfigureAwait(false);
         }
 
-        private async Task ImportOrganisationsAsync(string fileName, SectorTypes sectorType, long userId, int maxRecords=0, bool force = false)
+        private async Task<int> ImportOrganisationsAsync(string fileName, SectorTypes sectorType, long userId, int maxRecords = 0, bool importWhenAny = false, bool throwWhenExists = false)
         {
             if (string.IsNullOrWhiteSpace(fileName)) throw new ArgumentNullException(nameof(fileName));
             if (sectorType == SectorTypes.Unknown) throw new ArgumentOutOfRangeException(nameof(sectorType));
@@ -187,8 +244,8 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
             //Dont import unless forced when there are existing records
             var orgs = await _dataRepository.ToListAsync<Organisation>(o => o.SectorType == sectorType).ConfigureAwait(false);
-            
-            if (!force && orgs.Any()) return;
+
+            if (!importWhenAny && orgs.Any()) return 0;
 
             var coHoOrgs = await _dataRepository.ToListAsync<Organisation>(o => o.CompanyNumber != null).ConfigureAwait(false);
             var noCoHoOrgs = await _dataRepository.ToListAsync<Organisation>(o => o.CompanyNumber == null).ConfigureAwait(false);
@@ -218,147 +275,161 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             //Add or update the new records
             var created = VirtualDateTime.Now;
 
-            Parallel.ForEach(newRecords, async newRecord =>
-             {
+            if (Debugger.IsAttached)
+                foreach (var newRecord in newRecords) await AddRecord(newRecord);
+            else
+                Parallel.ForEach(newRecords, async newRecord => await AddRecord(newRecord));
 
-                 try
-                 {
-                    //Check organisation name in the file
+            async Task AddRecord(ImportOrganisationModel newRecord)
+            {
+                try
+                {
+                    //Check organisation name and length
+                    newRecord.OrganisationName = string.IsNullOrWhiteSpace(newRecord.OrganisationName) ? null : newRecord.OrganisationName.TrimNonLettersOrDigits();
                     if (string.IsNullOrWhiteSpace(newRecord.OrganisationName))
-                         throw new Exception($"Empty organisation name '{fileName}'");
+                        throw new Exception($"Empty organisation name '{fileName}'");
+                    else if (newRecord.OrganisationName.Length > 160) 
+                        throw new Exception($"{nameof(newRecord.OrganisationName)} exceeds 160 characters for organisation '{newRecord.OrganisationName}'");
+
+                    //Check company number and length
+                    newRecord.CompanyNumber = string.IsNullOrWhiteSpace(newRecord.CompanyNumber) ? null : newRecord.CompanyNumber.TrimNonLettersOrDigits();
+                    if (!string.IsNullOrWhiteSpace(newRecord.CompanyNumber) && newRecord.CompanyNumber.Length > 10) throw new Exception($"{nameof(newRecord.CompanyNumber)} exceeds 10 characters for organisation '{newRecord.OrganisationName}'");
 
                     //Check the sector is as expected in the file
-                    if (!sectorType.ToString().EqualsI(newRecord.Sector))
-                         throw new Exception($"Invalid sector '{newRecord.Sector}' in {sectorType.ToString().ToLower()} file '{fileName}'");
+                    if (string.IsNullOrWhiteSpace(newRecord.Sector))
+                        newRecord.Sector = sectorType.ToString();
+                    else if (!sectorType.ToString().EqualsI(newRecord.Sector))
+                        throw new Exception($"Invalid sector '{newRecord.Sector}' in {sectorType.ToString().ToLower()} file '{fileName}'");
 
                     //Check the sic codes
                     if (string.IsNullOrWhiteSpace(newRecord.SICCode) && string.IsNullOrWhiteSpace(newRecord.CompanyNumber))
-                         throw new Exception($"Missing SicCode for organisation '{newRecord.OrganisationName}'");
+                        throw new Exception($"Missing SicCode for organisation '{newRecord.OrganisationName}'");
 
-                    //Make sur number is null if empty
-                    newRecord.CompanyNumber=string.IsNullOrWhiteSpace(newRecord.CompanyNumber) ? null : newRecord.CompanyNumber;
-
-                     //Check post code
-                     if (string.IsNullOrWhiteSpace(newRecord.PostCode))
-                     {
-                         if (string.IsNullOrWhiteSpace(newRecord.CompanyNumber))throw new Exception($"Missing PostCode and CompanyNumber for organisation '{newRecord.OrganisationName}'");
-                     }
-                     else if (newRecord.PostCode.Length > 20)
-                         throw new Exception($"{nameof(newRecord.PostCode)} exceeds 20 characters for organisation '{newRecord.OrganisationName}'");
+                    //Check post code
+                    if (string.IsNullOrWhiteSpace(newRecord.PostCode))
+                    {
+                        if (string.IsNullOrWhiteSpace(newRecord.CompanyNumber)) throw new Exception($"Missing PostCode and CompanyNumber for organisation '{newRecord.OrganisationName}'");
+                    }
+                    else if (newRecord.PostCode.Length > 20)
+                        throw new Exception($"{nameof(newRecord.PostCode)} exceeds 20 characters for organisation '{newRecord.OrganisationName}'");
 
                     //Check address field length
-                    if (!string.IsNullOrWhiteSpace(newRecord.Address1) && newRecord.Address1.Length > 100)
-                         throw new Exception($"{nameof(newRecord.Address1)} exceeds 100 characters for organisation '{newRecord.OrganisationName}'");
-                     if (!string.IsNullOrWhiteSpace(newRecord.Address2) && newRecord.Address2.Length > 100)
-                         throw new Exception($"{nameof(newRecord.Address2)} exceeds 100 characters for organisation '{newRecord.OrganisationName}'");
-                     if (!string.IsNullOrWhiteSpace(newRecord.Address3) && newRecord.Address3.Length > 100)
-                         throw new Exception($"{nameof(newRecord.Address3)} exceeds 100 characters for organisation '{newRecord.OrganisationName}'");
-                     if (!string.IsNullOrWhiteSpace(newRecord.TownCity) && newRecord.TownCity.Length > 100)
-                         throw new Exception($"{nameof(newRecord.TownCity)} exceeds 100 characters for organisation '{newRecord.OrganisationName}'");
-                     if (!string.IsNullOrWhiteSpace(newRecord.County) && newRecord.County.Length > 100)
-                         throw new Exception($"{nameof(newRecord.County)} exceeds 100 characters for organisation '{newRecord.OrganisationName}'");
-                     if (!string.IsNullOrWhiteSpace(newRecord.Country) && newRecord.Country.Length > 100)
-                         throw new Exception($"{nameof(newRecord.Country)} exceeds 100 characters for organisation '{newRecord.OrganisationName}'");
+                    var newAddress = newRecord.GetAddressString();
+                    var hasAddress = !string.IsNullOrWhiteSpace(newAddress);
 
-                     var newSicCodes = newRecord.SICCode.SplitI(";,: ".ToCharArray()).Select(c => c.ToInt32()).ToHashSet();
-                     if (sectorType==SectorTypes.Public)newSicCodes.Add(1);
-                     var badSicCodes = newSicCodes.Except(allSicCodes);
-                     if (badSicCodes.Any())
-                     {
-                         if (!string.IsNullOrWhiteSpace(newRecord.CompanyNumber))
+                    if (hasAddress)
+                    {
+                        if (!string.IsNullOrWhiteSpace(newRecord.Address1) && newRecord.Address1.Length > 100)
+                            throw new Exception($"{nameof(newRecord.Address1)} exceeds 100 characters for organisation '{newRecord.OrganisationName}'");
+                        if (!string.IsNullOrWhiteSpace(newRecord.Address2) && newRecord.Address2.Length > 100)
+                            throw new Exception($"{nameof(newRecord.Address2)} exceeds 100 characters for organisation '{newRecord.OrganisationName}'");
+                        if (!string.IsNullOrWhiteSpace(newRecord.Address3) && newRecord.Address3.Length > 100)
+                            throw new Exception($"{nameof(newRecord.Address3)} exceeds 100 characters for organisation '{newRecord.OrganisationName}'");
+                        if (!string.IsNullOrWhiteSpace(newRecord.TownCity) && newRecord.TownCity.Length > 100)
+                            throw new Exception($"{nameof(newRecord.TownCity)} exceeds 100 characters for organisation '{newRecord.OrganisationName}'");
+                        if (!string.IsNullOrWhiteSpace(newRecord.County) && newRecord.County.Length > 100)
+                            throw new Exception($"{nameof(newRecord.County)} exceeds 100 characters for organisation '{newRecord.OrganisationName}'");
+                        if (!string.IsNullOrWhiteSpace(newRecord.Country) && newRecord.Country.Length > 100)
+                            throw new Exception($"{nameof(newRecord.Country)} exceeds 100 characters for organisation '{newRecord.OrganisationName}'");
+                    }
+
+                    var newSicCodes = newRecord.SICCode.SplitI(";,: ".ToCharArray()).Select(c => c.ToInt32()).ToHashSet();
+                    if (sectorType == SectorTypes.Public) newSicCodes.Add(1);
+                    var badSicCodes = newSicCodes.Except(allSicCodes);
+                    if (badSicCodes.Any())
+                    {
+                        if (!string.IsNullOrWhiteSpace(newRecord.CompanyNumber))
                             newSicCodes = newSicCodes.Except(badSicCodes).ToHashSet();
-                         else
+                        else
                             throw new Exception($"Invalid SicCodes '{badSicCodes.ToDelimitedString()}' for organisation '{newRecord.OrganisationName}'");
-                     }
+                    }
 
-                     //Try and get the existing organisation
-                     Organisation org = null;
-                     var newName = newRecord.OrganisationName;
-                     if (!string.IsNullOrWhiteSpace(newRecord.CompanyNumber))
-                     {
-                         newRecord.CompanyNumber = newRecord.CompanyNumber.IsNumber() ? newRecord.CompanyNumber.PadLeft(8, '0') : newRecord.CompanyNumber;
-                         if (processedNumbers.Contains(newRecord.CompanyNumber))
-                             throw new Exception($"Duplicate company number '{newRecord.CompanyNumber}' ");
-                         else
-                             org = coHoOrgs.SingleOrDefault(o => o.CompanyNumber == newRecord.CompanyNumber);
-                     }
-                     else 
-                     {
-                         var newAddress = newRecord.GetAddressString();
-                         if (sectorType == SectorTypes.Public) newName = $"{newRecord.OrganisationName},{newAddress}";
-                         if (processedNames.Contains(newName))
-                             throw new Exception($"Duplicate organisation '{newRecord.OrganisationName}' ");
-                         else
-                         {
-                             if (sectorType == SectorTypes.Public)
-                             {
-                                 org = noCoHoOrgs.SingleOrDefault(o => o.OrganisationName.EqualsI(newRecord.OrganisationName) && o.OrganisationAddresses.Any(a=>a.GetAddressString().EqualsI(newAddress)));
-                             }
-                             else
-                                 throw new Exception($"Attempt to import private organisation '{newRecord.OrganisationName}' with missing CompanyNumber");
-                         }
-                     }
+                    //Try and get the existing organisation
+                    Organisation org = null;
+                    if (!string.IsNullOrWhiteSpace(newRecord.CompanyNumber))
+                    {
+                        newRecord.CompanyNumber = newRecord.CompanyNumber.IsNumber() ? newRecord.CompanyNumber.PadLeft(8, '0') : newRecord.CompanyNumber;
+                        if (processedNumbers.Contains(newRecord.CompanyNumber))
+                            throw new Exception($"Duplicate company number '{newRecord.CompanyNumber}' ");
+                        else
+                            org = coHoOrgs.SingleOrDefault(o => o.CompanyNumber == newRecord.CompanyNumber);
+                    }
+                    else
+                    {
+                        if (processedNames.Contains(newRecord.OrganisationName))
+                            throw new Exception($"Duplicate organisation '{newRecord.OrganisationName}' ");
+                        else if (sectorType == SectorTypes.Public)
+                            org = noCoHoOrgs.SingleOrDefault(o => o.OrganisationName.EqualsI(newRecord.OrganisationName));
+                        else
+                            throw new Exception($"Attempt to import private organisation '{newRecord.OrganisationName}' with missing CompanyNumber");
+                    }
 
-                     if (org != null) return;
+                    if (org != null)
+                    {
+                        if (throwWhenExists)throw new Exception($"Organisation {newRecord.OrganisationName}:{newRecord.CompanyNumber}:{newRecord.Sector}:{newAddress}: already exists in database as {org.OrganisationName}:{org.CompanyNumber}:{org.SectorType}");
+                        return;
+                    }
 
-                     org = new Organisation()
-                     {
-                         SectorType = sectorType,
-                         OrganisationName = newRecord.OrganisationName,
-                         CompanyNumber = string.IsNullOrWhiteSpace(newRecord.CompanyNumber) ? null : newRecord.CompanyNumber,
-                     };
+                    org = new Organisation() {
+                        SectorType = sectorType,
+                        OrganisationName = newRecord.OrganisationName,
+                        CompanyNumber = string.IsNullOrWhiteSpace(newRecord.CompanyNumber) ? null : newRecord.CompanyNumber,
+                    };
 
-                     var orgStatus = org.SetStatus(OrganisationStatuses.Active, userId);
-                     if (orgStatus != null) bulkOrganisationStatuses.Add(orgStatus);
+                    var orgStatus = org.SetStatus(OrganisationStatuses.Active, userId);
+                    if (orgStatus != null) bulkOrganisationStatuses.Add(orgStatus);
 
                     //Add the name
-                    var orgName = new OrganisationName { Name = org.OrganisationName, Source = "External" };
-                     org.OrganisationNames.Add(orgName);
-                     bulkOrganisationNames.Add(orgName);
+                    var orgName = new OrganisationName { Organisation = org, Name = org.OrganisationName, Source = "External" };
+                    org.OrganisationNames.Add(orgName);
+                    bulkOrganisationNames.Add(orgName);
 
                     //Add the new address
-                    var address = new OrganisationAddress();
-                     address.Organisation = org;
-                     address.CreatedByUserId = userId;
-                     address.Address1 = string.IsNullOrWhiteSpace(newRecord.Address1) ? null : newRecord.Address1;
-                     address.Address2 = string.IsNullOrWhiteSpace(newRecord.Address2) ? null : newRecord.Address2;
-                     address.Address3 = string.IsNullOrWhiteSpace(newRecord.Address3) ? null : newRecord.Address3;
-                     address.TownCity = string.IsNullOrWhiteSpace(newRecord.TownCity) ? null : newRecord.TownCity;
-                     address.County = string.IsNullOrWhiteSpace(newRecord.County) ? null : newRecord.County;
-                     address.Country = string.IsNullOrWhiteSpace(newRecord.Country) ? null : newRecord.Country;
-                     address.PostCode = string.IsNullOrWhiteSpace(newRecord.PostCode) ? null : newRecord.PostCode;
-                     address.Source = "External";
-                     address.Trim();
-                     var addressStatus = address.SetStatus(AddressStatuses.Active, userId);
-                     if (addressStatus != null) bulkAddressStatuses.Add(addressStatus);
-                     org.OrganisationAddresses.Add(address);
-                     bulkAddresses.Add(address);
-                     
+                    if (hasAddress)
+                    {
+                        var address = new OrganisationAddress {
+                            Organisation = org,
+                            CreatedByUserId = userId,
+                            Address1 = string.IsNullOrWhiteSpace(newRecord.Address1) ? null : newRecord.Address1,
+                            Address2 = string.IsNullOrWhiteSpace(newRecord.Address2) ? null : newRecord.Address2,
+                            Address3 = string.IsNullOrWhiteSpace(newRecord.Address3) ? null : newRecord.Address3,
+                            TownCity = string.IsNullOrWhiteSpace(newRecord.TownCity) ? null : newRecord.TownCity,
+                            County = string.IsNullOrWhiteSpace(newRecord.County) ? null : newRecord.County,
+                            Country = string.IsNullOrWhiteSpace(newRecord.Country) ? null : newRecord.Country,
+                            PostCode = string.IsNullOrWhiteSpace(newRecord.PostCode) ? null : newRecord.PostCode,
+                            Source = "External"
+                        };
+                        address.Trim();
+                        var addressStatus = address.SetStatus(AddressStatuses.Active, userId);
+                        if (addressStatus != null) bulkAddressStatuses.Add(addressStatus);
+                        org.OrganisationAddresses.Add(address);
+                        bulkAddresses.Add(address);
+                    }
+
                     //Add the new sicCode
                     foreach (var sicCodeId in newSicCodes)
-                     {
-                         var sicCode = new OrganisationSicCode { Organisation = org, SicCodeId = sicCodeId, Source = "External" };
-                         org.OrganisationSicCodes.Add(sicCode);
-                         bulkOrganisationSicCodes.Add(sicCode);
-                     }
+                    {
+                        var sicCode = new OrganisationSicCode { Organisation = org, SicCodeId = sicCodeId, Source = "External" };
+                        org.OrganisationSicCodes.Add(sicCode);
+                        bulkOrganisationSicCodes.Add(sicCode);
+                    }
 
-                     //Remember the org reference
-                     if (!string.IsNullOrWhiteSpace(newRecord.CompanyNumber))
-                         processedNumbers.Add(newRecord.CompanyNumber);
-                     else 
-                         processedNames.Add(newName);
+                    //Remember the org reference
+                    if (!string.IsNullOrWhiteSpace(newRecord.CompanyNumber))
+                        processedNumbers.Add(newRecord.CompanyNumber);
+                    else
+                        processedNames.Add(org.OrganisationName);
 
-                     //Save toe org to the bulk list
-                     bulkOrganisations.Add(org);
-                 }
-                 catch (Exception ex)
-                 {
-                     exceptions.Add(ex);
-                 }
-             });
+                    //Save toe org to the bulk list
+                    bulkOrganisations.Add(org);
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            }
 
-            await _dataRepository.ExecuteTransactionAsync(async () => 
-            {
+            await _dataRepository.ExecuteTransactionAsync(async () => {
                 try
                 {
                     if (bulkOrganisations.Any())
@@ -367,9 +438,8 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                         //We need to set a dummy id to preserver insert order so we can retrieve ids 
                         long i = -10 - bulkOrganisations.Count;
                         bulkOrganisations.ForEach(org => org.OrganisationId = i++);
-                        await _dataRepository.BulkInsertAsync(bulkOrganisations,true, timeout: CommandTimeout).ConfigureAwait(false);
-                        Parallel.ForEach(bulkOrganisations, org =>
-                        {
+                        await _dataRepository.BulkInsertAsync(bulkOrganisations, true, timeout: CommandTimeout).ConfigureAwait(false);
+                        Parallel.ForEach(bulkOrganisations, org => {
                             org.OrganisationStatuses.ForEach(s => s.OrganisationId = org.OrganisationId);
                             org.OrganisationSicCodes.ForEach(s => s.OrganisationId = org.OrganisationId);
                             org.OrganisationNames.ForEach(s => s.OrganisationId = org.OrganisationId);
@@ -382,7 +452,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                         //We need to set a dummy id to preserver insert order so we can retrieve ids 
                         i = -10 - bulkAddresses.Count;
                         bulkAddresses.ForEach(address => address.AddressId = i++);
-                        if (bulkAddresses.Any()) await _dataRepository.BulkInsertAsync(bulkAddresses,true,timeout:CommandTimeout).ConfigureAwait(false);
+                        if (bulkAddresses.Any()) await _dataRepository.BulkInsertAsync(bulkAddresses, true, timeout: CommandTimeout).ConfigureAwait(false);
                         Parallel.ForEach(bulkAddresses, address => address.AddressStatuses.ForEach(s => s.AddressId = address.AddressId));
 
                         if (bulkAddressStatuses.Any()) await _dataRepository.BulkInsertAsync(bulkAddressStatuses, timeout: CommandTimeout).ConfigureAwait(false);
@@ -399,9 +469,11 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             if (exceptions.Any())
             {
                 if (exceptions.Count == 1) throw exceptions.First();
-                throw new AggregateException(exceptions);
+                throw new AggregateException("One or more errors occured",exceptions);
             }
+
+            return bulkOrganisations.Count;
         }
-        #endregion
     }
+    #endregion
 }

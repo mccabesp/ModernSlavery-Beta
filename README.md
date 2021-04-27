@@ -1,20 +1,17 @@
-# Modern Slavery Reporting service
+# Modern slavery statement registry
 
-This is the code for the [Modern Slavery Reporting service](https://modern-slavery.service.gov.uk).
+This is the code for the [Modern slavery statement registry](https://modern-slavery-statement-registry.service.gov.uk/).
 
-From 2017, any organisation that has 250 or more employees must publish and report specific figures about their Modern Slavery. 
-Modern Slavery is the difference between the average earnings of men and women, expressed relative to men’s earnings. 
-For example, ‘women earn 15% less than men per hour’.
+Since 2015, the UK Modern Slavery Act has required large businesses to publish an annual statement setting out the steps they are taking to prevent modern slavery in their operations and supply chains. 
 
-This service allows organisations to report their Modern Slavery statement. It then makes this data available to the general public. 
-It is managed by the Government Equalities Office (GEO) which forms part of the Cabinet Office.
+This service allows any organisation to submit a summary of their annual Modern Slavery statement to GOV.UK. It then makes this summary available to the general public for recognition and scrutiny. 
+The service is managed by the Modern Slavery Unit which forms part of the Home Office.
 
 
 ## Technical documentation
 
-This is a C# solution that has a user interface for public viewing pages, organisation reporting pages and an admin portal. There are also
-regular jobs for pulling information from Companies House and sending reminder emails. We use Identity Server for authentication 
-and SQL Server for the database.
+This is a C# cloud solution that includes user account set-up, registration of organisations, annual submitting of statements, a public interface for viewing pages as well as an administrator portal. There are also
+regular jobs for updating organisation information from Companies House and sending emails. The solution uses Identity Server for authentication and SQL Server for the database.
 
 ### Dependencies
 

@@ -47,28 +47,27 @@ namespace ModernSlavery.WebUI.Account.Controllers
         [HttpGet("~/sign-out")]
         public async Task<IActionResult> SignOut()
         {
-            if (!User.Identity.IsAuthenticated) return View("SignOut");
+            //Dont save in history
+            SkipSaveHistory = true;
+
+            if (!User.Identity.IsAuthenticated)
+            {
+                Session.Clear();
+                return View("SignedOut");
+            }
 
             var returnUrl = Url.Action("SignOut", "Account", null, "https");
-
             return await LogoutUser(returnUrl);
         }
-
 
         [HttpGet]
         public async Task<IActionResult> ManageAccount()
         {
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null && IsImpersonatingUser == false) return checkResult;
+            if (checkResult != null && !IsImpersonatingUser) return checkResult;
 
             // map the user to the view model
             var model = AutoMapper.Map<ManageAccountViewModel>(VirtualUser);
-
-            // check if we have any successful changes
-            if (TempData.ContainsKey(nameof(AccountResources.ChangeDetailsSuccessAlert)))
-                ViewBag.ChangeSuccessMessage = AccountResources.ChangeDetailsSuccessAlert;
-            else if (TempData.ContainsKey(nameof(AccountResources.ChangePasswordSuccessAlert)))
-                ViewBag.ChangeSuccessMessage = AccountResources.ChangePasswordSuccessAlert;
 
             // generate flow urls
             ViewBag.CloseAccountUrl = "";
@@ -76,7 +75,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             ViewBag.ChangePasswordUrl = "";
             ViewBag.ChangeDetailsUrl = "";
 
-            if (IsImpersonatingUser == false)
+            if (!IsImpersonatingUser)
             {
                 ViewBag.CloseAccountUrl =
                     Url.Action<CloseAccountController>(nameof(CloseAccountController.CloseAccount));
@@ -99,6 +98,9 @@ namespace ModernSlavery.WebUI.Account.Controllers
         [HttpGet("password-reset")]
         public async Task<IActionResult> PasswordReset()
         {
+            //Dont save in history
+            SkipSaveHistory = true;
+
             //Ensure IP address hasnt signed up recently
             if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
             {
@@ -135,7 +137,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             ModelState.Remove(nameof(model.ConfirmPassword));
 
             //Ensure IP address hasnt signed up recently
-            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection) 
+            if (!SharedBusinessLogic.TestOptions.DisableLockoutProtection)
             {
                 var lastPasswordResetDate = await GetLastPasswordResetDateAsync();
                 var remainingTime = lastPasswordResetDate == DateTime.MinValue
@@ -149,7 +151,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             if (!ModelState.IsValid)
             {
                 this.SetModelCustomErrors<ResetViewModel>();
-                return View("PasswordReset", model);
+                return View("../NewAccount/PasswordReset", model);
             }
 
             //Ensure user has not completed the registration process
@@ -160,7 +162,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             if (!ModelState.IsValid)
             {
                 this.SetModelCustomErrors<ResetViewModel>();
-                return View("PasswordReset", model);
+                return View("../NewAccount/PasswordReset", model);
             }
 
             //Ensure email is always lower case
@@ -172,12 +174,10 @@ namespace ModernSlavery.WebUI.Account.Controllers
                 await SetLastPasswordResetDateAsync(VirtualDateTime.Now);
 
             // find the latest active user by email
-            var user = await _accountService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.Active);
+            var user = await _accountService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.Active, UserStatuses.New);
             if (user == null)
             {
-                Logger.LogWarning(
-                    "Password reset requested for unknown email address",
-                    $"Email:{model.EmailAddress}, IP:{UserHostAddress}");
+                Logger.LogWarning("Password reset requested for unknown email address", $"Email:{model.EmailAddress}, IP:{UserHostAddress}");
                 return View("PasswordResetSent");
             }
 
@@ -185,7 +185,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             {
                 AddModelError(1122);
                 this.SetModelCustomErrors<ResetViewModel>();
-                return View("PasswordReset", model);
+                return View("../NewAccount/PasswordReset", model);
             }
 
             user.ResetAttempts = 0;
@@ -199,18 +199,15 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
         private async Task<bool> ResendPasswordResetAsync(User VirtualUser)
         {
-            //Send a password reset link to the email address
-            string resetCode = null;
             try
             {
-                resetCode = Encryption.Encrypt($"{VirtualUser.UserId}:{VirtualDateTime.Now.ToSmallDateTime()}", Encryption.Encodings.Base62);
+                //Send a password reset link to the email address
+                var resetCode = Encryption.Encrypt($"{VirtualUser.UserId}:{VirtualDateTime.Now.ToSmallDateTime()}:{VirtualUser.PasswordHash.GetDeterministicHashCode()}", Encryption.Encodings.Base62);
                 var resetUrl = Url.Action("NewPassword", "Account", new { code = resetCode }, "https");
-                if (!await SharedBusinessLogic.SendEmailService.SendResetPasswordNotificationAsync(resetUrl,
-                    VirtualUser.EmailAddress))
+                if (!await SharedBusinessLogic.SendEmailService.SendResetPasswordNotificationAsync(resetUrl, VirtualUser.EmailAddress))
                     return false;
 
-                Logger.LogInformation(
-                    $"Password reset sent. Name:{VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}");
+                Logger.LogInformation($"Password reset sent. Name:{VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}");
             }
             catch (Exception ex)
             {
@@ -223,8 +220,11 @@ namespace ModernSlavery.WebUI.Account.Controllers
         }
 
         [HttpGet("enter-new-password")]
-        public async Task<IActionResult> NewPassword([IgnoreText]string code = null)
+        public async Task<IActionResult> NewPassword([IgnoreText] string code = null)
         {
+            //Dont save in history
+            SkipSaveHistory = true;
+
             //Ensure user has not completed the registration process
             var result = await CheckUserRegisteredOkAsync();
             if (result != null) return result;
@@ -244,12 +244,14 @@ namespace ModernSlavery.WebUI.Account.Controllers
         {
             long userId = 0;
             DateTime resetDate;
+
+            int passwordHash = 0;
             try
             {
-                code = Encryption.Decrypt(code,Encryption.Encodings.Base62);
+                code = Encryption.Decrypt(code, Encryption.Encodings.Base62);
                 code = HttpUtility.UrlDecode(code);
                 var args = code.SplitI(':');
-                if (args.Length != 2) throw new ArgumentException("Too few parameters in password reset code");
+                if (args.Length != 3) throw new ArgumentException("Too few parameters in password reset code");
 
                 userId = args[0].ToLong();
                 if (userId == 0) throw new ArgumentException("Invalid user id in password reset code");
@@ -257,6 +259,10 @@ namespace ModernSlavery.WebUI.Account.Controllers
                 resetDate = args[1].FromSmallDateTime();
                 if (resetDate == DateTime.MinValue)
                     throw new ArgumentException("Invalid password reset date in password reset code");
+
+                passwordHash = args[2].ToInt32();
+                if (passwordHash == 0)
+                    throw new ArgumentException("Invalid current password hash in password reset code");
             }
             catch
             {
@@ -268,7 +274,8 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
             if (user == null) return (View("CustomError", WebService.ErrorViewModelFactory.Create(1124)), null);
 
-            if (resetDate.AddDays(1) < VirtualDateTime.Now)
+            //Password reset after password change or expiry period
+            if (resetDate.AddHours(SharedBusinessLogic.SharedOptions.PasswordResetExpiryHours) < VirtualDateTime.Now || passwordHash != user.PasswordHash.GetDeterministicHashCode())
                 return (View("CustomError", WebService.ErrorViewModelFactory.Create(1126)), null);
 
             return (null, user);
@@ -303,15 +310,15 @@ namespace ModernSlavery.WebUI.Account.Controllers
             ClearStash();
 
             //Save the user to ensure UserId>0 for new status
-            _accountService.UserRepository.UpdateUserPasswordUsingPBKDF2(passwordResult.User, model.Password);
+            await _accountService.UserRepository.UpdateUserPasswordUsingPBKDF2Async(passwordResult.User, model.Password);
 
             passwordResult.User.ResetAttempts = 0;
             passwordResult.User.ResetSendDate = null;
+            passwordResult.User.LoginAttempts = 0;
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Send completed notification email
-            await SharedBusinessLogic.SendEmailService.SendResetPasswordCompletedAsync(passwordResult.User
-                .EmailAddress);
+            await SharedBusinessLogic.SendEmailService.SendResetPasswordCompletedAsync(passwordResult.User.EmailAddress);
 
             //Send the verification code and showconfirmation
             return View("CustomError", WebService.ErrorViewModelFactory.Create(1127));

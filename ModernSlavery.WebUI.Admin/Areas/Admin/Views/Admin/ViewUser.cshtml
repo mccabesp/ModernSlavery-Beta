@@ -85,9 +85,9 @@
             <td class="govuk-table__cell"></td>
         </tr>
         @if (!string.IsNullOrEmpty(Model.ContactFirstName)
-         || !string.IsNullOrEmpty(Model.ContactLastName)
-         || !string.IsNullOrEmpty(Model.ContactJobTitle)
-         || !string.IsNullOrEmpty(Model.ContactEmailAddress))
+        || !string.IsNullOrEmpty(Model.ContactLastName)
+        || !string.IsNullOrEmpty(Model.ContactJobTitle)
+        || !string.IsNullOrEmpty(Model.ContactEmailAddress))
         {
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">Contact name</th>
@@ -132,9 +132,18 @@
                         No
                     </span>
                     <br />
-                    <span>
-                        Verification email sent on @(Model.EmailVerifySendDate.Value.ToString("d MMM yyyy, HH:mm"))
-                    </span>
+                    @if (Model.EmailVerifySendDate == null)
+                    {
+                        <span>
+                            Verification email not sent
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            Verification email sent on @(Model.EmailVerifySendDate.Value.ToString("d MMM yyyy, HH:mm"))
+                        </span>
+                    }
                 }
             </td>
             <td class="govuk-table__cell">
@@ -151,7 +160,7 @@
             <th scope="row" class="govuk-table__header">Happy to be contacted</th>
             <td class="govuk-table__cell">@(Model.AllowContact ? "Yes" : "No")</td>
             <td class="govuk-table__cell">
-                @if (Model.Status==UserStatuses.Active && (IsSuperAdministrator || IsDatabaseAdministrator))
+                @if (Model.Status == UserStatuses.Active && (IsSuperAdministrator || IsDatabaseAdministrator))
                 {
                     <a href="@Url.Action("ChangeContactPreferencesGet", "AdminUserContactPreferences", new { id = Model.UserId })"
                        class="govuk-link">

@@ -9,12 +9,17 @@
 }
 
 @section BeforeMain {
-    <a class="govuk-back-link" href="@backUrl">Back</a>
+
+    @if (!string.IsNullOrWhiteSpace(Model.BackUrl))
+    {
+        <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Model.BackUrl">Back</a>
+    }
 }
 
 <div class="govuk-grid-row cookie-settings-page">
     <div class="govuk-grid-column-two-thirds">
-        <form method="POST" action="@Url.Action("SendFeedback", "Shared")" novalidate>
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+        {
             @(Html.AntiForgeryToken())
             @(await Html.GovUkValidationSummaryAsync())
 
@@ -51,7 +56,7 @@
                             </h1>
                         </legend>
                         <div class="govuk-radios">
-                            @foreach (var reason in Enums.GetValues<HowEasyIsThisServiceToUse>().Where(x=> x != HowEasyIsThisServiceToUse.Unknown))
+                            @foreach (var reason in Enums.GetValues<HowEasyIsThisServiceToUse>().Where(x => x != HowEasyIsThisServiceToUse.Unknown))
                             {
                                 <div class="govuk-radios__item">
                                     <input class="govuk-radios__input" id="HowEasy-@(reason)" name="HowEasyIsThisServiceToUse" type="radio" value="@(reason)" checked="@(Model.HowEasyIsThisServiceToUse == reason)">
@@ -68,7 +73,7 @@
                 <div class="govuk-character-count @Html.SetErrorClass(model => model.Details, "govuk-form-group--error")" data-module="govuk-character-count" data-maxlength="2000">
                     <div class="govuk-form-group govuk-!-margin-top-6">
                         <label class="govuk-label govuk-label--m" for="details">
-                            How can we improve the service?
+                            How can we improve the service? (optional)
                         </label>
                         <textarea class="govuk-textarea govuk-js-character-count" id="details" name="Details" rows="5" aria-describedby="hint-info details-info">@Model.Details</textarea>
                     </div>
@@ -108,6 +113,6 @@
                 }))
 
             </div>
-        </form>
+        }
     </div>
 </div>

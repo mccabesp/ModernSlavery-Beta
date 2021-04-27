@@ -18,7 +18,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
         public static async Task DeleteDraftsAsync(this IServiceProvider serviceProvider)
         {
             var testBusinessLogic = serviceProvider.GetTestBusinessLogic();
-            await testBusinessLogic.DeleteDraftFilesAsync().ConfigureAwait(false);
+            await testBusinessLogic.DeleteDownloadFilesAsync().ConfigureAwait(false);
         }
 
         public static async Task DeleteDraftAsync(this IServiceProvider serviceProvider, string organisationIdentifier, long reportingDeadlineYear)

@@ -6,10 +6,10 @@ using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Hosts.Webjob
 {
-    [Options("Webjobs")]
-    public class WebjobsOptions : Dictionary<String, WebjobsOptions.WebjobOption>, IOptions
+    [Options("WebJobs")]
+    public class WebJobsOptions : Dictionary<String, WebJobsOptions.WebJobOption>, IOptions
     {
-        public WebjobsOptions() : base(StringComparer.OrdinalIgnoreCase)
+        public WebJobsOptions() : base(StringComparer.OrdinalIgnoreCase)
         {
 
         }
@@ -18,6 +18,8 @@ namespace ModernSlavery.Hosts.Webjob
             return !IsEnabled(webjobName);
         }
 
+        public int KeepConsoleLogDays { get; set; } = -1;
+
         public bool IsEnabled(string webjobName)
         {
             var webjob = this.ContainsKey(webjobName) ? this[webjobName] : null;
@@ -25,16 +27,16 @@ namespace ModernSlavery.Hosts.Webjob
             if (webjob != null)
                 switch (webjob.Action)
                 {
-                    case WebjobOption.Actions.Disable:
+                    case WebJobOption.Actions.Disable:
                         return VirtualDateTime.Now < webjob.StartDate || VirtualDateTime.Now > webjob.EndDate;
-                    case WebjobOption.Actions.Enable:
+                    case WebJobOption.Actions.Enable:
                         return VirtualDateTime.Now > webjob.StartDate && VirtualDateTime.Now < webjob.EndDate;
                 }
 
             return true;
         }
 
-        public class WebjobOption
+        public class WebJobOption
         {
             public enum Actions : byte
             {

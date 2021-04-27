@@ -33,29 +33,6 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             var body = JsonConvert.DeserializeObject<PostcodesIoApiValidateResponse>(bodyString);
             return body.result;
         }
-
-        public static void SetupHttpClient(HttpClient httpClient, string apiServer)
-        {
-            httpClient.BaseAddress = new Uri(apiServer);
-
-            httpClient.DefaultRequestHeaders.Clear();
-            httpClient.DefaultRequestHeaders.ConnectionClose = false;
-            ServicePointManager.FindServicePoint(httpClient.BaseAddress).ConnectionLeaseTimeout = 60 * 1000;
-        }
-
-        public static IAsyncPolicy<HttpResponseMessage> GetLinearRetryPolicy()
-        {
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .WaitAndRetryAsync(10,retryAttempt => TimeSpan.FromMilliseconds(new Random().Next(100, 1000)));
-        }
-        public static IAsyncPolicy<HttpResponseMessage> GetExponentialRetryPolicy()
-        {
-            var jitterer = new Random();
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .WaitAndRetryAsync(10, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))+TimeSpan.FromMilliseconds(jitterer.Next(0, 1000)));
-        }
     }
 
     internal class PostcodesIoApiValidateResponse

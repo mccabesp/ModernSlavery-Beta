@@ -4,10 +4,11 @@ namespace ModernSlavery.Core.Interfaces
 {
     public interface IDataImporter
     {
-        Task ImportPrivateOrganisationsAsync(long userId, int maxRecords = 0, bool force = false);
-        Task ImportPublicOrganisationsAsync(long userId, int maxRecords = 0, bool force = false);
-        Task ImportSICCodesAsync(bool force = false);
-        Task ImportSICSectionsAsync(bool force = false);
-        Task ImportStatementSectorTypesAsync(bool force = false);
+        Task EnsureSystemUserExistsAsync();
+        Task<int> ImportPrivateOrganisationsAsync(long userId, int maxRecords = 0, bool importWhenAny = false, bool throwWhenExists = false);
+        Task<int> ImportPublicOrganisationsAsync(long userId, int maxRecords = 0, bool importWhenAny = false, bool throwWhenExists = false);
+        Task<int> ImportSICCodesAsync(bool importWhenAny = false);
+        Task<int> ImportSICSectionsAsync(bool importWhenAny = false);
+        Task<int> ImportStatementSectorTypesAsync(bool importWhenAny = false);
     }
 }

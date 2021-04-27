@@ -80,7 +80,6 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             #region Approved date validation
 
-
             //Validate the approved date parts
             var partsComplete = !Text.IsAnyNull(ApprovedDay, ApprovedMonth, ApprovedYear);
             var partsEmpty = Text.IsAllNull(ApprovedDay, ApprovedMonth, ApprovedYear);
@@ -110,10 +109,9 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
             // Cannot be before the statement end date
             if (ApprovedDate.HasValue && StatementEndDate.HasValue && ApprovedDate.Value < StatementEndDate.Value)
-                validationResults.AddValidationError(3309, nameof(ApprovedDate), new { maxDate = StatementEndDate.Value.ToShortDateString() });
+                validationResults.AddValidationError(3309, nameof(ApprovedDate), new { minDate = StatementEndDate.Value.ToShortDateString() });
 
-            #endregion    
-
+            #endregion
 
             #region Approver validation
 

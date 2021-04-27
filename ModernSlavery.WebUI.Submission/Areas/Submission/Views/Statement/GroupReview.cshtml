@@ -62,13 +62,15 @@
                             </div>
                         </div>
                     </div>
-                }               
-                <a class="govuk-button" href="@(Model.StatementOrganisations.Count > 0 ? Model.ContinueUrl : Model.SkipUrl)">Continue</a>
+                }
 
-                <a href="@Url.Action(nameof(StatementController.GroupSearch), new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year=Model.ReportingDeadlineYear })" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-5" data-module="govuk-button">
-                    Select more organisations
-                </a>
+                <div class="govuk-button-group">
+                    <a class="govuk-button govuk-!-margin-right-3" href="@(Model.StatementOrganisations.Count > 0 ? Model.ContinueUrl : Model.SkipUrl)">Continue</a>
 
+                    <a href="@Url.Action(nameof(StatementController.GroupSearch), new {organisationIdentifier = Obfuscator.Obfuscate(Model.OrganisationId), year=Model.ReportingDeadlineYear })" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-5" data-module="govuk-button">
+                        Select more organisations
+                    </a>
+                </div>
             </div>
         }
     </div>

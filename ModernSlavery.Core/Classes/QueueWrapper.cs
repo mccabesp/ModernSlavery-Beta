@@ -1,18 +1,27 @@
-﻿using ModernSlavery.Core.Extensions;
+﻿using System;
 using Newtonsoft.Json;
 
 namespace ModernSlavery.Core.Classes
 {
     public class QueueWrapper
     {
-        public QueueWrapper(object message)
+        public QueueWrapper(object record)
         {
-            Message = Json.SerializeObject(message);
-            Type = message.GetType().ToString();
+            Record = record;
         }
 
-        public string Type { get; set; }
+        public string RecordJson { get; set; }
 
-        public string Message { get; set; }
+        [JsonIgnore]
+        public object Record {
+            get {
+                return string.IsNullOrWhiteSpace(RecordJson) ? null : JsonConvert.DeserializeObject(RecordJson, new JsonSerializerSettings {
+                    TypeNameHandling = TypeNameHandling.Auto
+                });
+            }
+            set {
+                RecordJson = value == null ? null : Core.Extensions.Json.SerializeObject(value, typeNameHandling: TypeNameHandling.All);
+            }
+        }
     }
 }

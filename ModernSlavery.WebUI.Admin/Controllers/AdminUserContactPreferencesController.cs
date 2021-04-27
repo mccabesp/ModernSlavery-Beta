@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -34,8 +35,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpGet("user/{id}/change-contact-preferences")]
-        public IActionResult ChangeContactPreferencesGet(long id)
+        public async Task<IActionResult> ChangeContactPreferencesGet(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var user = _adminService.SharedBusinessLogic.DataRepository.Get<User>(id);
 
             var viewModel = new AdminChangeUserContactPreferencesViewModel
@@ -50,8 +54,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpPost("user/{id}/change-contact-preferences")]
-        public IActionResult ChangeContactPreferencesPost(long id, AdminChangeUserContactPreferencesViewModel viewModel)
+        public async Task<IActionResult> ChangeContactPreferencesPost(long id, AdminChangeUserContactPreferencesViewModel viewModel)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var user = _adminService.SharedBusinessLogic.DataRepository.Get<User>(id);
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
@@ -69,7 +76,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 return View("ChangeContactPreferences", viewModel);
             }
 
-            auditLogger.AuditChangeToUser(
+            await auditLogger.AuditChangeToUserAsync(
                 this,
                 AuditedAction.AdminChangeUserContactPreferences,
                 user,
@@ -85,7 +92,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             user.AllowContact = viewModel.AllowContact;
             user.SendUpdates = viewModel.SendUpdates;
 
-            _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            await _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             return RedirectToAction("ViewUser", "AdminViewUser", new {id = user.UserId});
         }

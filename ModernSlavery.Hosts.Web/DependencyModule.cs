@@ -86,6 +86,7 @@ namespace ModernSlavery.Hosts.Web
                     if (_responseCachingOptions.Enabled)_responseCachingOptions.CacheProfiles.ForEach(p =>options.CacheProfiles.Add(p)); //Load the response cache profiles from options
                     options.Filters.Add<XssValidationFilter>(); //Checks for Xss
                     options.Filters.Add<ViewModelResultFilter>(); 
+                    options.Filters.Add<RedirectAntiforgeryValidationFailedResultFilter>(); //Handle AntiforgeryValidationException on sign in/out from 2 tabs
 
                 }).AddXmlSerializerFormatters().AddXmlDataContractSerializerFormatters();
 
@@ -141,7 +142,7 @@ namespace ModernSlavery.Hosts.Web
                     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; //Equivalent to <httpCookies requireSSL="true" /> from Web.Config
                     options.Cookie.HttpOnly = false; //Always use https cookies
                     options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict;
-                    options.Cookie.Domain = _sharedOptions.EXTERNAL_HOSTNAME.BeforeFirst(":"); //Domain cannot be an authority and contain a port number
+                    //options.Cookie.Domain = _sharedOptions.EXTERNAL_HOSTNAME.BeforeFirst(":"); //Domain cannot be an authority and contain a port number - Removed because IE11 doesnt like this which results in new session on every request
                     options.IdleTimeout = TimeSpan.FromMinutes(_sharedOptions.SessionTimeOutMinutes); //Equivalent to <sessionState timeout="20"> from old Web.config
 
                 });
@@ -228,6 +229,7 @@ namespace ModernSlavery.Hosts.Web
             }
             else
             {
+                //These pages handle unhandled exceptions  
                 app.UseExceptionHandler("/error/500");
                 app.UseStatusCodePagesWithReExecute("/error/{0}");
             }

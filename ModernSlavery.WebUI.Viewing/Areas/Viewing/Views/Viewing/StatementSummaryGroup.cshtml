@@ -8,10 +8,7 @@
 }
 
 @section BeforeMain {
-    <a class="govuk-back-link"
-       asp-controller="Viewing" asp-action="StatementSummary"
-       asp-route-organisationIdentifier="@first.ParentOrganisationId"
-       asp-route-year="@reportingYear">Back</a>
+    <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Controller.BackUrl">Back</a>
 }
 
 <div class="govuk-grid-row">
@@ -33,7 +30,10 @@
         {
             <div class="govuk-!-margin-top-2">
                 <p class="govuk-heading-s govuk-!-margin-bottom-1">@item.OrganisationName</p>
-                <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-bottom-1">@item.Address.GetFullAddress()</p>
+                @if (item.Address!=null)
+                {
+                    <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-bottom-1">@item.Address?.GetFullAddress()</p>
+                }
                 @if (!string.IsNullOrWhiteSpace(item.CompanyNumber))
                 {
                     <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-bottom-1">Company number: @item.CompanyNumber</p>

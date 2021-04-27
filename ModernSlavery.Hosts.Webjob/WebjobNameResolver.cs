@@ -1,16 +1,12 @@
 ﻿using Microsoft.Azure.WebJobs;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using static ModernSlavery.Hosts.Webjob.WebjobsOptions;
 
 namespace ModernSlavery.Hosts.Webjob
 {
-    public class WebjobNameResolver : INameResolver
+    public class WebJobNameResolver : INameResolver
     {
-        private readonly WebjobsOptions _webjobsOptions;
-        public WebjobNameResolver(WebjobsOptions webjobsOptions)
+        private readonly WebJobsOptions _webjobsOptions;
+        public WebJobNameResolver(WebJobsOptions webjobsOptions)
         {
             _webjobsOptions = webjobsOptions;
         }

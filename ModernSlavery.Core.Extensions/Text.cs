@@ -10,6 +10,10 @@ namespace ModernSlavery.Core.Extensions
 {
     public static class Text
     {
+        public const char Space = '\u0020';
+        public const char DoubleQuote = '\u0022';
+        public const char Apostrophe = '\u0027';
+
         public const string NumberChars = "0123456789";
         public const string UpperAlphaChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         public const string LowerAlphaChars = "abcdefghijklmnopqrstuvwxyz";
@@ -258,7 +262,7 @@ namespace ModernSlavery.Core.Extensions
                 return text;
             }
 
-            int i = text.LastIndexOf(separator, text.Length - 1, comparisionType);
+            var i = text.LastIndexOf(separator, text.Length - 1, comparisionType);
             if (i > -1)
             {
                 return text.Substring(0, inclusive ? i + 1 : i);
@@ -421,6 +425,61 @@ namespace ModernSlavery.Core.Extensions
             for (var i = position0; i < original.Length; ++i) chars[count++] = original[i];
 
             return new string(chars, 0, count);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string ReplaceSpaceSeparators(this string text)
+        {
+            //TODO: Test speed of this instead
+            //return (string)text.Select(ch => char.GetUnicodeCategory(ch) == System.Globalization.UnicodeCategory.SpaceSeparator ? Space : ch);
+
+            return text?
+                .Replace('\u00A0', Space)//Non-breaking Space (NBSP)
+                .Replace('\u1680', Space)//Ogham Space Mark
+                .Replace('\u2000', Space)//En Quad
+                .Replace('\u2001', Space)//Em Quad
+                .Replace('\u2002', Space)//En Space
+                .Replace('\u2003', Space)//Em Space
+                .Replace('\u2004', Space)//Three-Per-Em Space
+                .Replace('\u2005', Space)//Four-Per-Em Space
+                .Replace('\u2006', Space)//Siz-Per-Em Space
+                .Replace('\u2007', Space)//Figure Space
+                .Replace('\u2008', Space)//Punctuation Space
+                .Replace('\u2009', Space)//Thin Space
+                .Replace('\u200A', Space)//Hair Space
+                .Replace('\u202F', Space)//Narrow No-Break Space (NNBSP)
+                .Replace('\u205F', Space)//Medium Mathematical Space (MMSP)
+                .Replace('\u3000', Space);//Ideographic Space
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string ReplaceQuotePunctuation(this string text)
+        {
+            return text?
+                .Replace('\u2018', Apostrophe)//LEFT SINGLE QUOTATION MARK ‘
+                .Replace('\u201B', Apostrophe)//SINGLE HIGH-REVERSED-9 QUOTATION MARK ‛
+                .Replace('\u201C', DoubleQuote)//LEFT DOUBLE QUOTATION MARK “
+                .Replace('\u201F', DoubleQuote)//DOUBLE HIGH-REVERSED-9 QUOTATION MARK 	‟
+                .Replace('\u2E0C', Apostrophe)//LEFT RAISED OMISSION BRACKET ⸌
+
+                .Replace('\u201A', Apostrophe)//SINGLE LOW-9 QUOTATION MARK ‚
+                .Replace('\u201E', DoubleQuote)//DOUBLE LOW-9 QUOTATION MARK „
+                .Replace('\u2E42', DoubleQuote)//DOUBLE LOW-REVERSED-9 QUOTATION MARK ⹂
+                .Replace('\u301D', DoubleQuote)//REVERSED DOUBLE PRIME QUOTATION MARK〝
+                .Replace('\u301E', DoubleQuote)//DOUBLE PRIME QUOTATION MARK 〞
+                .Replace('\u301F', DoubleQuote)//LOW DOUBLE PRIME QUOTATION MARK
+
+                .Replace('\u2019', Apostrophe)//RIGHT SINGLE QUOTATION MARK ’
+                .Replace('\u201D', DoubleQuote)//RIGHT DOUBLE QUOTATION MARK ”
+                .Replace('\u2E0D', Apostrophe);//RIGHT RAISED OMISSION BRACKET ⸍
         }
 
         public static bool StartsWithI(this string original, params string[] texts)

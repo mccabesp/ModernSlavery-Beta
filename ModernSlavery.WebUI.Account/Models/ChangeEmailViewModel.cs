@@ -11,11 +11,11 @@ namespace ModernSlavery.WebUI.Account.Models
     {
         [Required(AllowEmptyStrings = false, ErrorMessageResourceName = nameof(AccountResources.EmailAddressRequired))]
         [EmailAddress]
+        [MaxLength(254, ErrorMessageResourceName = nameof(AccountResources.EmailAddressLength))]
         [Display(Name = nameof(EmailAddress))]
         public string EmailAddress { get; set; }
 
-        [Required(AllowEmptyStrings = false,
-            ErrorMessageResourceName = nameof(AccountResources.ConfirmEmailAddressRequired))]
+        [Required(AllowEmptyStrings = false,ErrorMessageResourceName = nameof(AccountResources.ConfirmEmailAddressRequired))]
         [Compare(nameof(EmailAddress), ErrorMessageResourceName = nameof(AccountResources.ConfirmEmailAddressCompare))]
         [Display(Name = nameof(ConfirmEmailAddress))]
         [EmailAddress]

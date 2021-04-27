@@ -17,7 +17,7 @@ namespace ModernSlavery.WebUI.Registration.Models
     public class AddOrganisationViewModel : BaseViewModel
     {
         [Required(AllowEmptyStrings = false)]
-        [StringLength(100, MinimumLength = 3)]
+        [StringLength(160, MinimumLength = 3)]
         [Text]
         public string OrganisationName { get; set; }
 

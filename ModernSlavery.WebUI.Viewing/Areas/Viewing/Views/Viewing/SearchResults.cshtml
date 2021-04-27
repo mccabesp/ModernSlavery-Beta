@@ -10,7 +10,7 @@
     }
 }
 @section BeforeMain {
-    <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Url.WithQuery("Search", null)">Back</a>
+    <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Controller.BackUrl">Back</a>
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <div class="right">
@@ -84,7 +84,7 @@
                 onRefresh: function () {
                     GOVUK.stickAtTopWhenScrolling.init();
                 },
-                onError: function(errorCode, error, errorThrown) {
+                onError: function (errorCode, error, errorThrown) {
                     window.location.href = '/error/408';
                 }
             });

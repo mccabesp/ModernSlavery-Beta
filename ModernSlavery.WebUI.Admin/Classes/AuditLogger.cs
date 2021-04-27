@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
@@ -20,19 +21,19 @@ namespace ModernSlavery.WebUI.Admin.Classes
             this.session = session;
         }
 
-        public void AuditChangeToOrganisation(Controller controller, AuditedAction action, Organisation organisation,
+        public async Task AuditChangeToOrganisationAsync(Controller controller, AuditedAction action, Organisation organisation,
             object anonymousObject)
         {
             var details = ExtractDictionaryOfDetailsFromAnonymousObject(anonymousObject);
 
-            AuditActionToOrganisation(controller, action, organisation.OrganisationId, details);
+            await AuditActionToOrganisationAsync(controller, action, organisation.OrganisationId, details);
         }
 
-        public void AuditChangeToUser(Controller controller, AuditedAction action, User user, object anonymousObject)
+        public async Task AuditChangeToUserAsync(Controller controller, AuditedAction action, User user, object anonymousObject)
         {
             var details = ExtractDictionaryOfDetailsFromAnonymousObject(anonymousObject);
 
-            AuditActionToUser(controller, action, user.UserId, details);
+            await AuditActionToUserAsync(controller, action, user.UserId, details);
         }
 
         private static Dictionary<string, string> ExtractDictionaryOfDetailsFromAnonymousObject(object anonymousObject)
@@ -53,7 +54,7 @@ namespace ModernSlavery.WebUI.Admin.Classes
             return details;
         }
 
-        private void AuditActionToOrganisation(Controller controller, AuditedAction action, long organisationId,
+        private async Task AuditActionToOrganisationAsync(Controller controller, AuditedAction action, long organisationId,
             Dictionary<string, string> details)
         {
             if (controller == null) throw new ArgumentNullException(nameof(controller));
@@ -78,10 +79,10 @@ namespace ModernSlavery.WebUI.Admin.Classes
                     DetailsDictionary = details
                 });
 
-            dataRepository.SaveChangesAsync().Wait();
+            await dataRepository.SaveChangesAsync();
         }
 
-        private void AuditActionToUser(Controller controller, AuditedAction action, long actionTakenOnUserId,
+        private async Task AuditActionToUserAsync(Controller controller, AuditedAction action, long actionTakenOnUserId,
             Dictionary<string, string> details)
         {
             if (controller == null) throw new ArgumentNullException(nameof(controller));
@@ -108,7 +109,7 @@ namespace ModernSlavery.WebUI.Admin.Classes
                     DetailsDictionary = details
                 });
 
-            dataRepository.SaveChangesAsync().Wait();
+            await dataRepository.SaveChangesAsync();
         }
     }
 }

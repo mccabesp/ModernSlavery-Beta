@@ -1,4 +1,5 @@
 {
+  "KeepConsoleLogDays": 0, //forever=0; disable=-1 
   "AzureWebJobsStorage": "$(Storage:AzureConnectionString)",
   "CompaniesHouse": {
     "RetryPolicy": "Exponential"
@@ -6,37 +7,36 @@
   "PostcodeChecker": {
     "RetryPolicy": "Exponential"
   },
-  "Webjobs": {
-    "CheckSiteCertAsync": {
-      "Action": "Disable",
+  "WebJobs": {
+    "CheckSiteCert": {
+      "Action": "Enable",
       "Trigger": "01:00:00:00"
     },
-    "ExecuteWebjob": { "Action": "Enable" },
-    "FixLatestAsync": {
+    "Execute": { "Action": "Enable" },
+    "FixLatest": {
       "Action": "Enable",
       "Trigger": "00:01:00:00"
     },
     "FixOrganisationAddresses": { "Action": "Enable" },
-    "LogEvent": { "Action": "Enable" },
     "LogRecord": { "Action": "Enable" },
     "MergeLogs": {
-      "Action": "Disable",
+      "Action": "Enable",
       "Trigger": "01:00:00:00"
     },
-    "PurgeStatementData": {
-      "Action": "Disable",
+    "PurgeStatements": {
+      "Action": "Enable",
       "Trigger": "01:00:00:00"
     },
     "PurgeOrganisations": {
-      "Action": "Disable",
+      "Action": "Enable",
       "Trigger": "01:00:00:00"
     },
     "PurgeRegistrations": {
-      "Action": "Disable",
+      "Action": "Enable",
       "Trigger": "01:00:00:00"
     },
     "PurgeUsers": {
-      "Action": "Disable",
+      "Action": "Enable",
       "Trigger": "01:00:00:00"
     },
     "ReferenceOrganisations": {
@@ -46,11 +46,11 @@
     "SendEmail": { "Action": "Enable" },
     "SendNotifyEmail": { "Action": "Enable" },
     "SendReminderEmails": {
-      "Action": "Enable",
+      "Action": "Disable",
       "Trigger": "00:01:00:00"
     },
-    "SetIsUkAddressesAsync": {
-      "Action": "Disable",
+    "SetIsUkAddresses": {
+      "Action": "Enable",
       "Trigger": "01:00:00:00"
     },
     "SetPresumedScopes": {
@@ -58,21 +58,21 @@
       "Trigger": "01:00:00:00"
     },
     "StorageHealthCheck": { "Action": "Disable" },
-    "TakeSnapshotAsync": { "Action": "Disable" },
-    "UpdateFromCompaniesHouseAsync": {
+    "TakeSnapshot": { "Action": "Enable" },
+    "UpdateFromCompaniesHouse": {
       "Action": "Enable",
       "Trigger": "00:01:00:00"
     },
-    "UpdateOrganisationsAsync": { "Action": "Enable" },
-    "UpdateOrphanOrganisationsAsync": { "Action": "Enable" },
-    "UpdateRegistrationAddressesAsync": { "Action": "Enable" },
+    "UpdateOrganisations": { "Action": "Enable" },
+    "UpdateOrphanOrganisations": { "Action": "Enable" },
+    "UpdateRegistrationAddresses": { "Action": "Enable" },
     "UpdateRegistrations": { "Action": "Enable" },
-    "UpdateScopes": { "Action": "Disable" },
-    "UpdateOrganisationSearchIndexesAsync": {
-      "Action": "Disable",
+    "UpdateScopes": { "Action": "Enable" },
+    "UpdateOrganisationSearchIndexes": {
+      "Action": "Enable",
       "Trigger": "00:03:00:00"
     },
-    "UpdateSubmissions": { "Action": "Disable" },
+    "UpdateSubmissions": { "Action": "Enable" },
     "UpdateUnverifiedRegistrations": { "Action": "Enable" },
     "UpdateUsers": { "Action": "Enable" },
     "UpdateUsersToContactForFeedback": { "Action": "Enable" },

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
+using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes;
@@ -32,7 +33,7 @@ namespace ModernSlavery.WebUI.Submission
         {
             //Register dependencies here
             builder.RegisterType<StatementPresenter>().As<IStatementPresenter>()
-                .InstancePerLifetimeScope();
+                .InstancePerLifetimeScope().WithAttributeFiltering();
             builder.RegisterType<ScopePresenter>().As<IScopePresenter>().InstancePerLifetimeScope();
 
             builder.RegisterType<OrganisationRepository>()

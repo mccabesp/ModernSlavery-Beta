@@ -22,15 +22,15 @@
                 </span>
             </summary>
             <div class="govuk-details__text">
-                @Html.Linebreak(Model.LatestAddress,Environment.NewLine,",")
-                <div>
+                @Html.Linebreak(Model.LatestAddress, Environment.NewLine, ",")
+                <h2 class="govuk-heading-s govuk-!-margin-top-7 govuk-!-margin-bottom-1">
                     What to do if the organisation’s address is incorrect?
-                </div>
-                <div>
+                </h2>
+                <p class="govuk-body">
                     If you are a private or voluntary organisation and need to change your organisation name, sector information, or address you should do this via Companies House.
                     Changes that you make will automatically be reflected on this site.
                     If this information is not available on Companies House, please contact <a class="govuk-link" href="mailto:modernslaverystatements@homeoffice.gov.uk">modernslaverystatements@homeoffice.gov.uk</a>
-                </div>
+                </p>
             </div>
         </details>
 
@@ -43,18 +43,24 @@
             Manage your modern slavery statements
         </h2>
 
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                You should select the year when your statement was due to be published on your website. This is 6 months after your financial year end.  
+            </strong>
+        </div>
         <details class="govuk-details" data-module="govuk-details">
             <summary class="govuk-details__summary">
                 <span class="govuk-details__summary-text">
-                    What is the statement year?
+                    Read more about which year to select for your statement
                 </span>
             </summary>
             <div class="govuk-details__text">
-                The statement year relates to the date by which you have to publish your modern slavery statement on your website.
-                <br>
-                For example, if you have to publish your statement by 31 March 2020, your statement year is 2020.
-                <br>
-                The statutory guidance states that you should publish your statement on your website within 6 months of your organisation’s financial year-end.
+                <p>If your financial year end was before June 2020, select 2020 for the statement covering this period (as it was due to be published before the end of 2020).</p>
+                <p>If your financial year end was after June 2020, select 2021 as the statement year (as it is due to be published in 2021).</p>
+                <p>If your financial year end this year is before June 2021, select 2021 for the statement covering this period (as it is due to be published before the end of 2021).</p>
+                <p>If your financial year end is after June 2021, your statement is not due to be published yet.</p>
             </div>
         </details>
     </div>
@@ -94,7 +100,7 @@
 </div>
 
 <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
+    <div class="govuk-grid-column-two-thirds">
         <h2 class="govuk-heading-m">
             Users who can add statements for this organisation
         </h2>
@@ -137,7 +143,7 @@
                         <tr>
                             <td style="border: none;" class="org-name">@userFullname</td>
                             <td style="border: none;">
-                                <a href="@Url.ActionArea("RemoveOrganisation","Registration", "Registration", new {orgId = Model.OrganisationIdentifier, userId = encUserId})">
+                                <a class="govuk-link" href="@Url.ActionArea("RemoveOrganisation","Registration", "Registration", new {orgId = Model.OrganisationIdentifier, userId = encUserId})">
                                     Remove
                                 </a>
                             </td>

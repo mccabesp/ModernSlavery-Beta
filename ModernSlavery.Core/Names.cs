@@ -23,12 +23,12 @@ namespace ModernSlavery.Core
 
     public static class UserRoleNames
     {
-        public const string Submitter = "SubmitterRole";
-        public const string Admin = "AdminRole";
-        public const string DatabaseAdmin = "DatabaseAdminRole";
-        public const string SuperAdmin = "SuperAdminRole";
-        public const string DevOpsAdmin = "DevOpsAdminRole";
-        public const string SuperOrDatabaseAdmins = "SuperAdminRole,DatabaseAdminRole";
+        public const string Submitter = nameof(UserRoleTypes.Submitter);
+        public const string BasicAdmin = nameof(UserRoleTypes.BasicAdmin);
+        public const string DatabaseAdmin = nameof(UserRoleTypes.DatabaseAdmin);
+        public const string SuperAdmin = nameof(UserRoleTypes.SuperAdmin);
+        public const string DevOpsAdmin = nameof(UserRoleTypes.DevOpsAdmin);
+        public const string SuperOrDatabaseAdmins = nameof(UserRoleTypes.DatabaseAdmin) + "," + nameof(UserRoleTypes.SuperAdmin);
     }
 
     public static class Filenames

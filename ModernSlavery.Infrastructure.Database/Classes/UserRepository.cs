@@ -9,19 +9,20 @@ using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Database.Classes
 {
     public class UserRepository : IUserRepository
     {
-        private readonly DatabaseOptions DatabaseOptions;
-        private readonly SharedOptions SharedOptions;
+        private readonly DatabaseOptions _databaseOptions;
+        private readonly SharedOptions _sharedOptions;
 
         public UserRepository(DatabaseOptions databaseOptions, SharedOptions sharedOptions,
             IDataRepository dataRepository, IUserLogger userAuditLog, IMapper autoMapper)
         {
-            DatabaseOptions = databaseOptions ?? throw new ArgumentNullException(nameof(databaseOptions));
-            SharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
+            _databaseOptions = databaseOptions ?? throw new ArgumentNullException(nameof(databaseOptions));
+            _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
             DataRepository = dataRepository ?? throw new ArgumentNullException(nameof(dataRepository));
             UserAuditLog = userAuditLog ?? throw new ArgumentNullException(nameof(userAuditLog));
             AutoMapper = autoMapper ?? throw new ArgumentNullException(nameof(autoMapper));
@@ -43,7 +44,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
 
         public async Task<User> FindByEmailAsync(string email, params UserStatuses[] filterStatuses)
         {
-            if (DatabaseOptions.EncryptEmails)
+            if (_databaseOptions.EncryptEmails)
             {
                 var encryptedEmail = Encryption.EncryptData(email.ToLower());
 
@@ -71,22 +72,27 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                 x.Fullname.ToLower().Contains(nameForSearch) || x.ContactFullname.ToLower().Contains(nameForSearch)).ConfigureAwait(false);
         }
 
+        public TimeSpan GetUserLoginLockRemaining(User user)=>user.LoginDate == null || user.LoginAttempts==0 || (user.LoginAttempts % _sharedOptions.MaxLoginAttempts)!=0
+               ? TimeSpan.Zero
+               : user.LoginDate.Value.AddMinutes(_sharedOptions.LockoutMinutes) - VirtualDateTime.Now;
+
         public async Task<bool> CheckPasswordAsync(User user, string password)
         {
             try
             {
                 user.LoginDate = VirtualDateTime.Now;
-                if (CheckPasswordBasedOnHashingAlgorithm(user, password))
+                if (!CheckPasswordBasedOnHashingAlgorithm(user, password))
                 {
-                    user.LoginAttempts = 0;
-
-                    if (user.HashingAlgorithm != HashingAlgorithm.PBKDF2) UpdateUserPasswordUsingPBKDF2(user, password);
-
-                    return true;
+                    //Prevent overflow exception
+                    if (user.LoginAttempts >= System.Data.SqlTypes.SqlInt32.MaxValue.Value)user.LoginAttempts = user.LoginAttempts % _sharedOptions.MaxLoginAttempts;
+                    
+                    user.LoginAttempts++;
+                    return false;
                 }
 
-                user.LoginAttempts++;
-                return false;
+                user.LoginAttempts = 0;
+                if (user.HashingAlgorithm != HashingAlgorithm.PBKDF2) await UpdateUserPasswordUsingPBKDF2Async(user, password);
+                return true;
             }
             finally
             {
@@ -130,7 +136,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
                 throw new ArgumentException(
                     $"Can only update passwords for active users. UserId={userToUpdate.UserId}");
 
-            UpdateUserPasswordUsingPBKDF2(userToUpdate, newPassword);
+            await UpdateUserPasswordUsingPBKDF2Async(userToUpdate, newPassword);
 
             userToUpdate.Modified = VirtualDateTime.Now;
 
@@ -205,16 +211,16 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             throw new NotImplementedException();
         }
 
-        public void UpdateUserPasswordUsingPBKDF2(User user, string password)
+        public async Task UpdateUserPasswordUsingPBKDF2Async(User currentUser, string password)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
+            if (currentUser == null) throw new ArgumentNullException(nameof(currentUser));
 
             var salt = Crypto.GetSalt();
-            user.Salt = Convert.ToBase64String(salt);
-            user.PasswordHash = Crypto.GetPBKDF2(password, salt);
-            user.HashingAlgorithm = HashingAlgorithm.PBKDF2;
+            currentUser.Salt = Convert.ToBase64String(salt);
+            currentUser.PasswordHash = Crypto.GetPBKDF2(password, salt);
+            currentUser.HashingAlgorithm = HashingAlgorithm.PBKDF2;
 
-            DataRepository.SaveChangesAsync().Wait();
+            await DataRepository.SaveChangesAsync();
         }
 
         private bool CheckPasswordBasedOnHashingAlgorithm(User user, string password)
@@ -222,7 +228,7 @@ namespace ModernSlavery.Infrastructure.Database.Classes
             switch (user.HashingAlgorithm)
             {
                 case HashingAlgorithm.Unhashed:
-                    if (SharedOptions.IsProduction()) break;
+                    if (_sharedOptions.IsProduction()) break;
                     return user.PasswordHash == password;
                 case HashingAlgorithm.SHA512:
                     return user.PasswordHash == Crypto.GetSHA512Checksum(password);

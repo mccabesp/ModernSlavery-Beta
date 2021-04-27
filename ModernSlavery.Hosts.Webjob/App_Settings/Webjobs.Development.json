@@ -1,0 +1,5 @@
+{
+  "WebJobs": {
+    "KeepConsoleLogDays": 7
+  }
+}

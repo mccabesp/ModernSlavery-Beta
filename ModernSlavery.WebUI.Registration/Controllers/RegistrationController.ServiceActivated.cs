@@ -106,9 +106,10 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 userOrg.Organisation.LatestRegistration = userOrg;
 
                 //Retire the old address 
-                if (userOrg.Organisation.LatestAddress != null && userOrg.Organisation.LatestAddress.AddressId != userOrg.Address.AddressId)
+                var latestAddress = userOrg.Organisation.LatestAddress ?? userOrg.Organisation.GetLatestAddress();
+                if (latestAddress != null && latestAddress.AddressId != userOrg.Address.AddressId)
                 {
-                    userOrg.Organisation.LatestAddress.SetStatus(AddressStatuses.Retired,OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,"Replaced by PIN in post");
+                    latestAddress.SetStatus(AddressStatuses.Retired,OriginalUser == null ? VirtualUser.UserId : OriginalUser.UserId,"Replaced by PIN in post");
                     updateSearchIndex = true;
                 }
 
@@ -117,7 +118,6 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                 userOrg.Organisation.LatestAddress = userOrg.Address;
                 userOrg.ConfirmAttempts = 0;
 
-                model.AccountingDate = _registrationService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(userOrg.Organisation.SectorType);
                 model.OrganisationId = userOrg.OrganisationId;
                 model.OrganisationName = userOrg.Organisation.OrganisationName;
                 StashModel(model);
@@ -143,7 +143,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                     Status = "PIN Confirmed",
                     ActionBy = VirtualUser.EmailAddress,
                     Details = "",
-                    Sector = userOrg.Organisation.SectorType,
+                    Sector = userOrg.Organisation.SectorType.ToString(),
                     Organisation = userOrg.Organisation.OrganisationName,
                     CompanyNo = userOrg.Organisation.CompanyNumber,
                     Address = userOrg?.Address.GetAddressString(),

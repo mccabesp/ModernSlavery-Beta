@@ -19,13 +19,12 @@ namespace ModernSlavery.Core.Extensions
             return default(T);
         }
 
-        public static IEnumerable<T> GetValues<T>() where T : Enum
+        public static IEnumerable<T> GetValues<T>(params T[] exceptions) where T : Enum
         {
-            return Enum.GetValues(typeof(T)).Cast<T>();
+            var values=Enum.GetValues(typeof(T)).Cast<T>();
+            if (exceptions.Any()) values = values.Except(exceptions);
+            return values;
         }
-
-        public static IEnumerable<T> GetValuesExcept<T>(params T[] exceptions) where T : Enum
-            => GetValues<T>().Except(exceptions);
 
         /// <summary>
         /// Returns the description text provided by a DescriptionAttribute or DisplayAttribute
@@ -40,6 +39,28 @@ namespace ModernSlavery.Core.Extensions
             if (string.IsNullOrWhiteSpace(description)) description=value.GetAttribute<DisplayAttribute>()?.Description;
             if (string.IsNullOrWhiteSpace(description)) description= value.ToString();
             return description;
+        }
+
+        public static IEnumerable<string> GetEnumDescriptions<T>(params T[] exceptions) where T : Enum
+        {
+            foreach (var value in GetValues(exceptions))
+                yield return value.GetEnumDescription();
+        }
+
+        public static bool TryCast<TEnum,TInt>(this TInt value, out TEnum result) where TEnum : Enum
+        {
+            if (Enum.TryParse(typeof(TEnum), value.ToString(),out var result1))
+            {
+                result = (TEnum)result1;
+                return true;
+            }
+            result = default;
+            return false;
+        }
+
+        public static string GetEnumOrValueDescription<TEnum, TInt>(this TInt value) where TEnum : Enum
+        {
+            return TryCast(value, out TEnum httpStatusCode) ? httpStatusCode.ToString() : value.ToString();
         }
     }
 }

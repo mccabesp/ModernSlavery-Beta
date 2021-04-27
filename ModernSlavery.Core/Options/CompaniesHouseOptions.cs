@@ -16,6 +16,8 @@ namespace ModernSlavery.Core.Options
         public int MaxPageSize { get; set; } = 100;
         public int MaxResponseCompanies { get; set; } = 400;
         public int MaxApiCallsPerFiveMins { get; set; } = 600;//The maximum allowed updates in a 5 min interval per ApiKey
+        public int BatchUpdateSize { get; set; } = 1000;//The number of updates per webjob execition
+
         public int UpdateHours { get; set; } = 24;//How often to check for updates
         public RetryPolicyTypes RetryPolicy { get; set; } = RetryPolicyTypes.None;
         public void Validate()

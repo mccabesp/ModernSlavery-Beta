@@ -44,7 +44,7 @@
                     </div>
 
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var auditType in Enums.GetValuesExcept<SocialAuditTypes>(SocialAuditTypes.Unknown))
+                        @foreach (var auditType in Enums.GetValues<SocialAuditTypes>(SocialAuditTypes.Unknown))
                         {
                             var value = (int)auditType;
                             var isNone = auditType == SocialAuditTypes.None;

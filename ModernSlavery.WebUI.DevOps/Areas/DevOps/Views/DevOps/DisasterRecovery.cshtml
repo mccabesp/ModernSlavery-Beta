@@ -1,12 +1,130 @@
 ﻿@model DisasterRecoveryViewModel
-@{Layout = "/Views/GdsLayout.cshtml";}
+@inject Microsoft.Extensions.Hosting.IHostEnvironment hostEnvironment;
+@inject DevOpsOptions devopsOptions;
 @{
+    Layout = "/Views/GdsLayout.cshtml";
     Title = "DevOps - Disaster Recovery";
 }
 @section BeforeMain {
     <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Url.Action("Home")">Back to DevOps home</a>
 }
-<h2 style="float:right">DevOps</h2>
+<h2 style="float:right">
+    <span>DevOps</span>
+    <span style="font-weight:normal">(@hostEnvironment.EnvironmentName)</span>
+</h2>
 <h1 class="heading-large" style="margin-top: 0.3em;">
     <span id="companyname">Disaster Recovery</span>
 </h1>
+
+<main id="content" role="main">
+    <div class="grid-row">
+        <div class="column-full">
+
+            @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
+            {
+                @await Html.GovUkValidationSummaryAsync()
+
+                @Html.AntiForgeryToken()
+
+                <h3>
+                    <span>Database Backups:</span>
+                    <span style="font-weight:normal">Server: @(Model?.SqlServerName)</span>
+                </h3>
+
+                <fieldset>
+                    <div>
+
+                        @if (Model.Databases != null && Model.Databases.Any())
+                        {
+                            <label for="databaseIndex" class="govuk-heading-s">Database:</label>
+                            <select id="databaseIndex" name="databaseIndex" class="govuk-select">
+                                <option value="-1" selected="@(Model.SelectedDatabaseIndex<0)">[Select database]</option>
+                                @for (var d = 0; d < Model.Databases.Count; d++)
+                                {
+                                    <option value="@d" selected="@(d==Model.SelectedDatabaseIndex)">@Model.Databases[d]</option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <p><b>No databases found</b></p>
+                        }
+                    </div>
+
+                    <div style="margin-top:20px">
+                        @if (Model.Backups != null && Model.Backups.Any())
+                        {
+                            <label for="backupIndex" class="govuk-heading-s">Backups:</label>
+                            <select id="backupIndex" name="backupIndex" class="govuk-select">
+                                <option value="-1" selected="selected">[Select backup]</option>
+                                @for (var b = 0; b < Model.Backups.Count; b++)
+                                {
+                                    <option value="@b">@Model.GetName(b)</option>
+                                }
+                            </select>
+                            <p class="govuk-body govuk-!-margin-top-3">
+                                @if (devopsOptions.AllowDatabaseRestore)
+                                {
+                                    <button class="govuk-button" role="button" name="Action" value="Restore">Restore</button>
+                                }
+                                @if (devopsOptions.AllowBackupDelete)
+                                {
+                                    <button class="govuk-button" role="button" name="Action" value="Delete">Delete</button>
+                                }
+                            </p>
+                        }
+                        else
+                        {
+                            <p><b>No backups found</b></p>
+                        }
+                    </div>
+                </fieldset>
+                <p class="govuk-body govuk-!-margin-top-3">
+                    @if (devopsOptions.AllowDatabaseBackup)
+                    {
+                        <button class="govuk-button" role="button" name="Action" value="CreateDac">Create DacPac</button>
+                        <button class="govuk-button" role="button" name="Action" value="CreateBac">Create BacPac</button>
+                    }
+                    @if (devopsOptions.AllowBackupDownload && Model.Backups != null && Model.Backups.Any())
+                    {
+                        <a class="govuk-button govuk-button--secondary" role="button" name="Action" value="Download" target="_blank">Download</a>
+                    }
+                </p>
+            }
+        </div>
+
+    </div>
+</main>
+@section AfterLoadedCompiledScripts {
+    <script type="text/javascript" nonce="@Html.GetNonce()">
+        $(document).on("submit",
+            "form",
+            function (e) {
+
+                //Must use a timout here otherwise the 'value' field of submitted buttons is never submitted
+                setTimeout(function () { $("button").attr("disabled", true); }, 0);
+            });
+
+        $(function () {
+            "use strict";
+            jQuery("[value=Restore]").click(function () {
+                if (!confirm('Are you sure you want to restore this database backup?')) return false;
+            });
+            jQuery("[value=Delete]").click(function () {
+                if (!confirm('Are you sure you want to delete this database backup?')) return false;
+            });
+            jQuery("[value=CreateBac]").click(function () {
+                if (!confirm('Are you sure you want to create a new database Bac backup?')) return false;
+            });
+            jQuery("[value=CreateDac]").click(function () {
+                if (!confirm('Are you sure you want to create a new database Dac backup?')) return false;
+            });
+            jQuery("[value=Download]").click(function () {
+                if (!confirm('Are you sure you want to download this backup?')) return false;
+                var index = jQuery("[name=backupIndex]").val();
+                jQuery("[value=Download]").attr("href", "download-backup/" + index);
+            });
+        });
+    </script>
+}
+

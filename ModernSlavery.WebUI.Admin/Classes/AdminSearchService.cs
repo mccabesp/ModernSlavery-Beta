@@ -187,8 +187,7 @@ namespace ModernSlavery.WebUI.Admin.Classes
                 .Where(
                     organisation =>
                     {
-                        var nameMatches =
-                            CurrentOrPreviousOrganisationNameMatchesSearchTerms(organisation, searchTerms);
+                        var nameMatches = CurrentOrPreviousOrganisationNameMatchesSearchTerms(organisation, searchTerms);
                         var organisationRefMatches = organisation.OrganisationReference?.Trim() == query.Trim();
                         var companyNumberMatches = organisation.CompanyNumber?.Trim() == query.Trim();
                         return nameMatches || organisationRefMatches || companyNumberMatches;
@@ -209,7 +208,7 @@ namespace ModernSlavery.WebUI.Admin.Classes
         private bool CurrentOrPreviousOrganisationNameMatchesSearchTerms(AdminSearchServiceOrganisation organisation,
             List<string> searchTerms)
         {
-            return organisation.OrganisationNames.Any(on => NameMatchesSearchTerms(on, searchTerms));
+            return searchTerms.All(st => organisation.OrganisationName.ToLower().Contains(st)) || organisation.OrganisationNames.Any(on => NameMatchesSearchTerms(on, searchTerms));
         }
 
         private bool NameMatchesSearchTerms(string name, List<string> searchTerms)

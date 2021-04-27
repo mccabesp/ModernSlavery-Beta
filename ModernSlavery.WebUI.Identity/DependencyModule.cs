@@ -40,16 +40,15 @@ namespace ModernSlavery.WebUI.Identity
             services.AddSingleton<IEventSink, AuditEventSink>();
 
             var identityServer = services.AddIdentityServer(
-                    options =>
-                    {
-                        if (!string.IsNullOrWhiteSpace(_identityServerOptions.PublicOrigin))options.PublicOrigin = _identityServerOptions.PublicOrigin;
+                    options => {
+                        if (!string.IsNullOrWhiteSpace(_identityServerOptions.PublicOrigin)) options.PublicOrigin = _identityServerOptions.PublicOrigin;
                         options.Events.RaiseSuccessEvents = true;
                         options.Events.RaiseFailureEvents = true;
                         options.Events.RaiseErrorEvents = true;
-                        options.UserInteraction.LoginUrl = "/identity/sign-in";
+                        options.UserInteraction.LoginUrl = "/sign-in";
                         options.UserInteraction.LogoutUrl = "/identity/sign-out";
                         options.UserInteraction.ErrorUrl = "/identity/error";
-                        options.Authentication.CookieLifetime= TimeSpan.FromMinutes(_sharedOptions.SessionTimeOutMinutes);
+                        options.Authentication.CookieLifetime = TimeSpan.FromMinutes(_sharedOptions.SessionTimeOutMinutes);
                         options.Authentication.CookieSlidingExpiration = true;
                     })
                 .AddInMemoryClients(_identityServerOptions.Clients)
@@ -58,8 +57,8 @@ namespace ModernSlavery.WebUI.Identity
                     new IdentityResources.OpenId(),
                     new IdentityResources.Profile(),
                     new IdentityResource {Name = "roles", UserClaims = new List<string> {ClaimTypes.Role}}
-                })
-                .AddResourceOwnerValidator<CustomResourceOwnerPasswordValidator>();
+                });
+                //.AddResourceOwnerValidator<CustomResourceOwnerPasswordValidator>();
                 //.AddProfileService<CustomProfileService>();
 
             if (!string.IsNullOrWhiteSpace(_sharedOptions.CertThumbprint))
@@ -104,7 +103,7 @@ namespace ModernSlavery.WebUI.Identity
             var expires = cert.GetExpirationDateString().ToDateTime();
             var remainingTime = expires - VirtualDateTime.Now;
             if (expires < VirtualDateTime.UtcNow)
-                _logger.LogError($"Certificate '{cert.FriendlyName}' from thumbprint '{certThumbprint}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
+                _logger.LogError(new Exception(), $"Certificate '{cert.FriendlyName}' from thumbprint '{certThumbprint}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
             else if (expires < VirtualDateTime.UtcNow.AddDays(certExpiresWarningDays))
                 _logger.LogWarning($"Certificate '{cert.FriendlyName}' from thumbprint '{certThumbprint}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
             else
@@ -124,7 +123,7 @@ namespace ModernSlavery.WebUI.Identity
             var expires = cert.GetExpirationDateString().ToDateTime();
             var remainingTime = expires - VirtualDateTime.Now;
             if (expires < VirtualDateTime.UtcNow)
-                _logger.LogError($"Certificate '{cert.FriendlyName}' from file '{filepath}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
+                _logger.LogError(new Exception(),$"Certificate '{cert.FriendlyName}' from file '{filepath}' expired on {expires.ToFriendlyDate()} and needs replacing immediately.");
             else if (expires < VirtualDateTime.UtcNow.AddDays(certExpiresWarningDays))
                 _logger.LogWarning($"Certificate '{cert.FriendlyName}' from file '{filepath}' is due expire on {expires.ToFriendlyDate()} and will need replacing within {remainingTime.ToFriendly(maxParts: 2)}.");
             else

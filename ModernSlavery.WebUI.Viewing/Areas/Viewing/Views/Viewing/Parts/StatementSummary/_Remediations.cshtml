@@ -35,7 +35,7 @@ else if (Model.Remediations.Any())
                     Organisation’s response
                 </div>
             </div>
-            @foreach (var remediation in Enums.GetValuesExcept<RemediationTypes>(RemediationTypes.Unknown, RemediationTypes.None))
+            @foreach (var remediation in Enums.GetValues<RemediationTypes>(RemediationTypes.Unknown, RemediationTypes.None))
             {
                 var isOther = remediation == RemediationTypes.Other;
                 <div class="app-question-list__item">
@@ -52,14 +52,14 @@ else if (Model.Remediations.Any())
                         }
                         else
                         {
-                            <div @(string.IsNullOrEmpty(Model.OtherTrainingTargets) ? "aria-description='no answer provided'" : "") class="app-question-list__response-details">
-                                @if (string.IsNullOrEmpty(Model.OtherTrainingTargets))
+                            <div @(string.IsNullOrEmpty(Model.OtherRemediations) ? "aria-description='no answer provided'" : "") class="app-question-list__response-details">
+                                @if (string.IsNullOrEmpty(Model.OtherRemediations))
                                 {
                                     <text>-</text>
                                 }
                                 else
                                 {
-                                    <text>@Model.OtherTrainingTargets</text>
+                                    <text>@Model.OtherRemediations</text>
                                 }
                             </div>
                         }

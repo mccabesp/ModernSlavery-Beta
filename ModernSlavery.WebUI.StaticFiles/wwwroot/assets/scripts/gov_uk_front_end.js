@@ -1683,7 +1683,8 @@
         };
 
 // Counts characters or words in text
-        CharacterCount.prototype.count = function(text) {
+        CharacterCount.prototype.count = function (text) {
+            var text = text.replace(/\n/g, "\r\n");
             var length;
             if (this.options.maxwords) {
                 var tokens = text.match(/\S+/g) || []; // Matches consecutive non-whitespace chars

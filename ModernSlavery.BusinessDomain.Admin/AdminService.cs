@@ -19,7 +19,6 @@ namespace ModernSlavery.BusinessDomain.Admin
             IShortCodesRepository shortCodesRepository,
             IOrganisationBusinessLogic organisationBusinessLogic,
             ISearchBusinessLogic searchBusinessLogic,
-            IStatementBusinessLogic statementBusinessLogic,
             IUserRepository userRepository,
             [KeyFilter(QueueNames.ExecuteWebJob)] IQueue executeWebjobQueue,
             [KeyFilter("Private")] IPagedRepository<OrganisationRecord> privateSectorRepository,
@@ -36,7 +35,6 @@ namespace ModernSlavery.BusinessDomain.Admin
             ShortCodesRepository = shortCodesRepository;
             OrganisationBusinessLogic = organisationBusinessLogic;
             SearchBusinessLogic = searchBusinessLogic;
-            StatementBusinessLogic = statementBusinessLogic;
             UserRepository = userRepository;
             ExecuteWebjobQueue = executeWebjobQueue;
             PrivateSectorRepository = privateSectorRepository;
@@ -56,7 +54,6 @@ namespace ModernSlavery.BusinessDomain.Admin
         public IShortCodesRepository ShortCodesRepository { get; }
         public IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
         public ISearchBusinessLogic SearchBusinessLogic { get; set; }
-        public IStatementBusinessLogic StatementBusinessLogic { get; }
         public IUserRepository UserRepository { get; }
         public IPagedRepository<OrganisationRecord> PrivateSectorRepository { get; }
         public IPagedRepository<OrganisationRecord> PublicSectorRepository { get; }
@@ -64,10 +61,5 @@ namespace ModernSlavery.BusinessDomain.Admin
 
         public ISearchRepository<OrganisationSearchModel> OrganisationSearchRepository { get; }
         public ISharedBusinessLogic SharedBusinessLogic { get; }
-
-        public async Task LogSubmission(IOrderedEnumerable<SubmissionLogModel> logRecords)
-        {
-            await StatementBusinessLogic.SubmissionLog.WriteAsync(logRecords).ConfigureAwait(false);
-        }
     }
 }

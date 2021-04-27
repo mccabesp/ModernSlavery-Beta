@@ -48,7 +48,7 @@ else if (Model.Indicators.Any())
                     Organisation’s response
                 </div>
             </div>
-            @foreach (var indicator in Enums.GetValuesExcept<IndicatorTypes>(IndicatorTypes.Unknown, IndicatorTypes.None))
+            @foreach (var indicator in Enums.GetValues<IndicatorTypes>(IndicatorTypes.Unknown, IndicatorTypes.None))
             {
                 var isOther = indicator == IndicatorTypes.Other;
                 <div class="app-question-list__item">
@@ -81,6 +81,8 @@ else if (Model.Indicators.Any())
             }
         </div>
     </div>
+
+    <partial name="Parts/StatementSummary/_Remediations" model="Model" />
 }
 else
 {

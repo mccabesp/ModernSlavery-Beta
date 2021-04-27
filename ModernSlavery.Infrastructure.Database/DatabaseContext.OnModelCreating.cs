@@ -150,7 +150,7 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.Property(e => e.OrganisationName)
                         .IsRequired()
-                        .HasMaxLength(100);
+                        .HasMaxLength(160);
 
                     entity.Property(e => e.StatusDetails).HasMaxLength(255);
 
@@ -182,7 +182,7 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.Property(e => e.Status).HasColumnName("StatusId");
 
-                    entity.Property(e => e.Address1).HasMaxLength(100);
+                    entity.Property(e => e.Address1).HasMaxLength(200);
 
                     entity.Property(e => e.Address2).HasMaxLength(100);
 
@@ -224,7 +224,7 @@ namespace ModernSlavery.Infrastructure.Database
 
                     entity.Property(e => e.Name)
                         .IsRequired()
-                        .HasMaxLength(100);
+                        .HasMaxLength(160);
 
                     entity.Property(e => e.Source).HasMaxLength(255);
 
@@ -523,7 +523,10 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasColumnType("Date");
 
                     entity.Property(e => e.StatementUrl)
-                        .HasMaxLength(255);
+                        .HasMaxLength(1024);
+
+                    entity.Property(e => e.StatementEmail)
+                        .HasMaxLength(254);
 
                     entity.Property(e => e.StatusDetails)
                         .HasMaxLength(255);
@@ -566,12 +569,12 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasForeignKey(e => e.StatementId);
 
                     entity.HasOne(e => e.Organisation)
-                        .WithMany()
+                        .WithMany(o => o.StatementOrganisations)
                         .HasForeignKey(e => e.OrganisationId)
                         .IsRequired(false);
 
                     entity.Property(e => e.OrganisationName)
-                        .HasMaxLength(100)
+                        .HasMaxLength(160)
                         .IsRequired();
                 });
 
@@ -666,6 +669,8 @@ namespace ModernSlavery.Infrastructure.Database
                         .HasMaxLength(255);
 
                     entity.Property(e => e.Method).HasColumnName("MethodId");
+
+                    entity.Property(e => e.Details).HasMaxLength(255);
 
                     entity.HasOne(d => d.Address).WithMany(e => e.UserOrganisations).HasForeignKey(e => e.AddressId);
 

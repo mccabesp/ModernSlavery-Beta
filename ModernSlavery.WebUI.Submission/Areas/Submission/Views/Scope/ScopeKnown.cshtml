@@ -1,8 +1,6 @@
-﻿@model ScopingViewModel
-@{
+﻿@{
     Layout = "/Views/GdsLayout.cshtml";
     Title = "Scope already known";
-    var controller = ViewData["Controller"] as BaseController;
 }
 
 @section BeforeMain {
@@ -10,30 +8,23 @@
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off", novalidate = "" }))
+        <h1 class="govuk-heading-l">
+            Your organisation has already declared it is not required to publish a modern slavery statement
+        </h1>
+
+        <h2 class="govuk-heading-m">
+            Publishing a statement voluntarily
+        </h2>
+
+        <p class="govuk-body">
+            If you are not legally required to publish a modern slavery statement, you can still create a statement voluntarily and submit it to our service.
+        </p>
+
+        @if (Controller.CurrentUser == null)
         {
-            @Html.AntiForgeryToken()
-            @Html.HiddenFor(m => Model.OrganisationId)
-
-
-            <h1 class="govuk-heading-l">
-                Your organisation has already declared it is not required to publish a modern slavery statement
-            </h1>
-
-            <h2 class="govuk-heading-m">
-                Publishing a statement voluntarily
-            </h2>
-
-            <p class="govuk-body">
-                If you are not legally required to publish a modern slavery statement, you can still create a statement voluntarily and submit it to our service.
-            </p>
-
-            @if (controller.CurrentUser == null)
-            {
-                <div class="govuk-inset-text">
-                    To submit a modern slavery statement to our service, <a href="/sign-up">create an account</a> and register your organisation.
-                </div>
-            }
+            <div class="govuk-inset-text">
+                To submit a modern slavery statement to our service, <a href="/sign-up">create an account</a> and register your organisation.
+            </div>
         }
     </div>
 </div>

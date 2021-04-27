@@ -13,32 +13,37 @@ namespace ModernSlavery.Infrastructure.Azure.DevOps
 {
     public class SqlManager
     {
-        IAzure _azure;
         private IList<ISqlDatabase> _SqlDatabases;
-        public IList<ISqlDatabase> SqlDatabases => _SqlDatabases ??= _azure.SqlServers.List().SelectMany(server => server.Databases.List()).ToList();
+        public IList<ISqlDatabase> SqlDatabases => _SqlDatabases ??= AzureManager.Azure.SqlServers.List().SelectMany(server => server.Databases.List()).ToList();
 
         private IList<ISqlServer> _SqlServers;
-        public IList<ISqlServer> SqlServers => _SqlServers ??= _azure.SqlServers.List().ToList();
+        public IList<ISqlServer> SqlServers => _SqlServers ??= AzureManager.Azure.SqlServers.List().ToList();
 
-        public SqlManager(IAzure azure)
+        public readonly AzureManager AzureManager;
+
+        public SqlManager(AzureManager azureManager)
         {
-            _azure = azure ?? throw new ArgumentNullException(nameof(azure));
+            AzureManager = azureManager;
         }
 
         public ISqlDatabase GetSqlDatabase(string sqlDatabaseName)
         {
             if (string.IsNullOrWhiteSpace(sqlDatabaseName)) throw new ArgumentNullException(nameof(sqlDatabaseName));
+            AzureManager.Authenticate();
 
             return SqlDatabases.FirstOrDefault(w => w.Name.EqualsI(sqlDatabaseName));
         }
         public ISqlServer GetSqlServer(string sqlServerName)
         {
             if (string.IsNullOrWhiteSpace(sqlServerName)) throw new ArgumentNullException(nameof(sqlServerName));
+
+            AzureManager.Authenticate();
             return SqlServers.FirstOrDefault(w => w.Name.EqualsI(sqlServerName));
         }
         public ISqlServer GetSqlServer(ISqlDatabase sqlDatabase)
         {
             if (sqlDatabase == null) throw new ArgumentNullException(nameof(sqlDatabase));
+            AzureManager.Authenticate();
 
             var sqlServer = SqlServers.FirstOrDefault(server => server.Name.EqualsI(sqlDatabase.SqlServerName));
             return sqlServer;
@@ -62,7 +67,7 @@ namespace ModernSlavery.Infrastructure.Azure.DevOps
         }
         #endregion
 
-
+        #region Firewall
         public ISqlFirewallRule GetFireWallRule(ISqlServer sqlServer, string ruleName)
         {
             if (sqlServer == null) throw new ArgumentNullException(nameof(sqlServer));
@@ -117,6 +122,32 @@ namespace ModernSlavery.Infrastructure.Azure.DevOps
             }
             return firewallRule;
         }
+        #endregion
+
+        #region Database Backup/Restore
+        public (string status, string errorMessage) CreateBackup(ISqlDatabase sqlDatabase, string storageUri, string storageAccessKey, string administratorLogin, string administratorPassword)
+        {
+            if (sqlDatabase == null) throw new ArgumentNullException(nameof(sqlDatabase));
+            if (string.IsNullOrWhiteSpace(storageUri)) throw new ArgumentNullException(nameof(storageUri));
+            if (string.IsNullOrWhiteSpace(storageAccessKey)) throw new ArgumentNullException(nameof(storageAccessKey));
+            if (string.IsNullOrWhiteSpace(administratorLogin)) throw new ArgumentNullException(nameof(administratorLogin));
+            if (string.IsNullOrWhiteSpace(administratorPassword)) throw new ArgumentNullException(nameof(administratorPassword));
+            var response=sqlDatabase.ExportTo(storageUri).WithStorageAccessKey(storageAccessKey).WithSqlAdministratorLoginAndPassword(administratorLogin, administratorPassword).Execute();
+            return (response.Status, response.ErrorMessage);
+        }
+
+        public (string status,string errorMessage) RestoreBackup(ISqlDatabase sqlDatabase, string storageUri, string storageAccessKey, string administratorLogin, string administratorPassword)
+        {
+            if (sqlDatabase == null) throw new ArgumentNullException(nameof(sqlDatabase));
+            if (string.IsNullOrWhiteSpace(storageUri)) throw new ArgumentNullException(nameof(storageUri));
+            if (string.IsNullOrWhiteSpace(storageAccessKey)) throw new ArgumentNullException(nameof(storageAccessKey));
+            if (string.IsNullOrWhiteSpace(administratorLogin)) throw new ArgumentNullException(nameof(administratorLogin));
+            if (string.IsNullOrWhiteSpace(administratorPassword)) throw new ArgumentNullException(nameof(administratorPassword));
+            var response=sqlDatabase.ImportBacpac(storageUri).WithStorageAccessKey(storageAccessKey).WithSqlAdministratorLoginAndPassword(administratorLogin, administratorPassword).Execute();
+            return (response.Status, response.ErrorMessage);
+        }
+
+        #endregion
 
     }
 }

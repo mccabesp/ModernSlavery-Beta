@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Autofac;
 using Autofac.Features.AttributeFilters;
-using Microsoft.Azure.Search;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
@@ -26,7 +25,7 @@ namespace ModernSlavery.Infrastructure.Search
             //Add a dedicated httpclient for Companies house API with retry policy
             services.AddHttpClient<ISearchRepository<OrganisationSearchModel>, AzureOrganisationSearchRepository>(
                     nameof(AzureOrganisationSearchRepository),
-                    httpClient => httpClient.SetupConnectionLease($"https://{_options.ServiceName}.search.windows.net/"))
+                    httpClient => httpClient.SetupHttpClient($"https://{_options.ServiceName}.search.windows.net/"))
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10));
         }
 

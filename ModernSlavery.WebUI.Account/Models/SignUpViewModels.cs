@@ -12,21 +12,24 @@ namespace ModernSlavery.WebUI.Account.Models
         [Required(AllowEmptyStrings = false)]
         [Display(Name = "First name")]
         [Text]
+        [StringLength(50, ErrorMessage = "Your first name can't be longer than {1} characters.")]
         public string FirstName { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [Display(Name = "Last name")]
-        [Text] 
+        [Text]
+        [StringLength(50, ErrorMessage = "Your last name can't be longer than {1} characters.")]
         public string LastName { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [Display(Name = "Job title")]
-        [StringLength(50, ErrorMessage = "Your job title cannot be longer than {1} characters.")]
+        [StringLength(50, ErrorMessage = "Your job title can't be longer than {1} characters.")]
         [Text] 
         public string JobTitle { get; set; }
 
         [Required(AllowEmptyStrings = false)]
         [EmailAddress]
+        [StringLength(254, ErrorMessage = "Your email address can't be longer than {1} characters.")]
         [Display(Name = "Email address")]
         public string EmailAddress { get; set; }
 

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Options;
 using ModernSlavery.WebUI.Shared.Classes;
 using ModernSlavery.WebUI.Shared.Models;
-using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Shared.Interfaces
 {

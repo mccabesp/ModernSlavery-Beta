@@ -1,14 +1,16 @@
-﻿@{
+﻿@model FeedbackViewModel
+@{
     Layout = "~/Views/GdSLayout.cshtml";
     Title = "Feedback sent";
 }
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-            <h1 class="govuk-heading-l">Thank you</h1>
+        <h1 class="govuk-heading-l">Thank you</h1>
 
-            <p>Thank you for giving us your feedback about this service. We regularly update the service and pay careful attention to all the comments we receive.</p><br>
+        <p>Thank you for giving us your feedback about this service. We regularly update the service and pay careful attention to all the comments we receive.</p><br>
 
-            <a class="govuk-button" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" role="button">Return to manage organisations</a>
-        </div>
+        <a class="govuk-button" href="@Model.BackUrl" role="button">Continue</a>
+
     </div>
+</div>

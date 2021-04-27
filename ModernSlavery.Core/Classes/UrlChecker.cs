@@ -1,9 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Rest;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Options;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
+using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,53 +14,65 @@ namespace ModernSlavery.Core.Classes
 {
     public interface IUrlChecker
     {
-        public Task<bool> IsUrlWorking(string url);
+        public Task<bool> IsUrlWorkingAsync(string url);
     }
 
     public class UrlChecker : IUrlChecker
     {
-        readonly ILogger<UrlChecker> Logger;
-        readonly UrlCheckerOptions Options;
-        readonly IHttpClientFactory ClientFactory;
+        private readonly ILogger<UrlChecker> _logger;
+        private readonly UrlCheckerOptions _options;
 
-        public UrlChecker(
-            ILogger<UrlChecker> logger,
-            UrlCheckerOptions options,
-            IHttpClientFactory clientFactory)
+        public UrlChecker(ILogger<UrlChecker> logger,UrlCheckerOptions options)
         {
-            ClientFactory = clientFactory;
-            Logger = logger;
-            Options = options;
+            _logger = logger;
+            _options = options;
         }
 
-        public async Task<bool> IsUrlWorking(string url)
+        public async Task<bool> IsUrlWorkingAsync(string url)
         {
-            if (Options.Disabled) return true;
+            if (_options.Disabled) return true;
 
-            Uri uri;
+            using var httpClientHandler = Web.ConfigureHttpMessageHandler();
+            using var httpClient = new HttpClient(httpClientHandler,true);
+            Web.SetupHttpClient(httpClient).AddBrowserHeaders();
 
-            if (!Uri.TryCreate(url, UriKind.Absolute, out uri))
-                return false;
+            var retryPolicy = _options.RetryPolicy == RetryPolicyTypes.Exponential ? Resilience.GetExponentialAsyncRetryPolicy(3) : Resilience.GetLinearAsyncRetryPolicy(3);
 
-            var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            var client = ClientFactory.CreateClient();
-            client.Timeout = TimeSpan.FromSeconds(Options.Timeout);
-
+            //Try a http HEAD first as this is the fastest
+            var headResponseStatus = "Unknown";
             try
             {
-                var response = await client.SendAsync(request).ConfigureAwait(false);
+                using var request = new HttpRequestMessage(HttpMethod.Head, url);
 
-                if (response.IsSuccessStatusCode)
-                    return true;
-                else
-                    return false;
+                //Make the request using Polly retry policy
+                using var headResponse = await retryPolicy.ExecuteAsync(async () => await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false)).ConfigureAwait(false);
+
+                if (headResponse.StatusCode == System.Net.HttpStatusCode.OK) return true;
+                headResponseStatus = headResponse.StatusCode.ToString();
             }
             catch (Exception ex)
             {
-                // exception due to timeout or DNS error
-                Logger.LogError(ex, "Failed loading {url} when checking exists", url);
-                return false;
+                _logger.LogError(ex, $"Url: {url} HEAD request failed");
+                headResponseStatus = ex.Message;
             }
+
+
+            //Then try a http GET first as this is the fastest
+            try
+            {
+                //Make the request using Polly retry policy
+                var getResponse = await retryPolicy.ExecuteAsync(async () => await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false)).ConfigureAwait(false);
+               
+                if (getResponse.StatusCode == System.Net.HttpStatusCode.OK) return true;
+
+                throw new HttpOperationException($"Invalid HTTP response HEAD({headResponseStatus}) and GET({getResponse.StatusCode}) - expected 200 OK");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Url: {url} GET check failed");
+            }
+            return false;
         }
+
     }
 }

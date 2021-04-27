@@ -4,8 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.HttpOverrides;
+
 
 namespace ModernSlavery.Core.Extensions
 {
@@ -56,38 +59,57 @@ namespace ModernSlavery.Core.Extensions
             return false;
         }
 
-        public static bool IsTrustedAddress(this string testIPAddress, string[] trustedIPdomains)
+        public static bool IsTrustedAddress(this string testIPAddress, params string[] trustedHostnamesOrIpAddressesORCidrs)
         {
-            if (string.IsNullOrWhiteSpace(testIPAddress)) throw new ArgumentNullException(nameof(testIPAddress));
+            if (trustedHostnamesOrIpAddressesORCidrs==null || !trustedHostnamesOrIpAddressesORCidrs.Any()) throw new ArgumentNullException(nameof(trustedHostnamesOrIpAddressesORCidrs));
 
-            if (trustedIPdomains == null || trustedIPdomains.Length == 0)
-                throw new ArgumentNullException(nameof(trustedIPdomains));
-
-            return trustedIPdomains.Any(trustedHostnameOrIpAddressORCidr => IsTrustedAddress(testIPAddress, trustedHostnameOrIpAddressORCidr));
+            return trustedHostnamesOrIpAddressesORCidrs.Any(trustedHostnameOrIpAddressORCidr => IsTrustedAddress(testIPAddress, trustedHostnameOrIpAddressORCidr));
         }
 
-        public static bool IsTrustedAddress(this string testIPAddress, string trustedHostnameOrIpAddressORCidr)
+        private static bool IsTrustedAddress(this string testIPAddress, string trustedHostnameOrIpAddressORCidr)
         {
-            if (string.IsNullOrWhiteSpace(trustedHostnameOrIpAddressORCidr)) throw new ArgumentNullException(nameof(trustedHostnameOrIpAddressORCidr));
             if (string.IsNullOrWhiteSpace(testIPAddress)) throw new ArgumentNullException(nameof(testIPAddress));
-            if (!IPAddress.TryParse(testIPAddress, out IPAddress testIP)) throw new ArgumentException($"Invalid IP Address '{testIPAddress}'",nameof(testIPAddress));
+            if (!IPAddress.TryParse(testIPAddress, out var testIP)) throw new ArgumentException($"Invalid IP Address '{testIPAddress}'", nameof(testIPAddress));
+            if (string.IsNullOrWhiteSpace(trustedHostnameOrIpAddressORCidr)) throw new ArgumentNullException(nameof(trustedHostnameOrIpAddressORCidr));
 
             //Check if IP on local subnet
             if (testIP.IsOnLocalSubnet()) return true;
 
-            //Check for exact domain or IP match
-            if (trustedHostnameOrIpAddressORCidr.Equals(testIPAddress,StringComparison.OrdinalIgnoreCase)) return true;
-
-            //Check for CIDR match
-            if (trustedHostnameOrIpAddressORCidr.IndexOf('/') > -1)
+            if (IPAddress.TryParse(trustedHostnameOrIpAddressORCidr, out var hostIP))
             {
+                //Check for exact IP match
+                return hostIP.Equals(testIP);
+            }
+            else if (IsValidCIDR(trustedHostnameOrIpAddressORCidr))
+            {
+                //Check for CIDR match
                 var ipNetwork = CIDRToIPNetwork(trustedHostnameOrIpAddressORCidr);
                 return ipNetwork.Contains(testIP);
             }
+            else if (IsValidHostname(trustedHostnameOrIpAddressORCidr))
+            {
+                //Check for domain IP match
+                var retryPolicy = Resilience.GetExponentialRetryPolicy<SocketException>(5,filter: sex => sex.Message.Contains("No such host is known.", StringComparison.OrdinalIgnoreCase));
+                var trustedIPs = retryPolicy.Execute(() => Dns.GetHostAddresses(trustedHostnameOrIpAddressORCidr));
+                return trustedIPs != null && trustedIPs.Any(address => address.Equals(testIP));
+            }
+            else
+                throw new ArgumentOutOfRangeException(nameof(trustedHostnameOrIpAddressORCidr), trustedHostnameOrIpAddressORCidr, "Not a valid IP Address, Hostname or CIDR");
+        }
 
-            //Check for domain IP match
-            var trustedIPs = Dns.GetHostAddresses(trustedHostnameOrIpAddressORCidr);
-            return trustedIPs != null && trustedIPs.Any(address => address.Equals(testIP));
+        public static bool IsValidHostname(this string hostname)
+        {
+            return Uri.CheckHostName(hostname)!=UriHostNameType.Unknown;
+        }
+
+        public static bool IsValidCIDR(this string cidr)
+        {
+            var subnet = cidr.BeforeFirst("/");
+            var bits= cidr.AfterFirst("/");
+            if (string.IsNullOrWhiteSpace(subnet) || !IPAddress.TryParse(subnet, out var testIP)) return false;
+            if (string.IsNullOrWhiteSpace(bits) || !byte.TryParse(bits, out var mask) || mask>32) return false;
+
+            return true;
         }
 
         public static IPNetwork CIDRToIPNetwork(string cidr)
@@ -96,13 +118,13 @@ namespace ModernSlavery.Core.Extensions
             var seperatorIndex = cidr.IndexOf('/');
 
             IPAddress ipAddress;
-            var prefixLength = 32;
+            byte prefixLength = 32;
 
             if (seperatorIndex < 0)
                 ipAddress = IPAddress.Parse(cidr);
             else
             {
-                prefixLength = int.Parse(cidr.Substring(seperatorIndex+1));
+                prefixLength = byte.Parse(cidr.Substring(seperatorIndex+1));
                 ipAddress = IPAddress.Parse(cidr.Substring(0, seperatorIndex));
             }
             return new IPNetwork(ipAddress, prefixLength);
@@ -174,7 +196,7 @@ namespace ModernSlavery.Core.Extensions
                 response = await Web.WebRequestAsync(Web.HttpMethods.Get, url).ConfigureAwait(false);
                 if (!string.IsNullOrWhiteSpace(response))
                 {
-                    string[] parts = response.Split(':');
+                    var parts = response.Split(':');
                     response = parts[1].Substring(1);
                     parts = response.Split('<');
                     response = parts[0];
@@ -188,21 +210,6 @@ namespace ModernSlavery.Core.Extensions
             catch { }
 
             return null;
-        }
-
-        /// <summary>
-        /// Setup a connection lease for HttpClient
-        /// </summary>
-        /// <param name="httpClient">The HttpClient to setup the connection lease</param>
-        /// <param name="baseAddress">the base address of Uniform Resource Identifier (URI) of the Internet resource used when sending requests</param>
-        /// <param name="connectionLeaseTimeout">The number of milliseconds after which an active System.Net.ServicePoint connection is closed. Defaults to 60 Seconds</param>
-        public static void SetupConnectionLease(this HttpClient httpClient, string baseAddress, int connectionLeaseTimeout=60000)
-        {
-            if (string.IsNullOrWhiteSpace(baseAddress)) throw new ArgumentNullException(nameof(baseAddress));
-            httpClient.BaseAddress = new Uri(baseAddress);
-            httpClient.DefaultRequestHeaders.Clear();
-            httpClient.DefaultRequestHeaders.ConnectionClose = false;
-            ServicePointManager.FindServicePoint(httpClient.BaseAddress).ConnectionLeaseTimeout = connectionLeaseTimeout;
         }
     }
 }

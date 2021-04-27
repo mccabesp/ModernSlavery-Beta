@@ -1,4 +1,4 @@
-﻿@model TriggerWebjobsViewModel
+﻿@inject DevOpsOptions devopsOptions;
 @{Layout = "/Views/GdsLayout.cshtml";}
 @{
     Title = "DevOps - Trigger Webjobs";
@@ -19,47 +19,66 @@
             @await Html.GovUkValidationSummaryAsync()
             @Html.AntiForgeryToken()
 
-            <div class="govuk-form-group">
-                <label class="govuk-label govuk-!-font-weight-bold" for="webjobname">
-                    COMMAND
-                </label>
-                <select class="govuk-select" name="webjobname" id="webjobname">
-                    <option value="" selected="true">Please select...</option>
-                    <option value="CheckSiteCertAsync">Check the website certificate is not due to expire</option>
-                    <option value="FixLatestAsync">Set organisation latest address, scope, statement etc</option>
-                    <option value="FixOrganisationAddresses">Fix organisation address statuses</option>
-                    <option value="PurgeOrganisations">Remove parially registerd orgs from database</option>
-                    <option value="PurgeRegistrations">Remove incomplete user registrations for organisations from database</option>
-                    <option value="PurgeStatementData">Remove retired submitted statements from database</option>
-                    <option value="PurgeTestDataAsync">Remove all test users and organisations and associated data</option>
-                    <option value="PurgeUsers">Remove incomplete user registrations from database</option>
-                    <option value="ReferenceOrganisations">Ensure all organisations have unique references</option>
-                    <option value="SendReminderEmails">Send due reminder emails</option>
-                    <option value="SetIsUkAddressesAsync">Set UK flag for all addresses with UK postcodes</option>
-                    <option value="SetPresumedScopes">Ensure all organisations have presumed scopes for all years</option>
-                    <option value="StorageHealthCheck">Check database storage capacity</option>
-                    <option value="TakeSnapshotAsync">Take a snapshot of all the file storage</option>
-                    <option value="UpdateFromCompaniesHouseAsync">Update organisations names, addresses and SIC Codes from companies house</option>
-                    <option value="UpdateOrganisationsAsync">Update organisations download file</option>
-                    <option value="UpdateOrganisationSearchIndexesAsync">Update the azure search indexes</option>
-                    <option value="UpdateOrphanOrganisationsAsync">Update orphan organisations download file</option>
-                    <option value="UpdateRegistrationAddressesAsync">Update registration addresses download file</option>
-                    <option value="UpdateRegistrations">Update registrations download file</option>
-                    <option value="UpdateScopes">Update scopes download file</option>
-                    <option value="UpdateSubmissions">Update statements download file</option>
-                    <option value="UpdateUnverifiedRegistrations">Update unverified registrations download file</option>
-                    <option value="UpdateUsers">Update users download file</option>
-                    <option value="UpdateUsersToContactForFeedback">Update users to contact for feedback download file</option>
-                    <option value="UpdateUsersToSendInfo">Update users to send infomation download file</option>
-                </select>
+            <fieldset>
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-!-font-weight-bold" for="webjobname">
+                        COMMAND
+                    </label>
+                    <select class="govuk-select" name="webjobname" id="webjobname">
+                        <option value="" selected="true">Please select...</option>
+                        @if (devopsOptions.AllowTriggerWebjobs)
+                        {
+                            <option value="CheckSiteCertAsync">Check the website certificate is not due to expire</option>
+                            <option value="FixLatestAsync">Set organisation latest address, scope, statement etc</option>
+                            <option value="FixOrganisationAddressesAsync">Fix organisation address statuses</option>
+                            <option value="PurgeOrganisationsAsync">Remove parially registerd orgs from database</option>
+                            <option value="PurgeRegistrationsAsync">Remove incomplete user registrations for organisations from database</option>
+                            <option value="PurgeStatementsAsync">Remove retired submitted statements from database</option>
+                            <option value="PurgeUsersAsync">Remove incomplete user registrations from database</option>
+                            <option value="ReferenceOrganisationsAsync">Ensure all organisations have unique references</option>
+                            <option value="SendReminderEmailsAsync">Send due reminder emails</option>
+                            <option value="SetIsUkAddressesAsync">Set UK flag for all addresses with UK postcodes</option>
+                            <option value="SetPresumedScopesAsync">Ensure all organisations have presumed scopes for all years</option>
+                            <option value="TakeSnapshotAsync">Take a snapshot of all the file storage</option>
+                            <option value="UpdateFromCompaniesHouseAsync">Update organisations names, addresses and SIC Codes from companies house</option>
+                            <option value="UpdateOrganisationsAsync">Update organisations download file</option>
+                            <option value="UpdateOrganisationSearchIndexesAsync">Update the azure search indexes</option>
+                            <option value="UpdateOrphanOrganisationsAsync">Update orphan organisations download file</option>
+                            <option value="UpdateRegistrationAddressesAsync">Update registration addresses download file</option>
+                            <option value="UpdateRegistrationsAsync">Update registrations download file</option>
+                            <option value="UpdateScopesAsync">Update scopes download file</option>
+                            <option value="UpdateSubmissionsAsync">Update statements download file</option>
+                            <option value="UpdateUnverifiedRegistrationsAsync">Update unverified registrations download file</option>
+                            <option value="UpdateUsersAsync">Update users download file</option>
+                            <option value="UpdateUsersToContactForFeedbackAsync">Update users to contact for feedback download file</option>
+                            <option value="UpdateUsersToSendInfoAsync">Update users to send infomation download file</option>
+                        }
+                    </select>
+                </div>
 
-            </div>
-
-
-            <p class="govuk-body govuk-!-margin-top-3">
-                <button type="submit" class="govuk-button" role="button" onclick="if (!confirm('Are you sure you want to trigger this webjob?')) return false;">Execute</button>
-            </p>
+                <p class="govuk-body govuk-!-margin-top-3">
+                    <button type="submit" class="govuk-button" role="button">Execute</button>
+                </p>
+            </fieldset>
         }
     </div>
 
 </div>
+@section AfterLoadedCompiledScripts {
+
+    <script type="text/javascript" nonce="@Html.GetNonce()">
+        $(document).on("submit",
+            "form",
+            function (e) {
+
+                //Must use a timout here otherwise the 'value' field of submitted buttons is never submitted
+                setTimeout(function () { $("button").attr("disabled", true); }, 0);
+            });
+        $(function () {
+            "use strict";
+            jQuery(":submit").click(function () {
+                if (!confirm('Are you sure you want to trigger this webjob?')) return false;
+            });
+        });
+    </script>
+}

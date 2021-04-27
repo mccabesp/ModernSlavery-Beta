@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Middleware
 {
+    /// <summary>
+    /// This is the top level middleware to catch unhandled errors in the pipeline
+    /// </summary>
     public class ExceptionMiddleware
     {
         private readonly ILogger _logger;
@@ -37,7 +40,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
         {
             context.Response.ContentType = "text/plain";
             context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-            return context.Response.WriteAsync($"ERROR {context.Response.StatusCode} Internal Server Error");
+            return context.Response.WriteAsync($"ERROR {context.Response.StatusCode}: Internal Server Error");
         }
     }
 }

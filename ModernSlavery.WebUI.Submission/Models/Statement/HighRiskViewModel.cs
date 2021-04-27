@@ -97,6 +97,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public RiskSourceTypes LikelySource { get; set; }
 
+        [MaxLength(200)]
         [Text]
         public string OtherLikelySource { get; set; }
 
@@ -140,6 +141,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             if (LikelySource == RiskSourceTypes.Other && string.IsNullOrWhiteSpace(OtherLikelySource)) return Status.InProgress;
             if (LikelySource == RiskSourceTypes.SupplyChains && !SupplyChainTiers.Any()) return Status.InProgress;
             if (Targets.Contains(RiskTargetTypes.Other) && string.IsNullOrWhiteSpace(OtherTargets)) return Status.InProgress;
+            if (!CountryReferences.Any()) return Status.InProgress;
             if (LikelySource != RiskSourceTypes.Unknown && Targets.Any()) return Status.Complete;
 
             return Status.Incomplete;

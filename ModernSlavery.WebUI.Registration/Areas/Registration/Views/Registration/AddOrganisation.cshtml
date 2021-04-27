@@ -19,7 +19,7 @@
             <div class="govuk-form-group">
 
 
-                <p class="govuk-body">Enter the name for the organisation whose Modern Slavery statement you’re reporting.</p>
+                <p class="govuk-body">Enter the details of the organisation you want to register.</p>
 
                 <div class="govuk-form-group @Html.SetErrorClass(model => model.OrganisationName, "govuk-form-group--error")">
                     @Html.LabelFor(model => model.OrganisationName, "Organisation name", new { @class = "govuk-label" })
@@ -72,12 +72,16 @@
                     </div>
                 </details>
             </div>
-
-            <label class="govuk-label" for="NoReference">
-                @Html.CheckBoxFor(m => m.NoReference)
-                I don't have a reference for this organisation
-            </label>
-
+            <div class="govuk-form-group govuk-!-margin-bottom-7">
+                <div class="govuk-checkboxes ">
+                    <div class="govuk-checkboxes__item">
+                        @Html.CheckBoxFor(m => m.NoReference, new { @class = "govuk-checkboxes__input" })
+                        <label class="govuk-label govuk-checkboxes__label" for="NoReference">
+                            I don't have a reference for this organisation
+                        </label>
+                    </div>
+                </div>
+            </div>
             <br />
             <input class="govuk-button" type="submit" role="button" name="command" value="Continue" aria-label="Continue" />
 

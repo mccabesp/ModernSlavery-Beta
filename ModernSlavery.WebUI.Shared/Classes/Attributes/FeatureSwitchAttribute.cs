@@ -3,8 +3,8 @@ using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using ModernSlavery.Core.Options;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
-using ModernSlavery.WebUI.Shared.Options;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 {

@@ -90,36 +90,8 @@ namespace ModernSlavery.Infrastructure.Configuration
         }
         #endregion
 
-        public static bool HasChildren(this IConfigurationSection section)
-        {
-            return section.GetChildren().Any();
-        }
 
-        public static IEnumerable<KeyValuePair<string, string>> GetChildValues(this IConfiguration config)
-        {
-            var children = config.GetChildren();
 
-            if (children.Any())
-                foreach (var child in children)
-                {
-                    foreach (var childResult in child.GetChildValues())
-                        yield return childResult;
-                }
-        }
-
-        public static IEnumerable<KeyValuePair<string, string>> GetChildValues(this IConfigurationSection parent)
-        {
-            var children = parent.GetChildren();
-
-            if (!children.Any())
-                yield return new KeyValuePair<string, string>(parent.Path, parent.Value);
-            else
-                foreach (var child in children)
-                {
-                    foreach (var childResult in child.GetChildValues())
-                        yield return childResult;
-                }
-        }
 
         public static bool ContainsSecretFiles(this IConfiguration config)
         {
@@ -127,28 +99,6 @@ namespace ModernSlavery.Infrastructure.Configuration
             return configRoot.Providers.OfType<FileConfigurationProvider>().Any(p => p.Source.Path.ContainsI(".secret."));
         }
 
-        public static Dictionary<string, string> ToDictionary(this IConfiguration config, string sectionName = null, bool ignoreEmpty=false)
-        {
-            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-            if (string.IsNullOrWhiteSpace(sectionName))
-            {
-                foreach (var childValue in config.GetChildValues())
-                {
-                    if (!ignoreEmpty || !string.IsNullOrWhiteSpace(childValue.Value)) result[childValue.Key] = childValue.Value;
-                }
-            }
-            else
-            {
-                var section = config.GetSection(sectionName);
-                foreach (var childValue in section.GetChildValues())
-                {
-                    if (childValue.Key == sectionName) continue;
-                    if (!ignoreEmpty || !string.IsNullOrWhiteSpace(childValue.Value)) result[childValue.Key.Substring(section.Path.Length + 1)] = childValue.Value;
-                }
-            }
-            return result;
-        }
 
         public static Dictionary<string, string> LoadSettings(string filepath, string sectionName = null)
         {
@@ -220,71 +170,61 @@ namespace ModernSlavery.Infrastructure.Configuration
             var configLoaded = configBuilder.Sources.OfType<JsonConfigurationSource>().Any(s => s.Path.EqualsI("appsettings.json"));
             if (configLoaded) throw new Exception("Attempt to load appsettings which are already loaded");
 
+            //Register the top settings file
             configBuilder.EnsureJsonFile("appsettings.json", false, false);
 
+            //Register the top environment settings file
             configBuilder.EnsureJsonFile($"appsettings.{environment}.json", true, false);
 
             var provider = configBuilder.GetFileProvider() as PhysicalFileProvider;
 
             var directory = new DirectoryInfo(Path.Combine(provider.Root, "App_Settings"));
 
-            IEnumerable<FileInfo> secretSettings=null;
+            IEnumerable<FileInfo> topSecretSettings=null;
+            IEnumerable<FileInfo> environmentSecretSettings = null;
             if (directory.Exists)
             {
                 //Get all json files in App_Settings folder
                 var allSettings = directory.GetFiles("*.json", SearchOption.AllDirectories);
 
-                //Get all environment.json files in App_Settings folder
-                var environmentSettings = allSettings.Where(f => f.Name.EndsWithI($".{environment}.json"));
-
-                //Get all .secret.json files in App_Settings folder
-                secretSettings = allSettings.Where(f => f.Name.EndsWithI($".secret.json"));
-
-                //Remove all the environment and secret settings from the top *.json settings
-                allSettings = allSettings.Except(environmentSettings).Except(secretSettings).ToArray();
-
-
-                //Register all the top *.json
-                foreach (var file in allSettings)
+                //Register the directory settings files
+                var topSettings = allSettings.Where(f => Path.GetFileNameWithoutExtension(f.Name).IndexOf('.') == -1);
+                foreach (var file in topSettings)
                     configBuilder.EnsureJsonFile(file.FullName, false, false);
+                allSettings = allSettings.Except(topSettings).ToArray();
 
-                //Register all the top *.environment.json
+                //Register the directory environment settings files
+                var environmentSettings = allSettings.Where(f => f.Name.EndsWithI($".{environment}.json"));
                 foreach (var file in environmentSettings)
                     configBuilder.EnsureJsonFile(file.FullName, false, false);
+                allSettings = allSettings.Except(environmentSettings).ToArray();
+
+                //Register the directory secret files
+                environmentSecretSettings = allSettings.Where(f => f.Name.EndsWithI($".{environment}.secret.json"));
+                allSettings = allSettings.Except(environmentSecretSettings).ToArray();
+
+                //Register the directory environment secret files
+                topSecretSettings = allSettings.Where(f => f.Name.EndsWithI($".secret.json"));
             }
 
             if (includeSecrets)
             {
+                //Register the top secret file
+                configBuilder.EnsureJsonFile($"appsettings.secret.json", true, false);
+                
+                //Register the top environment settings file
                 configBuilder.EnsureJsonFile($"appsettings.{environment}.secret.json", true, false);
 
-                if (secretSettings!=null && secretSettings.Any())
-                {
-                    //Get all environment.secret.json files in App_Settings folder
-                    var environmentSecretSettings = secretSettings.Where(f => f.Name.EndsWithI($".{environment}.secret.json"));
-
-                    //Remove all the environment and secret settings from the top *.secret.json settings
-                    secretSettings = secretSettings.Except(environmentSecretSettings).ToArray();
-
-                    //Register the top *.secret.json settings
-                    foreach (var file in secretSettings)
+                //Register the directory secret files
+                if (topSecretSettings!=null)
+                    foreach (var file in topSecretSettings)
                         configBuilder.EnsureJsonFile(file.FullName, false, false);
 
-                    //Register the top *.secret.json settings
+                //Register the directory environment secret files
+                if (environmentSecretSettings != null)
                     foreach (var file in environmentSecretSettings)
                         configBuilder.EnsureJsonFile(file.FullName, false, false);
-                }
             }
-        }
-
-
-        //Promotes previous configuration sources to top of stack
-        public static void RemoveConfigSources<T>(this IConfigurationBuilder configBuilder, Predicate<IConfigurationSource> match=null) where T : IConfigurationSource
-        {
-            var sources = configBuilder.Sources.OfType<T>().ToList();
-            if (match==null)
-                sources.ForEach(s => configBuilder.Sources.Remove(s));
-            else
-                sources.ForEach(s => configBuilder.Sources.ToList().RemoveAll(match));
         }
 
         //Promotes previous configuration sources to top of stack
@@ -303,52 +243,6 @@ namespace ModernSlavery.Infrastructure.Configuration
             sources.ForEach(s => configBuilder.Sources.Add(s));
         }
 
-        /// <summary>
-        /// Resolves all variables using pattern $(key) from configuration
-        /// </summary>
-        /// <param name="dictionary">The dictionary containing the keys and replacement values</param>
-        /// <returns>The source text with all variable declarations replaced</returns>
-        public static IDictionary<string, string> ResolveVariableNames(this IConfiguration configuration)
-        {
-            var dictionary = configuration.ToDictionary();
-            var badKeys = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
-            var keyStack = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var key in dictionary.Keys.ToList())
-                ResolveVariableNames(dictionary[key], key);
-
-            string ResolveVariableNames(string text, string key)
-            {
-                if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key));
-                if (keyStack.Contains(key)) throw new Exception($"Circular configuration variable '$({key})'");
-                
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    keyStack.Add(key);
-                    var newText = text;
-                    foreach (Match m in Text.VariableRegex.Matches(text))
-                    {
-                        var varName = m.Groups[1].Value;
-
-                        if (dictionary.ContainsKey(varName))
-                        {
-                            var replacementValue = ResolveVariableNames(dictionary[varName], varName);
-                            newText = newText.Replace(m.Groups[0].Value, replacementValue, StringComparison.OrdinalIgnoreCase);
-                        }
-                        else
-                            badKeys.Add(varName);
-                    }
-
-                    if (newText!=text)dictionary[key] = configuration[key] = text = newText;
-                    
-                    keyStack.Remove(key);
-                }
-
-                return text;
-            }
-
-            if (badKeys.Any()) throw new KeyNotFoundException($"Cannot find configuration settings '{badKeys.ToDelimitedString(", ")}'");
-            return dictionary;
-        }
+        
     }
 }

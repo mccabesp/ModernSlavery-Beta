@@ -14,7 +14,7 @@ namespace ModernSlavery.Core.Entities
         public long? OrganisationId { get; set; }
         public long? OriginalUserId { get; set; }
         public long? ImpersonatedUserId { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = VirtualDateTime.Now;
         
         public string Details { get; set; }
 

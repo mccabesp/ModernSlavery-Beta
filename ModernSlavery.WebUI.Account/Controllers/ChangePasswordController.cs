@@ -61,7 +61,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             }
 
             // set success alert flag
-            TempData.Add(nameof(AccountResources.ChangePasswordSuccessAlert), true);
+            SetSuccessMessage(AccountResources.ChangePasswordSuccessAlert);
 
             // go to manage account page
             return RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));

@@ -23,10 +23,6 @@ namespace ModernSlavery.Infrastructure.Telemetry.AppInsights
         {
             if (!string.IsNullOrWhiteSpace(_applicationInsightsOptions.InstrumentationKey))
             {
-                //Add app insights initialiser to set role name and set file 404 error codes to successful
-                //Should be superceded by AppInsightsTelemetryProcessor but doesnt work for webjobs so using this here
-                services.AddSingleton<ITelemetryInitializer, AppInsightsTelemetryInitializer>();
-
                 var aiOptions = new ApplicationInsightsServiceOptions {
                     //Disable adaptive sampling to use only ingestion sampling (see https://docs.microsoft.com/en-us/azure/azure-monitor/app/sampling)
 

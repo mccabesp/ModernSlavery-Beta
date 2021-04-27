@@ -15,5 +15,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         bool IsDatabaseAdministrator(ClaimsPrincipal principle);
         bool IsDevOpsAdministrator(ClaimsPrincipal principle);
         bool IsSystemUser(ClaimsPrincipal principle);
+        bool IsSubmitter(User user);
+        bool IsSubmitter(string emailAddress);
+        bool IsAdministrator(string emailAddress);
+        bool IsTrustedAddress(string testIPAddress);
     }
 }

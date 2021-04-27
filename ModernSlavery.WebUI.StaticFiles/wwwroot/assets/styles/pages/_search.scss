@@ -1,17 +1,12 @@
 ﻿// Author:Charlotte W
 // Styles for viewing => search page
 
-details.advanced-search-details[open] summary::after {
+details.advanced-search-details[open] summary .govuk-details__summary-text::after {
     content: attr(data-open);
 }
 
-details.advanced-search-details:not([open]) summary::after {
+details.advanced-search-details:not([open]) summary .govuk-details__summary-text::after {
     content: attr(data-close);
-}
-
-details.advanced-search-details summary:focus {
-    background-color: transparent;
-    box-shadow: none;
 }
 
 details.advanced-search-details .govuk-details__text {

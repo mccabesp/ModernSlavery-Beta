@@ -37,6 +37,7 @@ namespace ModernSlavery.Core.Interfaces
 
         Task AppendAsync(string filePath, string text);
 
+        Task WriteAsync(string filePath, string text);
         Task WriteAsync(string filePath, byte[] bytes);
         Task WriteAsync(string filePath, Stream stream);
         Task WriteAsync(string filePath, FileInfo uploadFile);

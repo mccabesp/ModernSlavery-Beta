@@ -3,11 +3,18 @@
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.14.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.14.0" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="3.1.6" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="App_Settings\**"  />
+    <Content Include="App_Settings\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

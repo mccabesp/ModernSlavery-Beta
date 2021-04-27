@@ -23,9 +23,13 @@ namespace ModernSlavery.WebUI.Admin.Models
         public bool IsRegistered { get; set; }
         public bool IsManualAddress { get; set; }
         [BindNever] public string RegisteredAddress { get; set; }
+        [BindNever] public bool? IsUKAddress { get; set; }
+        [BindNever] public string Details { get; set; }
 
         [Text] public string ReviewCode { get; set; }
-        [Text] public string CancellationReason { get; set; }
+
+        public const string DefaultCancellationReason = "We haven't been able to verify your organisation's identity. So we have declined your application.";
+        [Text] public string CancellationReason { get; set; } = DefaultCancellationReason;
 
         #region Search details
 

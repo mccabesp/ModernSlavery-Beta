@@ -23,6 +23,7 @@ namespace ModernSlavery.WebUI.Admin.Models
             public string Filename => Path.GetFileName(Filepath);
 
             public string Filepath { get; set; }
+            public string Webjob { get; set; }
             public string EhrcAccessKey { get; set; }
 
             public DateTime? Modified { get; set; }

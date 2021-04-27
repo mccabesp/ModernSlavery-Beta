@@ -35,7 +35,7 @@ else if (Model.GrievanceMechanisms.Any())
                     Organisation’s response
                 </div>
             </div>
-            @foreach (var grievanceMechanism in Enums.GetValuesExcept<GrievanceMechanismTypes>(GrievanceMechanismTypes.Unknown, GrievanceMechanismTypes.None))
+            @foreach (var grievanceMechanism in Enums.GetValues<GrievanceMechanismTypes>(GrievanceMechanismTypes.Unknown, GrievanceMechanismTypes.None))
             {
                 <div class="app-question-list__item">
                     <div class="app-question-list__column app-question-list__name">

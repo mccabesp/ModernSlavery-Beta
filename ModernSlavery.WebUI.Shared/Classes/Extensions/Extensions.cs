@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.SecuredModelBinder;
 using ModernSlavery.WebUI.Shared.Classes.ViewModelBinder;
@@ -88,6 +89,15 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                 .FirstOrDefault() as AreaAttribute;
         }
 
+
         #endregion
+
+        public static IActionResult GetRedirectToErrorPageResult(this RouteData routeData, int errorCode)
+        {
+            if (!routeData.IsAction("Default", "Error"))
+                return new RedirectToActionResult("Default", "Error", new { errorCode });
+            else
+                return new StatusCodeResult(errorCode);
+        }
     }
 }

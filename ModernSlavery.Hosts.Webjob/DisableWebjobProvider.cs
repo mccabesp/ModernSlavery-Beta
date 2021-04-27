@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
-using Microsoft.Extensions.Configuration;
-using ModernSlavery.Core.Attributes;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Hosts.Webjob
 {
-    //Allows disabling of named webjob methods in DisabledWebjobs section of appsettings.json
-    //This only applies to timed-functions
-    public class DisableWebjobProvider
+    //Allows disabling of named webjob methods in DisabledWebJobs section of appsettings.json
+    //This only applies to timed-class WebJob:WebJob
+    public class DisableWebJobProvider
     {
-        private readonly WebjobsOptions _webjobOptions;
-        public DisableWebjobProvider(WebjobsOptions webjobOptions)
+        private readonly WebJobsOptions _webjobOptions;
+        public DisableWebJobProvider(WebJobsOptions webjobOptions)
         {
             _webjobOptions = webjobOptions;
         }

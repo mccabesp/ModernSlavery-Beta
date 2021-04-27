@@ -19,29 +19,32 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = UserRoleNames.Admin)]
+    [Authorize(Roles = UserRoleNames.BasicAdmin)]
     [Route("admin")]
     public class AdminOrganisationNameController : BaseController
     {
-        private readonly IAdminService _adminService;
-        private readonly AuditLogger auditLogger;
-        private readonly ICompaniesHouseAPI companiesHouseApi;
+        private readonly AuditLogger _auditLogger;
+        private readonly ICompaniesHouseAPI _companiesHouseApi;
+        private readonly ISearchBusinessLogic _searchBusinessLogic;
 
         public AdminOrganisationNameController(
-            IAdminService adminService,
             ICompaniesHouseAPI companiesHouseApi,
+            ISearchBusinessLogic searchBusinessLogic,
             AuditLogger auditLogger,
             ILogger<AdminOrganisationNameController> logger, IWebService webService,
             ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
-            _adminService = adminService;
-            this.companiesHouseApi = companiesHouseApi;
-            this.auditLogger = auditLogger;
+            _companiesHouseApi = companiesHouseApi;
+            _searchBusinessLogic = searchBusinessLogic;
+            _auditLogger = auditLogger;
         }
 
         [HttpGet("organisation/{id}/name")]
-        public IActionResult ViewNameHistory(long id)
+        public async Task<IActionResult> ViewNameHistory(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             return View("ViewOrganisationName", organisation);
@@ -51,17 +54,23 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
         public async Task<IActionResult> ChangeNameGet(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
                 try
                 {
-                    var organisationFromCompaniesHouse = await companiesHouseApi.GetCompanyAsync(organisation.CompanyNumber);
+                    var organisationFromCompaniesHouse = await _companiesHouseApi.GetCompanyAsync(organisation.CompanyNumber);
 
-                    var nameFromCompaniesHouse = organisationFromCompaniesHouse.CompanyName;
+                    if (organisationFromCompaniesHouse != null)
+                    {
+                        var nameFromCompaniesHouse = organisationFromCompaniesHouse.CompanyName;
 
-                    if (!string.Equals(organisation.OrganisationName, nameFromCompaniesHouse, StringComparison.Ordinal))
-                        return OfferNewCompaniesHouseName(organisation, nameFromCompaniesHouse);
+                        if (!string.Equals(organisation.OrganisationName, nameFromCompaniesHouse, StringComparison.Ordinal))
+                            return OfferNewCompaniesHouseName(organisation, nameFromCompaniesHouse);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -104,8 +113,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost("organisation/{id}/name/change")]
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
-        public IActionResult ChangeNamePost(long id, ChangeOrganisationNameViewModel viewModel)
+        public async Task<IActionResult> ChangeNamePostAsync(long id, ChangeOrganisationNameViewModel viewModel)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             // We might need to change the value of Action before we go to the view
             // Apparently this is necessary
             // https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-from-view-model
@@ -123,7 +135,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 case ManuallyChangeOrganisationNameViewModelActions.CheckChangesManual:
                 case ManuallyChangeOrganisationNameViewModelActions.CheckChangesCoHo:
-                    return CheckChangesAction(viewModel, organisation);
+                    return await CheckChangesActionAsync(viewModel, organisation);
 
                 default:
                     throw new ArgumentException("Unknown action in AdminOrganisationNameController.ChangeNamePost");
@@ -191,26 +203,26 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return View("ConfirmNameChange", viewModel);
         }
 
-        private IActionResult CheckChangesAction(ChangeOrganisationNameViewModel viewModel, Organisation organisation)
+        private async Task<IActionResult> CheckChangesActionAsync(ChangeOrganisationNameViewModel viewModel, Organisation organisation)
         {
             if (viewModel.Action == ManuallyChangeOrganisationNameViewModelActions.CheckChangesManual)
-                OptOrganisationOutOfCompaniesHouseUpdates(organisation);
+                await OptOrganisationOutOfCompaniesHouseUpdatesAsync(organisation);
 
-            SaveChangesAndAuditAction(viewModel, organisation);
+            await SaveChangesAndAuditActionAsync(viewModel, organisation);
 
             return View("SuccessfullyChangedOrganisationName", organisation);
         }
 
-        private void SaveChangesAndAuditAction(ChangeOrganisationNameViewModel viewModel, Organisation organisation)
+        private async Task SaveChangesAndAuditActionAsync(ChangeOrganisationNameViewModel viewModel, Organisation organisation)
         {
             var oldName = organisation.OrganisationName;
 
             var newOrganisationName = CreateOrganisationNameFromViewModel(viewModel);
             AddNewNameToOrganisation(newOrganisationName, organisation);
 
-            SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            auditLogger.AuditChangeToOrganisation(
+            await _auditLogger.AuditChangeToOrganisationAsync(
                 this,
                 AuditedAction.AdminChangeOrganisationName,
                 organisation,
@@ -222,6 +234,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     NewNameId = newOrganisationName.OrganisationNameId,
                     viewModel.Reason
                 });
+
+            //Update the search record
+            await _searchBusinessLogic.RefreshSearchDocumentsAsync(organisation);
         }
 
         private OrganisationName CreateOrganisationNameFromViewModel(ChangeOrganisationNameViewModel viewModel)
@@ -245,10 +260,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             SharedBusinessLogic.DataRepository.Insert(organisationName);
         }
 
-        private void OptOrganisationOutOfCompaniesHouseUpdates(Organisation organisation)
+        private async Task OptOrganisationOutOfCompaniesHouseUpdatesAsync(Organisation organisation)
         {
             organisation.OptedOutFromCompaniesHouseUpdate = true;
-            SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
         }
     }
 }

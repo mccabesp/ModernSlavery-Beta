@@ -30,7 +30,7 @@
                         Select all that apply
                     </div>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var grievanceType in Enums.GetValuesExcept<GrievanceMechanismTypes>(GrievanceMechanismTypes.Unknown))
+                        @foreach (var grievanceType in Enums.GetValues<GrievanceMechanismTypes>(GrievanceMechanismTypes.Unknown))
                         {
                             var value = (int)grievanceType;
                             var isNone = grievanceType == GrievanceMechanismTypes.None;

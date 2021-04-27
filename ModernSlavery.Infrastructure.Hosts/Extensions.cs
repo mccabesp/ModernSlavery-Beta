@@ -74,13 +74,11 @@ namespace ModernSlavery.Infrastructure.Hosts
             {
                 //Remove the extra json appsettings added by system
                 appConfigBuilder.RemoveConfigSources<JsonConfigurationSource>();
-                appConfigBuilder.AddConfiguration(appConfig);
             });
 
             hostBuilder.ConfigureLogging((hostBuilderContext, loggingBuilder) =>
             {
                 loggingBuilder.ClearProviders();
-                //loggingBuilder.AddAzureQueueLogger(); //Use the custom logger
                 var instrumentationKey = appConfig["ApplicationInsights:InstrumentationKey"];
                 loggingBuilder.AddApplicationInsights(instrumentationKey); //log to app insights
                 loggingBuilder.AddAzureWebAppDiagnostics(); //Log to live azure stream (honors the settings in the App Service logs section of the App Service page of the Azure portal)
@@ -108,6 +106,16 @@ namespace ModernSlavery.Infrastructure.Hosts
             hostBuilder.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
             return (hostBuilder, dependencyBuilder, appConfig);
+        }
+
+        //Promotes previous configuration sources to top of stack
+        public static void RemoveConfigSources<T>(this IConfigurationBuilder configBuilder, Predicate<IConfigurationSource> match = null) where T : IConfigurationSource
+        {
+            var sources = configBuilder.Sources.OfType<T>().ToList();
+            if (match == null)
+                sources.ForEach(s => configBuilder.Sources.Remove(s));
+            else
+                sources.ForEach(s => configBuilder.Sources.ToList().RemoveAll(match));
         }
 
         public static IEnumerable<string> GetKeys(this IConfiguration config)

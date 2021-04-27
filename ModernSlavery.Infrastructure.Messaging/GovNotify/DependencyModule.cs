@@ -5,6 +5,7 @@ using Autofac;
 using Autofac.Features.AttributeFilters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
 
@@ -29,24 +30,14 @@ namespace ModernSlavery.Infrastructure.Messaging.GovNotify
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var linearRetry = _sharedOptions.ApplicationName == $"ModernSlavery.Hosts.Web";
-
-            services.AddHttpClient<GovNotifyAPI>(nameof(GovNotifyAPI),
-                httpClient =>
-                {
-                    GovNotifyAPI.SetupHttpClient(httpClient, _govNotifyOptions.ApiServer);
-                })
+            services.AddSingleton<IGovNotifyAPI, GovNotifyAPI>();
+            services.AddHttpClient<IGovNotifyAPI,GovNotifyAPI>(httpClient => httpClient.SetupHttpClient(_govNotifyOptions.ApiServer))
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10))
-                .AddPolicyHandler(GovNotifyAPI.GetRetryPolicy(linearRetry));
+                .AddPolicyHandler(_sharedOptions.ApplicationName == $"ModernSlavery.Hosts.Web" ? Resilience.GetLinearAsyncRetryPolicy(3) : Resilience.GetExponentialAsyncRetryPolicy(5));
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterType<GovNotifyAPI>().As<IGovNotifyAPI>()
-                .SingleInstance()
-                .WithParameter(
-                    (p, ctx) => p.ParameterType == typeof(HttpClient),
-                    (p, ctx) => ctx.Resolve<IHttpClientFactory>().CreateClient(nameof(GovNotifyAPI)));
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

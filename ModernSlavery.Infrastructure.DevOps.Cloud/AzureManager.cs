@@ -7,15 +7,26 @@ using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Azure
 {
     public class AzureManager
     {
-        private readonly AzureOptions _azureOptions;
+        private readonly DevOpsOptions _devOpsOptions;
+        public AzureManager(DevOpsOptions devOpsOptions)
+        {
+            _devOpsOptions = devOpsOptions;
+        }
+
         public AzureManager(AzureOptions azureOptions)
         {
-            _azureOptions = azureOptions;
+            _devOpsOptions = new DevOpsOptions {
+                ClientId = azureOptions.ClientId,
+                ClientSecret = azureOptions.ClientSecret,
+                SubscriptionId = azureOptions.SubscriptionId,
+                TenantId = azureOptions.TenantId
+            };
         }
 
         public const string ConfigSubscriptionId = "SubscriptionId";
@@ -29,11 +40,11 @@ namespace ModernSlavery.Infrastructure.Azure
 
         private AzureCredentials GetAppRegistrationCredentials()
         {
-            if (string.IsNullOrWhiteSpace(_azureOptions.ClientId)) throw new ArgumentNullException(nameof(_azureOptions.ClientId), $"You must provide a '{nameof(_azureOptions.ClientId)}' or specify '{ConfigClientId}' as an environment variable");
-            if (string.IsNullOrWhiteSpace(_azureOptions.ClientSecret)) throw new ArgumentNullException(nameof(_azureOptions.ClientSecret), $"You must provide a '{nameof(_azureOptions.ClientSecret)}' or specify '{ConfigClientSecret}' as an environment variable");
-            if (string.IsNullOrWhiteSpace(_azureOptions.TenantId)) throw new ArgumentNullException(nameof(_azureOptions.TenantId), $"You must provide a '{nameof(_azureOptions.TenantId)}' or specify '{ConfigTenantId}' as an environment variable");
+            if (string.IsNullOrWhiteSpace(_devOpsOptions.ClientId)) throw new ArgumentNullException(nameof(_devOpsOptions.ClientId), $"You must provide a '{nameof(_devOpsOptions.ClientId)}' or specify '{ConfigClientId}' as an environment variable");
+            if (string.IsNullOrWhiteSpace(_devOpsOptions.ClientSecret)) throw new ArgumentNullException(nameof(_devOpsOptions.ClientSecret), $"You must provide a '{nameof(_devOpsOptions.ClientSecret)}' or specify '{ConfigClientSecret}' as an environment variable");
+            if (string.IsNullOrWhiteSpace(_devOpsOptions.TenantId)) throw new ArgumentNullException(nameof(_devOpsOptions.TenantId), $"You must provide a '{nameof(_devOpsOptions.TenantId)}' or specify '{ConfigTenantId}' as an environment variable");
 
-            return SdkContext.AzureCredentialsFactory.FromServicePrincipal(_azureOptions.ClientId, _azureOptions.ClientSecret, _azureOptions.TenantId, AzureEnvironment.AzureGlobalCloud);
+            return SdkContext.AzureCredentialsFactory.FromServicePrincipal(_devOpsOptions.ClientId, _devOpsOptions.ClientSecret, _devOpsOptions.TenantId, AzureEnvironment.AzureGlobalCloud);
         }
 
         private AzureCredentials GetAppServiceCredentials()
@@ -43,11 +54,11 @@ namespace ModernSlavery.Infrastructure.Azure
 
         private ClientCredential GetClientCredential()
         {
-            if (string.IsNullOrWhiteSpace(_azureOptions.ClientId)) throw new ArgumentNullException(nameof(_azureOptions.ClientId), $"You must provide a '{nameof(_azureOptions.ClientId)}' or specify '{ConfigClientId}' as an environment variable");
+            if (string.IsNullOrWhiteSpace(_devOpsOptions.ClientId)) throw new ArgumentNullException(nameof(_devOpsOptions.ClientId), $"You must provide a '{nameof(_devOpsOptions.ClientId)}' or specify '{ConfigClientId}' as an environment variable");
 
-            if (string.IsNullOrWhiteSpace(_azureOptions.ClientSecret)) throw new ArgumentNullException(nameof(_azureOptions.ClientSecret), $"You must provide a '{nameof(_azureOptions.ClientSecret)}' or specify '{ConfigClientSecret}' as an environment variable");
+            if (string.IsNullOrWhiteSpace(_devOpsOptions.ClientSecret)) throw new ArgumentNullException(nameof(_devOpsOptions.ClientSecret), $"You must provide a '{nameof(_devOpsOptions.ClientSecret)}' or specify '{ConfigClientSecret}' as an environment variable");
 
-            return new ClientCredential(_azureOptions.ClientId,_azureOptions.ClientSecret);
+            return new ClientCredential(_devOpsOptions.ClientId, _devOpsOptions.ClientSecret);
         }
 
         public IAzure Authenticate()
@@ -56,7 +67,7 @@ namespace ModernSlavery.Infrastructure.Azure
             {
                 //=================================================================
                 // Authenticate
-                var credentials = _azureOptions.HasCredentials() ? GetAppRegistrationCredentials() : GetAppServiceCredentials();
+                var credentials = _devOpsOptions.HasCredentials() ? GetAppRegistrationCredentials() : GetAppServiceCredentials();
 
                 Azure = Authenticate(credentials);
             }
@@ -80,12 +91,12 @@ namespace ModernSlavery.Infrastructure.Azure
         {
             if (Azure == null)
             {
-                if (!string.IsNullOrWhiteSpace(_azureOptions.SubscriptionId))
+                if (!string.IsNullOrWhiteSpace(_devOpsOptions.SubscriptionId))
                     Azure = Microsoft.Azure.Management.Fluent.Azure
                         .Configure()
                         .WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic)
                         .Authenticate(credentials)
-                        .WithSubscription(_azureOptions.SubscriptionId);
+                        .WithSubscription(_devOpsOptions.SubscriptionId);
                 else
                     Azure = Microsoft.Azure.Management.Fluent.Azure
                         .Configure()
@@ -99,8 +110,8 @@ namespace ModernSlavery.Infrastructure.Azure
         private AuthenticationContext GetAuthenticationContext()
         {
             AuthenticationContext ctx = null;
-            if (_azureOptions.TenantId != null)
-                ctx = new AuthenticationContext("https://login.microsoftonline.com/" + _azureOptions.TenantId);
+            if (_devOpsOptions.TenantId != null)
+                ctx = new AuthenticationContext("https://login.microsoftonline.com/" + _devOpsOptions.TenantId);
             else
             {
                 ctx = new AuthenticationContext("https://login.windows.net/common");
@@ -123,7 +134,7 @@ namespace ModernSlavery.Infrastructure.Azure
 
             var result = await authenticationContext.AcquireTokenAsync("https://management.azure.com/", clientCredential).ConfigureAwait(false);
 
-            if (result == null)throw new InvalidOperationException("Failed to obtain the JWT token");
+            if (result == null) throw new InvalidOperationException("Failed to obtain the JWT token");
             return result.AccessToken;
         }
 
@@ -131,7 +142,7 @@ namespace ModernSlavery.Infrastructure.Azure
         {
             return AuthenticationHeader ?? (AuthenticationHeader = new AuthenticationHeaderValue("Bearer", await GetAccessTokenAsync().ConfigureAwait(false)));
         }
-        
+
 
     }
 }

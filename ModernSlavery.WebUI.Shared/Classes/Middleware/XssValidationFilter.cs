@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Options;
@@ -30,10 +32,12 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
     /// </summary>
     public class XssValidationFilter : IActionFilter
     {
+        private readonly ILogger<XssValidationFilter> _logger;
         private readonly XssValidator _xssValidator;
         private readonly TestOptions _testOptions;
-        public XssValidationFilter(XssValidator xssValidator, TestOptions testOptions)
+        public XssValidationFilter(ILogger<XssValidationFilter> logger, XssValidator xssValidator, TestOptions testOptions)
         {
+            _logger = logger;
             _xssValidator = xssValidator;
             _testOptions = testOptions;
         }
@@ -242,18 +246,25 @@ namespace ModernSlavery.WebUI.Shared.Classes.Middleware
             if (isApi) return;
 
             //Not required
+            int errorCode = -1;
             if (context.Result is StatusCodeResult statusCodeResult && statusCodeResult.StatusCode>=400)
             {
-                context.Result = new RedirectToActionResult("Default", "Error", new { errorCode=statusCodeResult.StatusCode });
+                errorCode = statusCodeResult.StatusCode;
+                _logger.LogError($"Http {Enums.GetEnumOrValueDescription<HttpStatusCode,int>(errorCode)} Error");
             }
             else if (context.Result is HttpStatusViewResult httpStatusViewResult && httpStatusViewResult.StatusCode >= 400)
             {
-                context.Result = new RedirectToActionResult("Default", "Error", new { errorCode = httpStatusViewResult.StatusCode});
+                errorCode = httpStatusViewResult.StatusCode == null ? 400 : httpStatusViewResult.StatusCode.Value;
+                _logger.LogError($"Http {Enums.GetEnumOrValueDescription<HttpStatusCode, int>(errorCode)} Error: {httpStatusViewResult.StatusDescription}");
             }
             else if (context.Result is HttpStatusCodeResult httpStatusCodeResult && httpStatusCodeResult.StatusCode >= 400)
             {
-                context.Result = new RedirectToActionResult("Default", "Error", new { errorCode = httpStatusCodeResult.StatusCode });
+                errorCode = httpStatusCodeResult.StatusCode == null ? 400 : httpStatusCodeResult.StatusCode.Value;
+                _logger.LogError($"Http {Enums.GetEnumOrValueDescription<HttpStatusCode, int>(errorCode)} Error: {httpStatusCodeResult.StatusDescription}");
             }
+
+            if (errorCode>-1)context.Result = context.RouteData.GetRedirectToErrorPageResult(errorCode);
+
         }
     }
 }

@@ -24,7 +24,7 @@ namespace ModernSlavery.BusinessDomain.Registration
         {
             //Add registrations here
             builder.RegisterType<OrganisationBusinessLogic>().As<IOrganisationBusinessLogic>()
-                .InstancePerLifetimeScope();
+                .InstancePerLifetimeScope().WithAttributeFiltering();
             builder.RegisterType<SecurityCodeBusinessLogic>().As<ISecurityCodeBusinessLogic>()
                 .SingleInstance();
             builder.RegisterType<RegistrationService>().As<IRegistrationService>()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Razor.Internal;
 using ModernSlavery.BusinessDomain.Shared;
@@ -29,7 +30,7 @@ namespace ModernSlavery.WebUI.Shared.Classes
         public string AreaName => ViewContext.RouteData.Values.ContainsKey("area") ? ViewContext.RouteData.Values["area"].ToString() : null;
 
 
-        protected BaseController Controller => ViewContext.ViewData["controller"] as BaseController;
+        protected BaseController Controller => ViewContext.HttpContext.Items["Controller"] as BaseController;
 
         protected string Title { get => ViewData.ContainsKey("Title") ? ViewData["Title"].ToString() : null; set => ViewData["Title"] = value; }
         protected string Subtitle { get => ViewData.ContainsKey("Subtitle") ? ViewData["Subtitle"].ToString() : null; set => ViewData["Subtitle"] = value; }
@@ -52,7 +53,8 @@ namespace ModernSlavery.WebUI.Shared.Classes
 
         public string UserHostAddress => Context.GetUserHostAddress();
 
-        public bool IsTrustedIP => SharedBusinessLogic.SharedOptions.IsTrustedAddress(UserHostAddress);
+        public bool IsTrustedIP => SharedBusinessLogic.AuthorisationBusinessLogic.IsTrustedAddress(UserHostAddress);
+        public bool BrowserIsIE11 => Regex.IsMatch(ViewContext.HttpContext.Request.Headers["User-Agent"].ToString(), @"Trident/7.*rv:11");
 
         public bool IsAdministrator => SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(Controller.VirtualUser);
         public bool IsSuperAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(Controller.VirtualUser);
@@ -67,6 +69,15 @@ namespace ModernSlavery.WebUI.Shared.Classes
         protected void ClearDisplayMessages()
         {
             Session.Remove("DisplayMessages");
+        }
+
+        protected string GetSuccessMessage()
+        {
+            return Session.Get<string>("SuccessMessage");
+        }
+        protected void ClearSuccessMessage()
+        {
+            Session.Remove("SuccessMessage");
         }
     }
     public enum RobotDirectives

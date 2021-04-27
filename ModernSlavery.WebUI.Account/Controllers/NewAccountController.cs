@@ -116,6 +116,13 @@ namespace ModernSlavery.WebUI.Account.Controllers
                 return View("AboutYou", model);
             }
 
+            //Only allow whitelisted email addresses to signup
+            if (!SharedBusinessLogic.TestOptions.IsWhitelistUser(model.EmailAddress))
+            {
+                ModelState.AddModelError(1157, nameof(model.EmailAddress));
+                return View("AboutYou", model);
+            }
+
             //Validate the submitted fields
             if (model.Password.ContainsI("password")) AddModelError(3000, "Password");
 
@@ -132,31 +139,10 @@ namespace ModernSlavery.WebUI.Account.Controllers
             var virtualUser = await _accountService.UserRepository.FindByEmailAsync(model.EmailAddress, UserStatuses.New, UserStatuses.Active);
             if (virtualUser != null)
             {
-                if (virtualUser.EmailVerifySendDate != null)
-                {
-                    if (virtualUser.EmailVerifiedDate != null)
-                    {
-                        //A registered user with this email already exists.
-                        AddModelError(3001, "EmailAddress");
-                        this.SetModelCustomErrors<SignUpViewModel>();
-                        return View("AboutYou", model);
-                    }
-
-                    var remainingTime = virtualUser.EmailVerifySendDate.Value.AddHours(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours)- VirtualDateTime.Now;
-                    if (remainingTime > TimeSpan.Zero)
-                    {
-                        AddModelError(3002, "EmailAddress",new { remainingTime = remainingTime.ToFriendly(maxParts: 2) });
-                        this.SetModelCustomErrors<SignUpViewModel>();
-                        return View("AboutYou", model);
-                    }
-                }
-
-                //Delete the previous user org if there is one
-                var userOrg = await SharedBusinessLogic.DataRepository.FirstOrDefaultAsync<UserOrganisation>(uo => uo.UserId == virtualUser.UserId);
-                if (userOrg != null) SharedBusinessLogic.DataRepository.Delete(userOrg);
-
-                //If from a previous user then delete the previous user
-                SharedBusinessLogic.DataRepository.Delete(virtualUser);
+                //A registered user with this email already exists.
+                AddModelError(3001, "EmailAddress");
+                this.SetModelCustomErrors<SignUpViewModel>();
+                return View("AboutYou", model);
             }
 
             //Save the submitted fields
@@ -174,7 +160,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
                 virtualUser.SetSetting(UserSettingKeys.SendUpdates, model.SendUpdates.ToString());
             }
 
-            _accountService.UserRepository.UpdateUserPasswordUsingPBKDF2(virtualUser, model.Password);
+            await _accountService.UserRepository.UpdateUserPasswordUsingPBKDF2Async(virtualUser, model.Password);
 
             virtualUser.EmailVerifySendDate = null;
             virtualUser.EmailVerifiedDate = null;
@@ -186,6 +172,8 @@ namespace ModernSlavery.WebUI.Account.Controllers
             // save the current user
             SharedBusinessLogic.DataRepository.Insert(virtualUser);
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+
+            Logger.LogInformation($"New user created: Name {virtualUser.Fullname}, Email:{virtualUser.EmailAddress}, IP:{UserHostAddress}");
 
             //Save pendingFasttrackCodes
             var pendingFasttrackCodes = PendingFasttrackCodes;
@@ -233,8 +221,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             {
                 var verifyCode = Encryption.Encrypt($"{VirtualUser.UserId}:{VirtualUser.Created.ToSmallDateTime()}", Encryption.Encodings.Base62);
                 var verifyUrl = Url.Action("VerifyEmail", "NewAccount", new { code = verifyCode }, "https");
-                if (!await SharedBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl,
-                    VirtualUser.EmailAddress))
+                if (!await SharedBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl,VirtualUser.EmailAddress))
                     return null;
 
                 VirtualUser.EmailVerifyHash = Crypto.GetSHA512Checksum(verifyCode);
@@ -242,8 +229,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
 
                 await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-                Logger.LogInformation(
-                    $"Email verification sent: Name {VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}");
+                Logger.LogInformation($"Email verification queued: Name {VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}");
                 return verifyCode;
             }
             catch (Exception ex)
@@ -356,6 +342,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             if (virtualUser.EmailVerifyHash != Crypto.GetSHA512Checksum(code))
             {
                 virtualUser.VerifyAttempts++;
+                Logger.LogInformation($"New user email verification fail {virtualUser.VerifyAttempts}: Name {virtualUser.Fullname}, Email:{virtualUser.EmailAddress}, IP:{UserHostAddress}");
 
                 //If code min time has elapsed 
                 if (remainingResend <= TimeSpan.Zero)
@@ -383,6 +370,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             {
                 //Set the user as verified
                 virtualUser.EmailVerifiedDate = VirtualDateTime.Now;
+                Logger.LogInformation($"New user email verified: Name {virtualUser.Fullname}, Email:{virtualUser.EmailAddress}, IP:{UserHostAddress}");
 
                 //Mark the user as active
                 virtualUser.SetStatus(UserStatuses.Active, OriginalUser ?? virtualUser, "Email verified");
@@ -410,8 +398,8 @@ namespace ModernSlavery.WebUI.Account.Controllers
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        [HttpPost("verify-email")]
-        public async Task<IActionResult> VerifyEmail(VerifyViewModel model)
+        [HttpPost("verify-email/{code?}")]
+        public async Task<IActionResult> VerifyEmailPost([IgnoreText] string code = null)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -423,7 +411,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             //Call GET action which will automatically resend
-            return await VerifyEmail();
+            return await VerifyEmail(code);
         }
 
         #endregion

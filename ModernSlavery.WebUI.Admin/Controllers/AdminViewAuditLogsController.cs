@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,7 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = UserRoleNames.Admin)]
+    [Authorize(Roles = UserRoleNames.BasicAdmin)]
     [Route("admin")]
     [NoCache]
     public class AdminViewAuditLogsController : BaseController
@@ -28,8 +29,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpGet("organisation/{id}/audit-logs")]
-        public IActionResult ViewOrganisationAuditLogs(long id)
+        public async Task<IActionResult> ViewOrganisationAuditLogs(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var auditLogs = _adminService.SharedBusinessLogic.DataRepository.GetAll<AuditLog>()
                 .Where(audit => audit.Organisation.OrganisationId == id)
                 .OrderByDescending(audit => audit.CreatedDate)
@@ -44,8 +48,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
 
         [HttpGet("user/{id}/audit-logs")]
-        public IActionResult ViewUserAuditLogs(long id)
+        public async Task<IActionResult> ViewUserAuditLogs(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var auditLogs = _adminService.SharedBusinessLogic.DataRepository.GetAll<AuditLog>()
                 .Where(audit => audit.OriginalUser.UserId == id || audit.ImpersonatedUser.UserId == id)
                 .OrderByDescending(audit => audit.CreatedDate)

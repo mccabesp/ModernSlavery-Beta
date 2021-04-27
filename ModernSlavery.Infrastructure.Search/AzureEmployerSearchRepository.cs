@@ -2,24 +2,20 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using Autofac.Features.AttributeFilters;
 using AutoMapper;
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
-using Microsoft.Extensions.Options;
 using Microsoft.Rest.Azure;
 using ModernSlavery.Core;
 using ModernSlavery.Core.Classes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Models.LogModels;
 using ModernSlavery.Core.Options;
 using Index = Microsoft.Azure.Search.Models.Index;
 
@@ -29,30 +25,23 @@ namespace ModernSlavery.Infrastructure.Search
     {
         private const string suggestorName = "sgOrgName";
         private const string synonymMapName = "desc-synonymmap";
-        private readonly IMapper _autoMapper;
 
         private readonly HttpClient _httpClient;
         private Lazy<Task<ISearchServiceClient>> _serviceClient;
         private Lazy<Task<ISearchIndexClient>> _indexClient;
 
-        private readonly TelemetryClient _telemetryClient;
         public readonly IAuditLogger SearchLog;
         private readonly SharedOptions _sharedOptions;
-        private readonly TestOptions _testOptions;
         private readonly SearchOptions _searchOptions;
 
         public AzureOrganisationSearchRepository(
             SharedOptions sharedOptions,
-            TestOptions testOptions,
             SearchOptions searchOptions,
             HttpClient httpClient,
             [KeyFilter(Filenames.SearchLog)] IAuditLogger searchLog,
-            IMapper autoMapper,
-            IOptions<TelemetryConfiguration> telemetryOptions=null,
-            TelemetryClient telemetryClient = null)
+            IMapper autoMapper)
         {
             _sharedOptions = sharedOptions ?? throw new ArgumentNullException(nameof(sharedOptions));
-            _testOptions = testOptions ?? throw new ArgumentNullException(nameof(testOptions));
             _searchOptions = searchOptions ?? throw new ArgumentNullException(nameof(searchOptions));
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
@@ -63,18 +52,16 @@ namespace ModernSlavery.Infrastructure.Search
                 return;
             }
             SearchLog = searchLog;
-            _autoMapper = autoMapper;
-            _telemetryClient = telemetryClient;
 
             IndexName = searchOptions.OrganisationIndexName.ToLower();
             if (string.IsNullOrWhiteSpace(searchOptions.ServiceName)) throw new ArgumentNullException(nameof(searchOptions.ServiceName));
 
 #if DEBUG || DEBUGLOCAL
             /* Since we cant emulate Search Index we share the same search search on Azure DEV environment.
-             * Therefore we must use a different index name to the default when running locally in development mode
-             * So as not to interfer with the default indexes.
-             * Add your initials after the index name in your appsettings.secret.json file. eg.,
-             *   "SearchService": {"OrganisationIndexName": "OrganisationSearchModel-SMc"} */
+              Therefore we must use a different index name to the default when running locally in development mode
+              So as not to interfer with the default indexes.
+              Add your initials after the index name in your appsettings.secret.json file. eg., "SearchService": {"OrganisationIndexName": "OrganisationSearchModel-SMc"} */
+
             if (searchOptions.OrganisationIndexName.EqualsI(nameof(OrganisationSearchModel)) && _sharedOptions.IsDevelopment()) throw new ArgumentException($"Config setting 'SearchService:OrganisationIndexName' cannot be '{nameof(OrganisationSearchModel)}' when running locally in Development mode");
 #endif
 
@@ -113,7 +100,7 @@ namespace ModernSlavery.Infrastructure.Search
                     //Get the index client
                     if (!string.IsNullOrWhiteSpace(_searchOptions.AdminApiKey))
                     {
-                        var serviceClient = await _serviceClient.Value;
+                        var serviceClient = await _serviceClient.Value.ConfigureAwait(false);
                         return serviceClient.Indexes.GetClient(IndexName);
                     }
 
@@ -125,8 +112,7 @@ namespace ModernSlavery.Infrastructure.Search
                         return indexClient;
                     }
 
-                    throw new ArgumentNullException(
-                        $"You must provide '{nameof(_searchOptions.AdminApiKey)}' or '{nameof(_searchOptions.QueryApiKey)}'");
+                    throw new ArgumentNullException($"You must provide '{nameof(_searchOptions.AdminApiKey)}' or '{nameof(_searchOptions.QueryApiKey)}'");
                 });
 
         }
@@ -137,7 +123,7 @@ namespace ModernSlavery.Infrastructure.Search
 
         public async Task CreateIndexIfNotExistsAsync(string indexName)
         {
-            await CreateIndexIfNotExistsAsync(null, indexName);
+            await CreateIndexIfNotExistsAsync(null, indexName).ConfigureAwait(false);
         }
 
         private async Task CreateIndexIfNotExistsAsync(ISearchServiceClient serviceClient, string indexName=null)
@@ -145,10 +131,10 @@ namespace ModernSlavery.Infrastructure.Search
             if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
             //Ensure we have a service client and index name
-            serviceClient = serviceClient ?? await _serviceClient.Value ?? throw new ArgumentNullException(nameof(serviceClient));
+            serviceClient = serviceClient ?? await _serviceClient.Value.ConfigureAwait(false) ?? throw new ArgumentNullException(nameof(serviceClient));
             indexName = !string.IsNullOrWhiteSpace(indexName) ? indexName : !string.IsNullOrWhiteSpace(IndexName) ? IndexName : throw new ArgumentNullException(nameof(indexName));
 
-            if (await serviceClient.Indexes.ExistsAsync(indexName)) return;
+            if (await serviceClient.Indexes.ExistsAsync(indexName).ConfigureAwait(false)) return;
 
             #region Create the field definitions
             var fields = new List<Field>(FieldBuilder.BuildForType<OrganisationSearchModel>());
@@ -261,7 +247,7 @@ namespace ModernSlavery.Infrastructure.Search
             index.Fields.First(f => f.Name == nameof(OrganisationSearchModel.OrganisationName)).SynonymMaps = new[] { synonymMapName };
 
             //Add the synonyms if they dont already exist
-            if (!await serviceClient.SynonymMaps.ExistsAsync(synonymMapName))
+            if (!await serviceClient.SynonymMaps.ExistsAsync(synonymMapName).ConfigureAwait(false))
                 serviceClient.SynonymMaps.CreateOrUpdate(
                     new SynonymMap
                     {
@@ -270,12 +256,12 @@ namespace ModernSlavery.Infrastructure.Search
                         Synonyms = "coop, co-operative"
                     });
 
-            await serviceClient.Indexes.CreateAsync(index);
+            await serviceClient.Indexes.CreateAsync(index).ConfigureAwait(false);
         }
 
         public async Task DeleteIndexIfExistsAsync(string indexName = null)
         {
-            await DeleteIndexIfExistsAsync(null, indexName);
+            await DeleteIndexIfExistsAsync(null, indexName).ConfigureAwait(false);
         }
 
         private async Task DeleteIndexIfExistsAsync(ISearchServiceClient serviceClient, string indexName=null)
@@ -283,12 +269,12 @@ namespace ModernSlavery.Infrastructure.Search
             if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
             //Ensure we have a service client and index name
-            serviceClient = serviceClient ?? await _serviceClient.Value ?? throw new ArgumentNullException(nameof(serviceClient));
+            serviceClient = serviceClient ?? await _serviceClient.Value.ConfigureAwait(false) ?? throw new ArgumentNullException(nameof(serviceClient));
             indexName = !string.IsNullOrWhiteSpace(indexName) ? indexName : !string.IsNullOrWhiteSpace(IndexName) ? IndexName : throw new ArgumentNullException(nameof(indexName));
 
-            if (!await serviceClient.Indexes.ExistsAsync(indexName)) return;
+            if (!await serviceClient.Indexes.ExistsAsync(indexName).ConfigureAwait(false)) return;
 
-            await serviceClient.Indexes.DeleteAsync(indexName);
+            await serviceClient.Indexes.DeleteAsync(indexName).ConfigureAwait(false);
 
             //Recreate the service client
             SetServiceClient();
@@ -297,7 +283,7 @@ namespace ModernSlavery.Infrastructure.Search
             SetIndexClient();
 
             //Recreate the index
-            await CreateIndexIfNotExistsAsync(IndexName);
+            await CreateIndexIfNotExistsAsync(IndexName).ConfigureAwait(false);
         }
 
         public async Task AddOrUpdateDocumentsAsync(IEnumerable<OrganisationSearchModel> newRecords)
@@ -323,7 +309,7 @@ namespace ModernSlavery.Infrastructure.Search
                 actions.RemoveRange(0, batchSize);
             }
 
-            var indexClient = await _indexClient.Value;
+            var indexClient = await _indexClient.Value.ConfigureAwait(false);
 
             Parallel.ForEach(
                 batches,
@@ -372,7 +358,7 @@ namespace ModernSlavery.Infrastructure.Search
             var deleteCount = 0;
 
             var exceptions = new ConcurrentBag<Exception>();
-            var indexClient = await _indexClient.Value;
+            var indexClient = await _indexClient.Value.ConfigureAwait(false);
 
             await batches.WaitForAllAsync(
                 async batch =>
@@ -381,7 +367,7 @@ namespace ModernSlavery.Infrastructure.Search
                     retry:
                     try
                     {
-                        await indexClient.Documents.IndexAsync(batch);
+                        await indexClient.Documents.IndexAsync(batch).ConfigureAwait(false);
                         Interlocked.Add(ref deleteCount, batch.Actions.Count());
                     }
                     catch (IndexBatchException e)
@@ -399,8 +385,8 @@ namespace ModernSlavery.Infrastructure.Search
                     {
                         exceptions.Add(ex);
                     }
-                });
-            if (exceptions.Count > 0) throw new AggregateException(exceptions);
+                }).ConfigureAwait(false);
+            if (!exceptions.IsEmpty) throw new AggregateException(exceptions);
 
             return deleteCount;
         }
@@ -412,11 +398,11 @@ namespace ModernSlavery.Infrastructure.Search
             //Limit result fields
             var selectedFields = string.IsNullOrWhiteSpace(selectFields) ? null : selectFields.SplitI().ToList();
 
-            var indexClient = await _indexClient.Value;
+            var indexClient = await _indexClient.Value.ConfigureAwait(false);
 
             try
             {
-                var result = await indexClient.Documents.GetAsync<OrganisationSearchModel>(key, selectedFields);
+                var result = await indexClient.Documents.GetAsync<OrganisationSearchModel>(key, selectedFields).ConfigureAwait(false);
 
                 return result;
             }
@@ -433,13 +419,14 @@ namespace ModernSlavery.Infrastructure.Search
             long totalPages = 0;
             var currentPage = 1;
             var resultsList = new List<OrganisationSearchModel>();
+            var orderBy = $"{nameof(OrganisationSearchModel.OrganisationName)}, {nameof(OrganisationSearchModel.SubmissionDeadlineYear)} desc";
             do
             {
-                var searchResults = await SearchDocumentsAsync(null,currentPage,selectFields: selectFields, filter:filter);
+                var searchResults = await SearchDocumentsAsync(null,currentPage,selectFields: selectFields, filter:filter,orderBy: orderBy).ConfigureAwait(false);
                 totalPages = searchResults.ActualPageCount;
                 resultsList.AddRange(searchResults.Results);
                 currentPage++;
-            } while (currentPage < totalPages);
+            } while (currentPage <= totalPages);
 
             return resultsList;
         }
@@ -448,11 +435,11 @@ namespace ModernSlavery.Infrastructure.Search
         {
             if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
-            var serviceClient = await _serviceClient.Value;
+            var serviceClient = await _serviceClient.Value.ConfigureAwait(false);
 
-            if (!await serviceClient.Indexes.ExistsAsync(IndexName)) return 0;
+            if (!await serviceClient.Indexes.ExistsAsync(IndexName).ConfigureAwait(false)) return 0;
 
-            var searchResults = await SearchDocumentsAsync(null, 1);
+            var searchResults = await SearchDocumentsAsync(null, 1).ConfigureAwait(false);
             return searchResults.ActualRecordTotal;
         }
 
@@ -469,7 +456,7 @@ namespace ModernSlavery.Infrastructure.Search
         {
             if (Disabled) throw new Exception($"{nameof(AzureOrganisationSearchRepository)} is disabled");
 
-            var indexClient = await _indexClient.Value;
+            var indexClient = await _indexClient.Value.ConfigureAwait(false);
 
             // Execute search based on query string
             var sp = new SearchParameters
@@ -500,7 +487,7 @@ namespace ModernSlavery.Infrastructure.Search
 
             //Execute the search
             var headers = new Dictionary<string, List<string>>() { { "x-ms-azs-return-searchid", new List<string>() { "true" } } };
-            var results = await indexClient.Documents.SearchWithHttpMessagesAsync<OrganisationSearchModel>(searchText, sp,customHeaders:headers);
+            var results = await indexClient.Documents.SearchWithHttpMessagesAsync<OrganisationSearchModel>(searchText, sp,customHeaders:headers).ConfigureAwait(false);
 
             //Return the total records
             var totalRecords = results.Body.Count.Value;
@@ -511,21 +498,19 @@ namespace ModernSlavery.Infrastructure.Search
                 //Get the search id for logging purposes
                 var searchId = results.Response.Headers.TryGetValues("x-ms-azs-searchid", out IEnumerable<string> headerValues) ? headerValues.FirstOrDefault() : string.Empty;
 
-                var telemetryProperties = new Dictionary<string, string>
+                var searchLogModel = new SearchLogModel
                 {
-                    {"TimeStamp", VirtualDateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")},
-                    {"SearchServiceName", _searchOptions.ServiceName},
-                    {"IndexName", IndexName},
-                    {"SearchId", searchId},
-                    {"QueryTerms", searchText},
-                    {"Filter",sp.Filter},
-                    {"OrderBy",sp.OrderBy.ToDelimitedString()},
-                    {"ResultCount", totalRecords.ToString()}
+                    TimeStamp=VirtualDateTime.Now,
+                    SearchServiceName=_searchOptions.ServiceName,
+                    IndexName=IndexName,
+                    SearchId=searchId,
+                    QueryTerms=searchText,
+                    Filter=sp.Filter,
+                    OrderBy=sp.OrderBy.ToDelimitedString(),
+                    ResultCount=totalRecords
                 };
 
-                _telemetryClient?.TrackEvent("Search", telemetryProperties);
-
-                await SearchLog.WriteAsync(telemetryProperties);
+                await SearchLog.WriteAsync(searchLogModel).ConfigureAwait(false);
             }
 
             
@@ -555,8 +540,5 @@ namespace ModernSlavery.Infrastructure.Search
             //Return the results
             return searchResults;
         }
-
-  
-
     }
 }

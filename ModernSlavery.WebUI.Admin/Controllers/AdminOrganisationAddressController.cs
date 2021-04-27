@@ -19,30 +19,36 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = UserRoleNames.Admin)]
+    [Authorize(Roles = UserRoleNames.BasicAdmin)]
     [Route("admin")]
     public class AdminOrganisationAddressController : BaseController
     {
-        private readonly AuditLogger auditLogger;
-        private readonly ICompaniesHouseAPI CompaniesHouseApi;
-        private readonly ICompaniesHouseService UpdateFromCompaniesHouseService;
+        private readonly AuditLogger _auditLogger;
+        private readonly ICompaniesHouseAPI _companiesHouseApi;
+        private readonly ICompaniesHouseService _updateFromCompaniesHouseService;
+        private readonly ISearchBusinessLogic _searchBusinessLogic;
 
         public AdminOrganisationAddressController(
             ICompaniesHouseAPI companiesHouseApi,
             ICompaniesHouseService updateFromCompaniesHouseService,
+            ISearchBusinessLogic searchBusinessLogic,
             AuditLogger auditLogger,
             ILogger<AdminOrganisationAddressController> logger,
             IWebService webService,
             ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
-            UpdateFromCompaniesHouseService = updateFromCompaniesHouseService;
-            this.auditLogger = auditLogger;
-            CompaniesHouseApi = companiesHouseApi;
+            _updateFromCompaniesHouseService = updateFromCompaniesHouseService;
+            _auditLogger = auditLogger;
+            _searchBusinessLogic = searchBusinessLogic;
+            _companiesHouseApi = companiesHouseApi;
         }
 
         [HttpGet("organisation/{id}/address")]
-        public IActionResult ViewAddressHistory(long id)
+        public async Task<IActionResult> ViewAddressHistory(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             return View("ViewOrganisationAddress", organisation);
@@ -52,17 +58,23 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
         public async Task<IActionResult> ChangeAddressGet(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
                 try
                 {
-                    var organisationFromCompaniesHouse = await CompaniesHouseApi.GetCompanyAsync(organisation.CompanyNumber);
+                    var organisationFromCompaniesHouse = await _companiesHouseApi.GetCompanyAsync(organisation.CompanyNumber);
 
-                    var addressFromCompaniesHouse = await UpdateFromCompaniesHouseService.CreateOrganisationAddressFromCompaniesHouseAddressAsync(organisationFromCompaniesHouse.RegisteredOfficeAddress);
+                    if (organisationFromCompaniesHouse != null)
+                    {
+                        var addressFromCompaniesHouse = await _updateFromCompaniesHouseService.CreateOrganisationAddressFromCompaniesHouseAddressAsync(organisationFromCompaniesHouse.RegisteredOfficeAddress);
 
-                    if (!organisation.GetLatestAddress().AddressMatches(addressFromCompaniesHouse))
-                        return OfferNewCompaniesHouseAddress(organisation, addressFromCompaniesHouse);
+                        if (!organisation.GetLatestAddress().AddressMatches(addressFromCompaniesHouse))
+                            return OfferNewCompaniesHouseAddress(organisation, addressFromCompaniesHouse);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -110,8 +122,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost("organisation/{id}/address/change")]
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
-        public IActionResult ChangeAddressPost(long id, ChangeOrganisationAddressViewModel viewModel)
+        public async Task<IActionResult> ChangeAddressPost(long id, ChangeOrganisationAddressViewModel viewModel)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             // We might need to change the value of Action before we go to the view
             // Apparently this is necessary
             // https://stackoverflow.com/questions/4837744/hiddenfor-not-getting-correct-value-from-view-model
@@ -129,7 +144,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 case ManuallyChangeOrganisationAddressViewModelActions.CheckChangesManual:
                 case ManuallyChangeOrganisationAddressViewModelActions.CheckChangesCoHo:
-                    return CheckChangesAction(viewModel, organisation);
+                    return await CheckChangesActionAsync(viewModel, organisation);
 
                 default:
                     throw new ArgumentException(
@@ -212,18 +227,18 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return View("ConfirmAddressChange", viewModel);
         }
 
-        private IActionResult CheckChangesAction(ChangeOrganisationAddressViewModel viewModel,
+        private async Task<IActionResult> CheckChangesActionAsync(ChangeOrganisationAddressViewModel viewModel,
             Organisation organisation)
         {
             if (viewModel.Action == ManuallyChangeOrganisationAddressViewModelActions.CheckChangesManual)
-                OptOrganisationOutOfCompaniesHouseUpdates(organisation);
+                await OptOrganisationOutOfCompaniesHouseUpdatesAsync(organisation);
 
-            SaveChangesAndAuditAction(viewModel, organisation);
+            await SaveChangesAndAuditActionAsync(viewModel, organisation);
 
             return View("SuccessfullyChangedOrganisationAddress", organisation);
         }
 
-        private void SaveChangesAndAuditAction(ChangeOrganisationAddressViewModel viewModel, Organisation organisation)
+        private async Task SaveChangesAndAuditActionAsync(ChangeOrganisationAddressViewModel viewModel, Organisation organisation)
         {
             var oldAddressString = organisation.GetLatestAddress()?.GetAddressString();
 
@@ -232,9 +247,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var newOrganisationAddress = CreateOrganisationAddressFromViewModel(viewModel);
             AddNewAddressToOrganisation(newOrganisationAddress, organisation);
 
-            SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            auditLogger.AuditChangeToOrganisation(
+            await _auditLogger.AuditChangeToOrganisationAsync(
                 this,
                 AuditedAction.AdminChangeOrganisationAddress,
                 organisation,
@@ -246,6 +261,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     NewAddressId = newOrganisationAddress.AddressId,
                     viewModel.Reason
                 });
+
+            //Update the search record
+            await _searchBusinessLogic.RefreshSearchDocumentsAsync(organisation);
         }
 
         private static void RetireOldAddress(Organisation organisation)
@@ -260,7 +278,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         {
             var organisationAddress = new OrganisationAddress
             {
-                PoBox = viewModel.PoBox,
                 Address1 = viewModel.Address1,
                 Address2 = viewModel.Address2,
                 Address3 = viewModel.Address3,
@@ -268,6 +285,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 County = viewModel.County,
                 Country = viewModel.Country,
                 PostCode = viewModel.PostCode,
+                PoBox = viewModel.PoBox,
                 Status = AddressStatuses.Active,
                 StatusDate = VirtualDateTime.Now,
                 StatusDetails = viewModel.Reason,
@@ -275,6 +293,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 Created = VirtualDateTime.Now,
                 Source = "Service Desk"
             };
+
+            organisationAddress.Trim();
 
             if (viewModel.IsUkAddress.HasValue)
                 organisationAddress.IsUkAddress =
@@ -292,10 +312,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             SharedBusinessLogic.DataRepository.Insert(organisationAddress);
         }
 
-        private void OptOrganisationOutOfCompaniesHouseUpdates(Organisation organisation)
+        private async Task OptOrganisationOutOfCompaniesHouseUpdatesAsync(Organisation organisation)
         {
             organisation.OptedOutFromCompaniesHouseUpdate = true;
-            SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
         }
     }
 }

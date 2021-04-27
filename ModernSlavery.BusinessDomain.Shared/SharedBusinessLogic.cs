@@ -19,7 +19,6 @@ namespace ModernSlavery.BusinessDomain.Shared
         ISendEmailService SendEmailService { get; }
         INotificationService NotificationService { get; }
         IAuthorisationBusinessLogic AuthorisationBusinessLogic { get; }
-        IAuthenticationBusinessLogic AuthenticationBusinessLogic { get; }
         IReportingDeadlineHelper ReportingDeadlineHelper { get; }
         IObfuscator Obfuscator { get; }
     }
@@ -35,14 +34,12 @@ namespace ModernSlavery.BusinessDomain.Shared
         public ISendEmailService SendEmailService { get; }
         public INotificationService NotificationService { get; }
         public IAuthorisationBusinessLogic AuthorisationBusinessLogic { get; }
-        public IAuthenticationBusinessLogic AuthenticationBusinessLogic { get; }
         public IReportingDeadlineHelper ReportingDeadlineHelper { get; }
         public SharedBusinessLogic(SharedOptions sharedOptions, TestOptions testOptions, IReportingDeadlineHelper reportingDeadlineHelper,
             ISourceComparer sourceComparer,
             ISendEmailService sendEmailService, 
             INotificationService notificationService, 
             IAuthorisationBusinessLogic authorisationBusinessLogic,
-            IAuthenticationBusinessLogic authenticationBusinessLogic,
             IFileRepository fileRepository, IDataRepository dataRepository, IObfuscator obfuscator)
         {
             SharedOptions = sharedOptions;
@@ -52,7 +49,6 @@ namespace ModernSlavery.BusinessDomain.Shared
             SendEmailService = sendEmailService;
             NotificationService = notificationService;
             AuthorisationBusinessLogic = authorisationBusinessLogic;
-            AuthenticationBusinessLogic = authenticationBusinessLogic;
             FileRepository = fileRepository;
             DataRepository = dataRepository;
             Obfuscator = obfuscator;

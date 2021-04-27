@@ -35,6 +35,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [IPAddressFilter]
         public async Task<IActionResult> DownloadFile([IgnoreText] string p)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             IActionResult result;
 
             try

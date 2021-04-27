@@ -64,7 +64,7 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
         {
             return new CustomError(
                 HttpStatusCode.NotFound,
-                $"Organisation: Could not find GPG Data for organisation:{organisationIdEncrypted} and year:{year}");
+                $"Organisation: Could not find Modern Slavery Data for organisation:{organisationIdEncrypted} and year:{year}");
         }
 
         public static CustomError HttpGoneCausedByReportNotHavingBeenSubmitted(int reportYear, string reportStatus)
@@ -76,7 +76,7 @@ namespace ModernSlavery.Core.Classes.ErrorMessages
         public static CustomError HttpNotFoundCausedByReturnIdNotInDatabase(string returnIdEncrypted)
         {
             return new CustomError(HttpStatusCode.NotFound,
-                $"Organisation: Could not find GPG Data for returnId:'{returnIdEncrypted}'");
+                $"Organisation: Could not find Modern Slavery Data for returnId:'{returnIdEncrypted}'");
         }
     }
 }

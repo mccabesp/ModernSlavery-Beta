@@ -15,13 +15,11 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         IShortCodesRepository ShortCodesRepository { get; }
         IOrganisationBusinessLogic OrganisationBusinessLogic { get; set; }
         ISearchBusinessLogic SearchBusinessLogic { get; set; }
-        IStatementBusinessLogic StatementBusinessLogic { get; }
         IUserRepository UserRepository { get; }
         IPagedRepository<OrganisationRecord> PrivateSectorRepository { get; }
         IPagedRepository<OrganisationRecord> PublicSectorRepository { get; }
         IQueue ExecuteWebjobQueue { get; }
         ISearchRepository<OrganisationSearchModel> OrganisationSearchRepository { get; }
         ISharedBusinessLogic SharedBusinessLogic { get; }
-        Task LogSubmission(IOrderedEnumerable<SubmissionLogModel> logRecords);
     }
 }

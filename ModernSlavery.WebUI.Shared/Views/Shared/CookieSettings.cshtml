@@ -6,6 +6,10 @@
     Title = $"Cookies on the {sharedOptions.ServiceName}";
 }
 
+@section BeforeMain {
+    <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Controller.BackUrl">Back</a>
+}
+
 <div class="govuk-grid-row cookie-settings-page">
     <div class="govuk-grid-column-two-thirds">
         @if (Model.ChangesHaveBeenSaved)

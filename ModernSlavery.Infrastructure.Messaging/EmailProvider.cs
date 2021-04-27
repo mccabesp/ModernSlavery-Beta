@@ -15,6 +15,12 @@ namespace ModernSlavery.Infrastructure.Messaging
 {
     public class EmailProvider : BaseEmailProvider
     {
+        #region Dependencies
+        private readonly GovNotifyEmailProvider _govNotifyEmailProvider;
+        private readonly SmtpEmailProvider _smtpEmailProvider;
+        public readonly EmailOptions EmailOptions;
+        #endregion
+
         public EmailProvider(
             GovNotifyEmailProvider govNotifyEmailProvider,
             SmtpEmailProvider smtpEmailProvider,
@@ -24,26 +30,25 @@ namespace ModernSlavery.Infrastructure.Messaging
             ILogger<EmailProvider> logger,
             [KeyFilter(Filenames.EmailSendLog)] IAuditLogger emailSendLog) : base(testOptions, emailTemplateRepo, logger, emailSendLog)
         {
-            GovNotifyEmailProvider = govNotifyEmailProvider ?? throw new ArgumentNullException(nameof(govNotifyEmailProvider));
-            SmtpEmailProvider = smtpEmailProvider ?? throw new ArgumentNullException(nameof(smtpEmailProvider));
+            _govNotifyEmailProvider = govNotifyEmailProvider ?? throw new ArgumentNullException(nameof(govNotifyEmailProvider));
+            _smtpEmailProvider = smtpEmailProvider ?? throw new ArgumentNullException(nameof(smtpEmailProvider));
             EmailOptions = emailOptions ?? throw new ArgumentNullException(nameof(emailOptions));
         }
 
         public override async Task<SendEmailResult> SendEmailAsync<TModel>(string emailAddress, string templateId,TModel model)
         {
-            SendEmailResult result;
+            SendEmailResult result=null;
 
-            if (GovNotifyEmailProvider.Enabled)
+            if (_govNotifyEmailProvider.Enabled)
             {
                 result = await TrySendGovNotifyEmailAsync(emailAddress, templateId, model).ConfigureAwait(false);
-
-                if (result != null)
-                    // gov notify provider succeeded 
-                    return result;
             }
 
             // gov notify provider failed so trying the smtp provider
-            result = await TrySendSmtpEmail(emailAddress, templateId, model).ConfigureAwait(false);
+            if (result == null && _smtpEmailProvider.Enabled)
+            {
+                result = await TrySendSmtpEmail(emailAddress, templateId, model).ConfigureAwait(false);
+            }
 
             return result;
         }
@@ -52,9 +57,8 @@ namespace ModernSlavery.Infrastructure.Messaging
         {
             try
             {
-                var result = await GovNotifyEmailProvider.SendEmailAsync(emailAddress, templateId, model).ConfigureAwait(false);
-                if (result.Status.EqualsI("created", "sending", "delivered") == false)
-                    throw new Exception($"Unexpected status '{result.Status}' returned");
+                var result = await _govNotifyEmailProvider.SendEmailAsync(emailAddress, templateId, model).ConfigureAwait(false);
+                if (!result.Status.EqualsI("created", "sending", "delivered"))throw new Exception($"Unexpected status '{result.Status}' returned from Template {templateId}");
 
                 await EmailSendLog.WriteAsync(
                     new EmailSendLogModel
@@ -69,20 +73,15 @@ namespace ModernSlavery.Infrastructure.Messaging
             }
             catch (Exception ex)
             {
-                Logger.LogError(
-                    ex,
-                    "{FuncName}: Could not send email to Gov Notify using the email address: {Email}:",
-                    nameof(TrySendGovNotifyEmailAsync),
-                    emailAddress);
+                Logger.LogError(ex,$"{nameof(TrySendGovNotifyEmailAsync)}: Could not send email to Gov Notify Template: {templateId} using the email address: {emailAddress}");
 
                 // send failure email to GEO using smtp email provider
-                await SmtpEmailProvider.SendEmailTemplateAsync(
+                await _smtpEmailProvider.SendEmailTemplateAsync(
                     new SendEmailTemplate
                     {
                         RecipientEmailAddress = EmailOptions.AdminDistributionList,
-                        Subject = "GPG - GOV NOTIFY ERROR",
-                        MessageBody =
-                            $"Could not send email to Gov Notify using {emailAddress} due to following error:\n\n{ex.GetDetailsText()}.\n\nWill attempting to resend email using SMTP."
+                        Subject = "MSU - GOV NOTIFY ERROR",
+                        MessageBody = $"Could not send email to Gov Notify Template:{templateId} using {emailAddress} due to following error:\n\n{ex.GetDetailsText()}.\n\nWill attempting to resend email using SMTP."
                     }).ConfigureAwait(false);
             }
 
@@ -93,7 +92,7 @@ namespace ModernSlavery.Infrastructure.Messaging
         {
             try
             {
-                var result = await SmtpEmailProvider.SendEmailAsync(emailAddress, templateId, model).ConfigureAwait(false);
+                var result = await _smtpEmailProvider.SendEmailAsync(emailAddress, templateId, model).ConfigureAwait(false);
 
                 await EmailSendLog.WriteAsync(
                     new EmailSendLogModel
@@ -118,15 +117,5 @@ namespace ModernSlavery.Infrastructure.Messaging
 
             return null;
         }
-
-        #region Dependencies
-
-        public GovNotifyEmailProvider GovNotifyEmailProvider { get; }
-
-        public SmtpEmailProvider SmtpEmailProvider { get; }
-
-        public EmailOptions EmailOptions { get; }
-
-        #endregion
     }
 }

@@ -179,8 +179,8 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
 
                     b.Property<string>("OrganisationName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
+                        .HasColumnType("nvarchar(160)")
+                        .HasMaxLength(160);
 
                     b.Property<string>("OrganisationReference")
                         .HasColumnType("nvarchar(10)")
@@ -255,8 +255,8 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Address1")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
 
                     b.Property<string>("Address2")
                         .HasColumnType("nvarchar(100)")
@@ -339,8 +339,8 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
+                        .HasColumnType("nvarchar(160)")
+                        .HasMaxLength(160);
 
                     b.Property<long>("OrganisationId")
                         .HasColumnType("bigint");
@@ -749,7 +749,8 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StatementEmail")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(254)")
+                        .HasMaxLength(254);
 
                     b.Property<DateTime>("StatementEndDate")
                         .HasColumnType("Date");
@@ -758,8 +759,8 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
                         .HasColumnType("Date");
 
                     b.Property<string>("StatementUrl")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
+                        .HasColumnType("nvarchar(1024)")
+                        .HasMaxLength(1024);
 
                     b.Property<byte>("StatementYears")
                         .HasColumnName("StatementYearsId")
@@ -841,8 +842,8 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
 
                     b.Property<string>("OrganisationName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
+                        .HasColumnType("nvarchar(160)")
+                        .HasMaxLength(160);
 
                     b.Property<long>("StatementId")
                         .HasColumnType("bigint");
@@ -1066,6 +1067,10 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
 
                     b.Property<byte>("Method")
                         .HasColumnName("MethodId")
@@ -1324,7 +1329,7 @@ namespace ModernSlavery.Infrastructure.Database.Migrations
             modelBuilder.Entity("ModernSlavery.Core.Entities.StatementOrganisation", b =>
                 {
                     b.HasOne("ModernSlavery.Core.Entities.Organisation", "Organisation")
-                        .WithMany()
+                        .WithMany("StatementOrganisations")
                         .HasForeignKey("OrganisationId");
 
                     b.HasOne("ModernSlavery.Core.Entities.Statement", "Statement")

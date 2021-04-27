@@ -92,18 +92,22 @@ namespace ModernSlavery.WebUI.Submission.Models
 
         [Required]
         [Text]
+        [MaxLength(50)]
         public string FirstName { get; set; }
 
         [Required]
         [Text]
+        [MaxLength(50)]
         public string LastName { get; set; }
 
         [Required]
         [Text]
+        [MaxLength(50)]
         public string JobTitle { get; set; }
 
         [Required]
         [EmailAddress]
+        [MaxLength(254)]
         public string EmailAddress { get; set; }
 
         public bool HasName => !string.IsNullOrEmpty(FirstName + LastName);

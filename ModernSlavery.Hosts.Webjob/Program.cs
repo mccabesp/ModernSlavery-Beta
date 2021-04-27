@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.Hosts.Webjob.Jobs;
 using ModernSlavery.Infrastructure.Hosts;
-using Microsoft.Extensions.Logging;
-using System;
 
 namespace ModernSlavery.Hosts.Webjob
 {
@@ -15,14 +14,17 @@ namespace ModernSlavery.Hosts.Webjob
         {
             //Create the host
             var host = CreateHostBuilder(args).Build();
-            
+
             //NOTE: Leave this here to ensure function dependencies resolve on startup rather than when each function method is invoked
             //      It is also also useful when debugging individual jobs locally
-            var functions = host.Services.GetService<Functions>();
-            //var loggerFactory = host.Services.GetService<ILoggerFactory>();
-            //var logger = loggerFactory.CreateLogger<ILogger<Program>>();
-            //functions.UpdateOrganisationSearchIndexesAsync(null, logger).Wait();
+            //var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
+            //var logger = loggerFactory.CreateLogger<ILogger<UpdateFromCompaniesHouseWebJob>>();
+            //var webjob = host.Services.GetRequiredService<UpdateFromCompaniesHouseWebJob>();
+            //webjob.UpdateFromCompaniesHouseAsync(null, logger).Wait();
             //return;
+
+            //Clear old console logs to prevent server crash on startup
+            host.Services.GetRequiredService<ClearConsoleLogsWebJob>()?.ClearConsoleLogs();
 
             //Run the host
             await host.RunAsync().ConfigureAwait(false);
@@ -35,7 +37,7 @@ namespace ModernSlavery.Hosts.Webjob
         /// <returns></returns>
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
-            //Create the WebjobHost
+            //Create the WebJobHost
             return WebjobHost.ConfigureWebjobHostBuilder<DependencyModule>(commandlineArgs: args);
         }
     }

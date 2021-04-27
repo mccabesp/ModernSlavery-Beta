@@ -36,8 +36,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
         /// <param name="message"></param>
         public async Task<bool> SendMsuMessageAsync(string subject, string message)
         {
-            return await QueueEmailAsync(new QueueWrapper(new SendMsuMessageModel
-            { subject = subject, message = message }));
+            return await QueueEmailAsync(new SendMsuMessageModel{ subject = subject, message = message });
         }
 
         public async Task<bool> SendCreateAccountPendingVerificationAsync(string verifyUrl, string emailAddress)
@@ -137,15 +136,16 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
         public async Task<bool> SendMsuRegistrationRequestAsync(string reviewUrl,
             string contactName,
             string reportingOrg,
-            string reportingAddress)
+            string reportingAddress,
+            string details=null)
         {
-            var geoOrganisationRegistrationRequest = new MsuOrganisationRegistrationRequestTemplate
-            {
+            var geoOrganisationRegistrationRequest = new MsuOrganisationRegistrationRequestTemplate {
                 RecipientEmailAddress = EmailOptions.AdminDistributionList,
                 Name = contactName,
                 Org2 = reportingOrg,
                 Address = reportingAddress,
-                Url = reviewUrl
+                Url = reviewUrl,
+                Details = string.IsNullOrWhiteSpace(details) ? " " : details
             };
 
             return await QueueEmailAsync(geoOrganisationRegistrationRequest);
@@ -173,6 +173,20 @@ namespace ModernSlavery.BusinessDomain.Shared.Classes
             };
 
             return await QueueEmailAsync(organisationRegistrationDeclined);
+        }
+
+        public async Task<bool> SendPinEmailAsync(string emailAddress, string pin, string organisationName, string url, DateTime expiresDate)
+        {
+            var sendPINTemplate = new SendPINTemplate {
+                RecipientEmailAddress=emailAddress,
+                PIN = pin,
+                OrganisationName = organisationName,
+                Date = VirtualDateTime.Now.ToString("d MMMM yyyy"),
+                Url = url,
+                ExpiresDate = expiresDate.ToString("d MMMM yyyy"),
+            };
+
+            return await QueueEmailAsync(sendPINTemplate);
         }
 
         private async Task<bool> QueueEmailAsync<TTemplate>(TTemplate emailTemplate)

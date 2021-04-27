@@ -9,11 +9,13 @@ namespace ModernSlavery.WebUI.Account.Models
     [DefaultResource(typeof(AccountResources))]
     public class ChangeDetailsViewModel
     {
+        [StringLength(50, ErrorMessageResourceName = nameof(AccountResources.FirstNameLength))]
         [Required(AllowEmptyStrings = false, ErrorMessageResourceName = nameof(AccountResources.FirstNameRequired))]
         [Display(Name = nameof(FirstName))]
         [Text] 
         public string FirstName { get; set; }
 
+        [StringLength(50, ErrorMessageResourceName = nameof(AccountResources.LastNameLength))]
         [Required(AllowEmptyStrings = false, ErrorMessageResourceName = nameof(AccountResources.LastNameRequired))]
         [Display(Name = nameof(LastName))]
         [Text] 

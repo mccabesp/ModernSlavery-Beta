@@ -33,11 +33,15 @@ namespace ModernSlavery.BusinessDomain.Registration
 
             var companyName = userOrganisation.Organisation.OrganisationName;
 
-            var address = GetAddressInFourLineFormat(userOrganisation.Organisation);
+            var organisationAddress = userOrganisation.Organisation.GetLatestAddress(AddressStatuses.Pending);
+            if (organisationAddress==null) organisationAddress = userOrganisation.Organisation.GetLatestAddress();
+            if (organisationAddress==null) throw new Exception($"Attempt to send PIN for {companyName} with no active or pending address");
 
-            var postCode = userOrganisation.Organisation.OrganisationAddresses.OrderByDescending(a => a.Modified).FirstOrDefault().PostCode;
+            var address = GetAddressInFourLineFormat(organisationAddress);
 
-            var pinExpiryDate = VirtualDateTime.Now.AddDays(_sharedOptions.PinInPostExpiryDays);
+            var postCode = organisationAddress.PostCode;
+
+            var pinExpiryDate = userOrganisation.PINSentDate.Value.AddDays(_sharedOptions.PinInPostExpiryDays);
 
             var templateId = _sharedOptions.GovUkNotifyPinInThePostTemplateId;
 
@@ -60,45 +64,43 @@ namespace ModernSlavery.BusinessDomain.Registration
             return await _govNotifyApi.SendLetterAsync(templateId, personalisation).ConfigureAwait(false);
         }
 
-        public List<string> GetAddressInFourLineFormat(Organisation organisation)
+        public List<string> GetAddressInFourLineFormat(OrganisationAddress organisationAddress)
         {
-            var address = GetAddressComponentsWithoutRepeatsOrUnnecessaryComponents(organisation);
+            var address = GetAddressComponentsWithoutRepeatsOrUnnecessaryComponents(organisationAddress);
 
             ReduceAddressToAtMostFourLines(address);
 
             return address;
         }
 
-        public List<string> GetAddressComponentsWithoutRepeatsOrUnnecessaryComponents(Organisation organisation)
+        public List<string> GetAddressComponentsWithoutRepeatsOrUnnecessaryComponents(OrganisationAddress organisationAddress)
         {
             var address = new List<string>();
 
-            var latestAddress = organisation.OrganisationAddresses.OrderByDescending(a => a.Modified).FirstOrDefault();
-
-            if (!string.IsNullOrWhiteSpace(latestAddress.PoBox))
+            if (!string.IsNullOrWhiteSpace(organisationAddress.PoBox))
             {
-                var poBox = latestAddress.PoBox;
+                var poBox = organisationAddress.PoBox;
                 if (!poBox.Contains("PO Box", StringComparison.OrdinalIgnoreCase)) poBox = $"PO Box {poBox}";
 
                 address.Add("PO Box " + poBox);
             }
 
-            if (!string.IsNullOrWhiteSpace(latestAddress.Address1)) address.Add(latestAddress.Address1);
+            if (!string.IsNullOrWhiteSpace(organisationAddress.Address1)) address.Add(organisationAddress.Address1);
 
-            if (!string.IsNullOrWhiteSpace(latestAddress.Address2)) address.Add(latestAddress.Address2);
+            if (!string.IsNullOrWhiteSpace(organisationAddress.Address2)) address.Add(organisationAddress.Address2);
 
-            if (!string.IsNullOrWhiteSpace(latestAddress.Address3)) address.Add(latestAddress.Address3);
+            if (!string.IsNullOrWhiteSpace(organisationAddress.Address3)) address.Add(organisationAddress.Address3);
 
-            if (!string.IsNullOrWhiteSpace(latestAddress.TownCity)) address.Add(latestAddress.TownCity);
+            if (!string.IsNullOrWhiteSpace(organisationAddress.TownCity)) address.Add(organisationAddress.TownCity);
 
-            if (!string.IsNullOrWhiteSpace(latestAddress.County)) address.Add(latestAddress.County);
+            if (!string.IsNullOrWhiteSpace(organisationAddress.County)) address.Add(organisationAddress.County);
 
             // Gov.UK Notify can only send post to the UK, so there's no need
             // to have 'UK' or 'United Kingdom' as part of the address
-            if (!string.IsNullOrWhiteSpace(latestAddress.Country)
-                && latestAddress.Country.ToUpper() != "UNITED KINGDOM"
-                && latestAddress.Country.ToUpper() != "UK")
-                address.Add(latestAddress.Country);
+            if (!string.IsNullOrWhiteSpace(organisationAddress.Country)
+                && organisationAddress.Country.ToUpper() != "UNITED KINGDOM"
+                && organisationAddress.Country.ToUpper() != "UK")
+                address.Add(organisationAddress.Country);
 
             return address;
         }

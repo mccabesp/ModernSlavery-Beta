@@ -24,6 +24,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
         private readonly HttpClient _httpClient;
         private readonly string[] _apiKeys;
         public RetryPolicyTypes RetryPolicy { get; set; } = RetryPolicyTypes.None;
+        private readonly int _maxSendsPerSecond;
 
         public CompaniesHouseAPI(CompaniesHouseOptions companiesHouseOptions, HttpClient httpClient)
         {
@@ -31,6 +32,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _apiKeys = _companiesHouseOptions.GetApiKeys();
             if (_apiKeys.Length==0)throw new ArgumentNullException(nameof(companiesHouseOptions.ApiKey));
+            _maxSendsPerSecond = (_companiesHouseOptions.MaxApiCallsPerFiveMins / (5 * 60)) * _apiKeys.Length;
         }
 
         public async Task<PagedResult<OrganisationRecord>> SearchOrganisationsAsync(string searchText, int page, int pageSize, int maxRecords)
@@ -110,6 +112,7 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
 
                 var response = await _httpClient.GetAsync($"/company/{companyNumber}").ConfigureAwait(false);
                 // Migration to dotnet core work around return status codes until over haul of this API client
+                if (response.StatusCode == HttpStatusCode.NotFound) return null;
                 if (response.StatusCode != HttpStatusCode.OK) throw new HttpException(response.StatusCode);
 
                 json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -229,29 +232,6 @@ namespace ModernSlavery.Infrastructure.CompaniesHouse
             var json = await _httpClient.GetStringAsync(
                 $"/search/companies/?q={companyName}&items_per_page={pageSize}&start_index={startIndex}").ConfigureAwait(false);
             return json;
-        }
-
-        public static void SetupHttpClient(HttpClient httpClient, string apiServer)
-        {
-            httpClient.BaseAddress = new Uri(apiServer);
-
-            httpClient.DefaultRequestHeaders.Clear();
-            httpClient.DefaultRequestHeaders.ConnectionClose = false;
-            ServicePointManager.FindServicePoint(httpClient.BaseAddress).ConnectionLeaseTimeout = 60 * 1000;
-        }
-
-        public static IAsyncPolicy<HttpResponseMessage> GetLinearRetryPolicy()
-        {
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .WaitAndRetryAsync(10,retryAttempt => TimeSpan.FromMilliseconds(new Random().Next(100, 1000)));
-        }
-        public static IAsyncPolicy<HttpResponseMessage> GetExponentialRetryPolicy()
-        {
-            var jitterer = new Random();
-            return HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .WaitAndRetryAsync(10, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)) + TimeSpan.FromMilliseconds(jitterer.Next(0, 1000)));
         }
     }
 }

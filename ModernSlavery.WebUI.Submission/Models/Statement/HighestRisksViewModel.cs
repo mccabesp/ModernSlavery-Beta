@@ -85,6 +85,18 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public bool NoRisks { get; set; }
 
+        public int TotalRisks 
+        {
+            get 
+            {
+                int c = 0;
+                if (!string.IsNullOrWhiteSpace(HighRisk1)) c++;
+                if (!string.IsNullOrWhiteSpace(HighRisk2)) c++;
+                if (!string.IsNullOrWhiteSpace(HighRisk3)) c++;
+                return c;
+            }
+        }
+
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var validationResults = new List<ValidationResult>();
@@ -97,8 +109,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public override Status GetStatus()
         {
-            if (NoRisks)
-                return Status.Complete;
+            if (NoRisks)return Status.Complete;
 
             if (!string.IsNullOrWhiteSpace(HighRisk1) || !string.IsNullOrWhiteSpace(HighRisk2) || !string.IsNullOrWhiteSpace(HighRisk3))
             {

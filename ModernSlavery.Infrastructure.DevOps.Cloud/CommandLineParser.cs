@@ -92,7 +92,7 @@ namespace ModernSlavery.Infrastructure.Azure
                 case SqlServerOptions sqlServerOptions:
                 case SqlDatabaseOptions sqlDatabaseOptions:
                     Authenticate(verbType as AzureOptions);
-                    var sqlManager = new SqlManager(_Azure);
+                    var sqlManager = new SqlManager(AzureManager);
 
                     switch (verbType)
                     {

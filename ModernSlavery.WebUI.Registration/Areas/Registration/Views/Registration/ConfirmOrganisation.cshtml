@@ -1,10 +1,9 @@
 @{
     Layout = "~/Views/GdsLayout.cshtml";
     Title = "Confirm your organisation";
-    var controller = ViewData["Controller"] as BaseController;
 }
 @model OrganisationViewModel
-@if (controller.PendingFasttrackCodes == null)
+@if (Controller.PendingFasttrackCodes == null)
 {
     @section BeforeMain {
         @if (!string.IsNullOrWhiteSpace(Model.ConfirmReturnAction))
@@ -186,7 +185,7 @@
             <p class="govuk-body">
                 <button type="submit" class="govuk-button" name="command" value="confirm">Confirm</button>
             </p>
-            @if (controller.PendingFasttrackCodes != null)
+            @if (Controller.PendingFasttrackCodes != null)
             {
                 <p class="govuk-body">
                     <button type="submit" class="govuk-link" name="command" value="CancelFasttrack">Cancel</button>

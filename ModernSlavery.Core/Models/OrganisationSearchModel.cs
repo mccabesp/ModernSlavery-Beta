@@ -199,7 +199,7 @@ namespace ModernSlavery.Core.Models
 
             public override int GetHashCode()
             {
-                return Key.GetHashCode();
+                return Key;
             }
         }
 
@@ -244,7 +244,7 @@ namespace ModernSlavery.Core.Models
 
             public override int GetHashCode()
             {
-                return Key.GetHashCode();
+                return Key.GetDeterministicHashCode();
             }
         }
 
@@ -256,7 +256,7 @@ namespace ModernSlavery.Core.Models
 
         public override int GetHashCode()
         {
-            return SearchDocumentKey.GetHashCode();
+            return SearchDocumentKey.GetDeterministicHashCode();
         }
 
         #region Search Properties
@@ -355,7 +355,7 @@ namespace ModernSlavery.Core.Models
                 if (ChildOrganisationId.HasValue)
                     key += $"-{ChildOrganisationId}";
                 else
-                    key += $"-{OrganisationName.ToLower().GetHashCode()}";
+                    key += $"-{OrganisationName.ToLower().GetDeterministicHashCode()}";
             }
             SearchDocumentKey = key;
             return this;

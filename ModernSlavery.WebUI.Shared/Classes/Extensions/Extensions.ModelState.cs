@@ -246,5 +246,28 @@ namespace ModernSlavery.WebUI.Shared.Classes.Extensions
                 }
             }
         }
+
+        public static void SetMultiException(this ModelStateDictionary modelState, Exception ex, string title)
+        {
+            if (ex is AggregateException aex)
+            {
+                if (aex.InnerExceptions.Count > 1)
+                {
+                    modelState.AddModelError("", $"{title}:");
+                    foreach (var iex in aex.InnerExceptions)
+                        modelState.AddModelError("", $"\t{iex.Message}");
+
+                    return;
+                }
+                else
+                    ex = aex.InnerExceptions.First();
+            }
+
+            if (ex is AggregateException aex1)
+                modelState.SetMultiException(aex1, title);
+            else
+                modelState.AddModelError("", $"{title}: {ex.Message}");
+        }
+
     }
 }

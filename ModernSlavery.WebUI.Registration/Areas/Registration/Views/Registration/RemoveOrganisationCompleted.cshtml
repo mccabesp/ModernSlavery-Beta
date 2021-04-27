@@ -4,7 +4,6 @@
 @{
     Layout = "~/Views/GdsLayout.cshtml";
     Title = "Remove organisation reason";
-    var controller = ViewData["Controller"] as BaseController;
     var userId = Obfuscator.DeObfuscate(Model.EncUserId).ToInt64();
 }
 <div class="govuk-grid-row">
@@ -15,7 +14,7 @@
             </h1>
         </div>
 
-        @if (controller.CurrentUser.UserId == userId && controller.IsImpersonatingUser == false)
+        @if (Controller.CurrentUser.UserId == userId && Controller.IsImpersonatingUser == false)
         {
             <p class="govuk-body">
                 You can no longer submit a modern slavery statement for @Model.OrganisationName. You will receive an email notification shortly.
@@ -33,7 +32,7 @@
                 More options
             </span>
             <p class="govuk-body">
-                <a class="govuk-link" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission" )">Manage organisations</a>
+                <a class="govuk-link" asp-action="ManageOrganisations" asp-controller="Submission" asp-area="Submission">Your organisations</a>
             </p>
         </div>
     </div>

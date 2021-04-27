@@ -11,11 +11,13 @@ using ModernSlavery.WebUI.GDSDesignSystem.Parsers;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Cookies;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.UrlHelper;
 using ModernSlavery.WebUI.Shared.Interfaces;
 using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Shared.Controllers
 {
+    [WhitelistUsersFilter(nameof(BaseController.Init),nameof(Ping),nameof(SessionExpired))]
     public class SharedController : BaseController
     {
         public SharedController(ILogger<SharedController> logger, IWebService webService,
@@ -26,12 +28,18 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         [HttpGet("~/ping")]
         public IActionResult Ping()
         {
+            //Dont save in history
+            SkipSaveHistory = true;
+
             return new OkResult(); // OK = 200
         }
 
         [HttpGet("~/Go/{shortCode?}", Order = 1)]
         public async Task<IActionResult> Go([Text]string shortCode)
         {
+            //Dont save in history
+            SkipSaveHistory = true;
+
             if (!string.IsNullOrWhiteSpace(shortCode))
             {
                 var allShortCodes = await WebService.ShortCodesRepository.GetAllShortCodesAsync();
@@ -58,12 +66,19 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         [HttpGet("~/session-expired")]
         public async Task<IActionResult> SessionExpired()
         {
-            //Clear the session
-            Session.Clear();
+            //Dont save in history
+            SkipSaveHistory = true;
 
-            if (!User.Identity.IsAuthenticated) return View("SessionExpired");
+            if (!User.Identity.IsAuthenticated)
+            {
+                //Clear the session
+                Session.Clear();
 
-            return await LogoutUser(Url.Action(nameof(SessionExpired), null, null, "https"));
+                return View("SessionExpired");
+            }
+
+            var redirectUrl = Url.Action(nameof(SessionExpired), null, null, "https");
+            return await LogoutUser(redirectUrl);
         }
 
         [HttpGet("~/report-concerns")]
@@ -74,11 +89,13 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         #region Feedback
         [HttpGet("~/send-feedback")]
-        public IActionResult SendFeedback()
+        public IActionResult SendFeedback(bool signOut=false)
         {
             var model = new FeedbackViewModel();
 
             PrePopulateEmailAndPhoneNumberFromLoggedInUser(model);
+
+            model.BackUrl = signOut ? null : BackUrl;
 
             return View("SendFeedback", model);
         }
@@ -95,11 +112,12 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                         : user.EmailAddress;
 
                 model.PhoneNumber = user.ContactPhoneNumber;
+
             }
         }
 
         [HttpPost("~/send-feedback")]
-        public async Task<IActionResult> SendFeedback(FeedbackViewModel viewModel)
+        public async Task<IActionResult> SendFeedback(FeedbackViewModel viewModel, bool signOut = false)
         {
             if (!ModelState.IsValid)
             {
@@ -114,7 +132,9 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             SharedBusinessLogic.DataRepository.Insert(feedbackDatabaseModel);
             await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            return View("FeedbackSent");
+            viewModel.BackUrl = signOut ? Url.ActionArea("SignOut", "Account", "Account") : BackUrl;
+
+            return View("FeedbackSent",viewModel);
         }
 
         private Feedback ConvertFeedbackViewModelIntoFeedbackDatabaseModel(FeedbackViewModel feedbackViewModel)

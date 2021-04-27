@@ -18,7 +18,7 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = UserRoleNames.Admin)]
+    [Authorize(Roles = UserRoleNames.BasicAdmin)]
     [Route("admin")]
     public class AdminUserResendVerificationEmailController : BaseController
     {
@@ -36,8 +36,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpGet("user/{id}/resend-verification-email")]
-        public IActionResult ResendVerificationEmailGet(long id)
+        public async Task<IActionResult> ResendVerificationEmailGet(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var user = SharedBusinessLogic.DataRepository.Get<User>(id);
 
             var viewModel = new AdminResendVerificationEmailViewModel {User = user};
@@ -51,9 +54,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpPost("user/{id}/resend-verification-email")]
-        public async Task<IActionResult> ResendVerificationEmailPost(long id,
-            AdminResendVerificationEmailViewModel viewModel)
+        public async Task<IActionResult> ResendVerificationEmailPost(long id,AdminResendVerificationEmailViewModel viewModel)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var user = SharedBusinessLogic.DataRepository.Get<User>(id);
             viewModel.User = user;
 
@@ -74,7 +79,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             if (viewModel.HasAnyErrors()) return View("ResendVerificationEmail", viewModel);
 
-            auditLogger.AuditChangeToUser(
+            await auditLogger.AuditChangeToUserAsync(
                 this,
                 AuditedAction.AdminResendVerificationEmail,
                 user,
@@ -88,9 +93,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             user.EmailVerifyHash = Crypto.GetSHA512Checksum(verifyCode);
             user.EmailVerifySendDate = VirtualDateTime.Now;
-            SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            var verifyUrl = Url.ActionArea("VerifyEmail", "Account","Account",new {vcode = verifyCode},"https");
+            var verifyUrl = Url.ActionArea("VerifyEmail", "NewAccount", "Account",new { code = verifyCode},"https");
 
             if (!await _adminService.SharedBusinessLogic.SendEmailService.SendCreateAccountPendingVerificationAsync(verifyUrl, user.EmailAddress))
             {

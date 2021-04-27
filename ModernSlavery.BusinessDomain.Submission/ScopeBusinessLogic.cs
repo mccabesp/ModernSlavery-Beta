@@ -241,7 +241,7 @@ namespace ModernSlavery.BusinessDomain.Submission
 
         public async Task<HashSet<Organisation>> FixScopeRowStatusesAsync()
         {
-            var lastSnapshotDate = DateTime.MinValue;
+            var lastSubmissionDeadline = DateTime.MinValue;
             long lastOrganisationId = -1;
             var index = -1;
             var count = 0;
@@ -254,7 +254,7 @@ namespace ModernSlavery.BusinessDomain.Submission
             foreach (var scope in scopes)
             {
                 count++;
-                if (lastSnapshotDate != scope.SubmissionDeadline || lastOrganisationId != scope.OrganisationId)
+                if (lastSubmissionDeadline != scope.SubmissionDeadline || lastOrganisationId != scope.OrganisationId)
                     index = 0;
                 else
                     index++;
@@ -267,7 +267,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                     changedOrgs.Add(scope.Organisation);
                 }
 
-                lastSnapshotDate = scope.SubmissionDeadline;
+                lastSubmissionDeadline = scope.SubmissionDeadline;
                 lastOrganisationId = scope.OrganisationId;
             }
 

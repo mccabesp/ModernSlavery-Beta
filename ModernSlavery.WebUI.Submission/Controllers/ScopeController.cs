@@ -215,6 +215,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             // when model is null then return session expired view
             if (stateModel == null) return SessionExpiredView();
 
+            //when organisation is already registered then tell user 
+            var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
+            if (!stateModel.IsChangeJourney
+                // considered registered if any user associated has confirmed via pin
+                && organisation.UserOrganisations.Any(uo => uo.PINConfirmedDate != null))
+                return RedirectToAction(nameof(AlreadyRegistered));
+
             //When on out-of-scope journey and any previous explicit scope then tell user scope is known
             if (!stateModel.IsChangeJourney
                 && (
@@ -224,18 +231,27 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     && stateModel.ThisScope.ScopeStatus.IsAny(ScopeStatuses.InScope, ScopeStatuses.OutOfScope)
                 )
             )
-                return View("ScopeKnown", stateModel);
-
-            //when organisation is already registered then tell user 
-            var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(stateModel.OrganisationId);
-            if (!stateModel.IsChangeJourney
-                // considered registered if any user associated has confirmed via pin
-                && organisation.UserOrganisations.Any(uo => uo.PINConfirmedDate != null))
-                return View("AlreadyRegistered", stateModel);
+                return RedirectToAction(nameof(ScopeKnown));
 
 
             // else redirect to EnterAnswers action
             return RedirectToAction("EnterOutOfScopeAnswers");
+        }
+
+        [HttpGet("out/already-registered")]
+        public async Task<IActionResult> AlreadyRegistered()
+        {
+            UnstashModel<ScopingViewModel>(true);
+
+            return View();
+        }
+
+        [HttpGet("out/scope-known")]
+        public async Task<IActionResult> ScopeKnown()
+        {
+            UnstashModel<ScopingViewModel>(true);
+
+            return View();
         }
 
         [HttpGet("out/questions")]
@@ -339,14 +355,13 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                 return RedirectToActionArea("Home", "Admin", "Admin");
 
             var stateModel = UnstashModel<ScopingViewModel>();
+            // when model is null then return session expired view
+            if (stateModel == null) return SessionExpiredView();
 
             // Hacky fix becuase requires email confirm field will not be bound to the statemodel
             // this is because it is stored in session and is not posted to the server, therefore not being bound
             if (!stateModel.UserIsRegistered)
                 stateModel.EnterAnswers.RequiresEmailConfirmation = RequiresEmailConfirmation;
-
-            // when model is null then return session expired view
-            if (stateModel == null) return SessionExpiredView();
 
             ApplyUserContactDetails(CurrentUser, stateModel);
 
@@ -368,7 +383,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
                     .Select(uo => uo.User);
                 foreach (var user in emailAddressesForOrganisation)
                 {
-                    _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(user.EmailAddress,
+                    await _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmailAsync(user.EmailAddress,
                             organisation.OrganisationName,
                             stateModel.EnterAnswers.FullName,
                             stateModel.DeadlineDate.Year.ToString(),
@@ -378,7 +393,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
             }
             else if (stateModel.EnterAnswers.RequiresEmailConfirmation)
             {
-                _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmail(stateModel.EnterAnswers.EmailAddress,
+                await _sharedBusinessLogic.NotificationService.SendScopeChangeOutEmailAsync(stateModel.EnterAnswers.EmailAddress,
                         organisation.OrganisationName,
                         stateModel.EnterAnswers.FullName,
                         stateModel.DeadlineDate.Year.ToString(),

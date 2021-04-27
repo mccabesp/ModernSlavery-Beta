@@ -225,7 +225,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
             //8
             if (GetWorkingConditionsStatus() == Status.Complete) count++;
             //9
-            if (HighestRisksPage.GetStatus() == Status.Complete && HighRiskPages.All(v => v.GetStatus() == Status.Complete)) count++;
+            if (GetRisksStatus() == Status.Complete) count++;
             //10
             if (IndicatorsPage.GetStatus() == Status.Complete && RemediationsPage.GetStatus() == Status.Complete) count++;
             //11
@@ -256,9 +256,17 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
         public Status GetRisksStatus()
         {
-            if (HighestRisksPage.GetStatus() == Status.Complete && HighRiskPages.All(r => r.GetStatus() == Status.Complete)) return Status.Complete;
-            if (HighestRisksPage.GetStatus() == Status.Incomplete && HighRiskPages.All(r => r.GetStatus() == Status.Incomplete)) return Status.Incomplete;
-            return Status.InProgress;
+            if (HighestRisksPage.NoRisks) return Status.Complete;
+
+            if (string.IsNullOrWhiteSpace(HighestRisksPage.HighRisk1) && string.IsNullOrWhiteSpace(HighestRisksPage.HighRisk2) && string.IsNullOrWhiteSpace(HighestRisksPage.HighRisk3))
+                return Status.Incomplete;
+
+            if ((!string.IsNullOrWhiteSpace(HighestRisksPage.HighRisk1) && HighRiskPages[0].GetStatus()!= Status.Complete)
+             || (!string.IsNullOrWhiteSpace(HighestRisksPage.HighRisk2) && HighRiskPages[1].GetStatus()!= Status.Complete)
+             || (!string.IsNullOrWhiteSpace(HighestRisksPage.HighRisk3) && HighRiskPages[2].GetStatus()!= Status.Complete))
+                return Status.InProgress;
+
+            return Status.Complete;
         }
 
         public Status GetIndicatorRemediationsStatus()

@@ -33,25 +33,28 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = UserRoleNames.Admin)]
+    [Authorize(Roles = UserRoleNames.BasicAdmin)]
     [Route("admin")]
     public partial class AdminController : BaseController
     {
         private readonly IAdminService _adminService;
         private readonly IAdminHistory _adminHistory;
         private readonly ISearchBusinessLogic _searchBusinessLogic;
+        private readonly IStatementBusinessLogic _statementBusinessLogic;
 
         #region Constructors
 
         public AdminController(
             IAdminService adminService,
             ISearchBusinessLogic searchBusinessLogic,
+            IStatementBusinessLogic statementBusinessLogic,
             IAdminHistory adminHistory,
             ILogger<AdminController> logger, IWebService webService, ISharedBusinessLogic sharedBusinessLogic) : base(logger, webService, sharedBusinessLogic)
         {
             _adminService = adminService;
             _adminHistory = adminHistory;
             _searchBusinessLogic = searchBusinessLogic;
+            _statementBusinessLogic = statementBusinessLogic;
         }
 
         #endregion
@@ -59,12 +62,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         #region Home Action
 
         [HttpGet]
-        public IActionResult Home()
+        public async Task<IActionResult> HomeAsync()
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             ClearStash();
 
-            var viewModel = new AdminHomepageViewModel
-            {
+            var viewModel = new AdminHomepageViewModel {
                 FeedbackCount = SharedBusinessLogic.DataRepository.GetAll<Feedback>().Count(),
                 LatestFeedbackDate = SharedBusinessLogic.DataRepository.GetAll<Feedback>()
                     .OrderByDescending(feedback => feedback.CreatedDate)
@@ -82,6 +87,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("history")]
         public async Task<IActionResult> History()
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var vm = await _adminHistory.GetHistoryLogs();
 
             return View(vm);
@@ -94,6 +102,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("download")]
         public async Task<IActionResult> Download([IgnoreText] string filePath)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             //Ensure the file exists
             if (string.IsNullOrWhiteSpace(filePath)) return new HttpNotFoundResult("Missing file path");
 
@@ -106,15 +117,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             model.Filepath = filePath;
 
             //Setup the http response
-            var contentDisposition = new ContentDisposition {FileName = model.Filename, Inline = true};
+            var contentDisposition = new ContentDisposition { FileName = model.Filename, Inline = true };
             HttpContext.SetResponseHeader("Content-Disposition", contentDisposition.ToString());
 
-            /* No Longer required as AspNetCore has response buffering on by default
-            // Buffer response so that page is sent after processing is complete.
-            Response.BufferOutput = true;
-            */
-
-            return Content(await SharedBusinessLogic.FileRepository.ReadAsync(filePath), model.ContentType);
+            //Write the raw file to include the byte order mark
+            var content = await SharedBusinessLogic.FileRepository.ReadBytesAsync(filePath);
+            return new FileContentResult(content, model.ContentType);
         }
 
         #endregion
@@ -124,6 +132,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("read")]
         public async Task<IActionResult> Read([IgnoreText] string filePath)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             //Ensure the file exists
             if (string.IsNullOrWhiteSpace(filePath) ||
                 !await SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath)) return new NotFoundResult();
@@ -148,6 +159,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [IPAddressFilter]
         public async Task<IActionResult> PendingRegistrations()
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             UnstashModel<ReviewOrganisationViewModel>(true);
 
             var nonUkAddressUserOrganisations =
@@ -187,8 +201,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     .Except(nonUkAddressUserOrganisations)
                     .ToList();
 
-            var model = new PendingRegistrationsViewModel
-            {
+            var model = new PendingRegistrationsViewModel {
                 PublicSectorUserOrganisations = publicSectorUserOrganisations,
                 NonUkAddressUserOrganisations = nonUkAddressUserOrganisations,
                 ManuallyRegisteredUserOrganisations = remainingManuallyRegisteredUserOrganisations
@@ -204,8 +217,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("downloads")]
         public async Task<IActionResult> Downloads()
         {
-            await SharedBusinessLogic.FileRepository.CreateDirectoryAsync(SharedBusinessLogic.SharedOptions
-                .DownloadsPath);
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
+            await SharedBusinessLogic.FileRepository.CreateDirectoryAsync(SharedBusinessLogic.SharedOptions.DownloadsPath);
 
             var model = new DownloadViewModel();
 
@@ -218,10 +233,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             foreach (var file in files.OrderByDescending(file => file))
             {
                 var period = Path.GetFileNameWithoutExtension(file).AfterFirst("_");
-                download = new DownloadViewModel.Download
-                {
+                download = new DownloadViewModel.Download {
                     Type = "Organisations",
                     Filepath = file,
+                    Webjob = "UpdateOrganisationsAsync",
                     Title = $"All Organisations ({period})",
                     Description = $"A list of all organisations and their statuses for {period}."
                 };
@@ -239,8 +254,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             foreach (var file in files.OrderByDescending(file => file))
             {
                 var period = Path.GetFileNameWithoutExtension(file).AfterFirst("_");
-                download = new DownloadViewModel.Download
-                {
+                download = new DownloadViewModel.Download {
                     Type = "Orphan Organisations",
                     Filepath = file,
                     Title = $"Orphan Organisations ({period})",
@@ -261,10 +275,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             foreach (var file in files.OrderByDescending(file => file))
             {
                 var period = Path.GetFileNameWithoutExtension(file).AfterFirst("_");
-                download = new DownloadViewModel.Download
-                {
+                download = new DownloadViewModel.Download {
                     Type = "Registration Addresses",
                     Filepath = file,
+                    Webjob = "UpdateRegistrationAddressesAsync",
                     Title = $"Registered Organisation Addresses ({period})",
                     Description =
                         $"A list of registered organisation addresses and their associated contact details for {period}. This includes the DnB contact details and the most recently registered user contact details."
@@ -284,10 +298,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             {
                 var period = Path.GetFileNameWithoutExtension(file).AfterFirst("_");
 
-                download = new DownloadViewModel.Download
-                {
+                download = new DownloadViewModel.Download {
                     Type = "Scopes",
                     Filepath = file,
+                    Webjob = "UpdateScopesAsync",
                     Title = $"Organisation Scopes ({period})",
                     Description = $"The latest organisation scope statuses for each organisation for ({period})."
                 };
@@ -307,12 +321,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             {
                 var period = Path.GetFileNameWithoutExtension(file).AfterFirst("_");
 
-                download = new DownloadViewModel.Download
-                {
+                download = new DownloadViewModel.Download {
                     Type = "Submissions",
                     Filepath = file,
+                    Webjob = "UpdateSubmissionsAsync",
                     Title = $"Organisation Submissions ({period})",
-                    Description = $"The reported GPG data for all organisations for ({period})."
+                    Description = $"The reported modern slavery data for all organisations for ({period})."
                 };
 
                 download.ShowUpdateButton = !await GetFileUpdatingAsync(download.Filepath);
@@ -323,10 +337,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Users
 
-            download = new DownloadViewModel.Download
-            {
+            download = new DownloadViewModel.Download {
                 Type = "Users",
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.Users),
+                Webjob = "UpdateUsersAsync",
                 Title = "All Users Accounts",
                 Description = "A list of all user accounts and their statuses."
             };
@@ -337,10 +351,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Registrations
 
-            download = new DownloadViewModel.Download
-            {
+            download = new DownloadViewModel.Download {
                 Type = "Users",
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.Registrations),
+                Webjob = "UpdateRegistrationsAsync",
                 Title = "User Organisation Registrations",
                 Description =
                     "A list of all organisations that have been registered by a user. This includes all users for each organisation."
@@ -348,11 +362,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             download.ShowUpdateButton = !await GetFileUpdatingAsync(download.Filepath);
             model.Downloads.Add(download);
 
-            download = new DownloadViewModel.Download
-            {
+            download = new DownloadViewModel.Download {
                 Type = "Users",
-                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DownloadsPath,
-                    Filenames.UnverifiedRegistrations),
+                Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.UnverifiedRegistrations),
+                Webjob = "UpdateUnverifiedRegistrationsAsync",
                 Title = "Unverified User Organisation Registrations",
                 Description = "A list of all unverified organisations pending verification from a user."
             };
@@ -363,10 +376,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Create Consent downloads
 
-            download = new DownloadViewModel.Download
-            {
+            download = new DownloadViewModel.Download {
                 Type = "User Consent",
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.SendInfo),
+                Webjob = "UpdateUsersToSendInfoAsync",
                 Title = "Users to send updates and info",
                 Description =
                     "Users who answered \"Yes\" to \"I would like to receive information about webinars, events and new guidance\""
@@ -374,10 +387,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             download.ShowUpdateButton = !await GetFileUpdatingAsync(download.Filepath);
             model.Downloads.Add(download);
 
-            download = new DownloadViewModel.Download
-            {
+            download = new DownloadViewModel.Download {
                 Type = "User Consent",
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.DownloadsPath, Filenames.AllowFeedback),
+                Webjob = "UpdateUsersToContactForFeedbackAsync",
                 Title = "Users to contact for feedback",
                 Description =
                     "Users who answered \"Yes\" to \"I'm happy to be contacted for feedback on this service and take part in Modern Slavery surveys\""
@@ -393,8 +406,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             //Get the modified date and record counts
             var isSuperAdministrator = IsSuperAdministrator;
             await model.Downloads.WaitForAllAsync(
-                async d =>
-                {
+                async d => {
                     if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(d.Filepath))
                     {
                         d.Modified = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(d.Filepath);
@@ -420,14 +432,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
         public async Task<IActionResult> Downloads([IgnoreText] string command)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var model = UnstashModel<DownloadViewModel>();
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1138));
-
-            var filepath = command.AfterFirst(":");
-            command = command.BeforeFirst(":");
             try
             {
-                await UpdateFileAsync(filepath, command);
+                await UpdateFileAsync(command);
             }
             catch (Exception ex)
             {
@@ -447,11 +459,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("uploads")]
         public async Task<IActionResult> Uploads()
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var model = new UploadViewModel();
 
             #region Show SicSection Upload
-            var upload = new UploadViewModel.Upload
-            {
+            var upload = new UploadViewModel.Upload {
                 Type = Filenames.SicSections,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.AppDataPath, Filenames.SicSections),
                 Title = "SIC Sections",
@@ -467,8 +481,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             #endregion
 
             #region Show SicCode Upload
-            upload = new UploadViewModel.Upload
-            {
+            upload = new UploadViewModel.Upload {
                 Type = Filenames.SicCodes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.AppDataPath, Filenames.SicCodes),
                 Title = "SIC Codes",
@@ -484,8 +497,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             #endregion
 
             #region Show StatementSectorTypes Upload
-            upload = new UploadViewModel.Upload
-            {
+            upload = new UploadViewModel.Upload {
                 Type = Filenames.StatementSectorTypes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.AppDataPath, Filenames.StatementSectorTypes),
                 Title = "Statement Sector Types",
@@ -501,13 +513,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             #endregion
 
             #region Show ImportPrivateOrganisations Upload
-            upload = new UploadViewModel.Upload
-            {
+            upload = new UploadViewModel.Upload {
                 Type = Filenames.ImportPrivateOrganisations,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.AppDataPath, Filenames.ImportPrivateOrganisations),
                 Title = "Private Organisations Import",
                 Description = "Add only new Private Organisations from external data source.  Import performs Add only.",
-                DatabaseCount = await SharedBusinessLogic.DataRepository.CountAsync<Organisation>(r=>r.SectorType== SectorTypes.Private)
+                DatabaseCount = await SharedBusinessLogic.DataRepository.CountAsync<Organisation>(r => r.SectorType == SectorTypes.Private)
             };
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
             {
@@ -519,8 +530,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             #endregion
 
             #region Show ImportPublicOrganisations Upload
-            upload = new UploadViewModel.Upload
-            {
+            upload = new UploadViewModel.Upload {
                 Type = Filenames.ImportPublicOrganisations,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.AppDataPath, Filenames.ImportPublicOrganisations),
                 Title = "Public Organisations Import",
@@ -538,8 +548,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             #region Show ShortCodes Upload
             var allShortCodes = await WebService.ShortCodesRepository.GetAllShortCodesAsync();
-            upload = new UploadViewModel.Upload
-            {
+            upload = new UploadViewModel.Upload {
                 Type = Filenames.ShortCodes,
                 Filepath = Path.Combine(SharedBusinessLogic.SharedOptions.AppDataPath, Filenames.ShortCodes),
                 Title = "Short Codes",
@@ -565,282 +574,161 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
         public async Task<IActionResult> Uploads(List<IFormFile> files, [IgnoreText] string command)
         {
-            string fileName = command.AfterFirst(":");
-            command = command.BeforeFirst(":");
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
 
             var model = UnstashModel<UploadViewModel>();
             if (model == null) return View("CustomError", WebService.ErrorViewModelFactory.Create(1138));
 
-            var filepath = command.AfterFirst(":");
+            string fileName = command.AfterFirst(":");
             command = command.BeforeFirst(":");
 
-            if (command.EqualsI("Send", "Pause", "Update"))
+            string fileContent = null;
+            if (command.EqualsI("Upload"))
             {
-                try
+                var file = files.FirstOrDefault();
+                if (file == null)
                 {
-                    await UpdateFileAsync(filepath, command);
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", $@"Error: {ex.Message}");
-                }
-            }
-            else if (command.EqualsI("Recheck"))
-            {
-                await RecheckCompaniesAsync();
-            }
-
-            else if (command.EqualsI("Upload","Import"))
-            {
-                string fileContent = null;
-                if (command.EqualsI("Upload"))
-                {
-                    var file = files.FirstOrDefault();
-                    if (file == null)
-                    {
-                        ModelState.AddModelError("", "No file uploaded");
-                        return View("Uploads", model);
-                    }
-
-                    if (!fileName.EqualsI(file.FileName))
-                    {
-                        ModelState.AddModelError("", $@"Invalid filename '{file.FileName}'");
-                        return View("Uploads", model);
-                    }
-
-                    if (file.Length == 0)
-                    {
-                        ModelState.AddModelError("", $@"No content found in '{file.FileName}'");
-                        return View("Uploads", model);
-                    }
-                    using (var reader = new StreamReader(file.OpenReadStream()))
-                        fileContent =await reader.ReadToEndAsync();
-                }
-
-                var upload = model.Uploads.FirstOrDefault(u => u.Filename.EqualsI(fileName));
-                if (upload == null)
-                {
-                    ModelState.AddModelError("", $@"Invalid filename '{fileName}'");
+                    ModelState.AddModelError("", "No file uploaded");
                     return View("Uploads", model);
                 }
 
-                if (command.EqualsI("Import")) 
+                if (!fileName.EqualsI(file.FileName))
                 {
-                    if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
-                        fileContent = await SharedBusinessLogic.FileRepository.ReadAsync(upload.Filepath);
-                    else
-                    {
-                        ModelState.AddModelError("", $@"Cannot find file '{upload.Filepath}'");
-                        return View("Uploads", model);
-                    } 
+                    ModelState.AddModelError("", $@"Invalid filename '{file.FileName}'");
+                    return View("Uploads", model);
                 }
 
+                if (file.Length == 0)
+                {
+                    ModelState.AddModelError("", $@"No content found in '{file.FileName}'");
+                    return View("Uploads", model);
+                }
                 try
                 {
-                    using (var reader = new StringReader(fileContent))
-                    {
-                        var config = new CsvConfiguration(CultureInfo.CurrentCulture);
-                        config.ShouldQuote = (field, context) => true;
-                        config.TrimOptions = TrimOptions.InsideQuotes | TrimOptions.Trim;
-                        config.MissingFieldFound = null;
-                        config.IgnoreQuotes = false;
-                        config.HeaderValidated =  null;
-                        using var csvReader = new CsvReader(reader, config);
-
-                        List<object> records;
-                        switch (fileName)
-                        {
-                            case var f when f.EqualsI(Filenames.ImportPrivateOrganisations):
-                                records = csvReader.GetRecords<ImportOrganisationModel>().Cast<object>().ToList();
-                                break;
-                            case var f when f.EqualsI(Filenames.ImportPublicOrganisations):
-                                records = csvReader.GetRecords<ImportOrganisationModel>().Cast<object>().ToList();
-                                break;
-                            case var f when f.EqualsI(Filenames.SicSections):
-                                records = csvReader.GetRecords<SicSection>().Cast<object>().ToList();
-                                break;
-                            case var f when f.EqualsI(Filenames.SicCodes):
-                                records = csvReader.GetRecords<SicCode>().Cast<object>().ToList();
-                                break;
-                            case var f when f.EqualsI(Filenames.ShortCodes):
-                                records = csvReader.GetRecords<ShortCodeModel>().Cast<object>().ToList();
-                                break;
-                            case var f when f.EqualsI(Filenames.StatementSectorTypes):
-                                records = csvReader.GetRecords<StatementSectorType>().Cast<object>().ToList();
-                                break;
-                            default:
-                                throw new Exception($"Invalid upload '{fileName}'");
-                        }
-
-                        if (records.Count < 1)
-                        {
-                            ModelState.AddModelError("", $@"No records found in '{fileName}'");
-                            return View("Uploads", model);
-                        }
-
-                        //Core.Classes.Extensions
-                        if (command.EqualsI("Upload"))await SharedBusinessLogic.FileRepository.SaveCSVAsync(records, fileName);
-
-                        var updateTime = VirtualDateTime.Now.AddMinutes(-2);
-                        switch (fileName)
-                        {
-                            case var f when f.EqualsI(Filenames.ImportPrivateOrganisations):
-                                await _adminService.DataImporter.ImportPrivateOrganisationsAsync(VirtualUser.UserId,0,true);
-                                break;
-                            case var f when f.EqualsI(Filenames.ImportPublicOrganisations):
-                                await _adminService.DataImporter.ImportPublicOrganisationsAsync(VirtualUser.UserId,0,true);
-                                break;
-                            case var f when f.EqualsI(Filenames.SicSections):
-                                await _adminService.DataImporter.ImportSICSectionsAsync(true);
-                                break;
-                            case var f when f.EqualsI(Filenames.SicCodes):
-                                await _adminService.DataImporter.ImportSICCodesAsync(true);
-                                break;
-                            case var f when f.EqualsI(Filenames.ShortCodes):
-                                await WebService.ShortCodesRepository.ClearAllShortCodesAsync();
-                                break;
-                            case var f when f.EqualsI(Filenames.StatementSectorTypes):
-                                await _adminService.DataImporter.ImportStatementSectorTypesAsync(true);
-                                break;
-                        }
-                    }
-                }
-                catch (AggregateException aex)
-                {
-                    ModelState.AddModelError("", $@"Error reading file '{fileName}'");
-                    foreach (var ex in aex.InnerExceptions)
-                        ModelState.AddModelError("", ex.Message);
+                    fileContent = file.OpenReadStream().ReadTextWithEncoding();
                 }
                 catch (Exception ex)
                 {
                     ModelState.AddModelError("", $@"Error reading file '{fileName}': {ex.Message}");
+                    return View("Uploads", model);
                 }
             }
+
+            var upload = model.Uploads.FirstOrDefault(u => u.Filename.EqualsI(fileName));
+            if (upload == null)
+            {
+                ModelState.AddModelError("", $@"Invalid filename '{fileName}'");
+                return View("Uploads", model);
+            }
+
+            if (command.EqualsI("Import"))
+            {
+                if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(upload.Filepath))
+                    fileContent = await SharedBusinessLogic.FileRepository.ReadAsync(upload.Filepath);
+                else
+                {
+                    ModelState.AddModelError("", $@"Cannot find file '{upload.Filepath}'");
+                    return View("Uploads", model);
+                }
+            }
+
+            //Replace any special spaces with normal spaces
+            fileContent = fileContent?.ReplaceSpaceSeparators();
+            try
+            {
+                using (var reader = new StringReader(fileContent))
+                {
+                    var config = new CsvConfiguration(CultureInfo.CurrentCulture);
+                    config.ShouldQuote = (field, context) => true;
+                    config.TrimOptions = TrimOptions.InsideQuotes | TrimOptions.Trim;
+                    config.MissingFieldFound = null;
+                    config.IgnoreQuotes = false;
+                    config.HeaderValidated = null;
+                    using var csvReader = new CsvReader(reader, config);
+
+                    List<object> records;
+                    switch (fileName)
+                    {
+                        case var f when f.EqualsI(Filenames.ImportPrivateOrganisations):
+                            records = csvReader.GetRecords<ImportOrganisationModel>().Cast<object>().ToList();
+                            break;
+                        case var f when f.EqualsI(Filenames.ImportPublicOrganisations):
+                            records = csvReader.GetRecords<ImportOrganisationModel>().Cast<object>().ToList();
+                            break;
+                        case var f when f.EqualsI(Filenames.SicSections):
+                            records = csvReader.GetRecords<SicSection>().Cast<object>().ToList();
+                            break;
+                        case var f when f.EqualsI(Filenames.SicCodes):
+                            records = csvReader.GetRecords<SicCode>().Cast<object>().ToList();
+                            break;
+                        case var f when f.EqualsI(Filenames.ShortCodes):
+                            records = csvReader.GetRecords<ShortCodeModel>().Cast<object>().ToList();
+                            break;
+                        case var f when f.EqualsI(Filenames.StatementSectorTypes):
+                            records = csvReader.GetRecords<StatementSectorType>().Cast<object>().ToList();
+                            break;
+                        default:
+                            throw new Exception($"Invalid upload '{fileName}'");
+                    }
+
+                    if (records.Count < 1)
+                    {
+                        ModelState.AddModelError("", $@"No records found in '{fileName}'");
+                        return View("Uploads", model);
+                    }
+
+                    //Core.Classes.Extensions
+                    if (command.EqualsI("Upload"))
+                    {
+                        await SharedBusinessLogic.FileRepository.WriteAsync(upload.Filepath, fileContent);
+                        var message = $"{records.Count()} records uploaded from {fileName}";
+                        AddDisplayMessage(message);
+                        Logger.LogInformation(message);
+                    }
+
+                    else if (command.EqualsI("Import"))
+                    {
+                        var importCount = 0;
+                        switch (fileName)
+                        {
+                            case var f when f.EqualsI(Filenames.ImportPrivateOrganisations):
+                                importCount = await _adminService.DataImporter.ImportPrivateOrganisationsAsync(VirtualUser.UserId, 0, true, false);
+                                break;
+                            case var f when f.EqualsI(Filenames.ImportPublicOrganisations):
+                                importCount = await _adminService.DataImporter.ImportPublicOrganisationsAsync(VirtualUser.UserId, 0, true, false);
+                                break;
+                            case var f when f.EqualsI(Filenames.SicSections):
+                                importCount = await _adminService.DataImporter.ImportSICSectionsAsync(true);
+                                break;
+                            case var f when f.EqualsI(Filenames.SicCodes):
+                                importCount = await _adminService.DataImporter.ImportSICCodesAsync(true);
+                                break;
+                            case var f when f.EqualsI(Filenames.ShortCodes):
+                                await WebService.ShortCodesRepository.ClearAllShortCodesAsync();
+                                importCount = records.Count();
+                                break;
+                            case var f when f.EqualsI(Filenames.StatementSectorTypes):
+                                importCount = await _adminService.DataImporter.ImportStatementSectorTypesAsync(true);
+                                break;
+                        }
+                        var message = $"Imported {importCount} of {records.Count()} records from {fileName}";
+                        AddDisplayMessage(message);
+                        Logger.LogInformation(message);
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.SetMultiException(ex, $"Error reading file '{fileName}'");
+            }
+
 
             //Return any errors
             if (!ModelState.IsValid) return View("Uploads", model);
 
             return RedirectToAction("Uploads");
-        }
-
-        private async Task UpdateCompanySicCodesAsync(DateTime updateTime)
-        {
-            //Ensure the log directory exists
-            if (!await SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(SharedBusinessLogic.SharedOptions.LogPath))
-                await SharedBusinessLogic.FileRepository.CreateDirectoryAsync(SharedBusinessLogic.SharedOptions.LogPath);
-
-            //Get all the bad sic records
-            var files = await SharedBusinessLogic.FileRepository.GetFilesAsync(
-                SharedBusinessLogic.SharedOptions.LogPath, "BadSicLog*.csv", true);
-            var fileRecords = new Dictionary<string, List<BadSicLogModel>>();
-            var changedFiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var file in files)
-            {
-                var records = await SharedBusinessLogic.FileRepository.ReadCSVAsync<BadSicLogModel>(file);
-                fileRecords[file] = records;
-            }
-
-            //Get all the new Sic Codes
-            var newSicCodes = SharedBusinessLogic.DataRepository.GetAll<SicCode>().Where(s => s.Created >= updateTime)
-                .Select(s => s.SicCodeId);
-
-            foreach (var newSicCode in newSicCodes)
-            foreach (var key in fileRecords.Keys)
-            {
-                var file = fileRecords[key];
-                var records = file.Where(r => r.SicCode == newSicCode);
-                foreach (var record in records)
-                {
-                    var orgSics = SharedBusinessLogic.DataRepository.GetAll<OrganisationSicCode>()
-                        .Where(o => o.OrganisationId == record.OrganisationId);
-                    if (await orgSics.AnyAsync())
-                    {
-                        if (await orgSics.AnyAsync(o => o.SicCodeId == newSicCode)) continue;
-
-                        SharedBusinessLogic.DataRepository.Insert(new OrganisationSicCode
-                            {OrganisationId = record.OrganisationId, SicCodeId = newSicCode});
-                    }
-
-                    file.Remove(record);
-                    changedFiles.Add(key);
-                }
-            }
-
-            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-
-            //Update or delete the changed log files
-            foreach (var changedFile in changedFiles)
-            {
-                var records = fileRecords[changedFile];
-                if (records.Any())
-                    await SharedBusinessLogic.FileRepository.SaveCSVAsync(fileRecords[changedFile], changedFile);
-                else
-                    await SharedBusinessLogic.FileRepository.DeleteFileAsync(changedFile);
-            }
-        }
-
-        private async Task RecheckCompaniesAsync()
-        {
-            //Ensure the log directory exists
-            if (!await SharedBusinessLogic.FileRepository.GetDirectoryExistsAsync(SharedBusinessLogic.SharedOptions.LogPath))
-                await SharedBusinessLogic.FileRepository.CreateDirectoryAsync(SharedBusinessLogic.SharedOptions.LogPath);
-
-            //Get all the bad sic records
-            var files = await SharedBusinessLogic.FileRepository.GetFilesAsync(
-                SharedBusinessLogic.SharedOptions.LogPath, "BadSicLog*.csv", true);
-            var badSicCodes = new HashSet<string>();
-            foreach (var file in files)
-            {
-                var records = await SharedBusinessLogic.FileRepository.ReadCSVAsync<BadSicLogModel>(file);
-                badSicCodes.AddRange(records.ToList().Select(s => $"{s.OrganisationId}:{s.SicCode}").Distinct());
-            }
-
-            //Get all the private organisations with no sic codes
-            var orgs = SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                .Where(
-                    o => o.SectorType == SectorTypes.Private
-                         && o.CompanyNumber != null
-                         && !o.OrganisationSicCodes.Where(s => s.Retired == null).Any());
-            var allSicCodes = await SharedBusinessLogic.DataRepository.GetAll<SicCode>().ToListAsync();
-            foreach (var org in orgs)
-                try
-                {
-                    //Lookup the sic codes from companies house
-                    var sicCodeResults = await _adminService.PrivateSectorRepository.GetSicCodesAsync(org.CompanyNumber);
-                    var sicCodes = sicCodeResults.SplitI().Select(s => s.ToInt32());
-                    foreach (var code in sicCodes)
-                    {
-                        if (code <= 0) continue;
-
-                        var sicCode = allSicCodes.FirstOrDefault(sic => sic.SicCodeId == code);
-                        if (sicCode != null)
-                        {
-                            org.OrganisationSicCodes.Add(
-                                new OrganisationSicCode {Organisation = org, SicCode = sicCode});
-                            continue;
-                        }
-
-                        if (badSicCodes.Contains($"{org.OrganisationId}:{code}")) continue;
-
-                        await _adminService.BadSicLog.WriteAsync(
-                            new BadSicLogModel
-                            {
-                                OrganisationId = org.OrganisationId, OrganisationName = org.OrganisationName,
-                                SicCode = code
-                            });
-                    }
-                }
-                catch (HttpException hex)
-                {
-                    var httpCode = hex.StatusCode;
-                    if (httpCode.IsAny(429, (int) HttpStatusCode.NotFound)) Logger.LogError(hex, hex.Message);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError(ex, ex.Message);
-                }
-
-            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
         }
 
         #endregion
@@ -849,8 +737,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         [HttpGet("impersonate")]
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
-        public async Task<IActionResult> Impersonate([EmailAddress]string emailAddress)
+        public async Task<IActionResult> Impersonate([EmailAddress] string emailAddress)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             if (!string.IsNullOrWhiteSpace(emailAddress)) return await ImpersonatePost(emailAddress);
 
             return View("Impersonate");
@@ -860,8 +751,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
-        public async Task<IActionResult> ImpersonatePost([EmailAddress]string emailAddress)
+        public async Task<IActionResult> ImpersonatePost([EmailAddress] string emailAddress)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             //Ignore case of email address
             emailAddress = emailAddress?.ToLower();
 

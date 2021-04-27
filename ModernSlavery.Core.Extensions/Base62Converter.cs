@@ -71,7 +71,7 @@ namespace ModernSlavery.Core.Extensions
                 var remainder = 0;
                 for (var i = 0; i != count; i++)
                 {
-                    int accumulator = source[i] + remainder * sourceBase;
+                    var accumulator = source[i] + remainder * sourceBase;
                     var digit = System.Convert.ToByte((accumulator - (accumulator % targetBase)) / targetBase);
                     remainder = accumulator % targetBase;
                     if (quotient.Count > 0 || digit != 0)

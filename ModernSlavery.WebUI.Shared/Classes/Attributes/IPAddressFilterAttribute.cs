@@ -4,6 +4,7 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
@@ -15,10 +16,11 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var sharedOptions = context.HttpContext.RequestServices.GetRequiredService<SharedOptions>();
+            var authorisationBusinessLogic = context.HttpContext.RequestServices.GetRequiredService<IAuthorisationBusinessLogic>();
             var userHostAddress = context.HttpContext.GetUserHostAddress();
-            if (!sharedOptions.IsTrustedAddress(userHostAddress))
+            if (!authorisationBusinessLogic.IsTrustedAddress(userHostAddress))
             {
+                var sharedOptions= context.HttpContext.RequestServices.GetRequiredService<SharedOptions>();
                 LogAttempt(context, sharedOptions.TrustedDomainsOrIPs, userHostAddress);
                 context.Result = new HttpStatusCodeResult(HttpStatusCode.Forbidden);
                 return;

@@ -123,7 +123,8 @@
             @if (!string.IsNullOrWhiteSpace(Model.CompanyNumber))
             {
                 <td class="govuk-table__cell">
-                    @(Model.OptedOutFromCompaniesHouseUpdate ? "Opted out" : "Opted in")
+                    @(Model.OptedOutFromCompaniesHouseUpdate ? "Opted out" : "Opted in")<br />
+                    <span>(updated: @(Model.LastCheckedAgainstCompaniesHouse==null ? "Never"  : Model.LastCheckedAgainstCompaniesHouse.Value.ToString("d MMM yyyy h:mm tt")))</span>
                 </td>
                 <td class="govuk-table__cell">
                     @if (IsSuperAdministrator || IsDatabaseAdministrator)

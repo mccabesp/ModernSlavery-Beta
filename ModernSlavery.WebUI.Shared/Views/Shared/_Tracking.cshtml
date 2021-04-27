@@ -2,13 +2,14 @@
 @using ModernSlavery.Core.Models
 @using ModernSlavery.WebUI.Shared.Classes.Cookies
 @using ModernSlavery.Core.Options
-
-@inject JavaScriptSnippet snippet
+@using Microsoft.Extensions.DependencyInjection;
+ 
 @inject SharedOptions sharedOptions
 @inject TestOptions testOptions;
 @inject ApplicationInsightsOptions appInsightsOptions
 @{
     var cookieSettings = CookieHelper.GetCookieSettingsCookie(Context.Request);
+    var snippet = this.ViewContext.HttpContext.RequestServices.GetService<JavaScriptSnippet>();
 }
 
 @*this is for the GA initialisation and sending page views*@
@@ -28,13 +29,13 @@
                     m.parentNode.insertBefore(a, m);
                 })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
-                ga('set', 'anonymizeIp', true);
-
             }
 
             function sendMSUPageView() {
                 // Setup tracking to the MSU Google Analytics account
                 ga('create', '@(sharedOptions.GoogleAnalyticsAccountId)', 'auto');
+
+                ga('set', 'anonymizeIp', true);
 
                 // Track the current page view using the MSU Google Analytics account
                 ga('send', 'pageview');

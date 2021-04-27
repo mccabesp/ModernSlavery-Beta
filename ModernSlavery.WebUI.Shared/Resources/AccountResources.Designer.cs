@@ -70,7 +70,7 @@ namespace ModernSlavery.WebUI.Shared.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your details have been updated successfully.
+        ///   Looks up a localized string similar to Your details have been updated.
         /// </summary>
         public static string ChangeDetailsSuccessAlert {
             get {
@@ -97,7 +97,7 @@ namespace ModernSlavery.WebUI.Shared.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your password has been changed successfully.
+        ///   Looks up a localized string similar to Your password has been changed.
         /// </summary>
         public static string ChangePasswordSuccessAlert {
             get {
@@ -241,6 +241,15 @@ namespace ModernSlavery.WebUI.Shared.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your email address cannot be longer than {1} characters.
+        /// </summary>
+        public static string EmailAddressLength {
+            get {
+                return ResourceManager.GetString("EmailAddressLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You need to enter your email address.
         /// </summary>
         public static string EmailAddressRequired {
@@ -255,6 +264,15 @@ namespace ModernSlavery.WebUI.Shared.Resources {
         public static string FirstName {
             get {
                 return ResourceManager.GetString("FirstName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your first name cannot be longer than {1} characters.
+        /// </summary>
+        public static string FirstNameLength {
+            get {
+                return ResourceManager.GetString("FirstNameLength", resourceCulture);
             }
         }
         
@@ -300,6 +318,15 @@ namespace ModernSlavery.WebUI.Shared.Resources {
         public static string LastName {
             get {
                 return ResourceManager.GetString("LastName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your last name cannot be longer than {1} characters.
+        /// </summary>
+        public static string LastNameLength {
+            get {
+                return ResourceManager.GetString("LastNameLength", resourceCulture);
             }
         }
         

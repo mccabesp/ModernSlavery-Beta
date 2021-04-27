@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using ModernSlavery.Infrastructure.Azure.KeyVault;
 using SqlManager = ModernSlavery.Infrastructure.Azure.DevOps.SqlManager;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Testing.Helpers.Extensions
 {
@@ -26,9 +27,9 @@ namespace ModernSlavery.Testing.Helpers.Extensions
             if (_azureManager != null && _azureManager.Azure != null) return _azureManager.Azure;
 
             _config = host.Services.GetRequiredService<IConfiguration>();
-            var _azureOptions = host.Services.GetRequiredService<AzureOptions>();
+            var _devOpsOptions = host.Services.GetRequiredService<DevOpsOptions>();
 
-            _azureManager = new AzureManager(_azureOptions);
+            _azureManager = new AzureManager(_devOpsOptions);
             var _azure = _azureManager.Authenticate();
 
             return _azure;
@@ -51,7 +52,7 @@ namespace ModernSlavery.Testing.Helpers.Extensions
 
             if (_sqlManager == null)
             {
-                _sqlManager = new SqlManager(_azureManager.Azure);
+                _sqlManager = new SqlManager(_azureManager);
 
                 var connectionString = _config["Database:ConnectionString"];
                 var connectionStringBuilder = new SqlConnectionStringBuilder(connectionString);

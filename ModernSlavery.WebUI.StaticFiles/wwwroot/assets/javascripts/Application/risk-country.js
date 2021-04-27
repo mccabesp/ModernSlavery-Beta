@@ -121,12 +121,20 @@
     }
 
     var keydownHandler = function (event) {
-        // only handle enter key
+
+        // handle enter key
         if (event.keyCode != 13)
             return;
 
         event.preventDefault();
         $('#add-country-button').click()
+    }
+
+    var keyupHandler = function (event) {
+        if (event.target.value.length > 0)
+            $('#add-country-button').removeAttr('disabled');
+        else
+            $('#add-country-button').prop('disabled', true);
     }
 
     var selectElement = document.getElementById('SelectedCountry');
@@ -154,7 +162,9 @@
 
     $('#add-country-button').click(addButtonClickHandler);
 
-    $(document).on('keydown', '#SelectedCountry', keydownHandler);
+    $(document)
+        .on('keyup', '#SelectedCountry', keyupHandler)
+        .on('keydown', '#SelectedCountry', keydownHandler);
 
     //This is the only way to disable autocomplete on chrome (see https://stackoverflow.com/questions/12374442/chrome-ignores-autocomplete-off)
     $('#SelectedCountry').attr("autocomplete", Math.random());

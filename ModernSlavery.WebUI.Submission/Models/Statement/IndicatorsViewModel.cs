@@ -22,7 +22,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
                 .ForMember(d => d.SubmissionDeadline, opt => opt.Ignore())
                 .ForPath(d => d.Summary.Indicators, opt => opt.MapFrom(s => s.Indicators))
                 .BeforeMap((s, d) => {
-                    if (!s.Indicators.Any())
+                    if (!s.Indicators.Any(i=>i!= IndicatorTypes.None))
                     {
                         d.Summary.Remediations = null;
                         d.Summary.OtherRemediations = null;

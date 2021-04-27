@@ -46,10 +46,6 @@ namespace ModernSlavery.WebUI.Submission.Controllers
         [HttpGet("~/manage-organisations")]
         public async Task<IActionResult> ManageOrganisations()
         {
-            //If the impersonated user is an administrator go to admin home
-            if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
-                return RedirectToActionArea("Home", "Admin", "Admin");
-
             //Clear all the stashes
             ClearAllStashes();
 
@@ -61,7 +57,7 @@ namespace ModernSlavery.WebUI.Submission.Controllers
 
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
-            if (checkResult != null && IsImpersonatingUser == false) return checkResult;
+            if (checkResult != null) return checkResult;
 
             // check if the user has accepted the privacy statement (unless admin or impersonating)
             if (WebService.FeatureSwitchOptions.IsEnabled("PrivacyPolicyLink") && !IsImpersonatingUser && !SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(base.CurrentUser))

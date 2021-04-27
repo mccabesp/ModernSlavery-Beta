@@ -1,12 +1,22 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ModernSlavery.WebUI.Shared.Classes.Attributes;
 
 namespace ModernSlavery.WebUI.Admin.Models
 {
     public class AdminSearchViewModel
     {
-        public string SearchQuery { get; set; }
-        public string Error { get; set; }
+        /// <summary>
+        /// The keyword to search for
+        /// </summary>
+        [FromQuery(Name = "Search")]
+        [Required(AllowEmptyStrings =false)]
+        [Text]
+        public string Search { get; set; }
 
+        [BindNever]
         public AdminSearchResultsViewModel SearchResults { get; set; }
     }
 

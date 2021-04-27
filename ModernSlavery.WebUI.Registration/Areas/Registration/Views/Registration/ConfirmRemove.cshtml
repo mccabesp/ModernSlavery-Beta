@@ -3,10 +3,9 @@
 @{
     Layout = "~/Views/GdsLayout.cshtml";
     Title = "Confirm removal of organisation";
-    var controller = ViewData["Controller"] as BaseController;
 
     var userId = Obfuscator.DeObfuscate(Model.EncUserId).ToInt64();
-    var userRemovingSelf = controller.CurrentUser.UserId == userId && controller.IsImpersonatingUser == false;
+    var userRemovingSelf = Controller.CurrentUser.UserId == userId && Controller.IsImpersonatingUser == false;
     var userNamePostFix = userRemovingSelf ? "You" : "";
 }
 

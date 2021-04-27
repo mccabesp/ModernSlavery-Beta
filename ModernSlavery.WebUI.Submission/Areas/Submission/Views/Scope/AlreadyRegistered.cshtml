@@ -1,5 +1,4 @@
-﻿@model ScopingViewModel
-@{
+﻿@{
     Layout = "/Views/GdsLayout.cshtml";
     Title = "Organisation already resgistered";
 }
@@ -8,11 +7,6 @@
 }
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "form", autocomplete = "off", novalidate = "" }))
-        {
-            @Html.AntiForgeryToken()
-            @Html.HiddenFor(m => Model.OrganisationId)
-
             <h1 class="govuk-heading-l">
                 Your organisation has already been registered on our service
             </h1>
@@ -25,6 +19,5 @@
                 <li>check the organisation’s status, and see whether our records show it’s required or not required to publish a modern slavery statement</li>
                 <li>update its status (or any other details)</li>
             </ul>
-        }
     </div>
 </div>

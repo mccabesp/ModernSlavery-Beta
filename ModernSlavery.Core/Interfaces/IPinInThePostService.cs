@@ -9,7 +9,7 @@ namespace ModernSlavery.Core.Interfaces
     {
         Task<SendLetterResponse> SendPinInThePostAsync(UserOrganisation userOrganisation, string pin, string returnUrl);
 
-        List<string> GetAddressInFourLineFormat(Organisation organisation);
-        List<string> GetAddressComponentsWithoutRepeatsOrUnnecessaryComponents(Organisation organisation);
+        List<string> GetAddressInFourLineFormat(OrganisationAddress organisationAddress);
+        List<string> GetAddressComponentsWithoutRepeatsOrUnnecessaryComponents(OrganisationAddress organisationAddress);
     }
 }

@@ -1,17 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Autofac.Features.AttributeFilters;
 using ModernSlavery.BusinessDomain.Shared;
 using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.Core;
-using ModernSlavery.Core.Classes.ErrorMessages;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
-using ModernSlavery.Core.Interfaces;
 
 namespace ModernSlavery.BusinessDomain.Submission
 {
@@ -49,65 +44,26 @@ namespace ModernSlavery.BusinessDomain.Submission
             return orgSubmission;
         }
 
-        public IEnumerable<Statement> GetAllStatementsByOrganisationIdAndReportingDeadlineYear(long organisationId,
-            int deadlineYear)
-        {
-            return _sharedBusinessLogic.DataRepository.GetAll<Statement>().Where(s =>
-                s.OrganisationId == organisationId && s.SubmissionDeadline.Year == deadlineYear);
-        }
-
         /// <summary>
         ///     Gets a list of submissions with scopes for Submissions download file
         /// </summary>
-        /// <param name="year"></param>
+        /// <param name="deadlineYear"></param>
         /// <returns></returns>
-        public virtual IEnumerable<StatementsFileModel> GetStatementsFileModelByYear(int year)
+        public virtual IEnumerable<StatementsFileModel> GetStatementsFileModelByYear(int deadlineYear)
         {
-            var scopes = _sharedBusinessLogic.DataRepository.GetAll<OrganisationScope>()
-                .Where(os => os.SubmissionDeadline.Year == year && os.Status == ScopeRowStatuses.Active)
-                .Select(os => new {os.OrganisationId, os.ScopeStatus, os.ScopeStatusDate, os.SubmissionDeadline}).ToList();
-
-            var statements = _sharedBusinessLogic.DataRepository.GetAll<Statement>()
-                .Where(r => r.SubmissionDeadline.Year == year && r.Status == StatementStatuses.Submitted).ToList();
+            var statements = _sharedBusinessLogic.DataRepository.GetAll<Statement>().Where(r => r.SubmissionDeadline.Year == deadlineYear && r.Status == StatementStatuses.Submitted).ToList();
+            statements.SelectMany(s => s.Organisation.OrganisationScopes);
+            statements.SelectMany(s => s.Statuses);
 
 #if DEBUG || DEBUGLOCAL
             if (Debugger.IsAttached) statements = statements.Take(100).ToList();
 #endif
-
-            // perform left join
-            var records = statements.AsQueryable().GroupJoin(
-                    // join
-                    scopes.AsQueryable(),
-                    // on
-                    // inner
-                    r => new {r.OrganisationId, r.SubmissionDeadline.Year},
-                    // outer
-                    os => new {os.OrganisationId, os.SubmissionDeadline.Year},
-                    // into
-                    (r, os) => new {r, os = os.FirstOrDefault()})
-                .ToList()
-                .Select(
-                    j => new StatementsFileModel
-                    {
-                        StatementId = j.r.StatementId,
-                        OrganisationId = j.r.OrganisationId,
-                        OrganisationName = j.r.Organisation.OrganisationName,
-                        DUNSNumber = j.r.Organisation.DUNSNumber,
-                        OrganisationReference = j.r.Organisation.OrganisationReference,
-                        CompanyNumber = j.r.Organisation.CompanyNumber,
-                        SectorType = j.r.Organisation.SectorType,
-                        ScopeStatus = j.os?.ScopeStatus,
-                        ScopeStatusDate = j.os?.ScopeStatusDate,
-                        SubmissionDeadline = j.r.SubmissionDeadline,
-                        ModifiedDate = j.r.Modified,
-                        StatementUrl = j.r.StatementUrl,
-                        StatementEmail = j.r.StatementEmail,
-                        ApprovingPerson = j.r.ApprovingPerson,
-                        Turnover = j.r.Turnover.GetEnumDescription(),
-                        Modifications = j.r.Modifications
-                    });
-
-            return records;
+            foreach (var statement in statements)
+            {
+                var organisationIdentifier = _sharedBusinessLogic.Obfuscator.Obfuscate(statement.OrganisationId);
+                var statementSummaryUrl = $"/statement-summary/{organisationIdentifier}/{deadlineYear}";
+                yield return StatementsFileModel.Create(statement, statementSummaryUrl);
+            }
         }
 
         /// <summary>
@@ -196,27 +152,6 @@ namespace ModernSlavery.BusinessDomain.Submission
                                 : j.r.ApprovingPerson
                     });
         }
-
-        public CustomResult<Statement> GetSubmissionByOrganisationAndYear(Organisation organisation, int year)
-        {
-            var reports = GetAllStatementsByOrganisationIdAndReportingDeadlineYear(organisation.OrganisationId, year);
-
-            if (!reports.Any())
-                return new CustomResult<Statement>(
-                    InternalMessages.HttpNotFoundCausedByOrganisationReturnNotInDatabase(_sharedBusinessLogic.Obfuscator.Obfuscate(organisation.OrganisationId),
-                        year));
-
-            var result = reports.OrderByDescending(r => r.Status == StatementStatuses.Submitted)
-                .ThenByDescending(r => r.StatusDate)
-                .FirstOrDefault();
-            if (result.Status!=StatementStatuses.Submitted)
-                return new CustomResult<Statement>(
-                    InternalMessages.HttpGoneCausedByReportNotHavingBeenSubmitted(result.SubmissionDeadline.Year,
-                        result.Status.ToString()));
-
-            return new CustomResult<Statement>(result);
-        }
-
         #endregion
     }
 }

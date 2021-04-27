@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ModernSlavery.Core.Extensions
 {
     public static class Reflect
     {
-        public static Dictionary<string, object> GetPropertiesDictionary(this object source,
+        public static Dictionary<string, object> GetPropertiesDictionary(this object source, bool ignoreNull = false,
             BindingFlags filterFlags = BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance)
         {
             return source.GetType()
                 .GetProperties(filterFlags)
                 .Select(prop => new {Key = prop.Name, Value = prop.GetValue(source, null)})
                 // ignore null values
-                .Where(prop => prop.Value != null)
+                .Where(prop => !ignoreNull || prop.Value != null)
                 // convert to dictionary
                 .ToDictionary(prop => prop.Key, prop => prop.Value);
         }
@@ -52,6 +54,14 @@ namespace ModernSlavery.Core.Extensions
         public static bool IsAsyncEnumerable(this Type type)
         {
             return type.Name.StartsWith("IAsyncEnumerable`");
+        }
+
+        public static async Task<List<T>> ToListAsync<T>(this IAsyncEnumerable<T> items,CancellationToken cancellationToken = default)
+        {
+            var results = new List<T>();
+            await foreach (var item in items.WithCancellation(cancellationToken).ConfigureAwait(false))
+                results.Add(item);
+            return results;
         }
 
         /// <summary>

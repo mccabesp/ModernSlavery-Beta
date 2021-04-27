@@ -40,8 +40,7 @@ namespace ModernSlavery.Infrastructure.Logging
 
         public async Task WriteAsync(object record)
         {
-            var wrapper = new LogRecordWrapperModel
-                {ApplicationName = ApplicationName, FileName = fileName, Record = record};
+            var wrapper = new LogRecordWrapperModel{ApplicationName = ApplicationName, FileName = fileName, Record = record};
 
             await queue.AddMessageAsync(wrapper).ConfigureAwait(false);
         }

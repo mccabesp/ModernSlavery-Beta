@@ -12,13 +12,13 @@
     if (adminTypes.Count == 0) adminTypes.Add("Basic");
 }
 
-<div style="float:right"><b>Admin Roles</b>: (@(adminTypes.ToDelimitedString(", ")))</div>
+<div style="float:right" title="@(Context.GetUserHostAddress())"><b>Admin Roles</b>: (@(adminTypes.ToDelimitedString(", ")))</div>
 <h1 class="govuk-heading-xl">Administration</h1>
 
 
 @if (!IsTrustedIP)
 {
-    <div class="govuk-warning-text" data-egress-ip="@(Context.GetUserHostAddress())">
+    <div class="govuk-warning-text">
         <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
         <strong class="govuk-warning-text__text">
             <span class="govuk-warning-text__assistive">Warning</span>
@@ -29,7 +29,8 @@
 
 <h2 class="govuk-heading-l">Search</h2>
 
-<form method="GET" action="@(Url.Action("SearchGet", "AdminSearch"))">
+@using (Html.BeginForm("SearchGet", "AdminSearch", FormMethod.Get, new { novalidate = "" }))
+{
     <div class="govuk-form-group">
         <label class="govuk-label" for="search-query">
             <b>Organisation:</b> current name, previous name, organisation reference, company number
@@ -37,11 +38,17 @@
             <b>User:</b> name, email address
         </label>
         <div class="admin-search-box">
-            <input class="govuk-input admin-search-input" id="search-query" name="query" type="text">
+            <input type="search"
+                   id="search-query"
+                   class="govuk-input admin-search-input"
+                   name="Search"
+                   spellcheck="false"
+                   title="Search" />
+
             <input type="submit" value="Search" class="admin-search-button" />
         </div>
     </div>
-</form>
+}
 
 
 @if (IsSuperAdministrator || IsDatabaseAdministrator)

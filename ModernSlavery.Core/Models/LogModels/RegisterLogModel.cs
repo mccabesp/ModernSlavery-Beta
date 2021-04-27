@@ -10,7 +10,7 @@ namespace ModernSlavery.Core.Models.LogModels
         public string Status { get; set; }
         public string ActionBy { get; set; }
         public string Details { get; set; }
-        public SectorTypes Sector { get; set; }
+        public string Sector { get; set; }
         public string Organisation { get; set; }
         public string CompanyNo { get; set; }
         public string Address { get; set; }

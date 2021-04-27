@@ -40,18 +40,19 @@
 
     <div class="govuk-grid-row govuk-!-margin-bottom-6 govuk-!-margin-top-4">
         <div class="govuk-grid-column-two-thirds">
-
-            @Html.LabelFor(m => m.NewOrganisationName, "Tell us the name of the organisation", new { @class = "govuk-label" })
-            <div class="organisation-input-table">
-                <div class="organisation-input-cell textbox">
-                    @Html.TextBoxFor(m => m.NewOrganisationName, new { @class = "govuk-input" })<br />
+            <div class="govuk-form-group govuk-body govuk-!-margin-bottom-0 @Html.SetErrorClass(m => m.NewOrganisationName, "govuk-form-group--error")">
+                @Html.LabelFor(m => m.NewOrganisationName, "Tell us the name of the organisation", new { @class = "govuk-label" })
+                <div class="organisation-input-table">
+                    <div class="organisation-input-cell textbox">
+                        @Html.TextBoxFor(m => m.NewOrganisationName, new { @class = "govuk-input" })<br />
+                    </div>
+                    <div class="organisation-input-cell">
+                        <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="addIndex" value="0">
+                            Include
+                        </button>
+                    </div>
+                    <span asp-validation-for="NewOrganisationName" class="govuk-error-message"></span>
                 </div>
-                <div class="organisation-input-cell">
-                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit" name="addIndex" value="0">
-                        Include
-                    </button>
-                </div>
-                <span asp-validation-for="OrganisationName" class="govuk-error-message"></span>
             </div>
 
             @if (Model.StatementOrganisations.Any(x => x.ManuallyAdded))

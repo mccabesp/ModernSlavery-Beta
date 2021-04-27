@@ -53,11 +53,12 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                 throw new ArgumentException($"{_msuEmailProvider.EmailOptions.AdminDistributionList} contains an invalid email address",nameof(_msuEmailProvider.EmailOptions.AdminDistributionList));
 
             var successCount = 0;
+
             foreach (var emailAddress in emailAddresses)
                 try
                 {
                     await Email.QuickSendAsync(
-                        subject,
+                        _testOptions.IsProduction() ? subject : $"[{_testOptions.Environment}] {subject}",
                         _smtpOptions.SenderEmail,
                         _smtpOptions.SenderName,
                         _smtpOptions.ReplyEmail,
@@ -103,7 +104,7 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                 try
                 {
                     await Email.QuickSendAsync(
-                        subject,
+                        _testOptions.IsProduction() ? subject : $"[{_testOptions.Environment}] {subject}",
                         _smtpOptions.SenderEmail,
                         _smtpOptions.SenderName,
                         _smtpOptions.ReplyEmail,
@@ -114,6 +115,7 @@ namespace ModernSlavery.Hosts.Webjob.Classes
                         _smtpOptions.Password,
                         _smtpOptions.Port,
                         simulate: _testOptions.SimulateMessageSend).ConfigureAwait(false);
+
                     await _msuEmailProvider.EmailSendLog.WriteAsync(
                         new EmailSendLogModel
                         {

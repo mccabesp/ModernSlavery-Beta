@@ -54,43 +54,43 @@ namespace ModernSlavery.WebUI.Admin
                 model.Downloads.Add(d);
             }
 
-            //var submissionLogs = GetLogs(Filenames.SubmissionLog, "Submission History", "Audit history of approved and rejected registrations.");
-            //await foreach (var d in submissionLogs)
-            //{
-            //    model.Downloads.Add(d);
-            //}
+            var submissionLogs = GetLogs(Filenames.SubmissionLog, "Submission History", "Audit history of approved and rejected registrations.");
+            await foreach (var d in submissionLogs)
+            {
+                model.Downloads.Add(d);
+            }
 
-            var manualLogs = GetLogs(Filenames.ManualChangeLog, "Manual Changes", "");
+            var manualLogs = GetLogs(Filenames.ManualChangeLog, "Manual Changes", "Audit history of data changes by admins and system ");
             await foreach (var d in manualLogs)
             {
                 model.Downloads.Add(d);
             }
 
-            var userLogs = GetLogs(Filenames.UserLog, "User", "");
+            var userLogs = GetLogs(Filenames.UserLog, "User", "Audit history of changes to user details");
             await foreach (var d in userLogs)
             {
                 model.Downloads.Add(d);
             }
 
-            var emailLogs = GetLogs(Filenames.EmailSendLog, "Emails", "");
+            var emailLogs = GetLogs(Filenames.EmailSendLog, "Emails", "Audit history of emails send");
             await foreach (var d in emailLogs)
             {
                 model.Downloads.Add(d);
             }
 
-            //var searchLogs = GetLogs(Filenames.SearchLog, "Search", "");
-            //await foreach (var d in searchLogs)
-            //{
-            //    model.Downloads.Add(d);
-            //}
+            var searchLogs = GetLogs(Filenames.SearchLog, "Search", "Audit history of statement searches");
+            await foreach (var d in searchLogs)
+            {
+                model.Downloads.Add(d);
+            }
 
-            //var badSicLogs = GetLogs(Filenames.BadSicLog, "Bad Sic", "");
-            //await foreach (var d in badSicLogs)
-            //{
-            //    model.Downloads.Add(d);
-            //}
+            var badSicLogs = GetLogs(Filenames.BadSicLog, "Bad Sic", "Audit history of bad SIC codes imported manually or from Companies house");
+            await foreach (var d in badSicLogs)
+            {
+                model.Downloads.Add(d);
+            }
 
-            model.Downloads.OrderByDescending(d => d.Modified).ThenByDescending(d => d.Filename);
+            model.Downloads=model.Downloads.OrderByDescending(d => d.Modified).ThenByDescending(d => d.Filename).ToList();
 
             return model;
         }

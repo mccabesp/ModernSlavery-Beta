@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Extensions;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 {
@@ -12,14 +13,21 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 
         public override void OnException(ExceptionContext context)
         {
-            var hex = context.Exception as HttpException;
-            if (hex != null)
+            _logger ??= context.HttpContext.RequestServices.GetRequiredService<ILogger<ControllerExceptionFilterAttribute>>();
+            int errorCode = 500;
+            if (context.Exception is HttpException hex)
             {
-                _logger ??= context.HttpContext.RequestServices.GetRequiredService<ILogger<ControllerExceptionFilterAttribute>>();
                 _logger.LogWarning(hex, hex.Message);
-                context.Result = new RedirectToActionResult("Default", "Error", new { errorCode = (int)hex.StatusCode });
-                context.ExceptionHandled = true;
+                errorCode = (int)hex.StatusCode;
             }
+            else
+            {
+                _logger.LogError(context.Exception, context.Exception.Message);
+            }
+
+            context.Result = context.RouteData.GetRedirectToErrorPageResult(errorCode);
+
+            context.ExceptionHandled = true;
         }
     }
 }

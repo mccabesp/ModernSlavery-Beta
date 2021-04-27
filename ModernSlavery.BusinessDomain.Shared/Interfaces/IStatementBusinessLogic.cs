@@ -157,7 +157,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="reportingDeadlineYear">The reporting deadline year of the statement data to submit</param>
         /// <param name="user">The the user who wishes to submit the draft statement data</param>
         /// <returns>???</returns>
-        Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(long organisationId, int reportingDeadlineYear, long userId = -1);
+        Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(long organisationId, int reportingDeadlineYear, long userId, string ip, string summaryUrl);
 
         /// <summary>
         /// Saves a statement model as submitted data to storage and deletes any deletes any draft data and draft backups.
@@ -166,7 +166,7 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="reportingDeadline">The reporting deadline of the statement data to submit</param>
         /// <param name="user">The the user who wishes to submit the draft statement data</param>
         /// <returns>???</returns>
-        Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId = -1);
+        Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId, string ip, string summaryUrl);
 
 
         /// <summary>
@@ -183,5 +183,13 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
         /// <param name="reportingDeadline">The reporting deadline to check</param>
         /// <returns>True if the reporting deadline has passed false if it is still OK to report</returns>
         bool ReportingDeadlineHasExpired(DateTime reportingDeadline);
+
+        /// <summary>
+        /// Deletes any existing Draft Statement model files (and backups) for this organisation
+        /// </summary>
+        /// <param name="organisationId">The Id of the organisation who owns the statement data</param>
+        /// <returns>Nothing</returns>
+
+        Task DeleteDraftStatementsAsync(long organisationId);
     }
 }

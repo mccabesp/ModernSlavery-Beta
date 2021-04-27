@@ -28,16 +28,16 @@
                 <div class="govuk-form-group govuk-body govuk-!-margin-bottom-0 @Html.SetErrorClass(model => model.StatementUrl, "govuk-form-group--error")">
                     <label asp-for="StatementUrl" class="govuk-label">URL</label>
                     <span class="govuk-hint">
-                        URL must begin with ‘https://' or ‘http://'
+                        URL must begin with  &lsquo;https://&rsquo; or &lsquo;http://&rsquo;
                     </span>
                     <input asp-for="StatementUrl" class="govuk-input" inputmode="url" spellcheck="false">
                     <span asp-validation-for="StatementUrl" class="govuk-error-message"></span>
                 </div>
 
-                <details class="govuk-details" data-module="govuk-details">
+                <details class="govuk-details" data-module="govuk-details" open="@(!string.IsNullOrWhiteSpace(Model.StatementEmail))">
                     <summary class="govuk-details__summary">
                         <span class="govuk-details__summary-text">
-                            If you do not have a website
+                            or provide an email address if you do not have a website
                         </span>
                     </summary>
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
@@ -7,14 +8,14 @@ using ModernSlavery.Core;
 using ModernSlavery.WebUI.Admin.Classes;
 using ModernSlavery.WebUI.Admin.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
-using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = UserRoleNames.Admin)]
+    [Authorize(Roles = UserRoleNames.BasicAdmin)]
     [Route("admin")]
     [NoCache]
     public class AdminSearchController : BaseController
@@ -32,22 +33,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpGet("search")]
-        public IActionResult SearchGet([Text]string query)
+        public async Task<IActionResult> SearchGet(AdminSearchViewModel viewModel)
         {
-            if (query == null) return View("../Admin/Search", new AdminSearchViewModel());
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
 
-            var viewModel = new AdminSearchViewModel {SearchQuery = query};
-
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                viewModel.Error = "Search query must not be empty";
-            }
+            if (!ModelState.IsValid)
+                this.SetModelCustomErrors(viewModel);
             else
-            {
-                var results = adminSearchService.Search(query);
-
-                viewModel.SearchResults = results;
-            }
+                viewModel.SearchResults = adminSearchService.Search(viewModel.Search);
 
             return View("../Admin/Search", viewModel);
         }

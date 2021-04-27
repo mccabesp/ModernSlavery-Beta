@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Queue;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Queue;
 using ModernSlavery.Core.Interfaces;
-using Newtonsoft.Json;
 
 namespace ModernSlavery.Infrastructure.Storage.MessageQueues
 {

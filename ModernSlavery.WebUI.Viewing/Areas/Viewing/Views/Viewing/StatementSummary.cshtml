@@ -3,7 +3,7 @@
     //Required for variables in Sitemap taghelpers
     Layout = "~/Views/GdsLayout.cshtml";
     Title = $"{Model.OrganisationName} modern slavery statement summary ({Model.SubmissionDeadlineYear})";
-    Description = $"Read summary details of {Model.OrganisationName}'{(Model.OrganisationName.EndsWithI("s")?"":"s")} modern slavery statement ({Model.SubmissionDeadlineYear}). See what steps they’re taking to address modern slavery risks in their supply chains.";
+    Description = $"Read summary details of {Model.OrganisationName}'{(Model.OrganisationName.EndsWithI("s") ? "" : "s")} modern slavery statement ({Model.SubmissionDeadlineYear}). See what steps they’re taking to address modern slavery risks in their supply chains.";
     Robots = RobotDirectives.All;
     ViewBag.pageDescription = $"View {Model.SubmissionDeadlineYear} Modern Slavery statement for {Model.OrganisationName}";
     ViewBag.pageClass = "organisation-report-page";
@@ -11,18 +11,18 @@
 }
 
 @section BeforeMain {
-    <a class="govuk-back-link" href="@Model.BackUrl">Back</a>
+    <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Controller.BackUrl">Back</a>
 }
 
 <div class="govuk-grid-row viewing-statement">
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-l">
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-1">
             @Model.OrganisationName modern slavery statement summary (@Model.SubmissionDeadlineYear)
         </h1>
 
         <partial name="Parts/StatementSummary/_Address" model="Model.Address" />
 
-        <p class="govuk-body govuk-!-font-size-24">
+        <p class="govuk-body govuk-!-font-size-24 govuk-!-margin-bottom-1">
             We asked the organisation a series of questions about its modern slavery statement.
             Its answers are published on this page as a statement summary.
         </p>
@@ -59,7 +59,7 @@
     <div class="contents statement-section-two-thirds">
         <p class="govuk-body govuk-!-font-size-16 govuk-!-margin-bottom-1">Contents</p>
         <ul class="govuk-list govuk-list--hyphen govuk-!-font-size-16">
-            @if (Model.GroupSubmission==true)
+            @if (Model.GroupSubmission == true)
             {
                 <li><a class="govuk-link" href="#organisations-covered">Organisations covered by the statement</a></li>
             }

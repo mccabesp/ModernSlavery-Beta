@@ -38,7 +38,7 @@
                         Select all that apply
                     </div>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var indicatorType in Enums.GetValuesExcept<IndicatorTypes>(IndicatorTypes.Unknown, IndicatorTypes.Other))
+                        @foreach (var indicatorType in Enums.GetValues<IndicatorTypes>(IndicatorTypes.Unknown, IndicatorTypes.Other))
                         {
                             var value = (int)indicatorType;
                             var isNone = indicatorType == IndicatorTypes.None;

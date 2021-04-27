@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -22,6 +23,7 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 {
     [Area("Viewing")]
     [Route("viewing")]
+    [WhitelistUsersFilter(nameof(BaseController.Init))]
     public class ViewingController : BaseController
     {
         #region Dependencies
@@ -62,6 +64,18 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
                     throw new NotImplementedException($"{nameof(StatementErrors)} type '{error.Error}' is not recognised");
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Redirect()
+        {
+            //Dont save in history
+            SkipSaveHistory = true;
+
+            await TrackPageViewAsync();
+
+            return RedirectPermanent("/");
+        }
+
         #endregion
 
         #region Landing
@@ -145,6 +159,10 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
 
             SearchPresenter.CacheCurrentSearchUrl();
 
+            //Set the back page
+            var backUrl = SearchPresenter.GetLastSearchUrl();
+            SetBackUrl(backUrl);
+
             return PartialView("Parts/_SearchMainContent", viewModel);
         }
 
@@ -188,31 +206,6 @@ namespace ModernSlavery.WebUI.Viewing.Controllers
             viewModel.BackUrl = returnUrl ?? (string.IsNullOrEmpty(backUrl) ? "/search" : backUrl);
 
             return View("StatementSummary", viewModel);
-        }
-
-        [HttpGet("statement-summary/{organisationIdentifier}/{year}/url")]
-        public async Task<IActionResult> StatementSummaryUrl([Obfuscated] long organisationIdentifier, int year)
-        {
-            var openResult = await ViewingPresenter.GetLinkRedirectUrl(organisationIdentifier, year);
-            if (openResult.Fail)
-                return HandleStatementViewErrors(openResult.Errors);
-
-            if (string.IsNullOrEmpty(openResult.Result))
-                return RedirectToAction(nameof(StatementSummaryLinkNotWorking), new { organisationIdentifier, year });
-            else
-                return Redirect(openResult.Result);   
-        }
-
-        [HttpGet("statement-summary/{organisationIdentifier}/{year}/link-not-working")]
-        public async Task<IActionResult> StatementSummaryLinkNotWorking([Obfuscated] long organisationIdentifier, int year)
-        {
-            var openResult = await ViewingPresenter.GetStatementSummaryViewModel(organisationIdentifier, year);
-            if (openResult.Fail) return HandleStatementViewErrors(openResult.Errors);
-
-            var viewModel = openResult.Result;
-            viewModel.BackUrl = $"/viewing/statement-summary/{organisationIdentifier}/{year}";
-
-            return View("StatementSummaryLinkNotWorking", viewModel);
         }
 
         [HttpGet("statement-summary/{organisationIdentifier}/{year}/group")]

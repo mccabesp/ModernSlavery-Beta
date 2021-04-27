@@ -61,7 +61,7 @@
                                     &#9642; No files found
                                     @if ((IsSuperAdministrator || IsDatabaseAdministrator) && download.ShowUpdateButton)
                                     {
-                                        <button type="submit" style="cursor: pointer; float: right;" class="link-button" id="btnUpdate" name="Command" value="Update:@download.Filepath" title="Updates the data records">Update</button>
+                                        <button type="submit" style="cursor: pointer; float: right;" class="link-button" id="btnUpdate" name="Command" value="@(download.Webjob):@(download.Filepath)" title="Updates the data records">Update</button>
                                     }
                                 </div>
                             }

@@ -34,7 +34,7 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
 
 
         [Required(AllowEmptyStrings = false)]
-        [MaxLength(100)]
+        [MaxLength(160)]
         [Text] 
         public string NewOrganisationName { get; set; }
 

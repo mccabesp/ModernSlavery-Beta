@@ -10,13 +10,14 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
+using ModernSlavery.WebUI.Shared.Classes.UrlHelper;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
 
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = UserRoleNames.SuperAdmin)]
+    [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
     [Route("admin")]
     public class AdminUnconfirmedPinsController : BaseController
     {
@@ -32,6 +33,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("unconfirmed-pins")]
         public async Task<IActionResult> UnconfirmedPins()
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var model = await _adminService.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .Where(uo => uo.Method == RegistrationMethods.PinInPost)
                 .Where(uo => uo.PINConfirmedDate == null)
@@ -44,6 +48,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("send-pin")]
         public async Task<IActionResult> SendPinWarning(long userId, long organisationId)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var userOrganisation = await _adminService.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == userId && uo.OrganisationId == organisationId);
 
@@ -55,11 +62,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendPin(long userId, long organisationId)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var userOrganisation = await _adminService.SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
                 .FirstOrDefaultAsync(uo => uo.UserId == userId && uo.OrganisationId == organisationId);
 
-            if (userOrganisation.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays) <
-                VirtualDateTime.Now)
+            if (userOrganisation.PINSentDate==null || userOrganisation.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays) < VirtualDateTime.Now)
             {
                 var newPin = _adminService.OrganisationBusinessLogic.GeneratePINCode();
                 userOrganisation.PIN = newPin;
@@ -69,10 +78,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             userOrganisation.PINSentDate = VirtualDateTime.Now;
             await _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            _adminService.SharedBusinessLogic.NotificationService.SendPinEmail(
+            var pinExpiryDate = userOrganisation.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays);
+            var returnUrl = Url.ActionArea("ActivateService", "Registration", "Registration", new { id = SharedBusinessLogic.Obfuscator.Obfuscate(userOrganisation.OrganisationId) },"https");
+
+            await _adminService.SharedBusinessLogic.SendEmailService.SendPinEmailAsync(
                 userOrganisation.User.EmailAddress,
                 userOrganisation.PIN,
-                userOrganisation.Organisation.OrganisationName);
+                userOrganisation.Organisation.OrganisationName,
+                returnUrl, 
+                pinExpiryDate);
 
             return View("../Admin/SendPinConfirmation", userOrganisation);
         }

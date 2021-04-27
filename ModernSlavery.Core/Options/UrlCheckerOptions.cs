@@ -14,6 +14,7 @@ namespace ModernSlavery.Core.Options
         /// </summary>
         public int Timeout { get; set; }
         public bool Disabled { get; set; }
+        public RetryPolicyTypes RetryPolicy { get; set; } = RetryPolicyTypes.Linear;
 
         public void Validate()
         {

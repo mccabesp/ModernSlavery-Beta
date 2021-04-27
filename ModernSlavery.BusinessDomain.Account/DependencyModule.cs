@@ -22,7 +22,6 @@ namespace ModernSlavery.BusinessDomain.Account
         public void ConfigureContainer(ContainerBuilder builder)
         {
             builder.RegisterType<AuthorisationBusinessLogic>().As<IAuthorisationBusinessLogic>().SingleInstance();
-            builder.RegisterType<AuthenticationBusinessLogic>().As<IAuthenticationBusinessLogic>().SingleInstance();
             builder.RegisterType<AccountService>().As<IAccountService>().InstancePerLifetimeScope();
         }
 

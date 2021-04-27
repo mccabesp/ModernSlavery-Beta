@@ -113,7 +113,7 @@ namespace ModernSlavery.Hosts.Web.Tests
             "Prohibits compulsory overtime",
             "Prohibits child labour",
             "Prohibits discrimination",
-            "Prohibits confiscation of workers original identification documents",
+            "Prohibits confiscation of workers' original identification documents",
             "Provides access to remedy, compensation and justice for victims of modern slavery",
             "Other" };
         public const string Policies_OtherDetails = "We have many other policies in place";

@@ -43,7 +43,7 @@
                     </div>
 
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var remediationType in Enums.GetValuesExcept<RemediationTypes>(RemediationTypes.Unknown))
+                        @foreach (var remediationType in Enums.GetValues<RemediationTypes>(RemediationTypes.Unknown))
                         {
                             var value = (int)remediationType;
                             var isOther = remediationType == RemediationTypes.Other;

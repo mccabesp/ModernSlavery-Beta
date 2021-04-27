@@ -8,6 +8,8 @@
 }
 
 @section Head {
+    <meta http-equiv="refresh" content="@(sharedOptions.SessionTimeOutSeconds-15);@Url.Action("SessionExpired", "Shared", null, "https")" />
+
     <script type="text/javascript" nonce="@Html.GetNonce()">
         var uri = window.location.toString();
         if (uri.indexOf("?") > 0) {
@@ -48,13 +50,15 @@
                 <anti-forgery-token token="model.antiForgery"></anti-forgery-token>
                 <fieldset>
                     <legend class="visuallyhidden">Sign in</legend>
-                    <div class="form-group ">
+                    <div class="form-group @Html.SetErrorClass(model => model.Username, "error") ">
                         <label asp-for="Username" class="form-label">Email</label>
                         <input class="form-control" asp-for="Username" autofocus autocomplete="off">
+                        @Html.ValidationMessageFor(model => model.Username, null, new { @class = "error-message" })
                     </div>
-                    <div class="form-group ">
+                    <div class="form-group @Html.SetErrorClass(model => model.Password, "error") ">
                         <label asp-for="Password" class="form-label">Password</label>
                         <input type="password" class="form-control" asp-for="Password" autocomplete="off" required>
+                        @Html.ValidationMessageFor(model => model.Password, null, new { @class = "error-message" })
                     </div>
                     <div class="form-group">
                         <button class="button dynamic-content default-content alert manual" name="button" value="login">Sign in</button>

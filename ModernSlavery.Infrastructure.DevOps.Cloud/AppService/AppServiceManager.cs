@@ -89,13 +89,63 @@ namespace ModernSlavery.Infrastructure.Azure.AppService
         }
 
         #region Start/Stop Control
-        public void DeleteWebAppSlot(string webAppName, string slotName) { }
+        public void StartWebApp(string webAppName, string slotName=null) { }
 
-        public void StartWebApp(string webAppName, string slotName) { }
+        public void StopWebApp(string webAppName, string slotName=null) { }
 
-        public void StopWebApp(string webAppName, string slotName) { }
+        public void RestartWebApp(string webAppName, string slotName=null) { }
+        #endregion
 
-        public void RestartWebApp(string webAppName, string slotName) { }
+        #region Deployment Slots
+        public IEnumerable<IDeploymentSlot> ListWebAppSlots(string webAppName) 
+        {
+            var webApp = GetWebApp(webAppName);
+            if (webApp == null) return Enumerable.Empty<IDeploymentSlot>();
+            return webApp.DeploymentSlots.List();
+        }
+
+        public IDeploymentSlot GetWebAppSlot(string webAppName, string slotName)
+        {
+            var webApp = GetWebApp(webAppName);
+            return GetWebAppSlot(webApp, slotName);
+        }
+
+        public IDeploymentSlot GetWebAppSlot(IWebApp webApp, string slotName)
+        {
+            return webApp.DeploymentSlots.GetByName(slotName);
+        }
+
+        public IDeploymentSlot CreateWebAppSlot(string webAppName, string slotName, Dictionary<string,string> appSettings) 
+        {
+            if (slotName.EqualsI("production")) throw new ArgumentOutOfRangeException(nameof(slotName), "Cannot create a production slot");
+            var webApp = GetWebApp(webAppName);
+            if (webApp==null) throw new ArgumentException(nameof(webAppName), $"Cannot find App Service '{webAppName}'");
+            var slot = GetWebAppSlot(webApp, slotName);
+            if (slot!=null) throw new ArgumentException(nameof(webAppName), $"Slot '{slotName}' already exists on App Service {webAppName}");
+            slot=webApp.DeploymentSlots.Define(slotName)
+                .WithConfigurationFromParent()
+                .WithAppSettings(appSettings)
+                .WithUserAssignedManagedServiceIdentity()
+                .Create();
+
+            return slot;
+        }
+
+        public void DeleteWebAppSlot(string webAppName, string slotName) 
+        {
+            if (slotName.EqualsI("production")) throw new ArgumentOutOfRangeException(nameof(slotName), "Cannot delete production slot");
+            var webApp = GetWebApp(webAppName);
+            if (webApp == null) throw new ArgumentException($"Cannot find App Service '{webAppName}'");
+            webApp.DeploymentSlots.DeleteByName(slotName);
+        }
+
+        public void SwapWebAppSlot(string webAppName, string sourceSlotName, string targetSlotName)
+        {
+            if (sourceSlotName.EqualsI(targetSlotName)) throw new ArgumentException(nameof(targetSlotName), $"Cannot swap same slot '{sourceSlotName}' to '{targetSlotName}'");
+            var sourceSlot = GetWebAppSlot(webAppName, sourceSlotName);
+            sourceSlot.Swap(targetSlotName);
+        }
+
         #endregion
 
         #region Application Settings

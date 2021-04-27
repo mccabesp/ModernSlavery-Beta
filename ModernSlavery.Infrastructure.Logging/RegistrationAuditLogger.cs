@@ -49,7 +49,7 @@ namespace ModernSlavery.Infrastructure.Logging
                     Status = status,
                     ActionBy = actionByEmailAddress,
                     Details = "",
-                    Sector = logOrg.SectorType,
+                    Sector = logOrg.SectorType.ToString(),
                     Organisation = logOrg.OrganisationName,
                     CompanyNo = logOrg.CompanyNumber,
                     Address = logAddress.GetAddressString(),

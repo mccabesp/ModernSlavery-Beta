@@ -336,6 +336,10 @@ namespace ModernSlavery.Core.Extensions
 
             return null;
         }
+        public static string GetPropertyString(this object item, string propertyName)
+        {
+            return item?.GetType().GetProperty(propertyName)?.GetValue(item)?.ToString();
+        }
 
         public static PropertyInfo GetPropertyInfo(this Type type, string propertyName)
         {

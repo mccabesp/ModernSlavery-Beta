@@ -25,8 +25,6 @@ namespace ModernSlavery.WebUI.Shared.Models
         public string RegisteredAddress { get; set; }
         public bool IsWrongAddress { get; set; }
 
-        public string BackAction { get; set; }
-
         public string ReviewCode { get; set; }
         public string CancellationReason { get; set; }
         

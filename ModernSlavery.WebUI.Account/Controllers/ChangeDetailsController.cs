@@ -55,7 +55,7 @@ namespace ModernSlavery.WebUI.Account.Controllers
             var success = await ChangeDetailsService.ChangeDetailsAsync(formData, VirtualUser);
 
             // set success alert flag
-            if (success) TempData.Add(nameof(AccountResources.ChangeDetailsSuccessAlert), true);
+            if (success) SetSuccessMessage(AccountResources.ChangeDetailsSuccessAlert);
 
             // go to manage account page
             return RedirectToAction<AccountController>(nameof(AccountController.ManageAccount));

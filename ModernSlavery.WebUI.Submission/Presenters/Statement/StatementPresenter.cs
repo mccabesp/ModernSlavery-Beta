@@ -120,7 +120,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
         /// <param name="reportingDeadlineYear">The year of the reporting deadlien to which the statement data relates</param>
         /// <param name="userId">The unique Id of the user who wishes to edit the Statement data</param>
         /// <returns>Outcome.Success or Outcome.Fail with a list of StatementErrors</returns>
-        Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId);
+        Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId, string ip, string summaryUrl);
 
         /// <summary>
         /// Save any changes to the statement model
@@ -242,10 +242,10 @@ namespace ModernSlavery.WebUI.Submission.Presenters
             return await _statementBusinessLogic.CancelDraftStatementModelAsync(organisationId, reportingDeadlineYear, userId);
         }
 
-        public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId)
+        public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(string organisationIdentifier, int reportingDeadlineYear, long userId, string ip, string summaryUrl)
         {
             long organisationId = _sharedBusinessLogic.Obfuscator.DeObfuscate(organisationIdentifier);
-            return await _statementBusinessLogic.SubmitDraftStatementModelAsync(organisationId, reportingDeadlineYear, userId);
+            return await _statementBusinessLogic.SubmitDraftStatementModelAsync(organisationId, reportingDeadlineYear, userId, ip, summaryUrl);
         }
 
         public async Task<Outcome<StatementErrors, TViewModel>> GetViewModelAsync<TViewModel>(string organisationIdentifier, int reportingDeadlineYear, long userId, params object[] arguments) where TViewModel : BaseStatementViewModel
@@ -311,7 +311,7 @@ namespace ModernSlavery.WebUI.Submission.Presenters
                     return new Outcome<StatementErrors>(StatementErrors.CoHoTransientError);
                 }
 
-                await _sharedBusinessLogic.SendEmailService.SendMsuMessageAsync("GPG - COMPANIES HOUSE ERROR", $"Cant search using Companies House API for query '{groupSearchViewModel.SearchKeywords}' page:'1' due to following error:\n\n{ex.GetDetailsText()}");
+                await _sharedBusinessLogic.SendEmailService.SendMsuMessageAsync("MSU - COMPANIES HOUSE ERROR", $"Cant search using Companies House API for query '{groupSearchViewModel.SearchKeywords}' page:'1' due to following error:\n\n{ex.GetDetailsText()}");
                 return new Outcome<StatementErrors>(StatementErrors.CoHoPermanentError);
             }
 

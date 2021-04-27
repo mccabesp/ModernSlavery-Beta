@@ -1,0 +1,126 @@
+{
+  "ApplicationInsights:Suppressions":
+  /*
+      "Justification": //Type a reason for suppressing this telemetry
+      "TelemetryType": The type of telemetry message (Availability, Dependency, Event, Exception, Metric , PageViewPerformance, PageView, Request, Trace)
+      "ApplicationRole": 
+      "Target": 
+      "Operation": 
+      "ResultCode": 
+      "Severity": 
+      "Message": 
+      "Action": The action to Perform on the telemetry (None, Delete, Success, Fail)
+
+  Special terminator characters
+    ^ - StartsWith
+    $ - EndsWith
+    ~ - Contains
+    % - Like using wildcards '*' and '?'
+    [] - Encapsulate regex pattern between square brackets
+  */
+  [
+    {
+      "Justification": "Azure File Storage always returns 404 'Not found' using HEAD request to when file or directory exists",
+      "TelemetryType": "Dependency",
+      "ApplicationRole": null,
+      "Target": "file.core.windows.net$",
+      "Operation": "^HEAD /$(Storage:AzureShareName)/",
+      "ResultCode": "404",
+      "Severity": null,
+      "Message": null,
+      "Action": "Success"
+    },
+    {
+      "Justification": "Transient Failure on Azure Queue Storage is handled by retry policy",
+      "TelemetryType": "Dependency",
+      "ApplicationRole": null,
+      "Target": "queue.core.windows.net$",
+      "Operation": "^POST",
+      "ResultCode": "Faulted",
+      "Severity": null,
+      "Message": null,
+      "Action": "Success"
+    },
+    {
+      "Justification": "Http Error 500 (Internal Server Error) fault on Companies House Api is handled by retry policy",
+      "TelemetryType": "Dependency",
+      "ApplicationRole": null,
+      "Target": "api.companieshouse.gov.uk",
+      "Operation": null,
+      "ResultCode": "500",
+      "Severity": null,
+      "Message": null,
+      "Action": "Success"
+    },
+    {
+      "Justification": "Http Error 502 (Bad Gateway) fault on Companies House Api is handled by retry policy",
+      "TelemetryType": "Dependency",
+      "ApplicationRole": null,
+      "Target": "api.companieshouse.gov.uk",
+      "Operation": null,
+      "ResultCode": "502",
+      "Severity": null,
+      "Message": null,
+      "Action": "Success"
+    },
+    {
+      "Justification": "HTTP 'HEAD' method not used by service actions and instead handled by catch-all error page",
+      "TelemetryType": "Request",
+      "ApplicationRole": "ModernSlavery.Hosts.Web",
+      "Target": null,
+      "Operation": "^HEAD Error/CatchAll",
+      "ResultCode": "404",
+      "Severity": null,
+      "Message": null,
+      "Action": "Success"
+    },
+    {
+      "Justification": "HTTP 'GET' from Url cannot be resolved by service and instead handled by catch-all error page",
+      "TelemetryType": "Request",
+      "ApplicationRole": "ModernSlavery.Hosts.Web",
+      "Target": null,
+      "Operation": "^GET Error/CatchAll",
+      "ResultCode": "404",
+      "Severity": null,
+      "Message": null,
+      "Action": "Success"
+    },
+    {
+      "Justification": "HTTP 'POST' to Url cannot be resolved by service and instead handled by catch-all error page",
+      "TelemetryType": "Request",
+      "ApplicationRole": "ModernSlavery.Hosts.Web",
+      "Target": null,
+      "Operation": "^POST Error/CatchAll",
+      "ResultCode": "404",
+      "Severity": null,
+      "Message": null,
+      "Action": "Success"
+    },
+    {
+      "Justification": "Missing cookie after safe-link clicked",
+      "TelemetryType": "Exception",
+      "ApplicationRole": "ModernSlavery.Hosts.Web",
+      "Target": null,
+      "Operation": "^POST /signin-oidc",
+      "ResultCode": null,
+      "Severity": null,
+      "Message": "Correlation Failed.",
+      "Properties": {
+        "FormattedMessage": "^Correlation Failure: Redirected to ",
+        "CategoryName": "Microsoft.AspNetCore.Authentication.RemoteFailureContext"
+      },
+      "Action": "None"
+    },
+    {
+      "Justification": "Sign-in from one tab then signin from another separate tab (see RedirectAntiforgeryValidationFailedResultFilter)",
+      "TelemetryType": "Exception",
+      "ApplicationRole": "ModernSlavery.Hosts.Web",
+      "Target": null,
+      "Operation": "^POST Identity/Login",
+      "ResultCode": null,
+      "Severity": null,
+      "Message": "The provided antiforgery token was meant for a different claims-based user than the current user.",
+      "Action": "None"
+    }
+  ]
+}

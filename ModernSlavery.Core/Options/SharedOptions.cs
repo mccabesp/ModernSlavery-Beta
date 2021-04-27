@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using ModernSlavery.Core.Attributes;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Options;
@@ -14,7 +15,6 @@ namespace ModernSlavery.Core.Models
     {
         public SharedOptions()
         {
-
         }
 
         public string ApplicationName { get; set; }
@@ -30,6 +30,7 @@ namespace ModernSlavery.Core.Models
 
         public string DefaultEncryptionKey { get; set; }
 
+        public string SubmitterEmails { get; set; } = "*";
         public string AdminEmails { get; set; }
         public string SuperAdminEmails { get; set; }
         public string DatabaseAdminEmails { get; set; }
@@ -43,7 +44,8 @@ namespace ModernSlavery.Core.Models
         public int CertExpiresWarningDays { get; set; } = 30;
 
         public string TrustedDomainsOrIPs { get; set; }
-        private string[] _trustedDomainsOrIPs = null;
+
+        public string[] TrustedDomainsOrIPArray = null;
 
         public bool UseDeveloperExceptions { get; set; }
 
@@ -58,6 +60,8 @@ namespace ModernSlavery.Core.Models
         public int OrganisationPageSize { get; set; }
         public string EXTERNAL_HOSTNAME { get; set; }//The public internet host name
         public string WEBSITE_HOSTNAME { get; set; }//The AzureWebsites host name
+
+        public string DEPLOYMENT_SLOT_NAME { get; set; } //Used to differentiate between production and staging slots
         public string GatewayHosts { get; set; }
         public bool DebugHeaders { get; set; }
 
@@ -82,6 +86,7 @@ namespace ModernSlavery.Core.Models
         public int SecurityCodeLength { get; set; } = 8;
         public int SecurityCodeExpiryDays { get; set; } = 90;
         public string OrganisationCodeChars { get; set; } = "123456789ABCDEFGHKLMNPQRSTUXYZ";
+        public int PasswordResetExpiryHours { get; set; } = 24;
         public string PasswordRegex { get; set; }
         public string PasswordRegexError { get; set; }
         public string PinChars { get; set; }
@@ -166,6 +171,7 @@ namespace ModernSlavery.Core.Models
 
         public string AppDataPath { get; set; }
         public string DownloadsPath => "Downloads";
+        public string ArchivePath => "Archive";
 
         public string LogPath { get; set; }
 
@@ -214,8 +220,8 @@ namespace ModernSlavery.Core.Models
 
             if (!string.IsNullOrWhiteSpace(TrustedDomainsOrIPs))
             {
-                _trustedDomainsOrIPs = TrustedDomainsOrIPs.SplitI();
-                if (_trustedDomainsOrIPs == null || _trustedDomainsOrIPs.Length == 0)
+                TrustedDomainsOrIPArray = TrustedDomainsOrIPs.SplitI();
+                if (TrustedDomainsOrIPArray == null || TrustedDomainsOrIPArray.Length == 0)
                     throw new ConfigurationErrorsException($"{nameof(TrustedDomainsOrIPs)} cannot be empty");
             }
 
@@ -228,13 +234,7 @@ namespace ModernSlavery.Core.Models
 
         }
 
-        public bool IsTrustedAddress(string testIPAddress)
-        {
-            if (_trustedDomainsOrIPs == null || _trustedDomainsOrIPs.Length==0) return true;
-            if (string.IsNullOrWhiteSpace(testIPAddress)) throw new ArgumentNullException(nameof(testIPAddress));
-            var trusted=Networking.IsTrustedAddress(testIPAddress, _trustedDomainsOrIPs);
-            return trusted;
-        }
+
 
     }
 }

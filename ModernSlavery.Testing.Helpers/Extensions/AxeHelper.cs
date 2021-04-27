@@ -12,6 +12,7 @@ using System.Globalization;
 using CsvHelper;
 using System.Data;
 using Microsoft.WindowsAzure.Storage.File;
+using System.Text;
 
 namespace ModernSlavery.Testing.Helpers.Extensions
 {
@@ -159,14 +160,14 @@ namespace ModernSlavery.Testing.Helpers.Extensions
                 }
             }
 
-            if (records == null || !records.Any()) return;
+            if (!records.Any()) return;
 
             var filePath = Path.Combine(LoggingHelper.AxeResultsFilepath, $"AxeResultSummary.csv");
             if (File.Exists(filePath)) File.Delete(filePath);
 
             var table = records.ToDataTable();
 
-            using (var textWriter = new StringWriter())
+            using (var textWriter = new StreamWriter(filePath, false, new UTF8Encoding(true)))
             {
                 var config = new CsvConfiguration(CultureInfo.CurrentCulture);
                 config.ShouldQuote = (field, context) => true;
@@ -183,10 +184,6 @@ namespace ModernSlavery.Testing.Helpers.Extensions
                         writer.NextRecord();
                     }
                 }
-
-                var appendString = textWriter.ToString().Trim();
-                if (!string.IsNullOrWhiteSpace(appendString))
-                    File.WriteAllText(filePath, appendString);
             }
         }
     }

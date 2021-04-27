@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.File;
-using Microsoft.WindowsAzure.Storage.Queue;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
+using Microsoft.Azure.Storage.File;
+using Microsoft.Azure.Storage.Queue;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Options;
 
@@ -22,7 +22,10 @@ namespace ModernSlavery.Infrastructure.Storage
             if (string.IsNullOrWhiteSpace(storageOptions.AzureConnectionString)) throw new ArgumentNullException(nameof(storageOptions.AzureConnectionString));
 
             _storageAccount = CloudStorageAccount.Parse(storageOptions.AzureConnectionString);
+            AccessKey = _storageAccount.Credentials.ExportBase64EncodedKey();
         }
+        public string AccessKey { get; }
+
 
         public async IAsyncEnumerable<(string name, int? messageCount)> ListQueuesAsync()
         {
@@ -77,6 +80,95 @@ namespace ModernSlavery.Infrastructure.Storage
             var shares = await client.ListSharesSegmentedAsync(token).ConfigureAwait(false);
             foreach (var share in shares.Results)
                 yield return share.Name;
+        }
+
+        public async Task<Uri> GetContainerDirectoryUriAsync(string containerName, string relativeAddress="/")
+        {
+            if (string.IsNullOrWhiteSpace(containerName)) throw new ArgumentNullException(nameof(containerName));
+
+            // Create a CloudFileClient object for credentialed access to File storage.
+            var client = _storageAccount.CreateCloudBlobClient();
+            var container = client.GetContainerReference(containerName);
+            if (!await container.ExistsAsync()) throw new Exception($"Container '{containerName}' does not exist");
+            var directoryReference = container.GetDirectoryReference(relativeAddress);
+            return directoryReference?.StorageUri == null ? null : directoryReference.StorageUri.PrimaryUri ?? directoryReference.StorageUri.SecondaryUri;
+        }
+
+        public async Task CreateContainerAsync(string containerName)
+        {
+            if (string.IsNullOrWhiteSpace(containerName)) throw new ArgumentNullException(nameof(containerName));
+
+            // Create a CloudFileClient object for credentialed access to File storage.
+            var client = _storageAccount.CreateCloudBlobClient();
+            var container = client.GetContainerReference(containerName);
+            await container.CreateIfNotExistsAsync();
+        }
+
+        public async IAsyncEnumerable<Uri> ListBlobUrisAsync(string containerName)
+        {
+            if (string.IsNullOrWhiteSpace(containerName)) throw new ArgumentNullException(nameof(containerName));
+
+            // Create a CloudFileClient object for credentialed access to File storage.
+            var client = _storageAccount.CreateCloudBlobClient();
+            var container = client.GetContainerReference(containerName);
+            if (!await container.ExistsAsync()) yield break;
+            var token = new BlobContinuationToken();
+            var blobs = await container.ListBlobsSegmentedAsync(token).ConfigureAwait(false);
+            foreach (var blob in blobs.Results)
+                yield return blob.StorageUri.PrimaryUri ?? blob.StorageUri.SecondaryUri;
+        }
+
+        public async Task<bool> DeleteBlobAsync(string containerName, Uri storageUri)
+        {
+            if (string.IsNullOrWhiteSpace(containerName)) throw new ArgumentNullException(nameof(containerName));
+            if (storageUri==null) throw new ArgumentNullException(nameof(storageUri));
+
+
+            // Create a CloudFileClient object for credentialed access to File storage.
+            var client = _storageAccount.CreateCloudBlobClient();
+            var blob = await client.GetBlobReferenceFromServerAsync(storageUri);
+
+            return await blob.DeleteIfExistsAsync();
+        }
+
+        public async Task<bool> DeleteBlobAsync(string containerName, string blobName)
+        {
+            if (string.IsNullOrWhiteSpace(containerName)) throw new ArgumentNullException(nameof(containerName));
+            if (string.IsNullOrWhiteSpace(blobName)) throw new ArgumentNullException(nameof(blobName));
+
+            // Create a CloudFileClient object for credentialed access to File storage.
+            var client = _storageAccount.CreateCloudBlobClient();
+            var container = client.GetContainerReference(containerName);
+            if (!await container.ExistsAsync()) return false;
+
+            var blob = container.GetBlobReference(blobName);
+            return await blob.DeleteIfExistsAsync();
+        }
+
+        public async Task<Stream> OpenBlobStreamAsync(string containerName, Uri storageUri)
+        {
+            if (string.IsNullOrWhiteSpace(containerName)) throw new ArgumentNullException(nameof(containerName));
+            if (storageUri == null) throw new ArgumentNullException(nameof(storageUri));
+
+            // Create a CloudFileClient object for credentialed access to File storage.
+            var client = _storageAccount.CreateCloudBlobClient();
+            var blob = await client.GetBlobReferenceFromServerAsync(storageUri) as CloudBlob;
+
+            if (!await blob.ExistsAsync()) throw new FileNotFoundException($"Cannot find blob '{blob.Name}' in container '{containerName}'");
+            return await blob.OpenReadAsync();
+        }
+        public async Task UploadBlobStreamAsync(Stream stream, string containerName, Uri storageUri)
+        {
+            if (string.IsNullOrWhiteSpace(containerName)) throw new ArgumentNullException(nameof(containerName));
+            if (storageUri == null) throw new ArgumentNullException(nameof(storageUri));
+
+            // Create a CloudFileClient object for credentialed access to File storage.
+            var client = _storageAccount.CreateCloudBlobClient();
+            var container = client.GetContainerReference(containerName);
+            await container.CreateIfNotExistsAsync();
+
+            var blob = container.GetBlockBlobReference(Path.GetFileName(storageUri.ToString()));
+            await blob.UploadFromStreamAsync(stream);
         }
     }
 }

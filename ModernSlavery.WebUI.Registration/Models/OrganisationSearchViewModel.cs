@@ -72,10 +72,7 @@ namespace ModernSlavery.WebUI.Registration.Models
         #region Search details
 
         [Required]
-        [StringLength(
-            100,
-            ErrorMessage = "You must enter an organisations name or company number between 3 and 100 characters in length",
-            MinimumLength = 3)]
+        [StringLength(160,ErrorMessage = "You must enter an organisations name or company number between 3 and 160 characters in length",MinimumLength = 3)]
         [DisplayName("Search")]
         [Text]
         public string SearchText { get; set; }

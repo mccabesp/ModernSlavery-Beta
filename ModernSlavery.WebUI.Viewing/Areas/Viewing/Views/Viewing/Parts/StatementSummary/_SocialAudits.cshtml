@@ -47,7 +47,7 @@ else if (Model.SocialAudits.Any())
                     Organisation’s response
                 </div>
             </div>
-            @foreach (var socialAudit in Enums.GetValuesExcept<SocialAuditTypes>(SocialAuditTypes.Unknown, SocialAuditTypes.None))
+            @foreach (var socialAudit in Enums.GetValues<SocialAuditTypes>(SocialAuditTypes.Unknown, SocialAuditTypes.None))
             {
                 <div class="app-question-list__item">
                     <div class="app-question-list__column app-question-list__name">

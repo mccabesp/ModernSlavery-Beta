@@ -4,8 +4,7 @@ using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Azure
 {
-    [Options("DevOps:Azure")]
-    public class AzureOptions: IOptions
+    public class AzureOptions
     {
         [Option("client", Required = false, HelpText = "The ClientId of the Azure App Registration")]
         public string ClientId { get; set; }
@@ -19,14 +18,9 @@ namespace ModernSlavery.Infrastructure.Azure
         [Option("sub", Required = false, HelpText = "The Id of the Azure subscription to connect to. If missing the default subscription is used")]
         public string SubscriptionId { get; set; }
 
-
         public bool HasCredentials()
         {
             return !string.IsNullOrWhiteSpace(ClientId) && !string.IsNullOrWhiteSpace(ClientSecret) && !string.IsNullOrWhiteSpace(TenantId);
-        }
-        public void Validate()
-        {
-
         }
     }
 }

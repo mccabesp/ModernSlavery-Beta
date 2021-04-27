@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace ModernSlavery.Core.Interfaces
 {
@@ -13,11 +14,12 @@ namespace ModernSlavery.Core.Interfaces
         Task<bool> SendMsuMessageAsync(string subject, string message);
         Task<bool> SendMsuOrphanOrganisationNotificationAsync(string organisationName);
 
-        Task<bool> SendMsuRegistrationRequestAsync(string reviewUrl, string contactName, string reportingOrg,string reportingAddress);
+        Task<bool> SendMsuRegistrationRequestAsync(string reviewUrl, string contactName, string reportingOrg,string reportingAddress, string details=null);
 
         Task<bool> SendRegistrationApprovedAsync(string organisationName, string returnUrl, string emailAddress);
         Task<bool> SendRegistrationDeclinedAsync(string organisationName, string emailAddress, string reason);
         Task<bool> SendResetPasswordCompletedAsync(string emailAddress);
         Task<bool> SendResetPasswordNotificationAsync(string resetUrl, string emailAddress);
+        Task<bool> SendPinEmailAsync(string emailAddress, string pin, string organisationName, string url, DateTime expiresDate);
     }
 }

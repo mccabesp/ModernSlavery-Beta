@@ -21,7 +21,7 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = UserRoleNames.Admin)]
+    [Authorize(Roles = UserRoleNames.BasicAdmin)]
     [Route("admin")]
     public class AdminOrganisationSicCodesController : BaseController
     {
@@ -42,8 +42,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpGet("organisation/{id}/sic-codes")]
-        public IActionResult ViewSicCodesHistory(long id)
+        public async Task<IActionResult> ViewSicCodesHistory(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             return View("ViewOrganisationSicCodes", organisation);
@@ -53,6 +56,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
         public async Task<IActionResult> ChangeSicCodesGet(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             if (!string.IsNullOrWhiteSpace(organisation.CompanyNumber))
@@ -60,12 +66,14 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 {
                     var organisationFromCompaniesHouse =await companiesHouseApi.GetCompanyAsync(organisation.CompanyNumber);
 
-                    var sicCodeIdsFromCompaniesHouse = organisationFromCompaniesHouse.SicCodes;
-                    var sicCodesFromDatabase =
-                        organisation.GetLatestSicCodeIds().ToList();
+                    if (organisationFromCompaniesHouse != null)
+                    {
+                        var sicCodeIdsFromCompaniesHouse = organisationFromCompaniesHouse.SicCodes;
+                        var sicCodesFromDatabase = organisation.GetLatestSicCodeIds().ToList();
 
-                    if (!sicCodesFromDatabase.ToHashSet().SetEquals(sicCodeIdsFromCompaniesHouse.Select(s => s.ToInt32())))
-                        return OfferNewCompaniesHouseSicCodes(organisation, sicCodeIdsFromCompaniesHouse);
+                        if (!sicCodesFromDatabase.ToHashSet().SetEquals(sicCodeIdsFromCompaniesHouse.Select(s => s.ToInt32())))
+                            return OfferNewCompaniesHouseSicCodes(organisation, sicCodeIdsFromCompaniesHouse);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -161,8 +169,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost("organisation/{id}/sic-codes/change")]
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
-        public IActionResult ChangeSicCodesPost(long id, ChangeOrganisationSicCodesViewModel viewModel)
+        public async Task<IActionResult> ChangeSicCodesPost(long id, ChangeOrganisationSicCodesViewModel viewModel)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             if (!ModelState.IsValid) return new HttpBadRequestResult();
 
             // We might need to change the value of Action before we go to the view
@@ -205,7 +216,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 case ManuallyChangeOrganisationSicCodesActions.ConfirmManual:
                 case ManuallyChangeOrganisationSicCodesActions.ConfirmCoho:
-                    return ConfirmChangesAction(viewModel, organisation);
+                    return await ConfirmChangesActionAsync(viewModel, organisation);
 
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -316,7 +327,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             return View("ConfirmSicCodeChanges", viewModel);
         }
 
-        private IActionResult ConfirmChangesAction(ChangeOrganisationSicCodesViewModel viewModel,
+        private async Task<IActionResult> ConfirmChangesActionAsync(ChangeOrganisationSicCodesViewModel viewModel,
             Organisation organisation)
         {
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
@@ -334,25 +345,25 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             if (viewModel.Action == ManuallyChangeOrganisationSicCodesActions.ConfirmManual)
-                OptOrganisationOutOfCompaniesHouseUpdates(organisation);
+                await OptOrganisationOutOfCompaniesHouseUpdatesAsync(organisation);
 
-            SaveChangesAndAuditAction(viewModel, organisation);
+            await SaveChangesAndAuditActionAsync(viewModel, organisation);
 
             return View("SuccessfullyChangedOrganisationSicCodes", organisation);
         }
 
-        private void SaveChangesAndAuditAction(ChangeOrganisationSicCodesViewModel viewModel, Organisation organisation)
+        private async Task SaveChangesAndAuditActionAsync(ChangeOrganisationSicCodesViewModel viewModel, Organisation organisation)
         {
             var oldSicCodes = organisation.GetLatestSicCodeIdsString();
 
             RemoveSicCodes(viewModel, organisation);
             AddSicCodes(viewModel, organisation);
 
-            SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             var newSicCodes = organisation.GetLatestSicCodeIdsString();
 
-            auditLogger.AuditChangeToOrganisation(
+            await auditLogger.AuditChangeToOrganisationAsync(
                 this,
                 AuditedAction.AdminChangeOrganisationSicCode,
                 organisation,
@@ -365,10 +376,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 });
         }
 
-        private void OptOrganisationOutOfCompaniesHouseUpdates(Organisation organisation)
+        private async Task OptOrganisationOutOfCompaniesHouseUpdatesAsync(Organisation organisation)
         {
             organisation.OptedOutFromCompaniesHouseUpdate = true;
-            SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
         }
 
         private void RemoveSicCodes(ChangeOrganisationSicCodesViewModel viewModel, Organisation organisation)

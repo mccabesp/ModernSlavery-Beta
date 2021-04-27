@@ -24,7 +24,12 @@
         <p class="govuk-body">
             The statement was signed off by:
             <br />
-            @Model.ApprovingPerson, on @Model.ApprovedDate.Value.ToString("d MMMM yyyy")
+            @Model.ApprovingPerson
+        </p>
+        <p class="govuk-body">
+            It was approved by the board (or equivalent management body) on:
+            <br />
+            @Model.ApprovedDate.Value.ToString("d MMMM yyyy")
         </p>
     }
     else

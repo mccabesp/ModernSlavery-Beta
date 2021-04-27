@@ -10,7 +10,7 @@ namespace ModernSlavery.Infrastructure.Messaging.GovNotify
 
         public string ApiServer { get; set; } = "https://api.notifications.service.gov.uk";
 
-        public string ClientReference { get; set; } = "ModernSlaveryAlphaTest";
+        public string ClientReference { get; set; } = "ModernSlaveryBeta";
 
         public string ApiKey { get; set; }
 

@@ -27,7 +27,7 @@
                         Select all that apply
                     </div>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var partnerType in Enums.GetValuesExcept<PartnerTypes>(PartnerTypes.Unknown))
+                        @foreach (var partnerType in Enums.GetValues<PartnerTypes>(PartnerTypes.Unknown))
                         {
                             var value = (int)partnerType;
                             var isNone = partnerType == PartnerTypes.None;

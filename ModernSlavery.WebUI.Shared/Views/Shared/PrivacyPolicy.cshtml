@@ -8,10 +8,7 @@
     if (string.IsNullOrWhiteSpace(backUrl)) backUrl = "/";
 }
 @section BeforeMain {
-    @if (User.Identity.IsAuthenticated)
-    {
-        <a class="govuk-back-link" href="@backUrl">Back</a>
-    }
+    <a class="govuk-back-link govuk-!-margin-bottom-0" href="@Controller.BackUrl">Back</a>
 }
 @using (Html.BeginForm(null, null, FormMethod.Post, new { novalidate = "" }))
 {

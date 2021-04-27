@@ -24,6 +24,7 @@ namespace ModernSlavery.WebUI.Registration.Models
 
         [Required(AllowEmptyStrings = false)]
         [EmailAddress]
+        [MaxLength(254)]
         public string ContactEmailAddress { get; set; }
 
         [Required(AllowEmptyStrings = false)]

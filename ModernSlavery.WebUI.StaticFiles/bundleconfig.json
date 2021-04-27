@@ -10,7 +10,10 @@
   // bundle js for DfeTemplate layout
   {
     "outputFileName": "wwwroot/assets/javascripts/application.min.js",
-    "inputFiles": [ "wwwroot/assets/javascripts/**/!(*.min).js" ],
+    "inputFiles": [
+      "wwwroot/assets/javascripts/Application/**/!(*.min).js",
+      "wwwroot/assets/javascripts/GOVUK/**/!(*.min).js"
+    ],
     "minify": {
       "enabled": true,
       "renameLocals": true
@@ -24,5 +27,15 @@
       "enabled": true,
       "renameLocals": true
     }
+  },
+  // bundle js for individual pages
+  {
+    "outputFileName": "wwwroot/assets/javascripts/page/uploads.min.js",
+    "inputFiles": [ "wwwroot/assets/javascripts/page/uploads.js" ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    }
   }
+
 ]

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModernSlavery.BusinessDomain.Shared;
@@ -12,7 +13,7 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = UserRoleNames.Admin)]
+    [Authorize(Roles = UserRoleNames.BasicAdmin)]
     [Route("admin")]
     [NoCache]
     public class AdminViewUserController : BaseController
@@ -26,8 +27,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpGet("user/{id}")]
-        public IActionResult ViewUser(long id)
+        public async Task<IActionResult> ViewUser(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var user = _adminService.SharedBusinessLogic.DataRepository.Get<User>(id);
 
             return View("../Admin/ViewUser", user);

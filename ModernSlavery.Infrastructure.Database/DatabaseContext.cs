@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Models;
+using ModernSlavery.Core.Options;
 
 namespace ModernSlavery.Infrastructure.Database
 {
@@ -149,10 +150,10 @@ namespace ModernSlavery.Infrastructure.Database
                 if (_sharedOptions.IsDevelopment() || _sharedOptions.IsTest())
                 {
                     var connectionString = new SqlConnectionStringBuilder(ConnectionString);
-                    if (connectionString.DataSource.ContainsI("(localdb"))
+                    if (connectionString.DataSource.ContainsI("(localdb") && connectionString.InitialCatalog.ContainsI("-V?"))
                     {
                         var migrationClasses = Assembly.GetExecutingAssembly().ExportedTypes.Where(p => p.IsClass && typeof(Migration).IsAssignableFrom(p)).ToList();
-                        connectionString.InitialCatalog = $"{connectionString.InitialCatalog.BeforeLast("-V")}-V{migrationClasses.Count}";
+                        connectionString.InitialCatalog = $"{connectionString.InitialCatalog.BeforeLast("-V?")}-V{migrationClasses.Count}";
                         ConnectionString = connectionString.ToString();
                     }
                 }

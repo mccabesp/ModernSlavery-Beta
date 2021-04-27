@@ -17,6 +17,7 @@ namespace ModernSlavery.Infrastructure.Messaging
 {
     public class SmtpEmailProvider : BaseEmailProvider
     {
+        private SmtpEmailOptions _smtpEmailOptions { get; }
         public SmtpEmailProvider(IEmailTemplateRepository emailTemplateRepo,
             SmtpEmailOptions smtpEmailOptions,
             TestOptions testOptions,
@@ -24,13 +25,12 @@ namespace ModernSlavery.Infrastructure.Messaging
             [KeyFilter(Filenames.EmailSendLog)] IAuditLogger emailSendLog)
             : base(testOptions, emailTemplateRepo, logger, emailSendLog)
         {
-            Options = smtpEmailOptions ?? throw new ArgumentNullException(nameof(smtpEmailOptions));
+            _smtpEmailOptions = smtpEmailOptions ?? throw new ArgumentNullException(nameof(smtpEmailOptions));
             //TODO ensure smtp config is present (when enabled)
         }
 
-        public SmtpEmailOptions Options { get; }
 
-        public override bool Enabled => Options.Enabled != false;
+        public override bool Enabled => _smtpEmailOptions.Enabled != false;
 
         public override async Task<SendEmailResult> SendEmailAsync<TModel>(string emailAddress, string templateId, TModel model)
         {
@@ -50,7 +50,7 @@ namespace ModernSlavery.Infrastructure.Messaging
 
             // remove the meta data comments from the document
             var templateMetaData = document.Descendents<IComment>().FirstOrDefault();
-            if (templateMetaData == null) new NullReferenceException(nameof(templateMetaData));
+            if (templateMetaData == null) throw new NullReferenceException(nameof(templateMetaData));
 
             templateMetaData.Remove();
 
@@ -61,28 +61,28 @@ namespace ModernSlavery.Infrastructure.Messaging
             // merge the template parameters
             foreach ((string name, object value) in mergeParameters)
             {
-                messageSubject = messageSubject.Replace($"(({name}))", value.ToString());
-                messageHtml = messageHtml.Replace($"(({name}))", value.ToString());
+                messageSubject = messageSubject.Replace($"(({name}))", value?.ToString(), StringComparison.OrdinalIgnoreCase);
+                messageHtml = messageHtml.Replace($"(({name}))", value?.ToString(),StringComparison.OrdinalIgnoreCase);
             }
 
             await Email.QuickSendAsync(
                 messageSubject,
-                Options.SenderEmail,
-                Options.SenderName,
-                Options.ReplyEmail,
+                _smtpEmailOptions.SenderEmail,
+                _smtpEmailOptions.SenderName,
+                _smtpEmailOptions.ReplyEmail,
                 emailAddress,
                 messageHtml,
-                Options.Server,
-                Options.Username,
-                Options.Password,
-                Options.Port,
+                _smtpEmailOptions.Server,
+                _smtpEmailOptions.Username,
+                _smtpEmailOptions.Password,
+                _smtpEmailOptions.Port,
                 simulate: _testOptions.SimulateMessageSend).ConfigureAwait(false);
 
             return new SendEmailResult
             {
                 Status = "sent",
-                Server = $"{Options.Server}:{Options.Port}",
-                ServerUsername = Options.Username,
+                Server = $"{_smtpEmailOptions.Server}:{_smtpEmailOptions.Port}",
+                ServerUsername = _smtpEmailOptions.Username,
                 EmailAddress = emailAddress,
                 EmailSubject = messageSubject,
                 EmailMessagePlainText = messageText

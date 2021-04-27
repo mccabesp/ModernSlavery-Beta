@@ -5,18 +5,21 @@
 401,Something’s gone wrong,,Please sign out and sign in again to continue,,,/sign-out,Sign in,,,,
 403,Something’s gone wrong,,Use your browser’s ‘Back’ button to return to the previous step.,,,,,,,,
 404,We can’t find the page you're looking for,,Use your browser’s ‘Back’ button to return to the previous step.,,,,,,,,
-410,This page is no longer available,,The data for the page you requested is no longer available,,,,,,,,
 408,Something’s gone wrong,,Use your browser’s ‘Back’ button to return to the previous step.,,,,,,,,
+410,This page is no longer available,,The data for the page you requested is no longer available,,,,,,,,
 429,Something’s gone wrong,,Please try again later,,,,,,,,
 500,Something’s gone wrong,,Please try again later,,,,,,,,
 501,Something’s gone wrong,,Please try again later,,,,,,,,
 503,Service Unavailable,,The Modern Slavery Reporting service is currently unavailable due to maintenance,,Please try again later,,,,,,
 1000,You’re not signed in properly,,Please sign out and sign in again to continue,,Sign out,/sign-out,,,,,
 1001,You’re not signed in properly,,Please sign out and sign in again to continue,,Sign out,/sign-out,,,,,
-1002,You’re not signed in,,Please sign in to continue,,Sign in,/Home/Login,,,,,
+1002,You’re not signed in,,Please sign in to continue,,Sign in,/sign-in,,,,,
 1003,Something’s gone wrong,,Please try again later,,,,,,,,
 1004,Something’s gone wrong,,There was a problem sending your verification email,,Try again now,/sign-up/verify-email,Resend,,,,
 1005,There's a problem with your text,,Invalid characters: {badChars},,,,,,,,
+1006,You are already signed in,,,,,/sign-in,,,,,
+1007,You are already signed out,,,,,/sign-out,,,,,
+1008,Sign-in failure,,There was a problem with your sign-in,,Click here to try again,/sign-in,Sign in,,,,
 1100,You haven’t verified your email address yet,,Please verify your email address to continue,,Verify your email address,/sign-up/verify-email,,,,,
 1101,You haven’t verified your email address yet,,The email we sent you has expired. You’ll need to get a new email to continue,,Get a new verification email,/sign-up/verify-email,,,,,
 1102,You haven’t verified your email address yet,,"Please check your email and junk mail folder. If you can’t find our email, you can request another one in {remainingTime}",,,,,,,,
@@ -32,19 +35,19 @@
 1114,You’ve entered the wrong registration review code,,Please try again using the correct registration review code,,,,,,,,
 1115,This registration request isn't valid,,This registration was previously declined and the user informed by email,,,,,,,,
 1117,Forbidden,,As an administrator you are not permitted to view this page,,,,,,,,
-1118,Something’s gone wrong,,Please start your search again,,Find Organisation,/Viewing/search-results,,,,,
+1118,Something’s gone wrong,,Please start your search again,,Find Organisation,/search-results,,,,,
 1120,It's too soon to request a new PIN,,Please wait for up to 7 days for your PIN to arrive. You can request another PIN in {remainingTime},,Enter your PIN now,/Register/activate-service/{OrganisationIdentifier},,,,,
 1121,You’ve tried to reset your password too many times,,You can try again in {remainingTime},,,,,,,,
 1122,Something’s gone wrong,,There was a problem sending your password reset email. Please try again.,,,,,,,,
 1123,You’ve entered the wrong password reset code,,Please try again using the correct password reset code,,,,,,,,
-1124,This password reset request is no longer valid,,This user account no longer exists. You must register again,,Register now,/Register/about-you,,,,,
+1124,This password reset request is no longer valid,,This user account no longer exists. You must register again,,Register now,/sign-up/about-you,,,,,
 1125,Too many attempts,,You've attempted this action too many times.,,Please try again in {remainingTime},#,,,,,
-1126,This password reset request has expired,,Please request a new password reset email.,,Reset password,/Register/password-reset,,,,,
+1126,This password reset request has expired,,Please request a new password reset email.,,Reset password,/manage-account/password-reset,,,,,
 1127,Password successfully reset,,Your new password has been accepted.,,,/manage-organisations,Sign In,,,,
 1130,We first need to know your organisation,,,,Select your organisation,/manage-organisations,,,,,
 1131,Something’s gone wrong,,There was a problem sending the cancellation email. Please try again.,,,,,,,,
 1132,Something’s gone wrong,,There was a problem sending the acceptance email. Please try again.,,,,,,,,
-1133,Too many password resets,,Too many password resets were recently requested from your internet address.,,Please try again in {remainingTime},/register/password-reset,,,,,
+1133,Too many password resets,,Too many password resets were recently requested from your internet address.,,Please try again in {remainingTime},,,,,,
 1134,Session has expired,,Your session has expired.,,,,,,,,
 1135,Address Expired,,The web address link you entered expired on {expiryDate} and is no longer available.,,,,,,,,
 1136,Address Unrecognised,,The web address link you entered is invalid.,,Please try again entering the correct full web address.,,,,,,
@@ -67,6 +70,8 @@
 1154,Statement Summary Locked,,Another user is currently editing this statement summary. Please try again later,,,/manage-organisation/{organisationIdentifier},,,,,
 1155,Reporting dealine expired,,The reporting deadline has expired and changes are no longer permitted.,,,/manage-organisation/{organisationIdentifier},,,,,
 1156,"Please check your email and junk mail folder. If you can’t find our email, you can request another one in {remainingTime}",,,,,,,,,,
+1157,Forbidden,,Sign-up is not permitted with this email address,,,,,,,,
+1158,Forbidden,,Sign-in is not permitted with this email address,,,,,,,,
 2000,There's a problem with your address,,Enter up to 100 characters,,,,,Address1,AddAddressViewModel,Address1,MaxLength
 2001,There's a problem with your address,,Please enter your address,,,,,Address1,AddAddressViewModel,Address1,Required
 2002,There's a problem with your address,,Enter up to 100 characters,,,,,Address2,AddAddressViewModel,Address2,MaxLength
@@ -78,119 +83,131 @@
 2008,There's a problem with your address,,Enter between 3 and 20 characters,,,,,Postcode,AddAddressViewModel,PostCode,StringLength
 2009,There's a problem with your contact details,,Please enter a valid email address,,,,,Email address,AddContactViewModel,ContactEmailAddress,EmailAddress
 2010,There's a problem with your contact details,,Please enter your email address,,,,,Email address,AddContactViewModel,ContactEmailAddress,Required
-2011,There's a problem with your address,,Enter up to 50 characters,,,,,First name,AddContactViewModel,ContactFirstName,MaxLength
-2012,There's a problem with your contact details,,Please enter your first name,,,,,First name,AddContactViewModel,ContactFirstName,Required
-2013,There's a problem with your contact details,,Enter up to 50 characters,,,,,Job title,AddContactViewModel,ContactJobTitle,MaxLength
-2014,There's a problem with your contact details,,Please enter your job title,,,,,Job title,AddContactViewModel,ContactJobTitle,Required
-2015,There's a problem with your contact details,,Enter up to 50 characters,,,,,Last name,AddContactViewModel,ContactLastName,MaxLength
-2016,There's a problem with your contact details,,Please enter your last name,,,,,Last name,AddContactViewModel,ContactLastName,Required
-2017,There's a problem with your contact details,,Enter up to 20 digits,,,,,Telephone number,AddContactViewModel,ContactPhoneNumber,MaxLength
-2018,There's a problem with your contact details,,Please enter a valid phone number,,,,,Telephone number,AddContactViewModel,ContactPhoneNumber,Phone
-2019,There's a problem with your contact details,,Please enter your telephone number,,,,,Telephone number,AddContactViewModel,ContactPhoneNumber,Required
-2020,There's a problem with your organisation details,,Please enter a charity number,,,,,Charity number,AddOrganisationViewModel,CharityNumber,Required
-2021,There's a problem with your organisation details,,Enter between 3 and 100 characters,,,,,Charity number,AddOrganisationViewModel,CharityNumber,StringLength
-2022,There's a problem with your organisation details,,Company number must contain 8 characters,,,,,Company number,AddOrganisationViewModel,CompanyNumber,CompanyNumber
-2023,There's a problem with your organisation details,,Please enter a company number,,,,,Company number,AddOrganisationViewModel,CompanyNumber,Required
-2024,There's a problem with your organisation details,,Please enter a mutual partnership number,,,,,Mutual partnership number,AddOrganisationViewModel,MutualNumber,Required
-2025,There's a problem with your organisation details,,Enter between 3 and 100 characters,,,,,Mutual partnership number,AddOrganisationViewModel,MutualNumber,StringLength
-2026,There's a problem with your organisation details,,Please enter your organisation name,,,,,Organisation name,AddOrganisationViewModel,OrganisationName,Required
-2027,There's a problem with your organisation details,,Enter between 3 and 100 characters,,,,,Organisation name,AddOrganisationViewModel,OrganisationName,StringLength
-2028,There's a problem with your organisation details,,Please enter a name for this reference,,,,,Name or type,AddOrganisationViewModel,OtherName,Required
-2029,There's a problem with your organisation details,,Enter between 3 and 100 characters,,,,,Name or type,AddOrganisationViewModel,OtherName,StringLength
-2030,There's a problem with your organisation details,,Please enter a value for this reference,,,,,Unique number or value,AddOrganisationViewModel,OtherValue,Required
-2031,There's a problem with your organisation details,,Enter between 3 and 100 characters,,,,,Unique number or value,AddOrganisationViewModel,OtherValue,StringLength
-2032,There's a problem with your PIN,,"Please enter your PIN, using at least 7 letters or numbers",,,,,Enter pin,CompleteViewModel,PIN,Pin
-2033,There’s a problem with your PIN,,Please enter your PIN,,,,,Enter pin,CompleteViewModel,PIN,Required
-2034,Invalid request,,,,,,,,CookieSettingsViewModel,ApplicationInsights,Text
-2035,Invalid request,,,,,,,,CookieSettingsViewModel,GoogleAnalyticsGovUk,Text
-2036,Invalid request,,,,,,,,CookieSettingsViewModel,GoogleAnalyticsMSU,Text
-2037,Invalid request,,,,,,,,CookieSettingsViewModel,RememberSettings,Text
-2038,There's a problem with your email address,,Please enter a valid email address (e.g. john.smith@smithlimited.co.uk),,,,,Email address,EnterAnswersViewModel,EmailAddress,EmailAddress
-2039,There's a problem with your contact details,,Please enter your email address,,,,,Email address,EnterAnswersViewModel,EmailAddress,Required
-2040,There's a problem with your contact details,,Please enter your first name,,,,,,EnterAnswersViewModel,FirstName,Required
-2041,There's a problem with your contact details,,Please enter your job title,,,,,,EnterAnswersViewModel,JobTitle,Required
-2042,There's a problem with your contact details,,Please enter your last name,,,,,,EnterAnswersViewModel,LastName,Required
-2043,You must provide details for other reason,,Enter details,,,,,,EnterAnswersViewModel,OtherReason,Required
-2044,Select the reasons why your organisation does not have to publish a modern slavery statement,,Select the reasons why your organisation does not have to publish a modern slavery statement,,,,,,EnterAnswersViewModel,SelectedReasonOptions,MinLength
-2045,You must provide details for turnover,,Please answer the turnover question,,,,,,EnterAnswersViewModel,TurnOver,Required
-2046,"Enter an organisation reference, matching the details we sent you",,"Enter an organisation reference, matching the details we sent you",,,,,Organisation Reference,EnterCodesViewModel,OrganisationReference,Required
-2047,"Enter a security code, matching the details we sent you",,"Enter a security code, matching the details we sent you",,,,,Security code,EnterCodesViewModel,SecurityToken,Required
-2048,There's a problem with your feedback details,,Enter up to 2000 characters,,,,,,FeedbackViewModel,Details,MaxLength
-2049,There's a problem with your selection,,Tell us how we can improve the service,,,,,,FeedbackViewModel,Details,Required
-2050,There's a problem with your email address,,Please enter a valid email address (e.g. john.smith@smithlimited.co.uk),,,,,Email address,FeedbackViewModel,EmailAddress,EmailAddress
-2051,There's a problem with your selection,,Select how easy or difficult this service is to use,,,,,,FeedbackViewModel,HowEasyIsThisServiceToUse,Required
-2052,There's a problem with your phone number,,Please enter a valid phone number,,,,,Phone number,FeedbackViewModel,PhoneNumber,Phone
-2053,There's a problem with your selection,,Select what you did on this service,,,,,,FeedbackViewModel,WhyVisitMSUSite,Required
-2054,There’s a problem with your email address or password,,,,,,,,LoginInputModel,Password,Password
-2056,There’s a problem with your email address or password,,,,,,,,LoginInputModel,Username,EmailAddress
-2057,There's a problem with your search,,Please enter an organisation to search for,,,,,SearchText,OrganisationSearchViewModel,SearchText,Required
-2058,There's a problem with your search,,Enter an organisation name or company number of between 3 and 100 characters,,,,,SearchText,OrganisationSearchViewModel,SearchText,StringLength
-2059,There's a problem with your email address,,The email addresses don't match. Please enter your email address again,,,,,Confirm your email address,ResetViewModel,ConfirmEmailAddress,Compare
-2060,There's a problem with your email address,,Please enter your email address again,,,,,Confirm your email address,ResetViewModel,ConfirmEmailAddress,Required
-2061,There's a problem with your password,,"Your password contains invalid characters, please enter your password again",,,,,Confirm password,ResetViewModel,ConfirmPassword,DataType
-2062,There's a problem with your email address,,Please enter a valid email address (e.g. john.smith@smithlimited.co.uk),,,,,Email address,ResetViewModel,EmailAddress,EmailAddress
-2063,There's a problem with your email address,,Please enter your email address,,,,,Email address,ResetViewModel,EmailAddress,Required
-2064,There's a problem with your password,,"Your password contains invalid characters, please try again",,,,,Password,ResetViewModel,Password,DataType
-2065,There's a problem with your password,,"Your password isn't valid, please try again",,,,,,ResetViewModel,Password,Password
-2066,There's a problem with your password,,Please enter your password,,,,,Password,ResetViewModel,Password,Required
-2067,There's a problem with your password,,Your password must be at least {1} characters long,,,,,Password,ResetViewModel,Password,StringLength
-2068,There's a problem with your contact details,,The email addresses don't match. Please confirm your email address,,,,,Confirm your email address,ScopingViewModel,ConfirmEmailAddress,Compare
-2069,There's a problem with your contact details,,Please confirm your email address,,,,,Confirm your email address,ScopingViewModel,ConfirmEmailAddress,Required
-2070,There's a problem with your search,,,,,,,,SearchViewModel,Search,Text
-2071,There's a problem with your email address,,The email addresses don't match. Please enter your email address again,,,,,Confirm your email address,SignUpViewModel,ConfirmEmailAddress,Compare
-2072,There's a problem with your email address,,Please enter your email address again,,,,,Confirm your email address,SignUpViewModel,ConfirmEmailAddress,Required
-2073,There's a problem with your password,,The passwords entries don't match. Please enter your password again,,,,,Confirm your password,SignUpViewModel,ConfirmPassword,Compare
-2074,There's a problem with your password,,"Your password contains invalid characters, please enter your password again",,,,,Confirm password,SignUpViewModel,ConfirmPassword,DataType
-2075,There's a problem with your password,,Please enter your password again,,,,,Confirm password,SignUpViewModel,ConfirmPassword,Required
-2076,There's a problem with your email address,,Please enter a valid email address (e.g. john.smith@smithlimited.co.uk),,,,,Email address,SignUpViewModel,EmailAddress,EmailAddress
-2077,There's a problem with your email address,,Please enter your email address,,,,,Email address,SignUpViewModel,EmailAddress,Required
-2078,There's a problem with your personal details,,Please enter your first name,,,,,First name,SignUpViewModel,FirstName,Required
-2079,There's a problem with your personal details,,Please enter your job title,,,,,Job title,SignUpViewModel,JobTitle,Required
-2080,There's a problem with your personal details,,Please enter your last name,,,,,Last name,SignUpViewModel,LastName,Required
-2081,There's a problem with your password,,"Your password contains invalid characters, please try again",,,,,Password,SignUpViewModel,Password,DataType
-2082,There's a problem with your password,,"Your password isn't valid, please try again",,,,,,SignUpViewModel,Password,Password
-2083,There's a problem with your personal details,,Please enter your password,,,,,Password,SignUpViewModel,Password,Required
-2084,There's a problem with your password,,Your password must be at least {1} characters long,,,,,Password,SignUpViewModel,Password,StringLength
-2085,There's a problem with your parameters,,,,,,,,ManualChangesViewModel,Parameters,Text
-2086,There's a problem with your comment,,,,,,,,ManualChangesViewModel,Comment,Text
-2087,Theres a problem with your input,,,,,,,,AdminChangeCompaniesHouseOptInOutViewModel,Reason,Text
-2088,Theres a problem with your input,,,,,,,,AdminChangePublicSectorClassificationViewModel,Reason,Text
-2089,Theres a problem with your input,,,,,,,,AdminChangeScopeViewModel,Reason,Text
-2090,Theres a problem with your input,,,,,,,,AdminChangeUserContactPreferencesViewModel,Reason,Text
-2091,Theres a problem with your input,,,,,,,,AdminResendVerificationEmailViewModel,Reason,Text
-2092,Theres a problem with your input,,,,,,,,AdminStatementLateFlagViewModel,Reason,Text
-2093,Theres a problem with your input,,,,,,,,ChangeOrganisationAddressViewModel,Reason,Text
-2094,Theres a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,Address1,Text
-2095,Theres a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,Address2,Text
-2096,Theres a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,Address3,Text
-2097,Theres a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,TownCity,Text
-2098,Theres a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,County,Text
-2099,Theres a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,Country,Text
-2100,Theres a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,PostCode,Text
-2101,Theres a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,PoBox,Text
-2102,Theres a problem with your input,,,,,,,,ChangeOrganisationNameViewModel,Name,Text
-2103,Theres a problem with your input,,,,,,,,ChangeOrganisationNameViewModel,Reason,Text
-2104,Theres a problem with your input,,,,,,,,ChangeOrganisationSicCodesViewModel,Reason,Text
-2105,Theres a problem with your input,,,,,,,,ChangeOrganisationSicCodesViewModel,SicCodeIdsFromCoHo,Text
-2106,Theres a problem with your input,,,,,,,,ReviewOrganisationViewModel,ReviewCode,Text
-2107,Theres a problem with your input,,,,,,,,ReviewOrganisationViewModel,CancellationReason,Text
-2108,Theres a problem with your password,,"Your password isn't valid, please try again",,,,,,CloseAccountViewModel,EnterPassword,Password
-2109,Invalid Input,,The details provided can't be longer than 200 characters.,,,,,,EnterAnswersViewModel,OtherReason,MaxLength
+2011,There's a problem with your contact details,,Enter up to 254 characters,,,,,Email address,AddContactViewModel,ContactEmailAddress,MaxLength
+2012,There's a problem with your address,,Enter up to 50 characters,,,,,First name,AddContactViewModel,ContactFirstName,MaxLength
+2013,There's a problem with your contact details,,Please enter your first name,,,,,First name,AddContactViewModel,ContactFirstName,Required
+2014,There's a problem with your contact details,,Enter up to 50 characters,,,,,Job title,AddContactViewModel,ContactJobTitle,MaxLength
+2015,There's a problem with your contact details,,Please enter your job title,,,,,Job title,AddContactViewModel,ContactJobTitle,Required
+2016,There's a problem with your contact details,,Enter up to 50 characters,,,,,Last name,AddContactViewModel,ContactLastName,MaxLength
+2017,There's a problem with your contact details,,Please enter your last name,,,,,Last name,AddContactViewModel,ContactLastName,Required
+2018,There's a problem with your contact details,,Enter up to 20 digits,,,,,Telephone number,AddContactViewModel,ContactPhoneNumber,MaxLength
+2019,There's a problem with your contact details,,Please enter a valid phone number,,,,,Telephone number,AddContactViewModel,ContactPhoneNumber,Phone
+2020,There's a problem with your contact details,,Please enter your telephone number,,,,,Telephone number,AddContactViewModel,ContactPhoneNumber,Required
+2021,There's a problem with your organisation details,,Please enter a charity number,,,,,Charity number,AddOrganisationViewModel,CharityNumber,Required
+2022,There's a problem with your organisation details,,Enter between 3 and 100 characters,,,,,Charity number,AddOrganisationViewModel,CharityNumber,StringLength
+2023,There's a problem with your organisation details,,Company number must contain 8 characters,,,,,Company number,AddOrganisationViewModel,CompanyNumber,CompanyNumber
+2024,There's a problem with your organisation details,,Please enter a company number,,,,,Company number,AddOrganisationViewModel,CompanyNumber,Required
+2025,There's a problem with your organisation details,,Please enter a mutual partnership number,,,,,Mutual partnership number,AddOrganisationViewModel,MutualNumber,Required
+2026,There's a problem with your organisation details,,Enter between 3 and 100 characters,,,,,Mutual partnership number,AddOrganisationViewModel,MutualNumber,StringLength
+2027,There's a problem with your organisation details,,Please enter your organisation name,,,,,Organisation name,AddOrganisationViewModel,OrganisationName,Required
+2028,There's a problem with your organisation details,,Enter between 3 and 160 characters,,,,,Organisation name,AddOrganisationViewModel,OrganisationName,StringLength
+2029,There's a problem with your organisation details,,Please enter a name for this reference,,,,,Name or type,AddOrganisationViewModel,OtherName,Required
+2030,There's a problem with your organisation details,,Enter between 3 and 100 characters,,,,,Name or type,AddOrganisationViewModel,OtherName,StringLength
+2031,There's a problem with your organisation details,,Please enter a value for this reference,,,,,Unique number or value,AddOrganisationViewModel,OtherValue,Required
+2032,There's a problem with your organisation details,,Enter between 3 and 100 characters,,,,,Unique number or value,AddOrganisationViewModel,OtherValue,StringLength
+2033,There's a problem with your PIN,,"Please enter your PIN, using at least 7 letters or numbers",,,,,Enter pin,CompleteViewModel,PIN,Pin
+2034,There’s a problem with your PIN,,Please enter your PIN,,,,,Enter pin,CompleteViewModel,PIN,Required
+2035,Invalid request,,,,,,,,CookieSettingsViewModel,ApplicationInsights,Text
+2036,Invalid request,,,,,,,,CookieSettingsViewModel,GoogleAnalyticsGovUk,Text
+2037,Invalid request,,,,,,,,CookieSettingsViewModel,GoogleAnalyticsMSU,Text
+2038,Invalid request,,,,,,,,CookieSettingsViewModel,RememberSettings,Text
+2039,There's a problem with your email address,,Please enter a valid email address (e.g. john.smith@smithlimited.co.uk),,,,,Email address,EnterAnswersViewModel,EmailAddress,EmailAddress
+2040,There's a problem with your contact details,,Please enter your email address,,,,,Email address,EnterAnswersViewModel,EmailAddress,Required
+2041,There's a problem with your contact details,,Enter up to 254 characters,,,,,Email address,EnterAnswersViewModel,EmailAddress,MaxLength
+2042,There's a problem with your contact details,,Please enter your first name,,,,,,EnterAnswersViewModel,FirstName,Required
+2043,There's a problem with your contact details,,Enter up to 50 characters,,,,,,EnterAnswersViewModel,FirstName,MaxLength
+2044,There's a problem with your contact details,,Please enter your job title,,,,,,EnterAnswersViewModel,JobTitle,Required
+2045,There's a problem with your contact details,,Enter up to 50 characters,,,,,,EnterAnswersViewModel,JobTitle,MaxLength
+2046,There's a problem with your contact details,,Please enter your last name,,,,,,EnterAnswersViewModel,LastName,Required
+2047,There's a problem with your contact details,,Enter up to 50 characters,,,,,,EnterAnswersViewModel,LastName,MaxLength
+2048,You must provide details for other reason,,Enter details,,,,,,EnterAnswersViewModel,OtherReason,Required
+2049,Select the reasons why your organisation does not have to publish a modern slavery statement,,Select the reasons why your organisation does not have to publish a modern slavery statement,,,,,,EnterAnswersViewModel,SelectedReasonOptions,MinLength
+2050,You must provide details for turnover,,Please answer the turnover question,,,,,,EnterAnswersViewModel,TurnOver,Required
+2051,"Enter an organisation reference, matching the details we sent you",,"Enter an organisation reference, matching the details we sent you",,,,,Organisation Reference,EnterCodesViewModel,OrganisationReference,Required
+2052,"Enter a security code, matching the details we sent you",,"Enter a security code, matching the details we sent you",,,,,Security code,EnterCodesViewModel,SecurityToken,Required
+2053,There's a problem with your feedback details,,Enter up to 2000 characters,,,,,,FeedbackViewModel,Details,MaxLength
+2054,There's a problem with your selection,,Tell us how we can improve the service,,,,,,FeedbackViewModel,Details,Required
+2055,There's a problem with your email address,,Enter up to 254 characters,,,,,Email address,FeedbackViewModel,EmailAddress,MaxLength
+2056,There's a problem with your email address,,Please enter a valid email address (e.g. john.smith@smithlimited.co.uk),,,,,Email address,FeedbackViewModel,EmailAddress,EmailAddress
+2057,There's a problem with your selection,,Select how easy or difficult this service is to use,,,,,,FeedbackViewModel,HowEasyIsThisServiceToUse,Required
+2058,There's a problem with your phone number,,Please enter a valid phone number,,,,,Phone number,FeedbackViewModel,PhoneNumber,Phone
+2059,There's a problem with your phone number,,Enter up to 20 characters,,,,,Phone number,FeedbackViewModel,PhoneNumber,MaxLength
+2060,There's a problem with your selection,,Select what you did on this service,,,,,,FeedbackViewModel,WhyVisitMSUSite,Required
+2061,There's a problem with your url,,Select what you did on this service,,,,,,FeedbackViewModel,ReferrerUrl,RelativeUrl
+2062,There’s a problem with your email address or password,,Please enter a valid password,,,,,,LoginInputModel,Password,Password
+2063,There’s a problem with your email address or password,,Please enter a valid email address,,,,,,LoginInputModel,Username,EmailAddress
+2064,There’s a problem with your email address or password,,Please enter your password,,,,,,LoginInputModel,Password,Required
+2065,There’s a problem with your email address or password,,Please enter your email address,,,,,,LoginInputModel,Username,Required
+2066,There's a problem with your search,,Please enter an organisation to search for,,,,,SearchText,OrganisationSearchViewModel,SearchText,Required
+2067,There's a problem with your search,,Enter an organisation name or company number of between 3 and 160 characters,,,,,SearchText,OrganisationSearchViewModel,SearchText,StringLength
+2068,There's a problem with your email address,,The email addresses don't match. Please enter your email address again,,,,,Confirm your email address,ResetViewModel,ConfirmEmailAddress,Compare
+2069,There's a problem with your email address,,Please enter your email address again,,,,,Confirm your email address,ResetViewModel,ConfirmEmailAddress,Required
+2070,There's a problem with your password,,"Your password contains invalid characters, please enter your password again",,,,,Confirm password,ResetViewModel,ConfirmPassword,DataType
+2071,There's a problem with your email address,,Please enter a valid email address (e.g. john.smith@smithlimited.co.uk),,,,,Email address,ResetViewModel,EmailAddress,EmailAddress
+2072,There's a problem with your email address,,Please enter your email address,,,,,Email address,ResetViewModel,EmailAddress,Required
+2073,There's a problem with your password,,"Your password contains invalid characters, please try again",,,,,Password,ResetViewModel,Password,DataType
+2074,There's a problem with your password,,"Your password isn't valid, please try again",,,,,,ResetViewModel,Password,Password
+2075,There's a problem with your password,,Please enter your password,,,,,Password,ResetViewModel,Password,Required
+2076,There's a problem with your password,,Your password must be at least {1} characters long,,,,,Password,ResetViewModel,Password,StringLength
+2077,There's a problem with your contact details,,The email addresses don't match. Please confirm your email address,,,,,Confirm your email address,ScopingViewModel,ConfirmEmailAddress,Compare
+2078,There's a problem with your contact details,,Please confirm your email address,,,,,Confirm your email address,ScopingViewModel,ConfirmEmailAddress,Required
+2079,There's a problem with your search,,Search query must not be empty,,,,,,AdminSearchViewModel,Search,Required
+2080,There's a problem with your search,,,,,,,,AdminSearchViewModel,Search,Text
+2081,There's a problem with your search,,,,,,,,SearchViewModel,Search,Text
+2082,There's a problem with your email address,,The email addresses don't match. Please enter your email address again,,,,,Confirm your email address,SignUpViewModel,ConfirmEmailAddress,Compare
+2083,There's a problem with your email address,,Please enter your email address again,,,,,Confirm your email address,SignUpViewModel,ConfirmEmailAddress,Required
+2084,There's a problem with your password,,The passwords entries don't match. Please enter your password again,,,,,Confirm your password,SignUpViewModel,ConfirmPassword,Compare
+2085,There's a problem with your password,,"Your password contains invalid characters, please enter your password again",,,,,Confirm password,SignUpViewModel,ConfirmPassword,DataType
+2086,There's a problem with your password,,Please enter your password again,,,,,Confirm password,SignUpViewModel,ConfirmPassword,Required
+2087,There's a problem with your email address,,Please enter a valid email address (e.g. john.smith@smithlimited.co.uk),,,,,Email address,SignUpViewModel,EmailAddress,EmailAddress
+2088,There's a problem with your email address,,Please enter your email address,,,,,Email address,SignUpViewModel,EmailAddress,Required
+2089,There's a problem with your email address,,Your email address can't be longer than 254 characters.,,,,,Email address,SignUpViewModel,EmailAddress,StringLength
+2090,There's a problem with your personal details,,Please enter your first name,,,,,First name,SignUpViewModel,FirstName,Required
+2091,There's a problem with your personal details,,Your first name can't be longer than 50 characters.,,,,,First name,SignUpViewModel,FirstName,StringLength
+2092,There's a problem with your personal details,,Please enter your job title,,,,,Job title,SignUpViewModel,JobTitle,Required
+2093,There's a problem with your personal details,,Your job title can't be longer than 50 characters.,,,,,Job title,SignUpViewModel,JobTitle,StringLength
+2094,There's a problem with your personal details,,Please enter your last name,,,,,Last name,SignUpViewModel,LastName,Required
+2095,There's a problem with your personal details,,Your last name can't be longer than 50 characters.,,,,,Last name,SignUpViewModel,LastName,StringLength
+2096,There's a problem with your password,,"Your password contains invalid characters, please try again",,,,,Password,SignUpViewModel,Password,DataType
+2097,There's a problem with your password,,"Your password isn't valid, please try again",,,,,,SignUpViewModel,Password,Password
+2098,There's a problem with your personal details,,Please enter your password,,,,,Password,SignUpViewModel,Password,Required
+2099,There's a problem with your password,,Your password must be at least {1} characters long,,,,,Password,SignUpViewModel,Password,StringLength
+2100,There's a problem with your parameters,,,,,,,,ManualChangesViewModel,Parameters,Text
+2101,There's a problem with your comment,,,,,,,,ManualChangesViewModel,Comment,Text
+2102,There’s a problem with your input,,,,,,,,AdminChangeCompaniesHouseOptInOutViewModel,Reason,Text
+2103,There’s a problem with your input,,,,,,,,AdminChangePublicSectorClassificationViewModel,Reason,Text
+2104,There’s a problem with your input,,,,,,,,AdminChangeScopeViewModel,Reason,Text
+2105,There’s a problem with your input,,,,,,,,AdminChangeUserContactPreferencesViewModel,Reason,Text
+2106,There’s a problem with your input,,,,,,,,AdminResendVerificationEmailViewModel,Reason,Text
+2107,There’s a problem with your input,,,,,,,,AdminStatementLateFlagViewModel,Reason,Text
+2108,There’s a problem with your input,,,,,,,,ChangeOrganisationAddressViewModel,Reason,Text
+2109,There’s a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,Address1,Text
+2110,There’s a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,Address2,Text
+2111,There’s a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,Address3,Text
+2112,There’s a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,TownCity,Text
+2113,There’s a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,County,Text
+2114,There’s a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,Country,Text
+2115,There’s a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,PostCode,Text
+2116,There’s a problem with your address,,,,,,,,ChangeOrganisationAddressViewModel,PoBox,Text
+2117,There’s a problem with your input,,,,,,,,ChangeOrganisationNameViewModel,Name,Text
+2118,There’s a problem with your input,,,,,,,,ChangeOrganisationNameViewModel,Reason,Text
+2119,There’s a problem with your input,,,,,,,,ChangeOrganisationSicCodesViewModel,Reason,Text
+2120,There’s a problem with your input,,,,,,,,ChangeOrganisationSicCodesViewModel,SicCodeIdsFromCoHo,Text
+2121,There’s a problem with your input,,,,,,,,ReviewOrganisationViewModel,ReviewCode,Text
+2122,There’s a problem with your input,,,,,,,,ReviewOrganisationViewModel,CancellationReason,Text
+2123,There’s a problem with your password,,"Your password isn't valid, please try again",,,,,,CloseAccountViewModel,EnterPassword,Password
+2124,Invalid Input,,The details provided can't be longer than 200 characters.,,,,,,EnterAnswersViewModel,OtherReason,MaxLength
 3000,There's a problem with your password,,Enter a password that doesn't contain 'password',,,,,,,,
 3001,There's a problem with your registration,,This email address has already been registered. Please sign in or enter a different email address,,,,,,,,
-3002,There's a problem with your registration,,This email address is awaiting confirmation. Please enter a different email address or try again in {remainingTime},,,,,,,,
-3003,Something’s gone wrong,,There was a problem sending your confirmation email. Please try again,,,,,,,,
 3004,You’ve entered the wrong email verification code,,Please try again using the correct verification code or request a new one,,,,,,,,
 3005,There’s a problem,,Please choose your type of organisation,,,,,,,,
 3006,There’s a problem,,Please enter your organisation name{orCompanyNumber},,,,,,,,
-3007,There’s a problem,,Please enter between 3 and 100 characters,,,,,,,,
 3008,Another user has already registered for this organisation,,Only one person in an organisation can register,,,,,,,,
 3009,Another user is trying to register for this organisation,,Please try again in {remainingTime},,,,,,,,
 3010,You don't have permission to register for this organisation,,Only one person in an organisation can register,,,,,,,,
 3011,There's a problem with your address,,Please enter your address,,,,,,,,
 3012,There's a problem with your address,,Please enter your town or city,,,,,,,,
 3013,There's a problem with your address,,Please enter your postcode,,,,,,,,
-3014,Something’s gone wrong,,There was a problem sending your PIN,,Use the button below to try again,/Register/pin-sent/{OrganisationIdentifier},,,,,
 3015,There's a problem with your PIN,,You've entered an incorrect PIN. Please try again,,,,,,,,
 3016,Your email verification code has expired,,Please request a new verification code,,,,,,,,
 3017,This organisation was previously registered by {approvedUser} on {approvedDate} at {approvedAddress},,,,,,,,,,
@@ -209,15 +226,15 @@
 3030,An organisation with this DUNS Number already exists.,,Please enter another DUNS Number to continue,,,,,,,,
 3031,The organisation {organisationName} already has this {referenceName}.,,,,,,,,,,
 3032,You are already registered for this organisation,,You can only register for an organisation once,,,,,,,,
-3033,There’s a problem,,Please tell us if your organisation was required to report,,,,,,,,
+3033,There's a problem,,Please tell us if your organisation was required to report,,,,,,,,
 3034,There's a problem,,Please tell us if you received a letter from us,,,,,,,,
 3040,Someone else is working on this,,You can continue working on the draft report once the other person has finished.,,,/manage-organisations,,,,,
 3100,Invalid URL,,Enter a valid URL,,,,,URL,UrlEmailViewModel,StatementUrl,Url
-3101,Invalid Input,,The web address (URL) cannot be longer than 256 characters,,,,,URL,UrlEmailViewModel,StatementUrl,MaxLength
+3101,Invalid Input,,The web address (URL) cannot be longer than 1024 characters,,,,,URL,UrlEmailViewModel,StatementUrl,TextLength
 3102,Enter a valid url or email,,Enter a valid url or email,,,,,,,,
 3103,Invalid Email,,Enter a valid email,,,,,Email,UrlEmailViewModel,StatementEmail,EmailAddress
-3104,Invalid Input,,The email cannot be longer than 256 characters,,,,,Email,UrlEmailViewModel,StatementEmail,MaxLength
-3105,Invalid Input,,"Provide either a URL or an email, not both",,,,,,,,
+3104,Invalid Input,,The email cannot be longer than 254 characters,,,,,Email,UrlEmailViewModel,StatementEmail,TextLength
+3105,Invalid Input,,"If you've provided a URL, do not provide an email address as well",,,,,,,,
 3200,Invalid start date,,Enter a valid day,,,,,,,,
 3201,Invalid start date,,Day must be between 1 and 31,,,,,,PeriodCoveredViewModel,StatementStartDay,Range
 3202,Invalid start date,,Enter a valid month,,,,,,,,
@@ -245,7 +262,7 @@
 3306,Incomplete approver details,,Enter first name,,,,,,,,
 3307,Incomplete approver details,,Enter last name,,,,,,,,
 3308,Incomplete approver details,,Enter job title,,,,,,,,
-3309,Invalid approved date,,Approved date must be before {maxDate},,,,,,,,
+3309,Invalid approved date,,Approved date must be after {minDate},,,,,,,,
 3310,Date the statement was approved is invalid,,Day must be between 1 and 12,,,,,,SignOffViewModel,ApprovedDay,Range
 3311,Date the statement was approved is invalid,,Month must be between 1 and 12,,,,,,SignOffViewModel,ApprovedMonth,Range
 3312,Invalid Approver,,The details provided can't be longer than 50 characters.,,,,,,SignOffViewModel,ApproverFirstName,MaxLength
@@ -265,23 +282,25 @@
 3700,Missing details,,Enter details,,,,,,,,
 3701,Invalid Input,,The details provided can't be longer than 256 characters.,,,,,,TrainingViewModel,OtherTrainingTargets,MaxLength
 3702,Invalid selection,,"Select who you provided training for, or that you did not provide training. You cannot do both.",,,,,,,,
+3800,Missing details,,Enter details,,,,,,,,
+3801,Invalid Input,,The details provided can't be longer than 500 characters.,,,,,,ProgressViewModel,ProgressMeasures,MaxLength
 3802,Invalid Input,,The details provided can't be longer than 256 characters.,,,,,,PartnersViewModel,OtherPartners,MaxLength
 3803,Invalid selection,,"Select who you engaged with, or that you did not engage with others. You cannot do both.",,,,,,,,
-3999,Accept declaration,,You must accept the declaration to submit this statement,,,,,,,,
+3900,Missing selection,,select option,,,,,,,,
+3901,Duplicate organisation,,The organisation '{organisationName}' has already been included in this statement,,,#,,,,,
+3902,Invalid search text,,You must supply a search phrase,,,,,,GroupSearchViewModel,SearchKeywords,Required
+3903,Invalid organisation name,,You must supply an organisation name,,,,,,GroupAddViewModel,NewOrganisationName,Required
+3904,Invalid organisation name,,The organisation name cannot exceed 160 characters.,,,,,,GroupAddViewModel,NewOrganisationName,MaxLength
+3905,Companies House Unavailable,,We are having problems connecting to the Companies House service.<br /> Please try again later.,,,,,,,,
+3906,There's a problem with your search,,Enter an organisation name or company number of between 3 and 160 characters,,,,,,GroupSearchViewModel,SearchKeywords,StringLength
 3910,Invalid Input,,The details provided can't be longer than 200 characters.,,,,,,HighestRisksViewModel,HighRisk1,MaxLength
 3911,Invalid Input,,The details provided can't be longer than 200 characters.,,,,,,HighestRisksViewModel,HighRisk2,MaxLength
 3912,Invalid Input,,The details provided can't be longer than 200 characters.,,,,,,HighestRisksViewModel,HighRisk3,MaxLength
 3913,Invalid Input,,"Describe up to 3 priority risks, or tell us you did not identify risks. You cannot do both.",,,,,,,,
-3800,Missing details,,Enter details,,,,,,,,
-3801,Invalid Input,,The details provided can't be longer than 500 characters.,,,,,,ProgressViewModel,ProgressMeasures,MaxLength
-3900,Missing selection,,select option,,,,,,,,
-3901,Duplicate organisation,,The organisation '{organisationName}' has already been included in this statement,,,,,,,,
-3902,Invalid search text,,You must supply a search phrase,,,,,,GroupSearchViewModel,SearchKeywords,Required
-3903,Invalid organisation name,,You must supply an organisation name,,,,,,GroupAddViewModel,NewOrganisationName,Required
-3904,Invalid organisation name,,The organisation name cannot exceed 100 characters.,,,,,,GroupAddViewModel,NewOrganisationName,MaxLength
-3905,Companies House Unavailable,,We are having problems connecting to the Companies House service.<br /> Please try again later.,,,,,,,,
-3906,There's a problem with your search,,Enter an organisation name or company number of between 3 and 100 characters,,,,,,GroupSearchViewModel,SearchKeywords,StringLength
+3999,Accept declaration,,You must accept the declaration to submit this statement,,,,,,,,
 4000,Missing details,,Enter details,,,,,,,,
+4001,"Enter an organisation reference, matching the details we sent you",,"Enter an organisation reference, matching the details we sent you",,,,,,FastTrackViewModel,OrganisationReference,Required
+4002,"Enter a security code, matching the details we sent you",,"Enter a security code, matching the details we sent you",,,,,,FastTrackViewModel,SecurityCode,Required
 4100,Missing details,,Enter details,,,,,,,,
 4101,Invalid selection,,"Select the social audits you carried out, or that you did not carry out social audits. You cannot do both.",,,,,,,,
 4200,Missing details,,Enter details,,,,,,,,
@@ -301,5 +320,4 @@
 4705,Invalid Input,,,,,,,,HighRiskViewModel,OtherTargets,Text
 4706,Invalid Input,,,,,,,,HighRiskViewModel,OtherLikelySource,Text
 4707,Invalid Input,,,,,,,,HighRiskViewModel,SelectedCountry,Text
-4001,"Enter an organisation reference, matching the details we sent you",,"Enter an organisation reference, matching the details we sent you",,,,,,FastTrackViewModel,OrganisationReference,Required
-4002,"Enter a security code, matching the details we sent you",,"Enter a security code, matching the details we sent you",,,,,,FastTrackViewModel,SecurityCode,Required
+4708,Invalid Input,,The details provided can't be longer than 200 characters,,,,,,HighRiskViewModel,OtherLikelySource,MaxLength

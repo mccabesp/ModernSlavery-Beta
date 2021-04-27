@@ -87,8 +87,7 @@ namespace ModernSlavery.WebUI.Account.ViewServices
 
             // Create the close account notification to user
             var sendEmails = new List<Task>();
-            sendEmails.Add(
-                SendEmailService.SendAccountClosedNotificationAsync(userToRetire.EmailAddress));
+            sendEmails.Add(SendEmailService.SendAccountClosedNotificationAsync(userToRetire.EmailAddress));
 
             //Create the notification to GEO for each newly orphaned organisation
             userOrgs.Where(org => _organisationBusinessLogic.GetOrganisationIsOrphan(org))

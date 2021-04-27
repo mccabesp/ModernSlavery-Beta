@@ -38,34 +38,6 @@ namespace ModernSlavery.Core.Classes
         public DateTime PrivateReportingDeadline => _sharedOptions.PrivateReportingDeadline;
         public DateTime PublicReportingDeadline => _sharedOptions.PublicReportingDeadline;
 
-        public DateTime GetReportingStartDate(SectorTypes sectorType, int year = 0)
-        {
-            var tempDay = 0;
-            var tempMonth = 0;
-
-            var now = VirtualDateTime.Now;
-
-            switch (sectorType)
-            {
-                case SectorTypes.Private:
-                    tempDay = PrivateReportingDeadline.Day;
-                    tempMonth = PrivateReportingDeadline.Month;
-                    break;
-                case SectorTypes.Public:
-                    tempDay = PublicReportingDeadline.Day;
-                    tempMonth = PublicReportingDeadline.Month;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(sectorType), sectorType,
-                        "Cannot calculate accounting date for this sector type");
-            }
-
-            if (year == 0) year = now.Year;
-
-            var reportingStartDate = new DateTime(year, tempMonth, tempDay).Date.AddDays(1);
-
-            return reportingStartDate < now ? reportingStartDate.AddYears(-1) : reportingStartDate;
-        }
         public DateTime GetReportingDeadline(SectorTypes sectorType, int reportingDeadlineYear = 0)
         {
             int tempDay;

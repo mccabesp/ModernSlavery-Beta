@@ -41,7 +41,7 @@
                         </h2>
                     </legend>
                     <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                        @foreach (var riskSource in Enums.GetValuesExcept<RiskSourceTypes>(RiskSourceTypes.Unknown))
+                        @foreach (var riskSource in Enums.GetValues<RiskSourceTypes>(RiskSourceTypes.Unknown))
                         {
                             var value = (int)riskSource;
                             var isOther = riskSource == RiskSourceTypes.Other;
@@ -63,7 +63,7 @@
                                         </span>
 
                                         <div class="govuk-checkboxes">
-                                            @foreach (var tier in Enums.GetValuesExcept<SupplyChainTierTypes>(SupplyChainTierTypes.Unknown))
+                                            @foreach (var tier in Enums.GetValues<SupplyChainTierTypes>(SupplyChainTierTypes.Unknown))
                                             {
                                                 var tierValue = (int)tier;
                                                 var isNone = tier == SupplyChainTierTypes.None;
@@ -95,11 +95,16 @@
                             if (isOther)
                             {
                                 <div class="govuk-radios__conditional govuk-radios__conditional--hidden" id="conditional-source-@value">
-                                    <div class="govuk-form-group @Html.SetErrorClass(model => model.OtherLikelySource, "govuk-form-group--error")">
-                                        <label class="govuk-label" for="OtherLikelySource">
-                                            Please specify
-                                        </label>
-                                        <textarea asp-for="OtherLikelySource" class="govuk-textarea" spellcheck="false" rows="5"></textarea>
+                                    <div class="govuk-character-count" data-module="govuk-character-count" data-maxlength="200">
+                                        <div class="govuk-form-group @Html.SetErrorClass(model => model.OtherLikelySource, "govuk-form-group--error")">
+                                            <label class="govuk-label" for="OtherLikelySource">
+                                                Please specify
+                                            </label>
+                                            <textarea id="other-source" name="@nameof(Model.OtherLikelySource)" class="govuk-textarea govuk-js-character-count" aria-describedby="other-source-info" spellcheck="false" rows="3">@Model.OtherLikelySource</textarea>
+                                        </div>
+                                        <div id="other-source-info" class="govuk-hint govuk-character-count__message" aria-live="polite">
+                                            You can enter up to 200 characters
+                                        </div>
                                         <span asp-validation-for="OtherLikelySource" class="govuk-error-message"></span>
                                     </div>
                                 </div>
@@ -117,7 +122,7 @@
                         </h2>
                     </legend>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var targetType in Enums.GetValuesExcept<RiskTargetTypes>(RiskTargetTypes.Unknown))
+                        @foreach (var targetType in Enums.GetValues<RiskTargetTypes>(RiskTargetTypes.Unknown))
                         {
                             var value = (int)targetType;
                             var isOther = targetType == RiskTargetTypes.Other;
@@ -189,5 +194,8 @@
 
 </div>
 @section BeforeLoadedCompiledScripts {
-    <script asp-append-version="true" src="/assets/javascripts/location-autocomplete.min.js" type="text/javascript"></script>
+    @if (!BrowserIsIE11)@* Country picker doesnt work as selectedOptions in javascript doesnt work in IE 11 *@
+    {
+        <script asp-append-version="true" src="/assets/javascripts/location-autocomplete.min.js" type="text/javascript"></script>
+    }
 }

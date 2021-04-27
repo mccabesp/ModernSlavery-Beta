@@ -21,7 +21,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary.V1
             [Description("Prohibits compulsory overtime")] CompulsoryOvertime,
             [Description("Prohibits child labour")] ChildLabour,
             [Description("Prohibits discrimination")] Discrimination,
-            [Description("Prohibits confiscation of workers original identification documents")] DocumentRetention,
+            [Description("Prohibits confiscation of workers' original identification documents")] DocumentRetention,
             [Description("Provides access to remedy, compensation and justice for victims of modern slavery")] RemedyAccess,
             [Description("Other")] Other,
             [Description("Your organisation's policies do not include any of these provisions in relation to modern slavery")] None
@@ -146,7 +146,7 @@ namespace ModernSlavery.Core.Entities.StatementSummary.V1
                 [Description("Migrants")] Migrants,
                 [Description("Refugees")] Refugees,
                 [Description("Children")] Children,
-                [Description("Other vulnerable group(s)")] Other,
+                [Description("Other vulnerable groups")] Other,
             }
 
             public SortedSet<RiskTargetTypes> Targets { get; set; } = new SortedSet<RiskTargetTypes>();

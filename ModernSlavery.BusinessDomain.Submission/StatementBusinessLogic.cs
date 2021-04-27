@@ -153,6 +153,13 @@ namespace ModernSlavery.BusinessDomain.Submission
             return await _organisationBusinessLogic.DataRepository.FirstOrDefaultAsync<Statement>(s => s.OrganisationId == organisationId && s.SubmissionDeadline.Year == reportingDeadlineYear && s.Status == StatementStatuses.Submitted).ConfigureAwait(false);
         }
 
+        public async Task DeleteDraftStatementsAsync(long organisationId)
+        {
+            //Delete all the draft files for this organisation
+            foreach (var draftFilePath in await _sharedBusinessLogic.FileRepository.GetFilesAsync(_submissionOptions.DraftsPath, $"{organisationId}_*.*"))
+                await _sharedBusinessLogic.FileRepository.DeleteFileAsync(draftFilePath).ConfigureAwait(false);
+        }
+
         /// <summary>
         /// Deletes any existing Draft Statement model files (and backups) for this organisation and reporting deadline
         /// </summary>
@@ -664,16 +671,16 @@ namespace ModernSlavery.BusinessDomain.Submission
             await SaveStatementModelToFileAsync(statementModel, draftFilePath).ConfigureAwait(false);
         }
 
-        public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(long organisationId, int reportingDeadlineYear, long userId = -1)
+        public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(long organisationId, int reportingDeadlineYear, long userId, string ip, string summaryUrl)
         {
             var outcome = await GetOrganisationAndDeadlineAsync(organisationId, reportingDeadlineYear).ConfigureAwait(false);
             if (outcome.Fail) new Outcome<StatementErrors>(outcome.Errors);
 
             //Submit the draft
-            return await SubmitDraftStatementModelAsync(outcome.Result.Organisation, outcome.Result.ReportingDeadline, userId).ConfigureAwait(false);
+            return await SubmitDraftStatementModelAsync(outcome.Result.Organisation, outcome.Result.ReportingDeadline, userId, ip, summaryUrl).ConfigureAwait(false);
         }
 
-        public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId = -1)
+        public async Task<Outcome<StatementErrors>> SubmitDraftStatementModelAsync(Organisation organisation, DateTime reportingDeadline, long userId, string ip, string summaryUrl)
         {
             //Validate the parameters
             if (userId <= 0) throw new ArgumentOutOfRangeException(nameof(userId));
@@ -749,7 +756,7 @@ namespace ModernSlavery.BusinessDomain.Submission
                 }).ConfigureAwait(false);
 
             //Add update to submission log
-            await SubmissionLog.WriteAsync(SubmissionLogModel.Create(newStatement)).ConfigureAwait(false);
+            await SubmissionLog.WriteAsync(SubmissionLogModel.Create(newStatement, ip, summaryUrl)).ConfigureAwait(false);
 
             //Update the search indexes
             await _searchBusinessLogic.RefreshSearchDocumentsAsync(newStatement.Organisation, newStatement.SubmissionDeadline.Year).ConfigureAwait(false);

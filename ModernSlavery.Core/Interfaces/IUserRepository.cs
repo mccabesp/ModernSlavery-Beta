@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using ModernSlavery.Core.Entities;
@@ -29,6 +30,7 @@ namespace ModernSlavery.Core.Interfaces
         Task<bool> UpdateDetailsAsync(User userToUpdate, UpdateDetailsModel changeDetails);
 
         Task RetireUserAsync(User userToRetire);
-        void UpdateUserPasswordUsingPBKDF2(User currentUser, string password);
+        Task UpdateUserPasswordUsingPBKDF2Async(User currentUser, string password);
+        TimeSpan GetUserLoginLockRemaining(User user);
     }
 }

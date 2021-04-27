@@ -13,8 +13,8 @@ namespace ModernSlavery.Infrastructure.Hosts
         public string AzureConnectionString { get; set; }
         public string KeyName { get; set; } = "DataProtection-Keys";
         public string ApplicationDiscriminator { get; set; }
-        public string Container { get; set; }
-        public string KeyFilepath { get; set; }
+        public string Container { get; set; } = "data-protection";
+        public string KeyFilepath { get; set; } = "keys.xml";
 
         public void Validate()
         {

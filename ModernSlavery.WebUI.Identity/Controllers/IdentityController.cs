@@ -28,12 +28,13 @@ using ModernSlavery.Core;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Options;
 using ModernSlavery.WebUI.Identity.Models;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
-using ModernSlavery.WebUI.Shared.Classes.HttpResultModels;
+using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using ModernSlavery.WebUI.Shared.Controllers;
 using ModernSlavery.WebUI.Shared.Interfaces;
-using ModernSlavery.WebUI.Shared.Options;
+using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Identity.Controllers
 {
@@ -75,6 +76,9 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             _schemeProvider = schemeProvider;
             _events = events;
             _featureSwitchOptions = featureSwitchOptions;
+
+            //Dont save in history
+            SkipSaveHistory = true;
         }
 
         #region Ping 
@@ -98,54 +102,72 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         ///     Shows the error page
         /// </summary>
         [HttpGet("error/{errorId?}")]
-        public async Task<IActionResult> Error(string errorId = null)
-        {
-            var errorCode = errorId.ToInt32();
-
-            if (errorCode == 0)
-            {
-                if (Response.StatusCode.Between(400, 599))
-                    errorCode = Response.StatusCode;
-                else
-                    errorCode = 500;
-            }
-
-
+        public async Task<IActionResult> Error([IgnoreText]string errorId = null)
+        {   
             // retrieve error details from identityserver
             var message = await _interaction.GetErrorContextAsync(errorId);
+            ErrorViewModel model;
             if (message != null)
             {
-                Logger.LogError($"{message.Error}: {message.ErrorDescription}");
+                // raise the logout event
+                await _events.RaiseAsync(new IdentityServer4.Events.ClientAuthenticationFailureEvent(errorId, $"{message.Error}: {message.ErrorDescription}"));
+                
+                // delete local authentication cookie
+                if (User.Identity.IsAuthenticated)await HttpContext.SignOutAsync();                
+                return RedirectToAction("Error", new { errorId = "400" });
             }
             else
             {
+                var errorCode = errorId.ToInt32();
+
+                if (errorCode == 0)
+                {
+                    if (Response.StatusCode.Between(400, 599))
+                        errorCode = Response.StatusCode;
+                    else
+                        errorCode = 500;
+                }
+
                 //Get the exception which caused this error
                 var errorData = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
-                if (errorData == null)
+                if (errorData?.Error != null)
+                {
+                    Logger.LogError(errorData.Error, $"ErrorCode {errorCode}, Path: {errorData.Path}");
+                }
+                else
                 {
                     //Log non-exception events
                     var statusCodeData = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
-                    if (statusCodeData != null)
-                        Logger.LogError($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
-                    else
-                        Logger.LogError($"HttpStatusCode {errorCode}, Path: Unknown");
+                    if (statusCodeData != null && errorCode.Between(400, 599))
+                    {
+                        if (errorCode >= 500)
+                            Logger.LogError(new Exception(), $"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
+                        else
+                            Logger.LogWarning($"HttpStatusCode {errorCode}, Path: {statusCodeData.OriginalPath}");
+                    }
                 }
+
+                model = WebService.ErrorViewModelFactory.Create(errorCode);
             }
 
-            Response.StatusCode = errorCode;
-            var model = WebService.ErrorViewModelFactory.Create(message.Error, message.ErrorDescription);
             return View("Error", model);
         }
         #endregion
+
+        [HttpGet("sign-in")]
+        public async Task<IActionResult> LoginOld([IgnoreText] string returnUrl)
+        {
+            return RedirectToActionPermanent(nameof(Login), new { returnUrl });
+        }
 
         #region SignIn
         /// <summary>
         ///     Show login page
         /// </summary>
-        [HttpGet("sign-in")]
+        [HttpGet("~/sign-in")]
         public async Task<IActionResult> Login([IgnoreText] string returnUrl)
         {
-            if (string.IsNullOrWhiteSpace(returnUrl))return Redirect(_identityServerOptions.DefaultSigninUri);
+            if (string.IsNullOrWhiteSpace(returnUrl)) return Redirect(_identityServerOptions.DefaultSigninUri);
 
             // build a model so we know what to show on the login page
             var vm = await BuildLoginViewModelAsync(returnUrl);
@@ -163,11 +185,10 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         ///     Handle postback from username/password login
         /// </summary>
         [ValidateAntiForgeryToken]
-        [HttpPost("sign-in")]
+        [HttpPost("~/sign-in")]
         public async Task<IActionResult> Login(LoginInputModel model, [IgnoreText] string button)
         {
             var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
-
             if (button != "login")
             {
                 // the user clicked the "cancel" button
@@ -205,35 +226,40 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                 }
                 else
                 {
-                    user = await _userRepository.FindByEmailAsync(model.Username, UserStatuses.New,
-                        UserStatuses.Active);
+                    user = await _userRepository.FindByEmailAsync(model.Username, UserStatuses.New, UserStatuses.Active);
+
+                    //Dont allow login of system user
+                    if (user != null && user.UserId <= 0) user = null;
                 }
+
                 if (user != null && user.UserId > 0)
                 {
-                    if (SharedBusinessLogic.AuthenticationBusinessLogic.GetUserLoginLockRemaining(user) > TimeSpan.Zero)
+                    var userLoginLockRemaining = _userRepository.GetUserLoginLockRemaining(user);
+                    if (userLoginLockRemaining > TimeSpan.Zero)
                     {
-                        await _events.RaiseAsync(
-                            new UserLoginFailureEvent(model.Username,
-                                IdentityOptions.TooManySigninAttemptsErrorMessage));
-                        ModelState.AddModelError(
-                            "",
-                            $"{IdentityOptions.TooManySigninAttemptsErrorMessage}\n Please try again in {SharedBusinessLogic.AuthenticationBusinessLogic.GetUserLoginLockRemaining(user).ToFriendly(maxParts: 2)}.");
+                        //Too many sign attempts
+                        await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, IdentityOptions.TooManySigninAttemptsErrorMessage));
+                        ModelState.AddModelError("", $"{IdentityOptions.TooManySigninAttemptsErrorMessage}\n Please try again in {userLoginLockRemaining.ToFriendly(maxParts: 2)}.");
                     }
-                    else if (await _userRepository.CheckPasswordAsync(user, model.Password) == false)
+                    else if (!await _userRepository.CheckPasswordAsync(user, model.Password))
                     {
                         await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "Wrong password"));
                         ModelState.AddModelError("", IdentityOptions.InvalidCredentialsErrorMessage);
                     }
+                    //Only allow whitelisted email addresses to signin
+                    else if (!SharedBusinessLogic.TestOptions.IsWhitelistUser(model.Username))
+                    {
+                        ModelState.AddModelError(1158, nameof(model.Username));
+                    }
                     else
                     {
-                        await _events.RaiseAsync(new UserLoginSuccessEvent(user.EmailAddress, user.UserId.ToString(),user.Fullname));
+                        await _events.RaiseAsync(new UserLoginSuccessEvent(user.EmailAddress, user.UserId.ToString(), user.Fullname));
 
                         // only set explicit expiration here if user chooses "remember me". 
                         // otherwise we rely upon expiration configured in cookie middleware.
                         AuthenticationProperties props = null;
                         if (IdentityOptions.AllowRememberLogin && model.RememberLogin)
-                            props = new AuthenticationProperties
-                            {
+                            props = new AuthenticationProperties {
                                 // Refreshing the authentication session should be allowed.
                                 AllowRefresh = true,
 
@@ -258,7 +284,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                         // set the user role
                         var claims = GetRoleClaims(user);
                         // issue authentication cookie with subject ID and username
-                        await HttpContext.SignInAsync(user.UserId.ToString(), user.EmailAddress, props,claims.ToArray());
+                        await HttpContext.SignInAsync(user.UserId.ToString(), user.EmailAddress, props, claims.ToArray());
 
                         // make sure the returnUrl is still valid, and if so redirect back to authorize endpoint or a local page
                         // the IsLocalUrl check is only necessary if you want to support additional local pages, otherwise IsValidReturnUrl is more strict
@@ -286,24 +312,20 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                     if (loginAttempts >= SharedBusinessLogic.SharedOptions.MaxLoginAttempts &&
                         lockRemaining > TimeSpan.Zero)
                     {
-                        await _events.RaiseAsync(
-                            new UserLoginFailureEvent(model.Username,
-                                IdentityOptions.TooManySigninAttemptsErrorMessage));
-                        ModelState.AddModelError(
-                            "",
-                            $"{IdentityOptions.TooManySigninAttemptsErrorMessage}\n Please try again in {lockRemaining.ToFriendly(maxParts: 2)}.");
+                        await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, IdentityOptions.TooManySigninAttemptsErrorMessage));
+                        ModelState.AddModelError("", $"{IdentityOptions.TooManySigninAttemptsErrorMessage}\n Please try again in {lockRemaining.ToFriendly(maxParts: 2)}.");
                     }
                     else
                     {
                         await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "Invalid user"));
                         ModelState.AddModelError("", IdentityOptions.InvalidCredentialsErrorMessage);
                         loginAttempts++;
-                        await WebService.Cache.AddAsync($"{model.Username}:login",
-                            $"{VirtualDateTime.Now}|{loginAttempts}",
-                            VirtualDateTime.Now.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes));
+                        await WebService.Cache.AddAsync($"{model.Username}:login", $"{VirtualDateTime.Now}|{loginAttempts}", VirtualDateTime.Now.AddMinutes(SharedBusinessLogic.SharedOptions.LockoutMinutes));
                     }
                 }
             }
+            else
+                this.SetModelCustomErrors(model);
 
             // something went wrong, show form with error
             var vm = await BuildLoginViewModelAsync(model);
@@ -316,7 +338,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             {
                 if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(user))
                 {
-                    yield return new Claim(ClaimTypes.Role, UserRoleNames.Admin);
+                    yield return new Claim(ClaimTypes.Role, UserRoleNames.BasicAdmin);
                     if (SharedBusinessLogic.AuthorisationBusinessLogic.IsDatabaseAdministrator(user))
                         yield return new Claim(ClaimTypes.Role, UserRoleNames.DatabaseAdmin);
                     if (SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(user))
@@ -338,7 +360,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
         public async Task<IActionResult> Logout([IgnoreText] string logoutId)
         {
             //If there is no logoutid then sign-out via webui
-            if (string.IsNullOrWhiteSpace(logoutId))return Redirect(_identityServerOptions.DefaultSignoutUri);
+            if (string.IsNullOrWhiteSpace(logoutId)) return Redirect(_identityServerOptions.DefaultSignoutUri);
 
             // build a model so the logout page knows what to display
             var vm = await BuildLogoutViewModelAsync(logoutId);
@@ -396,8 +418,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
             if (context?.IdP != null)
                 // this is meant to short circuit the UI and only trigger the one external IdP
-                return new LoginViewModel
-                {
+                return new LoginViewModel {
                     EnableLocalLogin = false,
                     ReturnUrl = returnUrl,
                     Username = context?.LoginHint,
@@ -429,8 +450,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                 }
             }
 
-            return new LoginViewModel
-            {
+            return new LoginViewModel {
                 AllowRememberLogin = IdentityOptions.AllowRememberLogin,
                 EnableLocalLogin = allowLocal && IdentityOptions.AllowLocalLogin,
                 ReturnUrl = returnUrl,
@@ -453,8 +473,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             // get context information (client name, post logout redirect URI and iframe for federated signout)
             var logout = await _interaction.GetLogoutContextAsync(logoutId);
 
-            var vm = new LogoutViewModel
-            {
+            var vm = new LogoutViewModel {
                 ShowLogoutPrompt = IdentityOptions.ShowLogoutPrompt,
                 AutomaticRedirectAfterSignOut = IdentityOptions.AutomaticRedirectAfterSignOut,
                 PostLogoutRedirectUri = logout?.PostLogoutRedirectUri,
@@ -496,8 +515,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             // get context information (client name, post logout redirect URI and iframe for federated signout)
             var logout = await _interaction.GetLogoutContextAsync(logoutId);
 
-            var vm = new LoggedOutViewModel
-            {
+            var vm = new LoggedOutViewModel {
                 AutomaticRedirectAfterSignOut = IdentityOptions.AutomaticRedirectAfterSignOut,
                 PostLogoutRedirectUri = logout?.PostLogoutRedirectUri,
                 ClientId = logout.ClientId,
@@ -544,8 +562,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
                 // we will issue the external cookie and then redirect the
                 // user back to the external callback, in essence, tresting windows
                 // auth the same as any other external authentication mechanism
-                var props = new AuthenticationProperties
-                {
+                var props = new AuthenticationProperties {
                     RedirectUri = Url.Action("ExternalLoginCallback"),
                     Items = { { "returnUrl", returnUrl }, { "scheme", IdentityOptions.WindowsAuthenticationSchemeName } }
                 };
@@ -639,7 +656,7 @@ namespace ModernSlavery.WebUI.Identity.Controllers
             out ChangeEmailVerificationToken changeEmailToken)
         {
             // Check if the referring url is an email change verification
-            var referrerPathAndQuery = authRequest.Parameters["Referrer"];
+            var referrerPathAndQuery = authRequest?.Parameters["Referrer"];
             if (referrerPathAndQuery != null &&
                 referrerPathAndQuery.StartsWith("/manage-account/complete-change-email"))
             {

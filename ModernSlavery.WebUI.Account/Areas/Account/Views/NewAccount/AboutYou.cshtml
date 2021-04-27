@@ -30,17 +30,17 @@
                 <p>Enter an email address that you can access. The service will send you an email to verify your identity.</p>
                 <div class="form-group @Html.SetErrorClass(model => model.EmailAddress, "error") ">
                     @Html.LabelFor(model => model.EmailAddress, new { @class = "form-label" })
-                    @Html.ValidationMessageFor(model => model.EmailAddress, null, new { @class = "error-message" })
                     <div class="col-md-10">
                         @Html.CustomEditorFor(model => model.EmailAddress, new { type = "email", @class = "form-control" })
                     </div>
+                    @Html.ValidationMessageFor(model => model.EmailAddress, null, new { @class = "error-message" })
                 </div>
                 <div class="form-group @Html.SetErrorClass(model => model.ConfirmEmailAddress, "error") ">
                     @Html.LabelFor(model => model.ConfirmEmailAddress, new { @class = "form-label" })
-                    @Html.ValidationMessageFor(model => model.ConfirmEmailAddress, "", new { @class = "error-message" })
                     <div class="col-md-10">
                         @Html.CustomEditorFor(model => model.ConfirmEmailAddress, new { type = "email", @class = "form-control" })
                     </div>
+                    @Html.ValidationMessageFor(model => model.ConfirmEmailAddress, "", new { @class = "error-message" })
                 </div>
             </fieldset>
 

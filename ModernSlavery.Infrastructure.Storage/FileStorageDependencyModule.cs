@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Autofac;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.WindowsAzure.Storage.RetryPolicies;
+using Microsoft.Azure.Storage.RetryPolicies;
 using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Core.Options;
 using ModernSlavery.Infrastructure.Storage.FileRepositories;

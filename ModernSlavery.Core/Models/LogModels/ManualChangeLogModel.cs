@@ -22,7 +22,7 @@ namespace ModernSlavery.Core.Models.LogModels
             string details = null)
         {
             MethodName = methodName;
-            Action = action;
+            Action = action.ToString();
             Source = source;
             ReferenceName = referenceName;
             ReferenceValue = referenceValue;
@@ -35,7 +35,7 @@ namespace ModernSlavery.Core.Models.LogModels
 
         public DateTime Date { get; set; } = VirtualDateTime.Now;
         public string MethodName { get; set; }
-        public ManualActions Action { get; set; }
+        public string Action { get; set; }
         public string ReferenceName { get; set; }
         public string ReferenceValue { get; set; }
         public string TargetName { get; set; }

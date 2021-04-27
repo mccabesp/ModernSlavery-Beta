@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Net.Http.Headers;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -190,5 +190,17 @@ namespace ModernSlavery.Core.Extensions
         }
 
         #endregion
+
+        public static bool IsAction(this RouteData routeData, string actionName, string controllerName=null, string areaName=null)
+        {
+            var actionName1 = routeData.Values.ContainsKey("action") ? routeData.Values["action"].ToString() : null;
+            var controllerName1 = routeData.Values.ContainsKey("controller") ? routeData.Values["controller"].ToString() : null;
+            var areaName1 = routeData.Values.ContainsKey("area") ? routeData.Values["area"].ToString() : null;
+
+            if (!actionName.EqualsI(actionName1)) return false;
+            if (controllerName!=null && !controllerName.EqualsI(controllerName1)) return false;
+            if (areaName!=null && !areaName.EqualsI(areaName1)) return false;
+            return true;
+        }
     }
 }

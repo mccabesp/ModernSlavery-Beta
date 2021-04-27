@@ -34,7 +34,7 @@ else if (Model.Partners.Any())
                     Organisation’s response
                 </div>
             </div>
-            @foreach (var partner in Enums.GetValuesExcept<PartnerTypes>(PartnerTypes.Unknown, PartnerTypes.None))
+            @foreach (var partner in Enums.GetValues<PartnerTypes>(PartnerTypes.Unknown, PartnerTypes.None))
             {
                 <div class="app-question-list__item">
                     <div class="app-question-list__column app-question-list__name">

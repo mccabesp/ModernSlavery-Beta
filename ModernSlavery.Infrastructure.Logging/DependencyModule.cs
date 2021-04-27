@@ -34,6 +34,8 @@ namespace ModernSlavery.Infrastructure.Logging
             builder.RegisterLogRecord(Filenames.ManualChangeLog);
             builder.RegisterLogRecord(Filenames.RegistrationLog);
             builder.RegisterLogRecord(Filenames.SubmissionLog);
+            builder.RegisterLogRecord(Filenames.EmailSendLog);
+            builder.RegisterLogRecord(Filenames.UserLog);
             builder.RegisterLogRecord(Filenames.SearchLog);
 
             // Register log records (without key filtering)

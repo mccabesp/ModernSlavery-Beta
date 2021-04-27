@@ -16,12 +16,16 @@
             </div>
 
             <div id="default-content">
-                <p>@ViewBag.UserFullName (@ViewBag.UserJobTitle),<br> @ViewBag.Organisation, <br />@Html.Linebreak((string)ViewBag.Address, Environment.NewLine,",")</p>
+                <p>@ViewBag.UserFullName (@ViewBag.UserJobTitle),<br> @ViewBag.Organisation, <br />@Html.Linebreak((string)ViewBag.Address, Environment.NewLine, ",")</p>
 
             </div>
             @if (!string.IsNullOrWhiteSpace(ViewBag.PinCode))
             {
                 <p style="color:#d4351c;">Your test pin code is <b id="PINCode" data-organisationidentifier="@(ViewBag.OrganisationIdentifier)">@ViewBag.PinCode</b></p>
+            }
+            else if (!string.IsNullOrWhiteSpace(ViewBag.EmailAddress))
+            {
+                <p style="color:#d4351c;">Your pin has been sent via email to <b>@ViewBag.EmailAddress</b></p>
             }
             <span class="govuk-!-font-weight-bold">What happens next.</span>
             <p class="govuk-body">Your PIN should arrive within 7 days.</p>

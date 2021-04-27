@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Interfaces;
+using ModernSlavery.WebUI.Shared.Models;
 
 namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 {
@@ -30,7 +32,21 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 
                 var lastToken = session["LastRequestVerificationToken"];
 
-                if (lastToken == currentToken) throw new HttpException(1150, "Duplicate post request");
+                if (lastToken == currentToken)
+                {
+                    // return the custom error view
+                    if (context.Controller is Controller controller)
+                    {
+                        var errorViewModelFactory = context.HttpContext.RequestServices.GetRequiredService<IErrorViewModelFactory>();
+
+                        // create the session expired error model
+                        var errorModel = errorViewModelFactory.Create(1150);
+
+                        context.Result = controller.View("CustomError", errorModel);
+                        return;
+                    }
+                    throw new HttpException(1150, "Duplicate post request");
+                }
 
                 session["LastRequestVerificationToken"] = currentToken;
             }

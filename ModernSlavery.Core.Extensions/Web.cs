@@ -6,6 +6,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Polly;
+using Polly.Extensions.Http;
 
 namespace ModernSlavery.Core.Extensions
 {
@@ -108,6 +110,51 @@ namespace ModernSlavery.Core.Extensions
             }
         }
 
-        
+
+        public static HttpClient SetupHttpClient(this HttpClient httpClient, string baseUrl=null, int connectionLeaseTimeoutSeconds = 60, int timeoutSeconds=100)
+        {
+            if (!string.IsNullOrWhiteSpace(baseUrl))
+            {
+                httpClient.BaseAddress = new Uri(baseUrl);
+                ServicePointManager.FindServicePoint(httpClient.BaseAddress).ConnectionLeaseTimeout = connectionLeaseTimeoutSeconds * 1000;
+            }
+
+            httpClient.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
+            httpClient.DefaultRequestHeaders.Clear();
+            httpClient.DefaultRequestHeaders.ConnectionClose = false;
+            return httpClient;
+        }
+
+        public static HttpClientHandler ConfigureHttpMessageHandler(bool acceptBadCertificate=true, int maxAutomaticRedirections=50, DecompressionMethods automaticDecompression = DecompressionMethods.All)
+        {
+            var httpClientHandler = new HttpClientHandler
+            {
+                //Alow automatic redirection up to 10 hops
+                AllowAutoRedirect = true,
+                MaxAutomaticRedirections = maxAutomaticRedirections,
+
+                //This is required for being able to decompress
+                AutomaticDecompression = automaticDecompression, 
+            };
+
+            //Allow invalid certificates
+            if (acceptBadCertificate) httpClientHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+
+            return httpClientHandler;
+        }
+
+        public static HttpClient AddBrowserHeaders(this HttpClient client)
+        {
+            //Accept headers required to preventabort
+            client.DefaultRequestHeaders.Add("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+            client.DefaultRequestHeaders.Add("accept-encoding", "gzip, deflate, br");
+            client.DefaultRequestHeaders.Add("accept-language", "en-GB,en-US;q=0.9,en;q=0.8");
+
+            //User agent is required to prevent 403 forbidden
+            client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36");
+
+            return client;
+        }
+
     }
 }

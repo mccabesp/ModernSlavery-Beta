@@ -92,11 +92,8 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             if (organisationId == 0) return new HttpBadRequestResult($"Cannot decrypt organisation id {model.EncOrganisationId}");
 
             // Check the current user has permission for this organisation
-            var userOrgToUnregister =
-                VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
-            if (userOrgToUnregister == null)
-                return new HttpForbiddenResult(
-                    $"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
+            var userOrgToUnregister = VirtualUser.UserOrganisations.FirstOrDefault(uo => uo.OrganisationId == organisationId);
+            if (userOrgToUnregister == null)return new HttpForbiddenResult($"User {VirtualUser?.EmailAddress} is not registered for organisation id {organisationId}");
 
             // Decrypt user id
             long userIdToRemove = SharedBusinessLogic.Obfuscator.DeObfuscate(model.EncUserId);
@@ -122,35 +119,26 @@ namespace ModernSlavery.WebUI.Registration.Controllers
             // Remove the registration
             var actionByUser = IsImpersonatingUser == false ? VirtualUser : OriginalUser;
             var orgToRemove = userOrgToUnregister.Organisation;
-            await _registrationService.RegistrationBusinessLogic.RemoveRegistrationAsync(userOrgToUnregister,
-                actionByUser);
 
-            // Email user that has been unregistered
-            SharedBusinessLogic.NotificationService.SendRemovedUserFromOrganisationEmail(
+            await _registrationService.RegistrationBusinessLogic.RemoveRegistrationAsync(userOrgToUnregister,actionByUser);
+
+            // Email the removed user 
+            await SharedBusinessLogic.NotificationService.SendRemovedUserFromOrganisationEmailAsync(
                 userToUnregister.EmailAddress,
                 orgToRemove.OrganisationName,
-                userToUnregister.Fullname);
-
-            // Email the other users of the organisation
-            var emailAddressesForOrganisation = orgToRemove.UserOrganisations.Select(uo => uo.User.EmailAddress);
-            foreach (var emailAddress in emailAddressesForOrganisation)
-                SharedBusinessLogic.NotificationService.SendRemovedUserFromOrganisationEmail(
-                    emailAddress,
-                    orgToRemove.OrganisationName,
-                    userToUnregister.Fullname);
+                userToUnregister.Fullname,
+                VirtualUser.Fullname);
 
             // Send the notification to GEO for each newly orphaned organisation
-            var sendEmails = new List<Task>();
-            var testEmail = !SharedBusinessLogic.SharedOptions.IsProduction();
             if (_registrationService.OrganisationBusinessLogic.GetOrganisationIsOrphan(orgToRemove))
-                sendEmails.Add(
-                    SharedBusinessLogic.SendEmailService.SendMsuOrphanOrganisationNotificationAsync(orgToRemove.OrganisationName));
-
-            await Task.WhenAll(sendEmails);
+                await SharedBusinessLogic.SendEmailService.SendMsuOrphanOrganisationNotificationAsync(orgToRemove.OrganisationName);
 
             //Make sure this organisation is no longer selected
             if (ReportingOrganisationId == organisationId) ReportingOrganisationId = 0;
 
+            // set fields before stashing
+            model.OrganisationName = orgToRemove.OrganisationName;
+            model.UserName = userToUnregister.Fullname;
             StashModel(model);
 
             return RedirectToAction("RemoveOrganisationCompleted");

@@ -18,15 +18,20 @@ namespace ModernSlavery.WebUI.Shared.Models
         [Required]
         public HowEasyIsThisServiceToUse? HowEasyIsThisServiceToUse { get; set; }
 
-        [Required]
         [MaxLength(2000)]
         [Text]
         public string Details { get; set; }
 
         [EmailAddress]
+        [MaxLength(254)]
         public string EmailAddress { get; set; }
+        
         [Phone]
+        [MaxLength(20)]
         public string PhoneNumber { get; set; }
+
+        [RelativeUrl]
+        public string BackUrl { get; set; }
     }
     public enum WhyVisitSite : byte
     {

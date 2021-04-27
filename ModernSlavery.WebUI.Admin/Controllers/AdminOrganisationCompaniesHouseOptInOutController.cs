@@ -48,6 +48,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpGet("organisation/{id}/coho-sync/opt-in")]
         public async Task<IActionResult> OptIn(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             var model = new AdminChangeCompaniesHouseOptInOutViewModel();
@@ -62,6 +65,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> OptIn(long id, AdminChangeCompaniesHouseOptInOutViewModel viewModel)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
@@ -83,9 +89,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             await updateFromCompaniesHouseService.UpdateOrganisationAsync(organisation);
 
             organisation.OptedOutFromCompaniesHouseUpdate = false;
-            _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            await _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            auditLogger.AuditChangeToOrganisation(
+            await auditLogger.AuditChangeToOrganisationAsync(
                 this,
                 AuditedAction.AdminChangeCompaniesHouseOpting,
                 organisation,
@@ -98,26 +104,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 new {id = organisation.OrganisationId});
         }
 
-        private async Task PopulateViewModelWithCompanyFromCompaniesHouseAsync(
-            AdminChangeCompaniesHouseOptInOutViewModel viewModel, Organisation organisation)
+        private async Task PopulateViewModelWithCompanyFromCompaniesHouseAsync(AdminChangeCompaniesHouseOptInOutViewModel viewModel, Organisation organisation)
         {
-            CompaniesHouseCompany companiesHouseCompany;
-            try
-            {
-                companiesHouseCompany = await companiesHouseApi.GetCompanyAsync(organisation.CompanyNumber);
-            }
-            catch (Exception)
-            {
-                throw new Exception("This organisation doesn't have a companies house record.");
-            }
+            var companiesHouseCompany = await companiesHouseApi.GetCompanyAsync(organisation.CompanyNumber);
+            if (companiesHouseCompany==null)throw new Exception("This organisation doesn't have a companies house record.");
 
             viewModel.CompaniesHouseCompany = companiesHouseCompany;
         }
 
 
         [HttpGet("organisation/{id}/coho-sync/opt-out")]
-        public IActionResult OptOut(long id)
+        public async Task<IActionResult> OptOut(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             var model = new AdminChangeCompaniesHouseOptInOutViewModel();
@@ -129,8 +130,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpPost("organisation/{id}/coho-sync/opt-out")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public IActionResult OptOut(long id, AdminChangeCompaniesHouseOptInOutViewModel viewModel)
+        public async Task<IActionResult> OptOut(long id, AdminChangeCompaniesHouseOptInOutViewModel viewModel)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
@@ -149,9 +153,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             }
 
             organisation.OptedOutFromCompaniesHouseUpdate = true;
-            _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            await _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            auditLogger.AuditChangeToOrganisation(
+            await auditLogger.AuditChangeToOrganisationAsync(
                 this,
                 AuditedAction.AdminChangeCompaniesHouseOpting,
                 organisation,

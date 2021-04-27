@@ -121,7 +121,7 @@
     <value>I am happy to be contacted for feedback on this service</value>
   </data>
   <data name="ChangeDetailsSuccessAlert" xml:space="preserve">
-    <value>Your details have been updated successfully</value>
+    <value>Your details have been updated</value>
   </data>
   <data name="ChangeEmailAddressMustDiffer" xml:space="preserve">
     <value>The email address you entered must be different from your current email address</value>
@@ -130,7 +130,7 @@
     <value>The password you have entered must be different from your previous password</value>
   </data>
   <data name="ChangePasswordSuccessAlert" xml:space="preserve">
-    <value>Your password has been changed successfully</value>
+    <value>Your password has been changed</value>
   </data>
   <data name="CloseAccountEnterPassword" xml:space="preserve">
     <value>Enter your password to confirm</value>
@@ -177,11 +177,17 @@
   <data name="EmailAddress" xml:space="preserve">
     <value>Email address</value>
   </data>
+  <data name="EmailAddressLength" xml:space="preserve">
+    <value>Your email address cannot be longer than {1} characters</value>
+  </data>
   <data name="EmailAddressRequired" xml:space="preserve">
     <value>You need to enter your email address</value>
   </data>
   <data name="FirstName" xml:space="preserve">
     <value>First name</value>
+  </data>
+  <data name="FirstNameLength" xml:space="preserve">
+    <value>Your first name cannot be longer than {1} characters</value>
   </data>
   <data name="FirstNameRequired" xml:space="preserve">
     <value>You need to enter your first name</value>
@@ -197,6 +203,9 @@
   </data>
   <data name="LastName" xml:space="preserve">
     <value>Last name</value>
+  </data>
+  <data name="LastNameLength" xml:space="preserve">
+    <value>Your last name cannot be longer than {1} characters</value>
   </data>
   <data name="LastNameRequired" xml:space="preserve">
     <value>You need to enter your last name</value>

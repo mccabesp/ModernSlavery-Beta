@@ -99,15 +99,15 @@ namespace ModernSlavery.Infrastructure.Configuration
                 Console.WriteLine($@"Using KeyVault: {vault}");
             }
 
-            //Add any additional settings source
-            if (_additionalSettings != null && _additionalSettings.Any())
-                appBuilder.AddInMemoryCollection(_additionalSettings);
-
             /* make sure these files are loaded AFTER the vault, so their keys superseed the vaults' values - that way, unit tests will pass because the obfuscation key is whatever the appSettings says it is [and not a hidden secret inside the vault])  */
             if (Debugger.IsAttached || _appConfig.IsDevelopment() || _appConfig.IsTest())
             {
                 appBuilder.PromoteConfigSecretSources();
             }
+
+            //Add any additional settings source
+            if (_additionalSettings != null && _additionalSettings.Any())
+                appBuilder.AddInMemoryCollection(_additionalSettings);
 
             // override using the azure environment variables into the configuration
             appBuilder.PromoteConfigSources<EnvironmentVariablesConfigurationSource>();
@@ -126,7 +126,9 @@ namespace ModernSlavery.Infrastructure.Configuration
             //Dump the settings to the console
             if (_appConfig.GetValueOrDefault("TestOptions:DUMP_SETTINGS", false))
             {
-                var dumpSettingPath = Path.Combine(_appConfig["Filepaths:LogFiles"], $"{_appConfig.GetApplicationName()}.SETTINGS.txt");
+                var slotName = _appConfig.GetValueOrDefault("DEPLOYMENT_SLOT_NAME", "");//Used to differentiate between production and staging slots
+                if (!string.IsNullOrWhiteSpace(slotName)) slotName = "-" + slotName.TrimNonLettersOrDigits();
+                var dumpSettingPath = Path.Combine(_appConfig["Filepaths:LogFiles"], $"{_appConfig.GetApplicationName()}{slotName}.SETTINGS.txt");
                 Directory.CreateDirectory(Path.GetDirectoryName(dumpSettingPath));
                 File.WriteAllLines(dumpSettingPath, configDictionary.Keys.Select(key=>$@"[{key}]={configDictionary[key]}"));
                 Console.WriteLine($@"AppSettings Dumped to file: {dumpSettingPath}");

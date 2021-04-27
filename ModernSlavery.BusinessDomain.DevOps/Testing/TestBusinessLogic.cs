@@ -29,14 +29,16 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
         Task ClearAppInsightsAsync(string subscriptionId, string resourceGroupName, string resourceName, string tableName);
 
         Task ClearAppInsightsAsync(DateTime? startDate = null, DateTime? endDate = null);
-        
+
         Task ClearCacheAsync();
 
-        Task DeleteFilesAsync(DateTime? startDate = null, DateTime? endDate = null);
+        Task DeleteDownloadFilesAsync(DateTime? startDate = null, DateTime? endDate = null);
         Task DeleteDraftFilesAsync(DateTime? startDate = null, DateTime? endDate = null);
         Task DeleteDraftFilesAsync(string organisationIdentifier, long reportingDeadlineYear);
+
+        Task DeleteAuditLogFilesAsync(DateTime? startDate = null, DateTime? endDate = null);
         Task ResetDatabaseAsync(bool keepAdministrators = false);
-        Task ClearDatabaseAsync(DateTime? startDate = null, DateTime? endDate = null, bool keepAdministrators=false);
+        Task ClearDatabaseAsync(DateTime? startDate = null, DateTime? endDate = null, bool keepAdministrators = false);
         Task ClearQueuesAsync(DateTime? startDate = null, DateTime? endDate = null);
         Task DeleteStatementsAsync(DateTime? startDate = null, DateTime? endDate = null);
         Task DeleteRegistrationsAsync(DateTime? startDate = null, DateTime? endDate = null);
@@ -50,7 +52,6 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
         Task RefreshSearchDocumentsAsync();
         void ClearLocalSettingsDump();
         void ClearLocalLogs();
-        Task SetIsUkAddressesAsync();
         Task QueueWebjob(string webjobName);
     }
 
@@ -104,7 +105,7 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
 
         public async Task ClearAppInsightsAsync()
         {
-            var resourceInfo=await _appInsightsManager.GetResourceInfoAsync(_appInsightsOptions.InstrumentationKey).ConfigureAwait(false);
+            var resourceInfo = await _appInsightsManager.GetResourceInfoAsync(_appInsightsOptions.InstrumentationKey).ConfigureAwait(false);
 
             //see https://docs.microsoft.com/en-us/azure/azure-monitor/app/apm-tables
             var tableNames = new[] { "availabilityResults", "browserTimings", "dependencies", "customEvents", "customMetrics", "pageViews", "performanceCounters", "requests", "exceptions", "traces" };
@@ -140,7 +141,7 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
         public async Task ClearAppInsightsAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
             await foreach (var queue in _azureStorageManager.ListQueuesAsync())
-                await _azureStorageManager.ClearQueueAsync(queue.name,startDate, endDate).ConfigureAwait(false);
+                await _azureStorageManager.ClearQueueAsync(queue.name, startDate, endDate).ConfigureAwait(false);
         }
         #endregion
 
@@ -152,15 +153,15 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
         #endregion
 
         #region Delete files
-        public async Task DeleteFilesAsync(DateTime? startDate = null, DateTime? endDate = null)
+        public async Task DeleteDownloadFilesAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
-            if (startDate >= DateTime.Now) throw new ArgumentOutOfRangeException(nameof(startDate), $"{nameof(startDate)} cannot be later than now");
-            if (endDate >= DateTime.Now) throw new ArgumentOutOfRangeException(nameof(endDate), $"{nameof(endDate)} cannot be later than now");
-            if (startDate != null && endDate != null && startDate >= endDate) throw new ArgumentOutOfRangeException(nameof(startDate), $"{nameof(startDate)} must be less than {nameof(endDate)}");
+            //TODO: date filtering
+            if (startDate != null || endDate != null) throw new NotImplementedException();
 
-            if (!await _fileRepository.GetDirectoryExistsAsync(_fileRepository.RootPath).ConfigureAwait(false)) return;
+            if (!await _fileRepository.GetDirectoryExistsAsync(_sharedOptions.DownloadsPath).ConfigureAwait(false)) return;
 
-            var files = await _fileRepository.GetFilesAsync(_fileRepository.RootPath,recursive:true).ConfigureAwait(false);
+            var files = await _fileRepository.GetFilesAsync(_sharedOptions.DownloadsPath).ConfigureAwait(false);
+
             DeleteFiles(files, startDate, endDate);
         }
 
@@ -186,11 +187,22 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
             DeleteFiles(files);
         }
 
+        public async Task DeleteAuditLogFilesAsync(DateTime? startDate = null, DateTime? endDate = null)
+        {
+            //TODO: date filtering
+            if (startDate != null || endDate != null) throw new NotImplementedException();
+
+            if (!await _fileRepository.GetDirectoryExistsAsync(_sharedOptions.LogPath).ConfigureAwait(false)) return;
+
+            var files = await _fileRepository.GetFilesAsync(_sharedOptions.LogPath,recursive:true).ConfigureAwait(false);
+
+            DeleteFiles(files, startDate, endDate);
+        }
+
         private void DeleteFiles(IEnumerable<string> files, DateTime? startDate = null, DateTime? endDate = null)
         {
-            Parallel.ForEach(files, async file =>
-            {
-                if (file.ContainsI(_sharedOptions.AppDataPath)) return;
+            Parallel.ForEach(files, async file => {
+                if (file.ContainsI(_sharedOptions.AppDataPath, _sharedOptions.ArchivePath)) return;
 
                 if (startDate != null || endDate != null)
                 {
@@ -232,9 +244,10 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
                 await _dataRepository.GetAll<UserOrganisation>().Where(r => r.Created >= startDate && r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false);
                 await _dataRepository.GetAll<Organisation>().Where(r => r.Created >= startDate && r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false);
                 await _dataRepository.GetAll<ReminderEmail>().Where(r => r.Created >= startDate && r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false);
-                var users = _dataRepository.GetAll<User>().Where(r => r.Created >= startDate && r.Created < endDate);
-                if (keepAdministrators) users = users.Where(u => !_authorisationBusinessLogic.IsAdministrator(u));
-                await users.BatchDeleteAsync().ConfigureAwait(false);
+
+                var users = _dataRepository.GetAll<User>().Where(r => r.UserId > 0 && r.Created >= startDate && r.Created < endDate).AsEnumerable();
+                if (keepAdministrators) users = users.Where(u => !_authorisationBusinessLogic.IsSystemUser(u) && !_authorisationBusinessLogic.IsAdministrator(u));
+                await _dataRepository.BulkDeleteAsync(users).ConfigureAwait(false);
 
                 await _dataRepository.GetAll<PublicSectorType>().Where(r => r.Created >= startDate && r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false);
                 await _dataRepository.GetAll<SicCode>().Where(r => r.Created >= startDate && r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false);
@@ -249,9 +262,10 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
                 await _dataRepository.GetAll<Statement>().Where(r => r.Created >= startDate).BatchDeleteAsync().ConfigureAwait(false);
                 await _dataRepository.GetAll<Organisation>().Where(r => r.Created >= startDate).BatchDeleteAsync().ConfigureAwait(false);
                 await _dataRepository.GetAll<ReminderEmail>().Where(r => r.Created >= startDate).BatchDeleteAsync().ConfigureAwait(false);
-                var users = _dataRepository.GetAll<User>().Where(r => r.Created >= startDate);
-                if (keepAdministrators) users = users.Where(u => !_authorisationBusinessLogic.IsAdministrator(u));
-                await users.BatchDeleteAsync().ConfigureAwait(false);
+
+                var users = _dataRepository.GetAll<User>().Where(r => r.UserId > 0 && r.Created >= startDate).AsEnumerable();
+                if (keepAdministrators) users = users.Where(u => !_authorisationBusinessLogic.IsSystemUser(u) && !_authorisationBusinessLogic.IsAdministrator(u));
+                await _dataRepository.BulkDeleteAsync(users).ConfigureAwait(false);
 
                 await _dataRepository.GetAll<PublicSectorType>().Where(r => r.Created >= startDate).BatchDeleteAsync().ConfigureAwait(false);
                 await _dataRepository.GetAll<SicCode>().Where(r => r.Created >= startDate).BatchDeleteAsync().ConfigureAwait(false);
@@ -262,14 +276,14 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
                 await _dataRepository.GetAll<AuditLog>().Where(r => r.CreatedDate < endDate).BatchDeleteAsync().ConfigureAwait(false);
                 await _dataRepository.GetAll<Feedback>().Where(r => r.CreatedDate < endDate).BatchDeleteAsync().ConfigureAwait(false);
                 await _dataRepository.GetAll<Organisation>().Where(r => r.Created < endDate).BatchUpdateAsync(o => new Organisation { LatestAddressId = null, LatestStatementId = null, LatestPublicSectorTypeId = null, LatestRegistrationOrganisationId = null, LatestRegistrationUserId = null, LatestScopeId = null }).ConfigureAwait(false);
-                await _dataRepository.GetAll<Statement>().Where(r => r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false); 
+                await _dataRepository.GetAll<Statement>().Where(r => r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false);
                 await _dataRepository.GetAll<UserOrganisation>().Where(r => r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false);
                 await _dataRepository.GetAll<Organisation>().Where(r => r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false);
                 await _dataRepository.GetAll<ReminderEmail>().Where(r => r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false);
 
-                var users = _dataRepository.GetAll<User>().Where(r => r.Created < endDate);
-                if (keepAdministrators) users = users.Where(u => !_authorisationBusinessLogic.IsAdministrator(u));
-                await users.BatchDeleteAsync().ConfigureAwait(false);
+                var users = _dataRepository.GetAll<User>().Where(r => r.UserId > 0 && r.Created < endDate).AsEnumerable();
+                if (keepAdministrators) users = users.Where(u => !_authorisationBusinessLogic.IsSystemUser(u) && !_authorisationBusinessLogic.IsAdministrator(u));
+                await _dataRepository.BulkDeleteAsync(users).ConfigureAwait(false);
 
                 await _dataRepository.GetAll<PublicSectorType>().Where(r => r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false);
                 await _dataRepository.GetAll<SicCode>().Where(r => r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false);
@@ -284,19 +298,18 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
                 await _dataRepository.BulkDeleteAsync(_dataRepository.GetAll<UserOrganisation>()).ConfigureAwait(false);
                 await _dataRepository.BulkDeleteAsync(_dataRepository.GetAll<Organisation>()).ConfigureAwait(false);
                 await _dataRepository.BulkDeleteAsync(_dataRepository.GetAll<ReminderEmail>()).ConfigureAwait(false);
-                if (keepAdministrators)
-                {
-                    var users = _dataRepository.GetAll<User>().ToList().Where(u => !_authorisationBusinessLogic.IsAdministrator(u));
-                    await _dataRepository.BulkDeleteAsync(users);
-                }
-                else
-                {
-                    await _dataRepository.BulkDeleteAsync(_dataRepository.GetAll<User>()).ConfigureAwait(false);
-                }
+
+                var users = _dataRepository.GetAll<User>().AsEnumerable();
+                if (keepAdministrators) users = users.Where(u => !_authorisationBusinessLogic.IsSystemUser(u) && !_authorisationBusinessLogic.IsAdministrator(u));
+                await _dataRepository.BulkDeleteAsync(users).ConfigureAwait(false);
+
                 await _dataRepository.BulkDeleteAsync(_dataRepository.GetAll<PublicSectorType>()).ConfigureAwait(false);
                 await _dataRepository.BulkDeleteAsync(_dataRepository.GetAll<SicCode>()).ConfigureAwait(false);
                 await _dataRepository.BulkDeleteAsync(_dataRepository.GetAll<SicSection>()).ConfigureAwait(false);
             }
+
+            //Ensure we have a system user
+            await _dataImporter.EnsureSystemUserExistsAsync().ConfigureAwait(false);
 
             //restore the old timeout
             if (_commandTimeout != oldCommandTimeout) _dataRepository.SetCommandTimeout(oldCommandTimeout);
@@ -304,14 +317,14 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
             //Reload the database context
             _dataRepository.Reload();
         }
-        
+
         public async Task DeleteStatementsAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
             if (startDate >= DateTime.Now) throw new ArgumentOutOfRangeException(nameof(startDate), $"{nameof(startDate)} cannot be later than now");
             if (endDate >= DateTime.Now) throw new ArgumentOutOfRangeException(nameof(endDate), $"{nameof(endDate)} cannot be later than now");
 
             //Get the old timeout
-            var oldCommandTimeout=_dataRepository.GetCommandTimeout();
+            var oldCommandTimeout = _dataRepository.GetCommandTimeout();
 
             //Set a new longer 5 min timeout
             if (_commandTimeout != oldCommandTimeout) _dataRepository.SetCommandTimeout(_commandTimeout);
@@ -320,7 +333,7 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
             if (startDate != null && endDate != null)
             {
                 if (startDate >= endDate) throw new ArgumentOutOfRangeException(nameof(startDate), $"{nameof(startDate)} must be less than {nameof(endDate)}");
-                await _dataRepository.GetAll<Organisation>().Where(r => r.Created >= startDate && r.Created < endDate).BatchUpdateAsync(o => new Organisation { LatestStatementId = null}).ConfigureAwait(false);
+                await _dataRepository.GetAll<Organisation>().Where(r => r.Created >= startDate && r.Created < endDate).BatchUpdateAsync(o => new Organisation { LatestStatementId = null }).ConfigureAwait(false);
                 await _dataRepository.GetAll<Statement>().Where(r => r.Created >= startDate && r.Created < endDate).BatchDeleteAsync().ConfigureAwait(false);
             }
             else if (startDate != null && endDate == null)
@@ -335,7 +348,7 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
             }
             else
             {
-                await _dataRepository.GetAll<Organisation>().BatchUpdateAsync(o => new Organisation { LatestStatementId = null}).ConfigureAwait(false);
+                await _dataRepository.GetAll<Organisation>().BatchUpdateAsync(o => new Organisation { LatestStatementId = null }).ConfigureAwait(false);
                 await _dataRepository.GetAll<Statement>().BatchDeleteAsync().ConfigureAwait(false);
             }
 
@@ -352,7 +365,7 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
             var oldCommandTimeout = _dataRepository.GetCommandTimeout();
 
             //Set a new longer 5 min timeout
-            if (_commandTimeout!= oldCommandTimeout)_dataRepository.SetCommandTimeout(_commandTimeout);
+            if (_commandTimeout != oldCommandTimeout) _dataRepository.SetCommandTimeout(_commandTimeout);
 
             //Delete the records
             if (startDate != null && endDate != null)
@@ -401,7 +414,7 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
             }
             else if (startDate == null && endDate != null)
             {
-                users=users.Where(r => r.Created < endDate);
+                users = users.Where(r => r.Created < endDate);
             }
 
             if (keepAdministrators) users = users.Where(u => !_authorisationBusinessLogic.IsAdministrator(u));
@@ -412,7 +425,7 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
             if (_commandTimeout != oldCommandTimeout) _dataRepository.SetCommandTimeout(oldCommandTimeout);
         }
 
-        public async Task SeedDatabaseAsync(int maxRecords=0)
+        public async Task SeedDatabaseAsync(int maxRecords = 0)
         {
             //Get the old timeout
             var oldCommandTimeout = _dataRepository.GetCommandTimeout();
@@ -420,11 +433,11 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
             //Set a new longer 5 min timeout
             if (_commandTimeout != oldCommandTimeout) _dataRepository.SetCommandTimeout(_commandTimeout);
 
-            await _dataImporter.ImportSICSectionsAsync().ConfigureAwait(false);
-            await _dataImporter.ImportSICCodesAsync().ConfigureAwait(false);
-            await _dataImporter.ImportStatementSectorTypesAsync().ConfigureAwait(false);
-            await _dataImporter.ImportPrivateOrganisationsAsync(-1, maxRecords).ConfigureAwait(false);
-            await _dataImporter.ImportPublicOrganisationsAsync(-1, maxRecords).ConfigureAwait(false);
+            await _dataImporter.ImportSICSectionsAsync(true).ConfigureAwait(false);
+            await _dataImporter.ImportSICCodesAsync(true).ConfigureAwait(false);
+            await _dataImporter.ImportStatementSectorTypesAsync(true).ConfigureAwait(false);
+            await _dataImporter.ImportPrivateOrganisationsAsync(-1, maxRecords, true, true).ConfigureAwait(false);
+            await _dataImporter.ImportPublicOrganisationsAsync(-1, maxRecords, true, true).ConfigureAwait(false);
 
             //restore the old timeout
             if (_commandTimeout != oldCommandTimeout) _dataRepository.SetCommandTimeout(oldCommandTimeout);
@@ -450,15 +463,10 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
             }
             else
             {
-                await _executeWebjobQueue.AddMessageAsync(new QueueWrapper($"command=ReferenceOrganisations"));
-                await _executeWebjobQueue.AddMessageAsync(new QueueWrapper($"command=SetPresumedScopes"));
+                await _executeWebjobQueue.AddMessageAsync(new QueueWrapper($"command=ReferenceOrganisationsAsync"));
+                await _executeWebjobQueue.AddMessageAsync(new QueueWrapper($"command=SetPresumedScopesAsync"));
                 await _executeWebjobQueue.AddMessageAsync(new QueueWrapper($"command=FixLatestAsync"));
             }
-        }
-
-        public async Task SetIsUkAddressesAsync()
-        {
-            await _executeWebjobQueue.AddMessageAsync(new QueueWrapper($"command=SetIsUkAddressesAsync"));
         }
 
         public async Task ResetDatabaseAsync(bool keepAdministrators = false)
@@ -497,13 +505,13 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
 
         public async Task DeleteSearchDocumentsAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
-            var documents=await _searchBusinessLogic.ListSearchDocumentsByTimestampAsync(startDate, endDate).ConfigureAwait(false);
+            var documents = await _searchBusinessLogic.ListSearchDocumentsByTimestampAsync(startDate, endDate).ConfigureAwait(false);
             if (documents.Any()) await _searchBusinessLogic.RemoveSearchDocumentsAsync(documents).ConfigureAwait(false);
         }
 
         public async Task ClearQueuesAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
-            var queues=_azureStorageManager.ListQueuesAsync();
+            var queues = _azureStorageManager.ListQueuesAsync();
             await foreach (var queue in queues)
                 await _azureStorageManager.ClearQueueAsync(queue.name, startDate, endDate).ConfigureAwait(false);
         }
@@ -518,21 +526,16 @@ namespace ModernSlavery.BusinessDomain.DevOps.Testing
         {
             var logsPath = _configuration["Filepaths:LogFiles"];
             logsPath = FileSystem.ExpandLocalPath(logsPath);
-            foreach (var logFile in Directory.GetFiles(logsPath, "*.log"))
+            var files = Directory.GetFiles(logsPath, "*.log").ToHashSet(StringComparer.OrdinalIgnoreCase);
+            files.AddRange(Directory.GetFiles(logsPath, "*.xml"));
+
+            foreach (var logFile in files)
             {
                 try
                 {
                     if (File.Exists(logFile)) File.Delete(logFile);
                 }
-                catch { }
-            }
-            foreach (var logFile in Directory.GetFiles(logsPath, "*.xml"))
-            {
-                try
-                {
-                    if (File.Exists(logFile)) File.Delete(logFile);
-                }
-                catch { }
+                catch  { }
             }
         }
         #endregion

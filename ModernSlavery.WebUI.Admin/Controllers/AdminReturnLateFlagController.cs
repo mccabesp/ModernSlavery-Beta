@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -35,8 +36,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpGet("return/{id}/change-late-flag")]
-        public IActionResult ChangeLateFlag(long id)
+        public async Task<IActionResult> ChangeLateFlag(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var specifiedStatement = _adminService.SharedBusinessLogic.DataRepository.Get<Statement>(id);
 
             var viewModel = new AdminStatementLateFlagViewModel
@@ -48,8 +52,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [HttpPost("return/{id}/change-late-flag")]
         [PreventDuplicatePost]
         [ValidateAntiForgeryToken]
-        public IActionResult ChangeLateFlag(long id, AdminStatementLateFlagViewModel viewModel)
+        public async Task<IActionResult> ChangeLateFlag(long id, AdminStatementLateFlagViewModel viewModel)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var specifiedStatement = _adminService.SharedBusinessLogic.DataRepository.Get<Statement>(id);
 
             viewModel.ParseAndValidateParameters(Request, m => m.Reason);
@@ -71,9 +78,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             specifiedStatement.IsLateSubmission = viewModel.NewLateFlag.Value;
 
-            _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            await _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            auditLogger.AuditChangeToOrganisation(
+            await auditLogger.AuditChangeToOrganisationAsync(
                 this,
                 AuditedAction.AdminChangeLateFlag,
                 specifiedStatement.Organisation,

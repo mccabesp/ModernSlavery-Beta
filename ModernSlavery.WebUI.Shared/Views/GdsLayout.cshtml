@@ -195,7 +195,7 @@
     else
     {
         <script asp-append-version="true" asp-src-include="/assets/scripts/**/*.js" asp-src-exclude="/assets/scripts/app.min.js" type="text/javascript"></script>
-        <script asp-append-version="true" asp-src-include="/assets/javascripts/**/*.js" asp-src-exclude="/assets/javascripts/**/*.min.js" type="text/javascript"></script>
+        <script asp-append-version="true" asp-src-include="/assets/javascripts/**/*.js" asp-src-exclude="/assets/javascripts/**/*.min.js,/assets/javascripts/page/**/*.js" type="text/javascript"></script>
     }
     <script type="text/javascript" nonce="@Html.GetNonce()">window.GOVUKFrontend.initAll()</script>
     @{ await Html.RenderPartialAsync("_GoogleAnalyticsEventTracking"); }

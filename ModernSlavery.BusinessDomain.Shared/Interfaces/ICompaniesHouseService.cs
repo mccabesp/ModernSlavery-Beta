@@ -11,9 +11,9 @@ namespace ModernSlavery.BusinessDomain.Shared.Interfaces
 
         Task UpdateOrganisationsAsync();
         Task UpdateOrganisationAsync(Organisation organisation);
-        Task UpdateSicCodeAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse);
-        Task UpdateAddressAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse);
-        Task UpdateNameAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse);
+        Task<bool> UpdateSicCodeAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse);
+        Task<bool> UpdateAddressAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse);
+        Task<bool> UpdateNameAsync(Organisation organisation, CompaniesHouseCompany organisationFromCompaniesHouse);
 
         bool AddressMatches(OrganisationAddress firstOrganisationAddress,OrganisationAddress secondOrganisationAddress);
         bool IsCompanyNameEqual(OrganisationName organisationName, string companyName);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
@@ -54,7 +55,6 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
             SharedBusinessLogic = sharedBusinessLogic;
 
-            ViewData["controller"] = this;
         }
 
     
@@ -62,13 +62,15 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         public string UserHostAddress => HttpContext.GetUserHostAddress();
 
+        public bool BrowserIsIE11 => Regex.IsMatch(Request.Headers["User-Agent"].ToString(), @"Trident/7.*rv:11");
+
+        [NonAction]
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             # region logic before action goes here
 
             //Pass the controller object into the ViewData 
-            var controller = context.Controller as Controller;
-            controller.ViewData["Controller"] = controller;
+            HttpContext.Items["Controller"] = this;
 
             #endregion
 
@@ -88,7 +90,9 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             #region logic after the action goes here
 
             //Save the history and action/controller names
-            SaveHistory();
+            // only save on get request
+            if (Request.Method.EqualsI("GET"))
+                SaveHistory();
 
             LastAction = ActionName;
             LastController = ControllerName;
@@ -96,11 +100,18 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             #endregion
         }
 
+        [NonAction]
+        public override void OnActionExecuted(ActionExecutedContext context)
+        {
+            base.OnActionExecuted(context);
+        }
+
         /// <summary>
         ///     returns true if previous action
         /// </summary>
         /// <param name="actionName"></param>
         /// <param name="controllerName"></param>
+        [NonAction]
         protected bool WasAction(string actionName, string controllerName = null, object routeValues = null)
         {
             if (string.IsNullOrWhiteSpace(controllerName)) controllerName = ControllerName;
@@ -108,6 +119,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             return !string.IsNullOrWhiteSpace(LastControllerAction) && LastControllerAction.EqualsI($"{(!string.IsNullOrWhiteSpace(controllerName) ? $"{controllerName}/" : "")}{actionName}");
         }
 
+        [NonAction]
         protected bool WasAnyAction(params string[] actionUrls)
         {
             for (var i = 0; i < actionUrls.Length; i++)
@@ -121,12 +133,14 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             return false;
         }
 
+        [NonAction]
         protected bool IsAction(string actionName, string controllerName = null)
         {
             return actionName.EqualsI(ActionName) &&
                    (controllerName.EqualsI(ControllerName) || string.IsNullOrWhiteSpace(controllerName));
         }
 
+        [NonAction]
         protected bool IsAnyAction(params string[] actionUrls)
         {
             for (var i = 0; i < actionUrls.Length; i++)
@@ -144,10 +158,13 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         [HttpGet("/[controller]/Init")]
         public IActionResult Init()
         {
+            //Dont save in history
+            SkipSaveHistory = true;
+
             if (!SharedBusinessLogic.SharedOptions.IsProduction())
                 Logger.LogInformation($"Controller {AreaName}/{ControllerName} Initialised");
             
-            return new EmptyResult();
+            return new OkResult();
         }
 
         [NonAction]
@@ -161,16 +178,14 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
             }
 
-            //Clear the session
-            Session.Clear();
-
             //otherwise actually logout
-            if (string.IsNullOrWhiteSpace(redirectUrl)) return SignOut("Cookies", "oidc");
+            if (string.IsNullOrWhiteSpace(redirectUrl)) redirectUrl = Url.ActionArea("SignOut", "Account", "Account", null, "https");
 
             var properties = new AuthenticationProperties {RedirectUri = redirectUrl};
             return SignOut(properties, "Cookies", "oidc");
         }
 
+        [NonAction]
         protected async Task IncrementRetryCountAsync(string retryLockKey, int expiryMinutes)
         {
             var count = await Cache.GetAsync<int>($"{UserHostAddress}:{retryLockKey}:Count");
@@ -182,6 +197,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 VirtualDateTime.Now.AddMinutes(expiryMinutes));
         }
 
+        [NonAction]
         protected async Task CreateRetryLockAsync(string retryLockKey, int expiryMinutes)
         {
             await Cache.RemoveAsync($"{UserHostAddress}:{retryLockKey}");
@@ -189,6 +205,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 VirtualDateTime.Now.AddMinutes(expiryMinutes));
         }
 
+        [NonAction]
         protected async Task<TimeSpan> GetRetryLockRemainingTimeAsync(string retryLockKey, int expiryMinutes)
         {
             var lockDate = await Cache.GetAsync<DateTime>($"{UserHostAddress}:{retryLockKey}");
@@ -199,6 +216,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             return remainingTime;
         }
 
+        [NonAction]
         protected async Task ClearRetryLocksAsync(string retryLockKey)
         {
             await Cache.RemoveAsync($"{UserHostAddress}:{retryLockKey}");
@@ -267,51 +285,76 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             }
         }
 
+        public string LandingUrl => User.Identity.IsAuthenticated ? Url.ActionArea("ManageOrganisations", "Submission", "Submission") : Url.ActionArea("Landing", "Viewing", "Viewing");
+
+        public string BackUrl 
+        {
+            get 
+            {
+                //Get the page called before the current page
+                var history = PageHistory;
+                var currentIndex = history.IndexOf(RequestUrl.PathAndQuery);
+                if (currentIndex == -1 && history.Count > 0) return history[0];
+                if (currentIndex > -1 && (currentIndex+1) < history.Count) return history[currentIndex + 1];
+
+                //If never been to current page then use the landing page as the previous page
+                return LandingUrl;
+            }
+        }
         private void SaveHistory()
         {
+            if (!Request.Method.EqualsI("GET") || Response.StatusCode!=(int)System.Net.HttpStatusCode.OK || SkipSaveHistory) return;
+
             var history = PageHistory;
             try
             {
-                var previousPage = UrlReferrer == null || !RequestUrl.Host.Equals(UrlReferrer.Host)
-                    ? null
-                    : UrlReferrer.PathAndQuery;
+                //Whenever on a landing url then clear the history
+                if (RequestUrl.PathAndQuery.EqualsI(LandingUrl))history.Clear();
+
+                //Get previous and current page
+                var previousPage = UrlReferrer == null || !RequestUrl.Host.Equals(UrlReferrer.Host) ? null : UrlReferrer.PathAndQuery;
                 var currentPage = RequestUrl.PathAndQuery;
 
-                var currentIndex = history.IndexOf(currentPage);
+                // get previous and current page position in history
                 var previousIndex = string.IsNullOrWhiteSpace(previousPage) ? -2 : history.IndexOf(previousPage);
+                var currentIndex = history.IndexOf(currentPage);
 
-                if (previousIndex == -2)
-                {
-                    history.Clear();
+                //If returning from referrer page all pages in queue back to current page
+                if (previousIndex == 0 && currentIndex > 0)
+                    history.RemoveRange(0, currentIndex);
+                else if (currentIndex != 0)
+                    //If not on page then add to queue
                     history.Insert(0, currentPage);
-                    return;
-                }
-
-                if (currentIndex == -1 && previousIndex == 0)
-                {
-                    history.Insert(0, currentPage);
-                    return;
-                }
-
-                if (currentIndex == -1)
-                {
-                    history.Clear();
-                    if (previousIndex == -1) history.Insert(0, previousPage);
-
-                    history.Insert(0, currentPage);
-                    return;
-                }
-
-                if (currentIndex == 0 && previousIndex == 1) return;
-
-                if (currentIndex > previousIndex)
-                    for (var i = currentIndex - 1; i >= 0; i--)
-                        history.RemoveAt(i);
             }
             finally
             {
                 PageHistory = history;
             }
+        }
+
+        protected bool SkipSaveHistory = false;
+        
+        [NonAction]
+        public void SetBackUrl(string backUrl)
+        {
+            var history = PageHistory;
+
+            try
+            {
+                var currentIndex = history.IndexOf(backUrl);
+                if (currentIndex > 0)
+                    history.RemoveRange(0, currentIndex);
+                else if (currentIndex != 0)
+                    //If not on page then add to queue
+                    history.Insert(0, backUrl);
+
+                SkipSaveHistory = true;
+            }
+            finally
+            {
+                PageHistory = history;
+            }
+
         }
 
         [NonAction]
@@ -329,13 +372,19 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         [NonAction]
         public IActionResult RedirectToActionArea(string actionName, string controllerName, string areaName, object routeValues=null, string fragment=null)
         {
-            return Redirect(Url.ActionArea(actionName, controllerName, areaName, routeValues, fragment: fragment));
+            var url = Url.ActionArea(actionName, controllerName, areaName, routeValues, fragment: fragment);
+            if (string.IsNullOrWhiteSpace(url)) throw new ArgumentException($"Cannot resolve route to url: Action: {actionName}, Controller: {controllerName}, Area: {areaName}, RouteValues: {(routeValues==null ? null : JsonConvert.SerializeObject(routeValues))}");
+
+            return Redirect(url);
         }
 
         [NonAction]
         public IActionResult RedirectToActionAreaPermanent(string actionName, string controllerName, string areaName, object routeValues = null, string fragment = null)
         {
-            return RedirectPermanent(Url.ActionArea(actionName, controllerName, areaName, routeValues, fragment: fragment));
+            var url = Url.ActionArea(actionName, controllerName, areaName, routeValues, fragment: fragment);
+            if (string.IsNullOrWhiteSpace(url)) throw new ArgumentException($"Cannot resolve route to url: Action: {actionName}, Controller: {controllerName}, Area: {areaName}, RouteValues: {(routeValues == null ? null : JsonConvert.SerializeObject(routeValues))}");
+
+            return RedirectPermanent(url);
         }
 
         #endregion
@@ -392,9 +441,17 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
         public virtual User CurrentUser => VirtualUser;
 
-        public bool IsTrustedIP => SharedBusinessLogic.SharedOptions.IsTrustedAddress(UserHostAddress);
+        public bool IsTrustedIP => SharedBusinessLogic.AuthorisationBusinessLogic.IsTrustedAddress(UserHostAddress);
+
+        public bool IsSubmitter => SharedBusinessLogic.AuthorisationBusinessLogic.IsSubmitter(VirtualUser);
+        
+        [NonAction]
+        public bool IsSubmitterEmail(string emailAddress) => SharedBusinessLogic.AuthorisationBusinessLogic.IsSubmitter(emailAddress);
 
         public bool IsAdministrator => SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser);
+        
+        [NonAction] 
+        public bool IsAdministratorEmail(string emailAddress) => SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(emailAddress);
         public bool IsSuperAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsSuperAdministrator(VirtualUser);
         public bool IsDatabaseAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsDatabaseAdministrator(VirtualUser);
         public bool IsDevOpsAdministrator => IsTrustedIP && SharedBusinessLogic.AuthorisationBusinessLogic.IsDevOpsAdministrator(VirtualUser);
@@ -448,7 +505,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             if (!User.Identity.IsAuthenticated)
             {
                 //Allow anonymous users when starting registration
-                if (IsAnyAction("NewAccount/AboutYou", "NewAccount/VerifyEmail")) return null;
+                if (IsAnyAction("NewAccount/AboutYou", "NewAccount/VerifyEmail", "NewAccount/VerifyEmailPost")) return null;
 
                 //Allow anonymous users when resetting password
                 if (IsAnyAction("Account/PasswordReset", "Account/NewPassword")) return null;
@@ -458,7 +515,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             }
 
             //Always allow the viewing controller
-            if (ControllerName.EqualsI("Viewing")) return null;
+            if (ControllerName.EqualsI("Viewing", "Shared")) return null;
 
             //Ensure we get a valid user from the database
             if (VirtualUser == null) throw new IdentityNotMappedException();
@@ -472,7 +529,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 //If email not sent
                 if (!VirtualUser.IsVerifyEmailSent)
                 {
-                    if (IsAnyAction("NewAccount/VerifyEmail")) return null;
+                    if (IsAnyAction("NewAccount/VerifyEmail", "NewAccount/VerifyEmailPost")) return null;
 
                     //Tell them to verify email
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1100));
@@ -481,7 +538,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 //If verification code has expired
                 if (VirtualUser.IsVerificationCodeExpired(SharedBusinessLogic.SharedOptions.EmailVerificationExpiryHours))
                 {
-                    if (IsAnyAction("NewAccount/VerifyEmail")) return null;
+                    if (IsAnyAction("NewAccount/VerifyEmail", "NewAccount/VerifyEmailPost")) return null;
 
                     //prompt user to click to request a new one
                     return View("CustomError", WebService.ErrorViewModelFactory.Create(1101));
@@ -492,7 +549,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 if (remainingTime > TimeSpan.Zero)
                 {
                     //Process the code if there is one
-                    if (IsAnyAction("NewAccount/VerifyEmail") && RouteData.Values.ContainsKey("code") && !string.IsNullOrWhiteSpace(RouteData.Values["code"].ToString()))
+                    if (IsAnyAction("NewAccount/VerifyEmail", "NewAccount/VerifyEmailPost") && RouteData.Values.ContainsKey("code") && !string.IsNullOrWhiteSpace(RouteData.Values["code"].ToString()))
                         return null;
 
                     //tell them to wait
@@ -502,44 +559,44 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 }
 
                 //if the code is still valid but min sent time has elapsed
-                if (IsAnyAction("NewAccount/VerifyEmail", "NewAccount/EmailConfirmed")) return null;
+                if (IsAnyAction("NewAccount/VerifyEmail", "NewAccount/VerifyEmailPost", "NewAccount/EmailConfirmed")) return null;
 
                 //Prompt user to request a new verification code
                 return View("CustomError", WebService.ErrorViewModelFactory.Create(1103));
             }
 
+            //Always allow users to manage their account
+            if (IsAnyAction(
+                    "NewAccount/VerifyEmail", 
+                    "NewAccount/VerifyEmailPost",
+                    "NewAccount/EmailConfirmed",
+                    "Account/ManageAccount",
+                    "ChangeEmail/ChangeEmail",
+                    "ChangeEmail/ChangeEmailPending",
+                    "ChangeEmail/VerifyChangeEmail",
+                    "ChangeEmail/CompleteChangeEmail",
+                    "ChangePassword/ChangePassword",
+                    "ChangeDetails/ChangeDetails",
+                    "CloseAccount/CloseAccount",
+                    "CloseAccount/CloseAccountCompleted"))
+                return null;
+
             //Ensure admins always routed to their home page
             if (SharedBusinessLogic.AuthorisationBusinessLogic.IsAdministrator(VirtualUser))
             {
-                if (IsAnyAction(
-                    "Account/ManageAccount",
-                    "NewAccount/VerifyEmail",
-                    "NewAccount/EmailConfirmed",
-                    "Admin/ReviewRequest",
-                    "Admin/ReviewRequestPost",
-                    "Admin/ConfirmCancellation",
-                    "Admin/RequestAccepted",
-                    "Admin/RequestCancelled"))
+                if (AreaName.EqualsI("Admin", "DevOps"))
                     return null;
 
                 return RedirectToActionArea("Home", "Admin", "Admin");
                 //return View("CustomError", WebService.ErrorViewModelFactory.Create(1117));
             }
 
-            //Ensure admin pages only available to administrators
-
-            if (ControllerName.EqualsI("admin")
-                || IsAnyAction(
-                    "Admin/ReviewRequest",
-                    "Admin/ReviewRequestPost",
-                    "Admin/ConfirmCancellation",
-                    "Admin/RequestAccepted",
-                    "Admin/RequestCancelled"))
-                return new HttpForbiddenResult($"User {CurrentUser?.EmailAddress} is not an administrator");
+            //Ensure admin/devops pages only available to administrators
+            if (AreaName.EqualsI("Admin", "DevOps"))
+                return RedirectToActionArea("ManageOrganisations", "Submission", "Submission");
 
             //Allow all steps from email confirmed to organisation chosen
             if (IsAnyAction(
-                "NewAccount/EmailConfirmed",
                 "Registration/OrganisationType",
                 "Registration/OrganisationSearch",
                 "Registration/ChooseOrganisation",
@@ -552,23 +609,9 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                 "Registration/FastTrack"))
                 return null;
 
-            //Always allow users to manage their account
-            if (IsAnyAction(
-                "Account/ManageAccount",
-                "ChangeEmail/ChangeEmail",
-                "ChangeEmail/ChangeEmailPending",
-                "ChangeEmail/VerifyChangeEmail",
-                "ChangeEmail/ChangeEmailFailed",
-                "ChangeEmail/CompleteChangeEmail",
-                "ChangeDetails/ChangeDetails",
-                "ChangePassword/ChangePassword",
-                "CloseAccount/CloseAccount"))
-                return null;
-
             //Always allow user home or remove registration page 
             if (IsAnyAction(
                 "Submission/ManageOrganisations",
-                "Shared/PrivacyPolicy",
                 "Registration/RemoveOrganisation",
                 "Registration/RemoveOrganisationPost",
                 "Submission/ReportForOrganisation",
@@ -597,7 +640,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
                     {
                         if (IsAnyAction("Registration/PINSent", "Registration/RequestPIN", "Registration/RequestPINPost")) return null;
 
-                        return RedirectToActionArea("PINSent","Registration", "Registration");
+                        return RedirectToActionArea("PINSent","Registration", "Registration", new { id = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId) });
                     }
 
                     //If PIN sent and expired then prompt to request a new pin
@@ -619,7 +662,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
 
                     if (IsAnyAction("Registration/ActivateService")) return null;
 
-                    return RedirectToActionArea("ActivateService", "Registration", "Registration");
+                    return RedirectToActionArea("ActivateService", "Registration", "Registration", new { id = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId) });
                 }
 
             //Ensure pending manual registrations always redirected back to home
@@ -675,12 +718,20 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         }
 
         [NonAction]
-        protected void AddDisplayMessage(string displayMessage)
+        protected void AddDisplayMessage(string displayMessage, bool addToLog=false)
         {
             if (string.IsNullOrWhiteSpace(displayMessage)) throw new ArgumentNullException(nameof(displayMessage));
             var messages = new HashSet<string>(Session.Get<List<string>>("DisplayMessages") ?? new List<string>(),StringComparer.OrdinalIgnoreCase);
             messages.Add(displayMessage);
+            if (addToLog) Logger.LogInformation($"Message: {displayMessage}{Environment.NewLine}User: {CurrentUser.EmailAddress}");
             Session["DisplayMessages"] = messages.ToList();
+        }
+
+        [NonAction]
+        protected void SetSuccessMessage(string successMessage)
+        {
+            if (string.IsNullOrWhiteSpace(successMessage)) throw new ArgumentNullException(nameof(successMessage));
+            Session["SuccessMessage"] = successMessage;
         }
 
         [NonAction]
@@ -724,16 +775,17 @@ namespace ModernSlavery.WebUI.Shared.Controllers
             var controllerType = this.GetType();
             
             foreach (var key in Session.Keys.ToList())
-                if (key.IsMatch($"{controllerType}:[0-9A-Za-z]*Model$"))
+                if (key.IsMatch($"{controllerType}:[0-9A-Za-z/./_]*:Model$"))
                     Session.Remove(key);
         }
 
+        [NonAction]
         public void ClearStash<TController>(Controller controller=null)where TController : Controller
         {
             var controllerType = controller?.GetType() ?? typeof(TController);
 
             foreach (var key in Session.Keys.ToList())
-                if (key.IsMatch($"{controllerType}:[0-9A-Za-z]*Model$"))
+                if (key.IsMatch($"{controllerType}:[0-9A-Za-z/./_]*:Model$"))
                     Session.Remove(key);
         }
 
@@ -741,7 +793,7 @@ namespace ModernSlavery.WebUI.Shared.Controllers
         protected void ClearAllStashes()
         {
             foreach (var key in Session.Keys.ToList())
-                if (key.IsMatch(":[0-9A-Za-z]*Model$"))
+                if (key.IsMatch(":[0-9A-Za-z/./_]*:Model$"))
                     Session.Remove(key);
         }
 

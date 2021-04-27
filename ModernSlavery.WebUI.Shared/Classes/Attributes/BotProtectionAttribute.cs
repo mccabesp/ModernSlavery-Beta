@@ -21,10 +21,12 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
             //If the model state isnt valid then return
             if (!filterContext.ModelState.IsValid) return;
 
+            var timeSpent = TimeSpan.Zero;
             try
             {
                 var remoteTime = Encryption.Decrypt(filterContext.HttpContext.GetParams("BotProtectionTimeStamp"), Encryption.Encodings.Base62).FromSmallDateTime(true);
-                if (remoteTime.AddSeconds(_minimumSeconds) < VirtualDateTime.Now) return;
+                timeSpent = VirtualDateTime.Now - remoteTime;
+                if (timeSpent.TotalSeconds>=_minimumSeconds) return;
             }
             catch
             {
@@ -32,7 +34,7 @@ namespace ModernSlavery.WebUI.Shared.Classes.Attributes
 
             var testOptions = filterContext.HttpContext.RequestServices.GetRequiredService<TestOptions>();
 
-            if (!testOptions.DisableLockoutProtection) throw new HttpException(429, "Too Many Requests");
+            if (!testOptions.DisableLockoutProtection) throw new HttpException(429, $"Postback to '{filterContext.HttpContext.GetUri().PathAndQuery} took {timeSpent.TotalSeconds}' which did not exceeded minimum of {_minimumSeconds} seconds");
         }
     }
 }

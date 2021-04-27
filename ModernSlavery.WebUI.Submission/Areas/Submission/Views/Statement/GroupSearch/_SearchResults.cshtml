@@ -44,34 +44,35 @@
 
                 @for (var addIndex = 0; addIndex < Model.ResultsPage.Results.Count; addIndex++)
                 {
+                    var record = Model.ResultsPage.Results[addIndex];
 
                     <div class="govuk-summary-list__row">
                         <dd class="govuk-summary-list__value">
 
-                            <p class="govuk-!-font-weight-bold"> @(Model.ResultsPage.Results[addIndex].OrganisationName)</p>
+                            <p class="govuk-!-font-weight-bold"> @(record.OrganisationName)</p>
 
                         </dd>
                         <dd class="govuk-summary-list__value wide">
 
-                            <p> @(Model.ResultsPage.Results[addIndex].CompanyNumber)</p>
+                            <p> @(record.CompanyNumber)</p>
 
                         </dd>
                         <dd class="govuk-summary-list__value">
-                            <p class="">@(Model.ResultsPage.Results[addIndex].GetFullAddress())</p>
+                            <p class="">@(record.GetFullAddress())</p>
 
                         </dd>
                         <dd class="govuk-summary-list__value small">
 
-                            <p>Company number: @(Model.ResultsPage.Results[addIndex].CompanyNumber)</p>
+                            <p>Company number: @(record.CompanyNumber)</p>
 
                         </dd>
 
                         <dd class="govuk-summary-list__actions">
-                            @if (Model.ContainsGroupOrganisation(Model.ResultsPage.Results[addIndex]))
+                            @if (Model.ContainsGroupOrganisation(record))
                             {
                                 <button type="submit" class="govuk-link link-button" data-module="govuk-button" name="removeIndex" value="@(addIndex)">Remove</button>
                             }
-                            else if (Model.OrganisationId != Model.ResultsPage.Results[addIndex].OrganisationId && Model.ResultsPage.Results[addIndex].GetFullAddress() != null)
+                            else if (Model.OrganisationId != record.OrganisationId)
                             {
                                 <button class="govuk-button govuk-button--secondary govuk-!-margin-right-1" data-module="govuk-button" type="submit" name="addIndex" value="@(addIndex)">
                                     Include

@@ -88,17 +88,22 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             model.SectorType = userOrg.Organisation.SectorType;
             model.SicCodes = userOrg.Organisation.GetLatestSicCodeIds().ToList();
 
+            model.Details = userOrg.Details;
+            model.IsUKAddress = userOrg.Address?.IsUkAddress;
+
             // pre populate the DUNSNumber text box
             if (!ignoreDUNS) model.DUNSNumber = userOrg.Organisation.DUNSNumber;
 
             ViewBag.NoDUNS = string.IsNullOrWhiteSpace(userOrg.Organisation.DUNSNumber);
 
-            model.Address1 = userOrg.Address.Address1;
-            model.Address2 = userOrg.Address.Address2;
-            model.Address3 = userOrg.Address.Address3;
-            model.Country = userOrg.Address.Country;
-            model.Postcode = userOrg.Address.PostCode;
-            model.PoBox = userOrg.Address.PoBox;
+            model.Address1 = userOrg.Address?.Address1;
+            model.Address2 = userOrg.Address?.Address2;
+            model.Address3 = userOrg.Address?.Address3;
+            model.City = userOrg.Address?.TownCity;
+            model.County = userOrg.Address?.County;
+            model.Country = userOrg.Address?.Country;
+            model.Postcode = userOrg.Address?.PostCode;
+            model.PoBox = userOrg.Address?.PoBox;
 
             model.RegisteredAddress = userOrg.Address.Status == AddressStatuses.Pending
                 ? userOrg.Organisation.LatestAddress?.GetAddressString()
@@ -157,7 +162,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             if (result != null) return result;
 
             //Tell reviewer if this org has already been approved
-            
+
             if (userOrg.Organisation.UserOrganisations.Any())
             {
                 var firstRegistered = userOrg.Organisation.UserOrganisations.OrderByDescending(uo => uo.PINConfirmedDate).FirstOrDefault(uo => uo.PINConfirmedDate != null);
@@ -178,7 +183,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         uo => uo.UserId != userOrg.UserId
                               && uo.OrganisationId == userOrg.OrganisationId
                               && uo.Organisation.Status == OrganisationStatuses.Pending);
-                if (requestCount > 0) AddModelError(3018, parameters: new {requestCount});
+                if (requestCount > 0) AddModelError(3018, parameters: new { requestCount });
             }
 
             //Get any conflicting or similar organisations
@@ -290,7 +295,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [ValidateAntiForgeryToken]
         [IPAddressFilter]
         [HttpPost("review-request/{code}")]
-        public async Task<IActionResult> ReviewRequestPost([IgnoreText]string command)
+        public async Task<IActionResult> ReviewRequestPost([IgnoreText] string command)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -340,7 +345,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         ModelState.AddModelError(
                             3031,
                             nameof(model.CompanyNumber),
-                            new {organisationName = conflictOrg.OrganisationName, referenceName = "Company number"});
+                            new { organisationName = conflictOrg.OrganisationName, referenceName = "Company number" });
                 }
 
                 //Check for charity number conflicts
@@ -356,7 +361,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         ModelState.AddModelError(
                             3031,
                             nameof(model.CharityNumber),
-                            new {organisationName = conflictOrg.OrganisationName, referenceName = "Charity number"});
+                            new { organisationName = conflictOrg.OrganisationName, referenceName = "Charity number" });
                 }
 
                 //Check for mutual number conflicts
@@ -392,7 +397,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         ModelState.AddModelError(
                             3031,
                             nameof(model.OtherValue),
-                            new {organisationName = conflictOrg.OrganisationName, referenceName = model.OtherValue});
+                            new { organisationName = conflictOrg.OrganisationName, referenceName = model.OtherValue });
                 }
 
                 if (!ModelState.IsValid)
@@ -432,8 +437,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     var newSicCodes = model.SicCodeIds.Split(',').Cast<int>().OrderBy(sc => sc);
                     foreach (var sc in newSicCodes)
                         userOrg.Organisation.OrganisationSicCodes.Add(
-                            new OrganisationSicCode
-                            {
+                            new OrganisationSicCode {
                                 SicCodeId = sc, OrganisationId = userOrg.OrganisationId, Created = VirtualDateTime.Now
                             });
                 }
@@ -465,13 +469,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 //Log the approval
                 await _adminService.RegistrationLog.WriteAsync(
-                    new RegisterLogModel
-                    {
+                    new RegisterLogModel {
                         StatusDate = VirtualDateTime.Now,
                         Status = "Manually registered",
                         ActionBy = VirtualUser.EmailAddress,
                         Details = "",
-                        Sector = userOrg.Organisation.SectorType,
+                        Sector = userOrg.Organisation.SectorType.ToString(),
                         Organisation = userOrg.Organisation.OrganisationName,
                         CompanyNo = userOrg.Organisation.CompanyNumber,
                         Address = userOrg?.Address.GetAddressString(),
@@ -548,7 +551,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost("confirm-cancellation")]
         [IPAddressFilter]
-        public async Task<IActionResult> ConfirmCancellation([IgnoreText] string command)
+        public async Task<IActionResult> ConfirmCancellation([Text] string cancellationReason, [IgnoreText] string command)
         {
             //Ensure user has completed the registration process
             var checkResult = await CheckUserRegisteredOkAsync();
@@ -561,6 +564,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             //If cancel button clicked the n return to review page
             if (command.EqualsI("Cancel")) return RedirectToAction("ReviewRequest", new { code = model.ReviewCode });
 
+            //Save the cancellation reason
+            model.CancellationReason = cancellationReason.Coalesce(ReviewOrganisationViewModel.DefaultCancellationReason);
+
             //Unwrap code
             UserOrganisation userOrg;
             var result = UnwrapRegistrationRequest(model, out userOrg, true);
@@ -568,13 +574,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
             //Log the rejection
             await _adminService.RegistrationLog.WriteAsync(
-                new RegisterLogModel
-                {
+                new RegisterLogModel {
                     StatusDate = VirtualDateTime.Now,
                     Status = "Manually Rejected",
                     ActionBy = VirtualUser.EmailAddress,
-                    Details = "",
-                    Sector = userOrg.Organisation.SectorType,
+                    Details = model.CancellationReason,
+                    Sector = userOrg.Organisation.SectorType.ToString(),
                     Organisation = userOrg.Organisation.OrganisationName,
                     CompanyNo = userOrg.Organisation.CompanyNumber,
                     Address = userOrg?.Address.GetAddressString(),
@@ -590,49 +595,67 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     ContactPhoneNumber = userOrg.User.ContactPhoneNumber
                 });
 
-            //Delete address for this user and organisation
-            if (userOrg.Address.Status != AddressStatuses.Active && userOrg.Address.CreatedByUserId == userOrg.UserId)
-                SharedBusinessLogic.DataRepository.Delete(userOrg.Address);
 
-            //Delete the org user
-            var orgId = userOrg.OrganisationId;
-            var emailAddress = userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress);
-
-            //Delete the organisation if it has no statement, is not in D&B, is not in scopes table, and is not registered to another user
+            //Delete the organisation if it has no statement, is not seed data, is not in scopes table, and is not registered to another user
             if (userOrg.Organisation != null
                 && !userOrg.Organisation.Statements.Any()
-                && !userOrg.Organisation.OrganisationAddresses.Any(a => a.CreatedByUserId == -1 || a.Source == "Ext")
-                && !userOrg.Organisation.OrganisationScopes.Any()
-                && !await SharedBusinessLogic.DataRepository.GetAll<UserOrganisation>()
-                    .AnyAsync(uo =>
-                        uo.OrganisationId == userOrg.Organisation.OrganisationId && uo.UserId != userOrg.UserId))
+                && !userOrg.Organisation.StatementOrganisations.Any()
+                && !userOrg.Organisation.OrganisationScopes.Any(sc => sc.ScopeStatus == ScopeStatuses.InScope || sc.ScopeStatus == ScopeStatuses.OutOfScope)
+                && !userOrg.Organisation.OrganisationNames.Any(a => a.Source == "External")
+                && !userOrg.Organisation.UserOrganisations.Any(uo => uo.UserId != userOrg.UserId))
             {
-                Logger.LogInformation(
-                    $"Unused organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}'(DUNS:{userOrg.Organisation.DUNSNumber}) deleted by {(OriginalUser == null ? VirtualUser.EmailAddress : OriginalUser.EmailAddress)} when declining manual registration for {userOrg.User.EmailAddress}");
-                SharedBusinessLogic.DataRepository.Delete(userOrg.Organisation);
+                await SharedBusinessLogic.DataRepository.ExecuteTransactionAsync(
+                    async () => {
+                        try
+                        {
+                            userOrg.Organisation.LatestAddress = null;
+                            userOrg.Organisation.LatestRegistration = null;
+                            userOrg.Organisation.LatestStatement = null;
+                            userOrg.Organisation.LatestScope = null;
+                            userOrg.Organisation.UserOrganisations.ForEach(uo => SharedBusinessLogic.DataRepository.Delete(uo));
+                            await SharedBusinessLogic.DataRepository.SaveChangesAsync().ConfigureAwait(false);
+
+                            SharedBusinessLogic.DataRepository.Delete(userOrg.Organisation);
+                            await SharedBusinessLogic.DataRepository.SaveChangesAsync().ConfigureAwait(false);
+                            SharedBusinessLogic.DataRepository.CommitTransaction();
+
+                            Logger.LogInformation($"Unused organisation {userOrg.OrganisationId}:'{userOrg.Organisation.OrganisationName}'(DUNS:{userOrg.Organisation.DUNSNumber}) deleted by {(OriginalUser == null ? VirtualUser.EmailAddress : OriginalUser.EmailAddress)} when declining manual registration for {userOrg.User.EmailAddress}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedBusinessLogic.DataRepository.RollbackTransaction();
+                            Logger.LogError(
+                                ex,
+                                $"{nameof(ConfirmCancellation)}: Failed to delete organisation {userOrg.OrganisationId} '{userOrg.Organisation.OrganisationName}' ERROR: {ex.Message}:{ex.GetDetailsText()}");
+                        }
+                    }).ConfigureAwait(false);
+
+
+                //Delete all the draft statements for this organisation
+                await _statementBusinessLogic.DeleteDraftStatementsAsync(userOrg.OrganisationId);
+
+                //Remove this organisation from the search index
+                await _adminService.SearchBusinessLogic.RemoveSearchDocumentsAsync(userOrg.Organisation);
+            }
+            else
+            {
+                //Delete address if pending and only used by this organisation
+                if (userOrg.Address.Status != AddressStatuses.Active && await SharedBusinessLogic.DataRepository.CountAsync<UserOrganisation>(uo => uo.AddressId == userOrg.AddressId) == 1)
+                    SharedBusinessLogic.DataRepository.Delete(userOrg.Address);
+
+                SharedBusinessLogic.DataRepository.Delete(userOrg);
+                //Save the changes and redirect
+                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
             }
 
-            var searchRecords = await _adminService.SearchBusinessLogic.ListSearchDocumentsAsync(userOrg.Organisation);
-            SharedBusinessLogic.DataRepository.Delete(userOrg);
-
             //Send the declined email to the applicant
-            if (!await SendRegistrationDeclinedAsync(
-                userOrg.Organisation.OrganisationName,
-                emailAddress,
-                string.IsNullOrWhiteSpace(model.CancellationReason)
-                    ? "We haven't been able to verify your organisation's identity. So we have declined your application."
-                    : model.CancellationReason))
+            var emailAddress = userOrg.User.ContactEmailAddress.Coalesce(userOrg.User.EmailAddress);
+            if (!await SendRegistrationDeclinedAsync(userOrg.Organisation.OrganisationName, emailAddress, model.CancellationReason))
             {
                 ModelState.AddModelError(1131);
                 this.SetModelCustomErrors<ReviewOrganisationViewModel>();
                 return View("ConfirmCancellation", model);
             }
-
-            //Save the changes and redirect
-            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
-
-            //Remove this organisation from the search index
-            await _adminService.SearchBusinessLogic.RemoveSearchDocumentsAsync(searchRecords);
 
             //Save the model for the redirect
             StashModel(model);

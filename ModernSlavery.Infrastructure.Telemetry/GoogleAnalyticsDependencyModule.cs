@@ -24,15 +24,9 @@ namespace ModernSlavery.Infrastructure.Telemetry
         public void ConfigureServices(IServiceCollection services)
         {
             //Add a dedicated httpclient for Google Analytics tracking with exponential retry policy
-            services.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), httpClient => httpClient.SetupConnectionLease(GoogleAnalyticsTracker.BaseUri.ToString()))
+            services.AddHttpClient<IWebTracker, GoogleAnalyticsTracker>(nameof(IWebTracker), httpClient => httpClient.SetupHttpClient(GoogleAnalyticsTracker.BaseUri.ToString()))
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10))
-                .AddPolicyHandler(
-                    //see https://developers.google.com/analytics/devguides/config/mgmt/v3/errors
-                    HttpPolicyExtensions
-                        .HandleTransientHttpError()
-                        .WaitAndRetryAsync(6,
-                            retryAttempt => TimeSpan.FromMilliseconds(new Random().Next(1, 1000)) +
-                                            TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
+                .AddPolicyHandler(Resilience.GetExponentialAsyncRetryPolicy(6));
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

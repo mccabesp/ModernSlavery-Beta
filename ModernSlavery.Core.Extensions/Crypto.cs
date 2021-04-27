@@ -53,6 +53,30 @@ namespace ModernSlavery.Core.Extensions
             return calculatedChecksum;
         }
 
+        /// <summary>
+        ///  Returns the hash code for this string which will remain constant out of application domain
+        /// see https://andrewlock.net/why-is-string-gethashcode-different-each-time-i-run-my-program-in-net-core/
+        /// <param name="text">The source text</param>
+        /// <returns>A 32-bit signed integer deterministic hash code.</returns>
+        public static int GetDeterministicHashCode(this string text)
+        {
+            unchecked //Prevents OverflowException in checked context
+            {
+                var hash1 = (5381 << 16) + 5381;
+                var hash2 = hash1;
+
+                for (var i = 0; i < text.Length; i += 2)
+                {
+                    hash1 = ((hash1 << 5) + hash1) ^ text[i];
+                    if (i == text.Length - 1)
+                        break;
+                    hash2 = ((hash2 << 5) + hash2) ^ text[i + 1];
+                }
+
+                return hash1 + (hash2 * 1566083941);
+            }
+        }
+
         public static string GeneratePasscode(char[] charset, int passcodeLength)
         {
             //Ensure characters are distict and mixed up

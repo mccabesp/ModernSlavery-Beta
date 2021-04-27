@@ -15,7 +15,7 @@
     <PackageReference Include="MockQueryable.Moq" Version="3.1.3" />
     <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.2.8" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\ModernSlavery.Core\ModernSlavery.Core.csproj" />
     <ProjectReference Include="..\ModernSlavery.Core.Entities\ModernSlavery.Core.Entities.csproj" />

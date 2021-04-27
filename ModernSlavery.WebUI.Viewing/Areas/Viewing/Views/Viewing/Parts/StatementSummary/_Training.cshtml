@@ -48,7 +48,7 @@
                         Organisation’s response
                     </div>
                 </div>
-                @foreach (var training in Enums.GetValuesExcept<TrainingTargetTypes>(TrainingTargetTypes.Unknown, TrainingTargetTypes.None))
+                @foreach (var training in Enums.GetValues<TrainingTargetTypes>(TrainingTargetTypes.Unknown, TrainingTargetTypes.None))
                 {
                     var isOther = training == TrainingTargetTypes.Other;
                     <div class="app-question-list__item">

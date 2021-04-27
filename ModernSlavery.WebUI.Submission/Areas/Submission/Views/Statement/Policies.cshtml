@@ -29,7 +29,7 @@
                         Select all that apply
                     </div>
                     <div class="govuk-checkboxes" data-module="govuk-checkboxes">
-                        @foreach (var policyType in Enums.GetValuesExcept<PolicyTypes>(PolicyTypes.Unknown))
+                        @foreach (var policyType in Enums.GetValues<PolicyTypes>(PolicyTypes.Unknown))
                         {
                             var value = (int)policyType;
                             var isOther = policyType == PolicyTypes.Other;

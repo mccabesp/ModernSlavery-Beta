@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ModernSlavery.BusinessDomain.Shared.Models;
-using ModernSlavery.Core.Extensions;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
 using ModernSlavery.WebUI.Shared.Classes.Extensions;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using static ModernSlavery.WebUI.Submission.Models.Statement.GroupOrganisationsViewModel;
 using ValidationContext = System.ComponentModel.DataAnnotations.ValidationContext;
 
 namespace ModernSlavery.WebUI.Submission.Models.Statement
@@ -32,11 +29,11 @@ namespace ModernSlavery.WebUI.Submission.Models.Statement
         public override string PageTitle => "Provide a link to the modern slavery statement on your organisation's website";
 
         [AbsoluteUrl]
-        [MaxLength(256)]
+        [TextLength(1024)]
         public string StatementUrl { get; set; }
 
         [EmailAddress]
-        [MaxLength(256)]
+        [TextLength(254)]
         public string StatementEmail { get; set; }
 
 

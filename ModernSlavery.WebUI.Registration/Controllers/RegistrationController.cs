@@ -8,6 +8,7 @@ using ModernSlavery.BusinessDomain.Shared.Interfaces;
 using ModernSlavery.Core.Entities;
 using ModernSlavery.Core.Extensions;
 using ModernSlavery.Core.Interfaces;
+using ModernSlavery.Core.Models;
 using ModernSlavery.WebUI.Registration.Models;
 using ModernSlavery.WebUI.Registration.Presenters;
 using ModernSlavery.WebUI.Shared.Classes.Attributes;
@@ -83,6 +84,7 @@ namespace ModernSlavery.WebUI.Registration.Controllers
 
             //If a pin has never been sent or resend button submitted then send one immediately
             if (!userOrg.HasPINCode || !userOrg.IsPINCodeSent || userOrg.IsPINCodeExpired(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays))
+            {
                 try
                 {
                     var now = VirtualDateTime.Now;
@@ -103,31 +105,45 @@ namespace ModernSlavery.WebUI.Registration.Controllers
                         ViewBag.PinCode = pin;
                         ViewBag.OrganisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId);
                     }
+                    else if (SharedBusinessLogic.TestOptions.SendPinByEmail)
+                    {
+                        var returnUrl = Url.ActionArea("ActivateService", "Registration", "Registration", new { id = SharedBusinessLogic.Obfuscator.Obfuscate(userOrg.OrganisationId) }, "https");
+                        var pinExpiryDate = userOrg.PINSentDate.Value.AddDays(SharedBusinessLogic.SharedOptions.PinInPostExpiryDays);
+
+                        if (!await SharedBusinessLogic.SendEmailService.SendPinEmailAsync(VirtualUser.EmailAddress, pin, userOrg.Organisation.OrganisationName, returnUrl, pinExpiryDate))
+                            throw new Exception("Unable to queue Send PIN Email");
+
+                        Logger.LogInformation($"Send Pin-in-post by email. Name {VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}, Address:{userOrg?.Address.GetAddressString()}");
+                        ViewBag.EmailAddress = VirtualUser.EmailAddress;
+                    }
                     else
                     {
-                        // Try and send the PIN in post
-                        var returnUrl = Url.ActionArea("ManageOrganisations", "Submission", "Submission", null, "https");
-                        try
-                        {
-                            var response = await _registrationService.PinInThePostService.SendPinInThePostAsync(userOrg, pin, returnUrl);
-                            userOrg.PITPNotifyLetterId = response.LetterId;
-                        }
-                        catch
-                        {
-                            // Show "Notify is down" error message
-                            return View("PinFailedToSend", new PinFailedToSendViewModel { OrganisationName = userOrg.Organisation.OrganisationName });
-                        }
+                        var returnUrl = Url.ActionArea("Login", "Identity", "Identity", null, "https");
 
-                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+                        // Try and send the PIN in post
+                        var response = await _registrationService.PinInThePostService.SendPinInThePostAsync(userOrg, pin, returnUrl);
+
+                        // Show "Notify is down" error message
+                        userOrg.PITPNotifyLetterId = response.LetterId;
                         Logger.LogInformation($"Send Pin-in-post. Name {VirtualUser.Fullname}, Email:{VirtualUser.EmailAddress}, IP:{UserHostAddress}, Address:{userOrg?.Address.GetAddressString()}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, ex.Message);
-                    // TODO: maybe change this?
-                    return View("CustomError", WebService.ErrorViewModelFactory.Create(3014, new { OrganisationIdentifier = SharedBusinessLogic.Obfuscator.Obfuscate(organisationId) }));
+                    Logger.LogError(ex, $"Error whilst sending Pin-In-Post.");
+                    userOrg.PINSentDate = null;
+                    userOrg.Details = "Failed to send PIN";
+                    userOrg.Method = RegistrationMethods.Manual;
                 }
+
+                await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+
+                if (userOrg.Method == RegistrationMethods.Manual)
+                {
+                    await SendMsuRegistrationRequestAsync(userOrg);
+                    return RedirectToAction("RequestReceived");
+                }
+            }
 
             //Prepare view parameters
             ViewBag.UserFullName = VirtualUser.Fullname;
@@ -141,6 +157,9 @@ namespace ModernSlavery.WebUI.Registration.Controllers
         [HttpGet("pin-sent/{id}")]
         public async Task<IActionResult> PINSent([Obfuscated] long id)
         {
+            //Ensure user has completed the registration process
+            ReportingOrganisationId = id;
+
             //Clear the stash
             ClearStash();
 

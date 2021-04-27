@@ -8,6 +8,7 @@ using ModernSlavery.Core.Interfaces;
 using ModernSlavery.Infrastructure.Azure;
 using ModernSlavery.Infrastructure.Azure.AppInsights;
 using ModernSlavery.Infrastructure.Azure.Cache;
+using ModernSlavery.Infrastructure.Azure.DevOps;
 using ModernSlavery.Infrastructure.Storage;
 
 namespace ModernSlavery.BusinessDomain.DevOps
@@ -24,6 +25,7 @@ namespace ModernSlavery.BusinessDomain.DevOps
             //TODO: Register service dependencies here
             services.AddSingleton<AzureManager>();
             services.AddSingleton<AppInsightsManager>();
+            services.AddSingleton<SqlManager>();
             services.AddSingleton<IAzureStorageManager,AzureStorageManager>();
             services.AddSingleton<DistributedCacheManager>();
         }
@@ -32,6 +34,7 @@ namespace ModernSlavery.BusinessDomain.DevOps
         {
             //TODO: Configure autofac dependencies here
             builder.RegisterType<TestBusinessLogic>().As<ITestBusinessLogic>().InstancePerLifetimeScope().WithAttributeFiltering();
+            builder.RegisterType<DisasterRecoveryBusinessLogic>().As<IDisasterRecoveryBusinessLogic>().InstancePerLifetimeScope().WithAttributeFiltering();
         }
 
         public void Configure(ILifetimeScope lifetimeScope)

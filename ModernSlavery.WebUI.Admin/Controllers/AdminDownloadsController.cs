@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +19,7 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = UserRoleNames.Admin)]
+    [Authorize(Roles = UserRoleNames.BasicAdmin)]
     [Route("admin")]
     [NoCache]
     public class AdminDownloadsController : BaseController
@@ -29,12 +31,15 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpGet("download-feedback")]
-        public FileContentResult DownloadFeedback()
+        public async Task<IActionResult> DownloadFeedbackAsync()
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var feedback = _adminService.SharedBusinessLogic.DataRepository.GetAll<Feedback>().ToList();
 
             var memoryStream = new MemoryStream();
-            using (var writer = new StreamWriter(memoryStream))
+            using (var writer = new StreamWriter(memoryStream, new UTF8Encoding(true)))
             {
                 var config = new CsvConfiguration(CultureInfo.CurrentCulture);
                 config.ShouldQuote = (field, context) => true;

@@ -32,8 +32,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             var count = await _adminService.OrganisationSearchRepository.GetDocumentCountAsync();
             if (!test)
             {
-                await _adminService.ExecuteWebjobQueue.AddMessageAsync(
-                    new QueueWrapper($"command=UpdateOrganisationSearch&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
+                await _adminService.ExecuteWebjobQueue.AddMessageAsync(new QueueWrapper($"command=UpdateOrganisationSearch&userEmail={CurrentUser.EmailAddress}&comment={comment}"));
                 writer.WriteLine(
                     $"An email will be sent to '{CurrentUser.EmailAddress}' when the background task '{nameof(UpdateOrganisationSearchIndexesAsync)}' has completed");
             }
@@ -51,8 +50,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         [HttpGet("manual-changes")]
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
-        public IActionResult ManualChanges()
+        public async Task<IActionResult> ManualChanges()
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             return View(new ManualChangesViewModel());
         }
 
@@ -62,6 +64,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
         public async Task<IActionResult> ManualChanges(ManualChangesViewModel model)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             model.Results = null;
 
             if (!ModelState.IsValid)
@@ -411,10 +416,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         $"{i}: {organisationRef}: {hasBeenWillBe} set as '{outOfScopeOutcome.Result.ScopeStatus}' for snapshotYear '{outOfScopeOutcome.Result.SubmissionDeadline.Year}' with comment '{outOfScopeOutcome.Result.Reason}'");
                     if (!test)
                         await _adminService.ManualChangeLog.WriteAsync(
-                            new ManualChangeLogModel
-                            {
-                                MethodName = $"SetOrg{scopeStatus.ToString()}",
-                                Action = ManualActions.Update,
+                            new ManualChangeLogModel {
+                                MethodName = $"SetOrg{scopeStatus}",
+                                Action = ManualActions.Update.ToString(),
                                 Source = CurrentUser.EmailAddress,
                                 Comment = comment,
                                 ReferenceName = nameof(Organisation.OrganisationReference),
@@ -435,9 +439,6 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             {
                 await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 //todo: writer.WriteLine(Color.Green, $"INFO: Changes saved to database, attempting to update search index.");
-
-                await _adminService.SearchBusinessLogic.RefreshSearchDocumentsAsync(listOfModifiedOrgs.ToArray());
-                //todo: writer.WriteLine(Color.Green, $"INFO: Search index updated successfully.");
             }
 
             return count;
@@ -611,7 +612,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure the org does not have a company number
-                if (string.IsNullOrEmpty(org.CompanyNumber) == false)
+                if (!string.IsNullOrEmpty(org.CompanyNumber))
                 {
                     writer.WriteLine(
                         Color.Red,
@@ -630,7 +631,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 // ensure all sic codes are integers
                 var sicCodes = newSicCodes.Trim(' ').Split(',');
-                if (sicCodes.Any(x => int.TryParse(x, out var o) == false))
+                if (sicCodes.Any(x => !int.TryParse(x, out var o)))
                 {
                     writer.WriteLine(Color.Red,
                         $"{i}: ERROR: '{organisationRef}:{org.OrganisationName}' you can only input numeric SIC codes");
@@ -643,7 +644,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (var sc in sicCodes)
                 {
                     var parsedSc = int.Parse(sc);
-                    if (SharedBusinessLogic.DataRepository.GetAll<SicCode>().Any(x => x.SicCodeId == parsedSc) == false)
+                    if (!SharedBusinessLogic.DataRepository.GetAll<SicCode>().Any(x => x.SicCodeId == parsedSc))
                         invalidSicCodes.Add(sc);
                     else
                         parsedSicCodes.Add(parsedSc);
@@ -665,9 +666,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 // set new sic codes
                 parsedSicCodes.ForEach(
-                    x =>
-                    {
-                        var sic = new OrganisationSicCode {Organisation = org, SicCodeId = x, Source = "Manual"};
+                    x => {
+                        var sic = new OrganisationSicCode { Organisation = org, SicCodeId = x, Source = "Manual" };
                         SharedBusinessLogic.DataRepository.Insert(sic);
                         org.OrganisationSicCodes.Add(sic);
                     });
@@ -754,7 +754,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure the org does not have a company number
-                if (string.IsNullOrEmpty(org.CompanyNumber) == false)
+                if (!string.IsNullOrEmpty(org.CompanyNumber))
                 {
                     writer.WriteLine(
                         Color.Red,
@@ -798,20 +798,20 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (address1.Length > 100) requiredState.Add("Address1 is greater than 100 chars");
 
-                if (string.IsNullOrWhiteSpace(address2) == false && address2.Length > 100)
+                if (!string.IsNullOrWhiteSpace(address2) && address2.Length > 100)
                     requiredState.Add("Address2 is greater than 100 chars");
 
-                if (string.IsNullOrWhiteSpace(address3) == false && address3.Length > 100)
+                if (!string.IsNullOrWhiteSpace(address3) && address3.Length > 100)
                     requiredState.Add("Address3 is greater than 100 chars");
 
                 if (string.IsNullOrWhiteSpace(townCity)) requiredState.Add("Town\\City is required");
 
                 if (townCity.Length > 100) requiredState.Add("Town\\City is greater than 100 chars");
 
-                if (string.IsNullOrWhiteSpace(county) == false && county.Length > 100)
+                if (!string.IsNullOrWhiteSpace(county) && county.Length > 100)
                     requiredState.Add("County is greater than 100 chars");
 
-                if (string.IsNullOrWhiteSpace(country) == false && country.Length > 100)
+                if (!string.IsNullOrWhiteSpace(country) && country.Length > 100)
                     requiredState.Add("Country is greater than 100 chars");
 
                 if (string.IsNullOrWhiteSpace(postCode)) requiredState.Add("Postcode is required");
@@ -829,8 +829,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 // add new address
                 var prevAddress = org.LatestAddress;
-                var newAddress = new OrganisationAddress
-                {
+                var newAddress = new OrganisationAddress {
                     OrganisationId = org.OrganisationId,
                     Address1 = address1,
                     Address2 = address2,
@@ -841,6 +840,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     PostCode = postCode,
                     Source = "Manual"
                 };
+
+                newAddress.Trim();
 
                 newAddress.SetStatus(AddressStatuses.Active, CurrentUser.UserId, $"Inserted by {newAddress.Source}");
                 if (prevAddress != null)
@@ -959,7 +960,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
 
                 // ensure the public sector type is an integer
-                if (int.TryParse(enteredClassification, out var parsedPublicSectorTypeId) == false)
+                if (!int.TryParse(enteredClassification, out var parsedPublicSectorTypeId))
                 {
                     writer.WriteLine(
                         Color.Red,
@@ -991,8 +992,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (prevClassification != null) prevClassification.Retired = VirtualDateTime.Now;
 
                 // create new public sector type mapping to the org
-                var newOrgSectorClass = new OrganisationPublicSectorType
-                {
+                var newOrgSectorClass = new OrganisationPublicSectorType {
                     OrganisationId = org.OrganisationId,
                     PublicSectorTypeId = parsedPublicSectorTypeId,
                     PublicSectorType = newSectorType,
@@ -1283,10 +1283,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 processed.Add(organisationRef);
 
-                var manualChangeLogModel = new ManualChangeLogModel
-                {
+                var manualChangeLogModel = new ManualChangeLogModel {
                     MethodName = nameof(UnRetireOrganisationsAsync),
-                    Action = ManualActions.Update,
+                    Action = ManualActions.Update.ToString(),
                     Source = CurrentUser.EmailAddress,
                     Comment = comment,
                     ReferenceName = nameof(Organisation.OrganisationReference),
@@ -1522,8 +1521,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                     if (!sicCodes.Any(sic => sic.SicCodeId == 1 && sic.Retired == null))
                     {
                         org.OrganisationSicCodes.Add(
-                            new OrganisationSicCode
-                            {
+                            new OrganisationSicCode {
                                 OrganisationId = org.OrganisationId,
                                 SicCodeId = 1,
                                 Source = "Manual",
@@ -1572,8 +1570,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         foreach (var scope in org.OrganisationScopes)
                         {
                             var oldDate = scope.SubmissionDeadline;
-                            var newDate =
-                                _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(newSector, oldDate.Year);
+                            var newDate = _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
                             scope.SubmissionDeadline = newDate;
@@ -1637,8 +1634,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 var newSector = SectorTypes.Private;
 
-                var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>()
-                    .FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == organisationRef);
+                var org = await SharedBusinessLogic.DataRepository.GetAll<Organisation>().FirstOrDefaultAsync(o => o.OrganisationReference.ToUpper() == organisationRef);
                 if (org == null)
                 {
                     writer.WriteLine(Color.Red,
@@ -1663,7 +1659,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 foreach (var scope in org.OrganisationScopes)
                 {
                     var oldDate = scope.SubmissionDeadline;
-                    var newDate = _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(newSector, oldDate.Year);
+                    var newDate = _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(newSector, oldDate.Year);
                     if (oldDate == newDate) continue;
 
                     badScopeDates = true;
@@ -1763,8 +1759,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                         foreach (var scope in org.OrganisationScopes)
                         {
                             var oldDate = scope.SubmissionDeadline;
-                            var newDate =
-                                _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingStartDate(newSector, oldDate.Year);
+                            var newDate = _adminService.SharedBusinessLogic.ReportingDeadlineHelper.GetReportingDeadline(newSector, oldDate.Year);
                             if (oldDate == newDate) continue;
 
                             scope.SubmissionDeadline = newDate;
@@ -1860,8 +1855,10 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 else
                 {
                     //Output the actual execution result
-                    org.OrganisationName = newValue;
                     if (!test)
+                    {
+                        org.OrganisationName = newValue;
+
                         await _adminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel(
                                 methodName,
@@ -1874,9 +1871,8 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 newValue,
                                 comment));
 
-                    org.OrganisationNames.Add(new OrganisationName
-                        {Organisation = org, Source = "Manual", Name = newValue});
-                    if (!test)
+                        org.OrganisationNames.Add(new OrganisationName { Organisation = org, Source = "Manual", Name = newValue });
+
                         await _adminService.ManualChangeLog.WriteAsync(
                             new ManualChangeLogModel(
                                 methodName,
@@ -1888,9 +1884,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                 oldValue,
                                 newValue,
                                 comment));
-
+                        await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+                    }
                     writer.WriteLine($"{i}: {organisationRef}: '{oldValue}' set to '{newValue}'");
-                    if (!test) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
                 count++;
@@ -1965,11 +1961,13 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 }
                 else
                 {
-                    if (oldValue != newValue)
+                    if (!test)
                     {
-                        //Output the actual execution result
-                        org.OrganisationName = newValue;
-                        if (!test)
+                        if (oldValue != newValue)
+                        {
+                            //Output the actual execution result
+                            org.OrganisationName = newValue;
+
                             await _adminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     methodName,
@@ -1981,13 +1979,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     oldValue,
                                     newValue,
                                     comment));
-                    }
+                        }
 
-                    if (org.OrganisationName.Count() != 1)
-                    {
-                        foreach (var name in org.OrganisationNames.ToList())
+                        if (org.OrganisationName.Count() != 1)
                         {
-                            if (!test)
+                            foreach (var name in org.OrganisationNames.ToList())
+                            {
                                 await _adminService.ManualChangeLog.WriteAsync(
                                     new ManualChangeLogModel(
                                         methodName,
@@ -2008,13 +2005,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                         null,
                                         comment));
 
-                            SharedBusinessLogic.DataRepository.Delete(name);
-                        }
+                                SharedBusinessLogic.DataRepository.Delete(name);
+                            }
 
-                        org.OrganisationNames.Add(
-                            new OrganisationName
-                                {Organisation = org, Source = "Manual", Name = newValue, Created = org.Created});
-                        if (!test)
+                            org.OrganisationNames.Add(new OrganisationName { Organisation = org, Source = "Manual", Name = newValue, Created = org.Created });
+
                             await _adminService.ManualChangeLog.WriteAsync(
                                 new ManualChangeLogModel(
                                     methodName,
@@ -2026,10 +2021,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                                     oldValue,
                                     newValue,
                                     comment));
+
+                            await SharedBusinessLogic.DataRepository.SaveChangesAsync();
+                        }
                     }
 
                     writer.WriteLine($"{i}: {organisationRef}: '{oldValue}' set to '{newValue}'");
-                    if (!test) await SharedBusinessLogic.DataRepository.SaveChangesAsync();
                 }
 
                 count++;
@@ -2129,10 +2126,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                             });
 
                         await _adminService.ManualChangeLog.WriteAsync(
-                            new ManualChangeLogModel
-                            {
-                                MethodName = $"{manualAction.ToString()}SecurityCode",
-                                Action = manualAction,
+                            new ManualChangeLogModel {
+                                MethodName = $"{manualAction}SecurityCode",
+                                Action = manualAction.ToString(),
                                 Source = CurrentUser.EmailAddress,
                                 Comment = comment,
                                 ReferenceName = nameof(Organisation.OrganisationReference),
@@ -2237,10 +2233,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                         if (!test)
                             await _adminService.ManualChangeLog.WriteAsync(
-                                new ManualChangeLogModel
-                                {
+                                new ManualChangeLogModel {
                                     MethodName = methodName,
-                                    Action = manualAction,
+                                    Action = manualAction.ToString(),
                                     Source = CurrentUser.EmailAddress,
                                     Comment = comment,
                                     ReferenceName = nameof(Organisation.OrganisationReference),
@@ -2305,7 +2300,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (securityCodeBulkWorkOutcome.Failed)
                 {
                     var groupedErrors = securityCodeBulkWorkOutcome.ConcurrentBagOfErrors
-                        .GroupBy(x => new {x.ErrorMessage.Code, x.ErrorMessage.Description})
+                        .GroupBy(x => new { x.ErrorMessage.Code, x.ErrorMessage.Description })
                         .Select(
                             r => new
                             {
@@ -2346,10 +2341,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (!test)
                     await _adminService.ManualChangeLog.WriteAsync(
-                        new ManualChangeLogModel
-                        {
+                        new ManualChangeLogModel {
                             MethodName = methodName,
-                            Action = manualAction,
+                            Action = manualAction.ToString(),
                             Source = CurrentUser.EmailAddress,
                             Comment = comment,
                             TargetName = nameof(Organisation.SecurityCode),
@@ -2392,7 +2386,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 if (securityCodeBulkWorkOutcome.Failed)
                 {
                     var groupedErrors = securityCodeBulkWorkOutcome.ConcurrentBagOfErrors
-                        .GroupBy(x => new {x.ErrorMessage.Code, x.ErrorMessage.Description})
+                        .GroupBy(x => new { x.ErrorMessage.Code, x.ErrorMessage.Description })
                         .Select(
                             r => new
                             {
@@ -2433,10 +2427,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
                 if (!test)
                     await _adminService.ManualChangeLog.WriteAsync(
-                        new ManualChangeLogModel
-                        {
+                        new ManualChangeLogModel {
                             MethodName = methodName,
-                            Action = manualAction,
+                            Action = manualAction.ToString(),
                             Source = CurrentUser.EmailAddress,
                             Comment = comment,
                             TargetName = nameof(Organisation.SecurityCode),

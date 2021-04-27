@@ -14,20 +14,21 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         ///     Refresh DATA in SCV files
         /// </summary>
         /// <param name="filePath"></param>
-        private async Task UpdateFileAsync(string filePath, string action = null)
+        private async Task UpdateFileAsync(string command)
         {
-            var fileName = Path.GetFileName(filePath);
+            if (string.IsNullOrWhiteSpace(command)) throw new ArgumentNullException(nameof(command));
 
-            if (fileName == Filenames.UnfinishedOrganisations)
-                throw new NotImplementedException(
-                    $"Cannot execute {nameof(UpdateFileAsync)} on {fileName} as the code has not yet been implemented");
+            var webjobName = command.BeforeFirst(":");
+            if (string.IsNullOrWhiteSpace(webjobName)) throw new ArgumentNullException(nameof(command), "Missing webjobName");
+
+            var filePath = command.AfterFirst(":");
+            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(command), "Missing filePath");
 
             //Mark the file as updating
-            await SetFileUpdatedAsync(filePath);
+            await SetFileUpdatingAsync(filePath);
 
             //trigger the update webjob
-            await _adminService.ExecuteWebjobQueue.AddMessageAsync(
-                new QueueWrapper($"command=UpdateFile&filePath={filePath}&action={action}"));
+            await _adminService.ExecuteWebjobQueue.AddMessageAsync(new QueueWrapper($"command={webjobName}"));
         }
 
         /// <summary>
@@ -52,12 +53,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         ///     Marks a file as triggered for an update
         /// </summary>
         /// <param name="filePath"></param>
-        private async Task SetFileUpdatedAsync(string filePath)
+        private async Task SetFileUpdatingAsync(string filePath)
         {
             filePath = filePath.ToLower();
             if (await SharedBusinessLogic.FileRepository.GetFileExistsAsync(filePath))
-                Session[$"FileUpdate:{filePath}"] =
-                    await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(filePath);
+                Session[$"FileUpdate:{filePath}"] = await SharedBusinessLogic.FileRepository.GetLastWriteTimeAsync(filePath);
             else
                 Session[$"FileUpdate:{filePath}"] = VirtualDateTime.Now;
         }

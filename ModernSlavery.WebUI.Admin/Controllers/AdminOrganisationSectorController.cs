@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -36,8 +37,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpGet("organisation/{id}/change-public-sector-classification")]
-        public IActionResult ChangePublicSectorClassificationGet(long id)
+        public async Task<IActionResult> ChangePublicSectorClassificationGet(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             var viewModel = new AdminChangePublicSectorClassificationViewModel
@@ -52,9 +56,12 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpPost("organisation/{id}/change-public-sector-classification")]
-        public IActionResult ChangePublicSectorClassificationPost(long id,
+        public async Task<IActionResult> ChangePublicSectorClassificationPost(long id,
             AdminChangePublicSectorClassificationViewModel viewModel)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
             viewModel.OrganisationId = organisation.OrganisationId;
             viewModel.OrganisationName = organisation.OrganisationName;
@@ -80,24 +87,24 @@ namespace ModernSlavery.WebUI.Admin.Controllers
                 throw new ArgumentException(
                     $"User selected an invalid PublicSectorType ({viewModel.SelectedPublicSectorTypeId})");
 
-            AuditChange(viewModel, organisation, newPublicSectorType);
+            await AuditChangeAsync(viewModel, organisation, newPublicSectorType);
 
             RetireExistingOrganisationPublicSectorTypesForOrganisation(organisation);
 
             AddNewOrganisationPublicSectorType(organisation, viewModel.SelectedPublicSectorTypeId.Value);
 
-            _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync().Wait();
+            await _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
             return RedirectToAction("ViewOrganisation", "AdminViewOrganisation",
                 new {id = organisation.OrganisationId});
         }
 
-        private void AuditChange(
+        private async Task AuditChangeAsync(
             AdminChangePublicSectorClassificationViewModel viewModel,
             Organisation organisation,
             PublicSectorType newPublicSectorType)
         {
-            auditLogger.AuditChangeToOrganisation(
+            await auditLogger.AuditChangeToOrganisationAsync(
                 this,
                 AuditedAction.AdminChangeOrganisationPublicSectorClassification,
                 organisation,

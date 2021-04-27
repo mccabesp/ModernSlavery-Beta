@@ -19,7 +19,7 @@ using ModernSlavery.WebUI.Shared.Interfaces;
 namespace ModernSlavery.WebUI.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = UserRoleNames.Admin)]
+    [Authorize(Roles = UserRoleNames.BasicAdmin)]
     [Route("admin")]
     [NoCache]
     public class AdminOrganisationScopeController : BaseController
@@ -37,8 +37,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         }
 
         [HttpGet("organisation/{id}/scope")]
-        public IActionResult ViewScopeHistory(long id)
+        public async Task<IActionResult> ViewScopeHistory(long id)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
 
             return View("ViewOrganisationScope", organisation);
@@ -46,8 +49,11 @@ namespace ModernSlavery.WebUI.Admin.Controllers
 
         [HttpGet("organisation/{id}/scope/change/{year}")]
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
-        public IActionResult ChangeScopeGet(long id, int year)
+        public async Task<IActionResult> ChangeScopeGet(long id, int year)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
             var currentScopeStatus = organisation.GetActiveScope(year).ScopeStatus;
 
@@ -69,6 +75,9 @@ namespace ModernSlavery.WebUI.Admin.Controllers
         [Authorize(Roles = UserRoleNames.SuperOrDatabaseAdmins)]
         public async Task<IActionResult> ChangeScopePost(long id, int year, AdminChangeScopeViewModel viewModel)
         {
+            var checkResult = await CheckUserRegisteredOkAsync();
+            if (checkResult != null) return checkResult;
+
             var organisation = _adminService.SharedBusinessLogic.DataRepository.Get<Organisation>(id);
             var currentOrganisationScope = organisation.GetActiveScope(year);
 
@@ -121,7 +130,7 @@ namespace ModernSlavery.WebUI.Admin.Controllers
             organisation.LatestScope = newOrganisationScope;
             await _adminService.SharedBusinessLogic.DataRepository.SaveChangesAsync();
 
-            auditLogger.AuditChangeToOrganisation(
+            await auditLogger.AuditChangeToOrganisationAsync(
                 this,
                 AuditedAction.AdminChangeOrganisationScope,
                 organisation,

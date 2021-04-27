@@ -88,7 +88,13 @@
         }
     }
 
+    .govuk-panel {
+        padding-top: 22px;
+        padding-bottom: 22px;
+    }
+
     .link-header {
+        margin-bottom: 5px;
         @include govuk-font($size: 24, $weight: bold);
     }
 
@@ -98,9 +104,12 @@
 
     .link-text--action {
         text-decoration: underline;
-        font-weight: bold;
         color: #fff;
     }
+}
+
+.wordwrap {
+    word-wrap: break-word;
 }
 
 .app-question-list {
@@ -114,6 +123,7 @@
 .app-question-list__header {
     font-weight: bold;
     border-bottom: 1px solid $govuk-border-colour;
+    padding-bottom: govuk-spacing(3);
 
     .app-question-list__column:not(:first-child) {
         display: none;
@@ -130,6 +140,8 @@
 
 .app-question-list__item {
     border-bottom: 1px solid $govuk-border-colour;
+    padding-top: govuk-spacing(3);
+    padding-bottom: govuk-spacing(3);
 
     &:first-child {
         border-top: 1px solid $govuk-border-colour;
@@ -141,12 +153,13 @@
 }
 
 .app-question-list__column {
-    padding-top: govuk-spacing(3);
     padding-right: govuk-spacing(5);
-    padding-bottom: govuk-spacing(3);
+    padding-bottom: govuk-spacing(2);
 
     @include govuk-media-query($from: tablet) {
         display: table-cell;
+        padding-top: govuk-spacing(3);
+        padding-bottom: govuk-spacing(3);
     }
 }
 

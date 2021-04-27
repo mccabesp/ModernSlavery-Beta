@@ -126,52 +126,54 @@ namespace ModernSlavery.Core.Entities
 
             AddressStatuses.Add(addressStatus);
             Status = status;
+            Modified = statusDate.Value;
             StatusDate = statusDate.Value;
             StatusDetails = details;
             return addressStatus;
         }
 
-        public void Trim(int maxChars=100)
+        public void Trim()
         {
             var addresses = GetAddressList();
 
-            if (addresses.Any(a => a.Length > maxChars) && addresses.Count < 6)
+            var breakChars = ",.!;:/\\".ToCharArray();
+            var splitIndex = -1;
+
+            var index = addresses.Count - 1;
+            const int maxChars = 100;
+            while (index >= 0 && addresses.Count < 6 && addresses.Any(address => address.Length > maxChars))
             {
-
-                var breakChars = ",.!;:/\\".ToCharArray();
-                var splitIndex = -1;
-                for (var i = addresses.Count - 1; i >= 0; i--)
+                var address = addresses[index];
+                if (address.Length > maxChars)
                 {
-                    var address = addresses[i];
-                    if (address.Length > maxChars)
+                    var foundIndex = address.LastIndexOfAny(breakChars);
+                    if (foundIndex > -1)
                     {
-                        int foundIndex = address.IndexOfAny(breakChars);
-                        if (foundIndex > -1)
-                        {
-                            var afterPart = address.Substring(foundIndex + 1).TrimNonLettersOrDigits();
-                            var beforePart = address.Substring(0, foundIndex).TrimNonLettersOrDigits();
+                        var afterPart = address.Substring(foundIndex + 1).TrimNonLettersOrDigits();
+                        var beforePart = address.Substring(0, foundIndex).TrimNonLettersOrDigits();
 
-                            addresses.Insert(i + 1, afterPart);
-                            addresses[i] = beforePart;
-                            splitIndex = i;
-                            i++;
-                        }
+                        addresses.Insert(index + 1, afterPart);
+                        addresses[index] = beforePart;
+                        splitIndex = index;
+                        index++;
                     }
-                    if (!addresses.Any(a => a.Length > maxChars) || addresses.Count >= 6) break;
                 }
 
-                if (splitIndex > -1)
-                {
-                    if (splitIndex < 1 && addresses.Count > 0) Address1 = addresses[0];
-                    if (splitIndex < 2 && addresses.Count > 1) Address2 = addresses[1];
-                    if (splitIndex < 3 && addresses.Count > 2) Address3 = addresses[2];
-                    if (splitIndex < 4 && addresses.Count > 3) TownCity = addresses[3];
-                    if (splitIndex < 5 && addresses.Count > 4) County = addresses[4];
-                    if (splitIndex < 6 && addresses.Count > 5) Country = addresses[5];
-                }
+                index--;
             }
 
-            Address1 = Address1?.TrimNonLettersOrDigits().Left(maxChars);
+            if (splitIndex > -1)
+            {
+
+                if (splitIndex < 1) Address1 = addresses.Count > 0 ? addresses[0] : null;
+                if (splitIndex < 2) Address2 = addresses.Count > 1 ? addresses[1] : null;
+                if (splitIndex < 3) Address3 = addresses.Count > 2 ? addresses[2] : null;
+                if (splitIndex < 4) TownCity = addresses.Count > 3 ? addresses[3] : null;
+                if (splitIndex < 5) County = addresses.Count > 4 ? addresses[4] : null;
+                if (splitIndex < 6) Country = addresses.Count > 5 ? addresses[5] : null;
+            }
+
+            Address1 = Address1?.TrimNonLettersOrDigits().Left(maxChars * 2);
             Address2 = Address2?.TrimNonLettersOrDigits().Left(maxChars);
             Address3 = Address3?.TrimNonLettersOrDigits().Left(maxChars);
             TownCity = TownCity?.TrimNonLettersOrDigits().Left(maxChars);

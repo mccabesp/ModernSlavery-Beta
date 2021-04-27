@@ -169,9 +169,8 @@ namespace ModernSlavery.Core.Entities
 
         public OrganisationAddress GetLatestAddress(AddressStatuses status = AddressStatuses.Active)
         {
-            return OrganisationAddresses.OrderByDescending(a => a.Created).SingleOrDefault(a => a.Status == AddressStatuses.Active);
+            return OrganisationAddresses.OrderByDescending(a => a.Created).SingleOrDefault(a => a.Status == status);
         }
-
         public void FixLatestAddress(OrganisationAddress newAddress = null)
         {
             if (newAddress != null && newAddress.Status != AddressStatuses.Active) throw new ArgumentException($"Cannot set latest address with status={newAddress.Status}");
@@ -434,6 +433,7 @@ namespace ModernSlavery.Core.Entities
 
             Status = status;
             StatusDetails = details;
+            Modified = StatusDate;
             return organisationStatus;
         }
 

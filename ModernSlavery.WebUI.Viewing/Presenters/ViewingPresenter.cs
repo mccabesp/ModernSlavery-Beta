@@ -27,7 +27,6 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(long organisationId, int reportingDeadlineYear);
         Task<Outcome<StatementErrors, List<StatementSummaryViewModel>>> GetStatementSummaryGroupViewModel(long organisationId, int reportingDeadlineYear);
         Task<Outcome<StatementErrors, string>> GetLinkRedirectUrl(long organisationId, int reportingDeadlineYear);
-        Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(long organisationId, int reportingDeadlineYear);
 
         /// <summary>
         /// Checks if a statement has changed since the last modified date and returns Http 304 (Not Modified)
@@ -132,22 +131,6 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             return null;
         }
 
-        public async Task<Outcome<StatementErrors, StatementViewModel>> GetStatementViewModelAsync(long organisationId, int reportingDeadlineYear)
-        {
-            var openOutcome = await _statementBusinessLogic.GetLatestSubmittedStatementModelAsync(organisationId, reportingDeadlineYear);
-            if (openOutcome.Fail) return new Outcome<StatementErrors, StatementViewModel>(openOutcome.Errors);
-
-            if (openOutcome.Result == null) throw new ArgumentNullException(nameof(openOutcome.Result));
-            var statementModel = openOutcome.Result;
-
-            //Copy the statement properties to the view model
-            var viewModel = ActivatorUtilities.CreateInstance<StatementViewModel>(_serviceProvider);
-            var statementViewModel = _mapper.Map(statementModel, viewModel);
-
-            //Return the view model
-            return new Outcome<StatementErrors, StatementViewModel>(statementViewModel);
-        }
-
         public async Task<Outcome<StatementErrors, StatementSummaryViewModel>> GetStatementSummaryViewModel(long organisationId, int reportingDeadlineYear)
         {
             var organisationSearchModel = await _searchBusinessLogic.GetOrganisationAsync(organisationId, reportingDeadlineYear);
@@ -163,7 +146,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
         {
             var groups = await _searchBusinessLogic.ListGroupOrganisationsAsync(organisationId, reportingDeadlineYear);
 
-            if (!groups.Any())
+            if (groups==null || !groups.Any())
                 return new Outcome<StatementErrors, List<StatementSummaryViewModel>>(StatementErrors.NotFound, $"Cannot find statement summary for Organisation:{organisationId} due for reporting deadline year {reportingDeadlineYear}");
 
             var vm = _mapper.Map<List<StatementSummaryViewModel>>(groups);
@@ -177,7 +160,7 @@ namespace ModernSlavery.WebUI.Viewing.Presenters
             if (organisationSearchModel == null)
                 return new Outcome<StatementErrors, string>(StatementErrors.NotFound, $"Cannot find statement summary for Organisation:{organisationId} due for reporting deadline year {reportingDeadlineYear}");
 
-            var isWorking = _testOptions.LoadTesting || await _urlChecker.IsUrlWorking(organisationSearchModel.StatementUrl);
+            var isWorking = _testOptions.LoadTesting || await _urlChecker.IsUrlWorkingAsync(organisationSearchModel.StatementUrl);
 
             if (isWorking)
                 return new Outcome<StatementErrors, string>(organisationSearchModel.StatementUrl);
